@@ -2132,3 +2132,14 @@
   2. home lower section artifact 경로 정리
   3. service/plp pc/mo screenshot 경로 정리
   4. 현재 recorded acceptance 상태와 함께 검수 진입점 고정
+
+### 2026-04-12 023
+
+- acceptance CLI 추가
+- 추가:
+  1. `scripts/manage_acceptance.mjs`
+  2. `npm run acceptance:list`
+  3. `npm run acceptance:set`
+- 검증:
+  1. `testuser1` 기준 bundle 목록 조회
+  2. `home-lower-primary -> pending` note 갱신 경로 확인

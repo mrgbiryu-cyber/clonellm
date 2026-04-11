@@ -37,7 +37,9 @@
     "check:git-upload": "bash scripts/check_git_upload_prep.sh",
     "report:acceptance": "node scripts/report_acceptance_status.mjs --write docs/acceptance-current-state.md",
     "check:care-header": "node scripts/check_care_solutions_header.mjs",
-    "report:acceptance-pack": "node scripts/build_acceptance_review_pack.mjs"
+    "report:acceptance-pack": "node scripts/build_acceptance_review_pack.mjs",
+    "acceptance:list": "node scripts/manage_acceptance.mjs list",
+    "acceptance:set": "node scripts/manage_acceptance.mjs set"
   },
   "keywords": [],
   "author": "",

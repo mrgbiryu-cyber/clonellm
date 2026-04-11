@@ -6311,3 +6311,26 @@ acceptance API는 인증이 필요한 반면, 운영자는 현재 실제 기록 
 
 - 남은 acceptance는 이제 문서 한 장으로 바로 따라갈 수 있다.
 - 다음 단계는 실제 `pass/fail/pending` 기록을 채우는 운영이다.
+
+### 22.85 Acceptance CLI Added
+
+acceptance는 `/admin`에서만 기록할 수 있어도 되지만, 로컬 작업 흐름에서는 빠르게 현재 상태를 보거나 note를 갱신할 수 있는 CLI가 있으면 운영이 단순해진다.
+
+추가:
+
+1. `scripts/manage_acceptance.mjs`
+2. `package.json`
+   - `npm run acceptance:list`
+   - `npm run acceptance:set`
+
+검증:
+
+1. `testuser1` 기준 bundle 목록 조회 성공
+2. `home-lower-primary`
+   - `status=pending`
+   - `note=recheck pending`
+   갱신 경로 확인
+
+의미:
+
+- acceptance 운영이 이제 UI와 CLI 두 경로로 닫혔다.
