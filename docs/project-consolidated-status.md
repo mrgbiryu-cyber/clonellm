@@ -6363,3 +6363,34 @@ acceptance는 `/admin`에서만 기록할 수 있어도 되지만, 로컬 작업
 
 - 다음 acceptance 우선순위는 `home-lower-primary`와 `PLP pc`가 맞다.
 - `support/bestshop/care-solutions`는 상대적으로 뒤로 미뤄도 된다.
+
+### 22.87 Home Lower Capture Normalization Applied
+
+기존 home lower mismatch 비율은 일부 섹션에서 실제 시각 차이보다 크게 잡혀 있었다. 원인은 live reference는 mobile section clip인데 clone 쪽은 wider shell 안의 section rect를 그대로 잡고 있었기 때문이다.
+
+수정:
+
+1. `scripts/capture_home_lower_sections.mjs`
+2. clone URL을 `viewportProfile=mo + homeSandbox=<slot>` 기준으로 통일
+3. clone capture 전 section을 `#__codex_capture_target`로 분리하고 `430px` 폭으로 강제
+
+정규화 후 핵심 결과:
+
+1. home lower 실제 hotspot
+   - `smart-life 11.64%`
+   - `subscription 7.71%`
+   - `summary-banner-2 7.32%`
+   - `space-renewal 6.44%`
+2. 이전 과장치 해소
+   - `brand-showroom 32.72% -> 2.20%`
+   - `latest-product-news 16.36% -> 1.38%`
+   - `space-renewal 18.68% -> 6.44%`
+3. PLP 우선순위는 그대로 유지
+   - `category-tvs:pc 30.41%`
+   - `category-refrigerators:pc 21.77%`
+
+의미:
+
+- home lower acceptance 우선순위는 여전히 중요하지만, 실제 수정 대상은 `smart-life / subscription / summary-banner-2` 쪽으로 좁혀졌다.
+- `brand-showroom / latest-product-news`는 capture artifact 비중이 컸고 현재는 상대적으로 안정적이다.
+- 다음 구현 우선순위는 `home-lower-primary`의 남은 hotspot과 `PLP pc` 보정이다.

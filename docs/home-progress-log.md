@@ -2158,3 +2158,26 @@
      - `latest-product-news 16.36%`
   2. service page diff는 매우 낮음
   3. PLP는 `pc` 쪽 우선 검수 필요
+
+### 2026-04-12 025
+
+- home lower compare 캡처를 `mobile section isolate` 기준으로 정규화
+- 변경:
+  1. `scripts/capture_home_lower_sections.mjs`
+  2. clone capture를 `viewportProfile=mo + homeSandbox=<slot>` 기준으로 통일
+  3. clone section을 `#__codex_capture_target`로 분리해 `430px` 폭으로 캡처
+- 의미:
+  1. 이전 home lower diff는 desktop shell 폭이 섞여 과장된 값이 있었다
+  2. 이제 live mobile section과 clone mobile section을 같은 폭 기준으로 비교한다
+- 정규화 후 핵심 결과:
+  1. 개선:
+     - `brand-showroom 32.72% -> 2.20%`
+     - `latest-product-news 16.36% -> 1.38%`
+     - `space-renewal 18.68% -> 6.44%`
+  2. 실제 home lower hotspot:
+     - `smart-life 11.64%`
+     - `subscription 7.71%`
+     - `summary-banner-2 7.32%`
+  3. PLP 우선순위는 유지:
+     - `category-tvs:pc 30.41%`
+     - `category-refrigerators:pc 21.77%`

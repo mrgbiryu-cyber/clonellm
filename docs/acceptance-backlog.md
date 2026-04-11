@@ -91,24 +91,26 @@
 1. `home-lower-primary`
    - 이유: 홈 하단 핵심 섹션 묶음이며 진행 기록도 `pending`
    - diff hotspot:
-     - `brand-showroom 32.72%`
-     - `space-renewal 18.68%`
-     - `latest-product-news 16.36%`
-2. `home-lower-secondary`
-   - 이유: 홈 하단 마무리 묶음
+     - `smart-life 11.64%`
+     - `subscription 7.71%`
+     - `space-renewal 6.44%`
+2. `category-tvs-pcmo`
+   - 이유: `pc 30.41%`로 현재 PLP 중 가장 큰 차이
+3. `category-refrigerators-pcmo`
+   - 이유: `pc 21.77%`로 다음 우선순위
+4. `home-lower-secondary`
+   - 이유: 홈 하단 마무리 묶음이며 `summary-banner-2`와 하단 가이드 계열 차이가 남아 있음
    - diff hotspot:
-     - `missed-benefits 12.18%`
-3. `care-solutions-pcmo`
+     - `summary-banner-2 7.32%`
+     - `bestshop-guide 5.46%`
+     - `lg-best-care 4.92%`
+5. `home-core`
+   - 이유: 전체 home 기준 `11.89%`
+6. `care-solutions-pcmo`
    - 이유: 기존 advisory 대상이었으나 현재 auto check 기준 거의 해소
    - diff:
      - `pc 0.07%`
      - `mo 0.08%`
-4. `category-tvs-pcmo`
-   - 이유: `pc 30.41%`로 현재 PLP 중 가장 큰 차이
-5. `category-refrigerators-pcmo`
-   - 이유: `pc 21.77%`로 다음 우선순위
-6. `home-core`
-   - 이유: 전체 home 기준 `11.89%`
 7. `support-pcmo`
    - diff:
      - `pc 0.01%`
