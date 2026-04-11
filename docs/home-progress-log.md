@@ -2143,3 +2143,18 @@
 - 검증:
   1. `testuser1` 기준 bundle 목록 조회
   2. `home-lower-primary -> pending` note 갱신 경로 확인
+
+### 2026-04-12 024
+
+- acceptance diff report 추가
+- 추가:
+  1. `scripts/build_acceptance_diff_report.mjs`
+  2. `npm run report:acceptance-diff`
+  3. `docs/acceptance-diff-report.md`
+- 핵심 결과:
+  1. home lower hotspot
+     - `brand-showroom 32.72%`
+     - `space-renewal 18.68%`
+     - `latest-product-news 16.36%`
+  2. service page diff는 매우 낮음
+  3. PLP는 `pc` 쪽 우선 검수 필요

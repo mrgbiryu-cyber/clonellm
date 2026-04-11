@@ -38,6 +38,7 @@
     "report:acceptance": "node scripts/report_acceptance_status.mjs --write docs/acceptance-current-state.md",
     "check:care-header": "node scripts/check_care_solutions_header.mjs",
     "report:acceptance-pack": "node scripts/build_acceptance_review_pack.mjs",
+    "report:acceptance-diff": "node scripts/build_acceptance_diff_report.mjs",
     "acceptance:list": "node scripts/manage_acceptance.mjs list",
     "acceptance:set": "node scripts/manage_acceptance.mjs set"
   },
@@ -45,6 +46,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "playwright": "^1.59.1"
+    "pixelmatch": "^7.1.0",
+    "playwright": "^1.59.1",
+    "pngjs": "^7.0.0",
+    "sharp": "^0.34.5"
   }
 }

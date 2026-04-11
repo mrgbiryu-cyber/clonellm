@@ -6334,3 +6334,32 @@ acceptance는 `/admin`에서만 기록할 수 있어도 되지만, 로컬 작업
 의미:
 
 - acceptance 운영이 이제 UI와 CLI 두 경로로 닫혔다.
+
+### 22.86 Acceptance Diff Report Added
+
+남은 acceptance에서 무엇부터 봐야 하는지를 감으로 정하면 비효율적이다. 기존 visual artifact를 재사용해 screenshot diff 비율을 계산하면 검수 우선순위를 더 빠르게 고정할 수 있다.
+
+추가:
+
+1. `scripts/build_acceptance_diff_report.mjs`
+2. `package.json`
+   - `npm run report:acceptance-diff`
+3. output
+   - `docs/acceptance-diff-report.md`
+
+핵심 결과:
+
+1. home lower hotspot
+   - `brand-showroom 32.72%`
+   - `space-renewal 18.68%`
+   - `latest-product-news 16.36%`
+2. service pages
+   - 전반적으로 `0.01% ~ 0.08%`
+3. PLP
+   - `category-tvs:pc 30.41%`
+   - `category-refrigerators:pc 21.77%`
+
+의미:
+
+- 다음 acceptance 우선순위는 `home-lower-primary`와 `PLP pc`가 맞다.
+- `support/bestshop/care-solutions`는 상대적으로 뒤로 미뤄도 된다.

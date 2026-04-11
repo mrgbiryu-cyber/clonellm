@@ -90,16 +90,33 @@
 
 1. `home-lower-primary`
    - 이유: 홈 하단 핵심 섹션 묶음이며 진행 기록도 `pending`
+   - diff hotspot:
+     - `brand-showroom 32.72%`
+     - `space-renewal 18.68%`
+     - `latest-product-news 16.36%`
 2. `home-lower-secondary`
    - 이유: 홈 하단 마무리 묶음
+   - diff hotspot:
+     - `missed-benefits 12.18%`
 3. `care-solutions-pcmo`
-   - 이유: `Duplicate GNB under header` advisory
-4. `home-core`
-   - 이유: 이미 `pass` 기록은 있으나 home shell 전체 기준으로 최종 재확인 가치가 큼
-5. `support-pcmo`
-6. `bestshop-pcmo`
-7. `category-tvs-pcmo`
-8. `category-refrigerators-pcmo`
+   - 이유: 기존 advisory 대상이었으나 현재 auto check 기준 거의 해소
+   - diff:
+     - `pc 0.07%`
+     - `mo 0.08%`
+4. `category-tvs-pcmo`
+   - 이유: `pc 30.41%`로 현재 PLP 중 가장 큰 차이
+5. `category-refrigerators-pcmo`
+   - 이유: `pc 21.77%`로 다음 우선순위
+6. `home-core`
+   - 이유: 전체 home 기준 `11.89%`
+7. `support-pcmo`
+   - diff:
+     - `pc 0.01%`
+     - `mo 0.02%`
+8. `bestshop-pcmo`
+   - diff:
+     - `pc 0.01%`
+     - `mo 0.04%`
 
 ## Review Focus
 
@@ -129,6 +146,7 @@
 
 1. `banner/filter/sort/productGrid` 정렬
 2. shared PDP route는 known advisory이므로 acceptance note와 별개로 운영상 인지
+3. 현재 diff 기준으로는 `pc`가 `mo`보다 우선 검수 대상
 
 ## Acceptance Rule
 
