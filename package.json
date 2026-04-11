@@ -34,7 +34,8 @@
     "verify:home-links": "node scripts/verify_home_link_coverage.mjs",
     "capture:states": "node scripts/capture_states.mjs",
     "dev:web": "node server.js",
-    "check:git-upload": "bash scripts/check_git_upload_prep.sh"
+    "check:git-upload": "bash scripts/check_git_upload_prep.sh",
+    "report:acceptance": "node scripts/report_acceptance_status.mjs --write docs/acceptance-current-state.md"
   },
   "keywords": [],
   "author": "",

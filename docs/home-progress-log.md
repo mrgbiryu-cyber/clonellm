@@ -2093,3 +2093,17 @@
   2. 8개 bundle 정의
   3. recommended review order
   4. bundle별 review focus
+
+### 2026-04-12 020
+
+- acceptance current state 리포트 스크립트 추가
+- 추가:
+  1. `scripts/report_acceptance_status.mjs`
+  2. `npm run report:acceptance`
+  3. `docs/acceptance-current-state.md`
+- 현재 결과:
+  1. workspace `testuser1`
+  2. `pass=1`
+  3. `pending=1`
+  4. `unreviewed=6`
+  5. next actionable bundle = `home-lower-primary`
