@@ -1,0 +1,78 @@
+{
+  "siteId": "lge-co-kr",
+  "pages": [
+    {
+      "id": "home",
+      "title": "LGE.COM | LG전자",
+      "pageGroup": "home",
+      "sections": [
+        {
+          "id": "home-section-1",
+          "name": "Header",
+          "componentType": "global-header",
+          "visible": true,
+          "order": 1,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          }
+        },
+        {
+          "id": "home-section-2",
+          "name": "Hero Banner",
+          "componentType": "hero-banner",
+          "visible": true,
+          "order": 2,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          }
+        },
+        {
+          "id": "home-section-3",
+          "name": "Promotion Carousel",
+          "componentType": "promo-carousel",
+          "visible": true,
+          "order": 3,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          }
+        },
+        {
+          "id": "home-section-4",
+          "name": "Featured Products",
+          "componentType": "product-card-grid",
+          "visible": true,
+          "order": 4,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          }
+        },
+        {
+          "id": "home-section-5",
+          "name": "CTA Banner",
+          "componentType": "cta-banner",
+          "visible": true,
+          "order": 5,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          }
+        },
+        {
+          "id": "home-section-6",
+          "name": "Footer",
+          "componentType": "global-footer",
+          "visible": true,
+          "order": 6,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          }
+        }
+      ]
+    }
+  ]
+}

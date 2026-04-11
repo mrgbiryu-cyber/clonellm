@@ -1,0 +1,3369 @@
+{
+  "pageId": "home",
+  "source": "reference",
+  "mode": "hybrid",
+  "url": "https://www.lge.co.kr/m/home",
+  "visualUrl": "https://www.lge.co.kr/m/home",
+  "structuralUrl": "https://www.lge.co.kr/home",
+  "viewport": {
+    "width": 1460,
+    "height": null
+  },
+  "zones": [
+    {
+      "zoneId": "header-zone",
+      "mode": "desktop-like",
+      "sourceUrl": "https://www.lge.co.kr/home",
+      "slotIds": [
+        "header-top",
+        "header-bottom"
+      ]
+    },
+    {
+      "zoneId": "hero-zone",
+      "mode": "desktop-like",
+      "sourceUrl": "https://www.lge.co.kr/home",
+      "slotIds": [
+        "hero"
+      ]
+    },
+    {
+      "zoneId": "content-zone",
+      "mode": "mobile-like",
+      "sourceUrl": "https://www.lge.co.kr/m/home",
+      "slotIds": [
+        "quickmenu"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "slotId": "header-top",
+      "kind": "header",
+      "structure": "two-tier-header",
+      "containerMode": "full",
+      "layout": {
+        "tier": 1,
+        "containerRule": "full-bleed",
+        "rowCountDesktop": 1,
+        "align": "baseline",
+        "density": "compact"
+      },
+      "logoHref": "/home",
+      "utilityItems": [
+        {
+          "kind": "search"
+        },
+        {
+          "kind": "mp"
+        },
+        {
+          "kind": "cart"
+        }
+      ],
+      "utilityLinks": [
+        {
+          "label": "회사소개",
+          "href": "/company/main"
+        },
+        {
+          "label": "사업자몰",
+          "href": "/business"
+        }
+      ]
+    },
+    {
+      "slotId": "header-bottom",
+      "kind": "header",
+      "containerMode": "full",
+      "layout": {
+        "tier": 2,
+        "containerRule": "full-bleed",
+        "rowCountDesktop": 1,
+        "align": "center",
+        "density": "compact",
+        "containsBrandTabs": true,
+        "containsHomeStyle": true
+      },
+      "mainMenus": [
+        "제품/소모품",
+        "가전 구독",
+        "고객지원",
+        "혜택/이벤트",
+        "스토리",
+        "베스트샵",
+        "LG AI"
+      ],
+      "brandTabs": [
+        "LG SIGNATURE",
+        "LG Objet Collection",
+        "LG ThinQ",
+        "Let's gram"
+      ],
+      "hasNavArrow": true
+    },
+    {
+      "slotId": "hero",
+      "kind": "hero",
+      "containerMode": "full",
+      "layout": {
+        "containerRule": "full-bleed",
+        "rowCountDesktop": 1,
+        "contentMode": "split-copy-visual",
+        "horizontalPadding": 0,
+        "slideCount": 15
+      },
+      "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/Home_Hero_PC_1760x500_20260331_153421.png",
+      "headline": "",
+      "description": "",
+      "badge": "",
+      "slides": [
+        {
+          "href": "/benefits/exhibitions/detail-PE00895007",
+          "badge": "",
+          "headline": "",
+          "description": "",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/Home_Hero_PC_1760x500_20260331_153421.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00895007?tab=homestyle-brand",
+          "badge": "",
+          "headline": "All New 세일 홈스타일 특가 최대 82% 할인",
+          "description": "시몬스, 한샘 등 인기 브랜드 모음",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/03r_20260331_153016.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00892015",
+          "badge": "",
+          "headline": "공기청정기 대규모 할인 大청정 세일 시작!",
+          "description": "특가에 쿠폰 더한 지금이 기회",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/04r_20260306_173744.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00721001",
+          "badge": "",
+          "headline": "처음이라 더 특별한 구독",
+          "description": "첫 구독 시 멤버십 10만P 전원증정",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/가전구독r_20260130_175316.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00898013",
+          "badge": "",
+          "headline": "2026 휘센 미리구매 페스티벌",
+          "description": "지금이 AI 업그레이드 타이밍",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/04r_20260113_151034.png"
+        },
+        {
+          "href": "/benefits/event/detail-EV00009031?tab=sns-event",
+          "badge": "",
+          "headline": "LGE.COM 인스타그램 오픈 소식 알리기",
+          "description": "네이버페이 포인트 당첨의 기회",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/07r_20260320_163707.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00894004",
+          "badge": "",
+          "headline": "LG 디오스 AI 오브제컬렉션 냉장고 사전 런칭 기획전",
+          "description": "혜택으로 먼저 만나는 AI 신선케어",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/01r_20260402_173215.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00901007",
+          "badge": "",
+          "headline": "역대 가장 빛나는 Micro RGB의 탄생",
+          "description": "혜택으로 만나는 LG TV 신모델",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/01r_20260407_154645.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00892017",
+          "badge": "",
+          "headline": "LG 퓨리케어 바스에어시스템 런칭",
+          "description": "환기 걱정 없는 욕실 관리의 시작",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/01r_20251014_111653.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00892018",
+          "badge": "",
+          "headline": "공간 맞춤 스마트 사운드 LG Sound Suite 런칭",
+          "description": "런칭 기념 10% 할인 쿠폰 증정",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/01r_20260303_142033.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00878001",
+          "badge": "",
+          "headline": "PREMIUM COOKING EDITION",
+          "description": "요리 완성도를 높여줄 쿠킹가전 쿠폰",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/04r_20260309_155028.png"
+        },
+        {
+          "href": "/benefits/exhibitions/detail-PE00892010",
+          "badge": "",
+          "headline": "200만대 돌파 기념 LG 스타일러 스팀 모델 특별전",
+          "description": "봄철 LG 스타일러가 활약할 순간",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/04r_20260331_155333.png"
+        },
+        {
+          "href": "https://bestshop.lge.co.kr/event/couponInfo/EV10992000?inflow=lgekor&amp;utm_medium=banner&amp;utm_source=lgecom&amp;utm_campaign=20260327_EV10992000",
+          "badge": "",
+          "headline": "베스트 79 페스타 쿠폰팩 이벤트",
+          "description": "최대 116만 쿠폰팩 신청하기 >",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/06r_20260407_132957.png"
+        },
+        {
+          "href": "https://bestshop.lge.co.kr/event/wedding-community",
+          "badge": "",
+          "headline": "결혼 정보에 대한 모든 것 D5 웨딩 커뮤니티",
+          "description": "상담 예약하기 >",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/06r_20251217_111246.png"
+        },
+        {
+          "href": "https://bestshop.lge.co.kr/counselReserve/main/MC11722008?inflow=lgekor&amp;utm_medium=banner&amp;utm_source=lgecom&amp;utm_campaign=2026327_MC11722008",
+          "badge": "",
+          "headline": "베스트 79 페스타 SALE",
+          "description": "상담 예약하기 >",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/06r_20260407_132937.png"
+        }
+      ]
+    },
+    {
+      "slotId": "quickmenu",
+      "kind": "quickmenu",
+      "containerMode": "narrow",
+      "layout": {
+        "containerRule": "narrow-after-hero",
+        "rowCountDesktop": 2,
+        "columnCountDesktop": 5,
+        "iconShape": "circle",
+        "density": "compact",
+        "mobileOnly": true
+      },
+      "itemCount": 10,
+      "expectedColumnsDesktop": 5,
+      "expectedRowsDesktop": 2,
+      "items": [
+        {
+          "href": "/benefits/exhibitions/detail-PE00895007",
+          "title": "올뉴세일",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/MO_AllNew_20260330_140436.gif"
+        },
+        {
+          "href": "/benefits",
+          "title": "혜택/이벤트",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/혜택이벤트_20251120_133446.png"
+        },
+        {
+          "href": "/benefits/exhibitions/multiple-products",
+          "title": "다품목 할인",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/다품목할인_20251120_133501.png"
+        },
+        {
+          "href": "/livecommerce",
+          "title": "라이브",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/라이브_20251120_133516.png"
+        },
+        {
+          "href": "/benefits/card-discount/lgeshinhancard",
+          "title": "카드혜택",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/카드혜택_20251120_133531.png"
+        },
+        {
+          "href": "/care-solutions",
+          "title": "가전 구독",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/가전구독_20251023_160616.png"
+        },
+        {
+          "href": "/superCategory?superCategoryId=CT50020000#",
+          "title": "소모품",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/소모품_20251023_160543.png"
+        },
+        {
+          "href": "https://homestyle.lge.co.kr/home",
+          "title": "홈스타일",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/홈스타일_20251119_160123.png"
+        },
+        {
+          "href": "/support",
+          "title": "고객지원",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/고객지원_20251023_160514.png"
+        },
+        {
+          "href": "/business",
+          "title": "사업자몰",
+          "imageSrc": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/BusinessMall_20251023_160349.png"
+        }
+      ]
+    }
+  ],
+  "states": [
+    {
+      "stateId": "gnb-product-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "menuId": "제품/소모품",
+      "tabCount": 16,
+      "panelCount": 16,
+      "tabs": [
+        {
+          "id": "NV00011403",
+          "label": "TV/오디오"
+        },
+        {
+          "id": "NV00011404",
+          "label": "PC/모니터"
+        },
+        {
+          "id": "NV00011405",
+          "label": "주방가전"
+        },
+        {
+          "id": "NV00011406",
+          "label": "생활가전"
+        },
+        {
+          "id": "NV00011407",
+          "label": "에어컨/에어케어"
+        },
+        {
+          "id": "NV00255400",
+          "label": "AI Home"
+        },
+        {
+          "id": "NV00012400",
+          "label": "케어용품/소모품"
+        },
+        {
+          "id": "NV00012544",
+          "label": "LG SIGNATURE"
+        },
+        {
+          "id": "NV00012545",
+          "label": "LG Objet Collection"
+        },
+        {
+          "id": "NV00057400",
+          "label": "LG UP 가전"
+        },
+        {
+          "id": "NV00266406",
+          "label": "주방가전"
+        },
+        {
+          "id": "NV00266427",
+          "label": "에어컨/에어케어"
+        },
+        {
+          "id": "NV00266437",
+          "label": "생활가전"
+        },
+        {
+          "id": "NV00266456",
+          "label": "TV/노트북"
+        },
+        {
+          "id": "NV00139402",
+          "label": "구독 안내/혜택"
+        },
+        {
+          "id": "NV00139401",
+          "label": "구독 관리"
+        }
+      ],
+      "panels": [
+        {
+          "id": "NV00011403",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/tvs",
+                "label": "TV",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/tvs?subCateId=CT50000028",
+                    "label": "올레드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/tvs?subCateId=CT50368000",
+                    "label": "Micro RGB evo"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/tvs?subCateId=CT50041000",
+                    "label": "QNED"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/tvs?subCateId=CT50000029",
+                    "label": "나노셀"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/tvs?subCateId=CT50000030",
+                    "label": "울트라 HD"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/tvs?subCateId=CT50000026",
+                    "label": "일반 LED"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/tvs?subCateId=CT50029007",
+                    "label": "라이프스타일 스크린"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/tvs?subCateId=CT50220000",
+                    "label": "TV 세트"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/stan-by-me",
+                "label": "스탠바이미",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/projectors",
+                "label": "프로젝터",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/projectors?subCateId=CT50000033",
+                    "label": "시네빔"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/projectors?subCateId=CT50256007",
+                    "label": "시네빔 세트"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/projectors?subCateId=CT50308000",
+                    "label": "시네빔 액세서리"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/projectors?subCateId=CT50348000",
+                    "label": "무드메이트"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/projectors?subCateId=CT50077001",
+                    "label": "프로빔(상업용)"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/home-audio",
+                "label": "오디오",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/home-audio?subCateId=CT50367000",
+                    "label": "사운드스위트"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-audio?subCateId=CT50366002",
+                    "label": "사운드스위트 세트"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-audio?subCateId=CT50000044",
+                    "label": "블루투스 이어폰"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-audio?subCateId=CT50000040",
+                    "label": "무선 스피커"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-audio?subCateId=CT50000041",
+                    "label": "사운드바"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-audio?subCateId=CT50000037",
+                    "label": "오디오/플레이어"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/displays",
+                "label": "사이니지",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/displays?subCateId=CT50077003",
+                    "label": "LED"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/displays?subCateId=CT50220002",
+                    "label": "단독형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/displays?subCateId=CT50220001",
+                    "label": "전자칠판"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/displays?subCateId=CT50208000",
+                    "label": "키오스크"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/displays?subCateId=CT50281001",
+                    "label": "고휘도/스트레치"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/displays?subCateId=CT50077005",
+                    "label": "올레드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/displays?subCateId=CT50220003",
+                    "label": "비디오월"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00011404",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/notebook",
+                "label": "노트북",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/notebook?subCateId=CT50304000",
+                    "label": "그램 Pro"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/notebook?subCateId=CT50304001",
+                    "label": "그램 Pro 360"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/notebook?subCateId=CT50000050",
+                    "label": "그램"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/notebook?subCateId=CT50000047",
+                    "label": "그램북"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/notebook?subCateId=CT50235000",
+                    "label": "노트북 세트"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/trend/intel-core-ultra",
+                    "label": "Intel Core Ultra"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/tech-inside/copilotpluspc",
+                    "label": "Copilot+ PC"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/all-in-one-pc-and-desktop",
+                "label": "일체형/데스크톱/태블릿",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/all-in-one-pc-and-desktop?subCateId=CT50022002",
+                    "label": "일체형 PC"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/all-in-one-pc-and-desktop?subCateId=CT50022003",
+                    "label": "데스크톱"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/all-in-one-pc-and-desktop?subCateId=CT50304002",
+                    "label": "태블릿 기타"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/monitors",
+                "label": "모니터",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/monitors?subCateId=CT50347000",
+                    "label": "올레드 게이밍"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/monitors?subCateId=CT50000059",
+                    "label": "게이밍모니터"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/monitors?subCateId=CT50169000",
+                    "label": "스마트모니터"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/monitors?subCateId=CT50319000",
+                    "label": "스마트모니터 스윙"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/monitors?subCateId=CT50340006",
+                    "label": "울트라파인 evo"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/monitors?subCateId=CT50000056",
+                    "label": "UHD모니터"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/monitors?subCateId=CT50000060",
+                    "label": "와이드모니터"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/monitors?subCateId=CT50000057",
+                    "label": "PC모니터"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00011405",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/refrigerators",
+                "label": "냉장고",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/refrigerators?subCateId=CT50000070",
+                    "label": "STEM"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/refrigerators?subCateId=CT50000069",
+                    "label": "상냉장/하냉동"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/refrigerators?subCateId=CT50000066",
+                    "label": "양문형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/refrigerators?subCateId=CT50000067",
+                    "label": "일반형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/refrigerators?subCateId=CT50220004",
+                    "label": "페어설치키트"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/refrigerators?subCateId=CT50210011",
+                    "label": "냉장고 세트"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/convertible-refrigerators",
+                "label": "컨버터블 패키지",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/convertible-refrigerators?subCateId=CT50220005",
+                    "label": "냉장전용고"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/convertible-refrigerators?subCateId=CT50220006",
+                    "label": "냉동전용고"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/convertible-refrigerators?subCateId=CT50220007",
+                    "label": "김치냉장고"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/convertible-refrigerators?subCateId=CT50220008",
+                    "label": "페어설치키트"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/convertible-refrigerators?subCateId=CT50233000",
+                    "label": "컨버터블 패키지 세트"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/kimchi-refrigerators",
+                "label": "김치냉장고",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/category/fit-max-studio?step=FRIDGE&amp;categoryNo=2601000816",
+                    "label": "컨버터블 조합하여 구매하기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/kimchi-refrigerators?subCateId=CT50000073",
+                    "label": "스탠드형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/kimchi-refrigerators?subCateId=CT50000074",
+                    "label": "뚜껑형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/kimchi-refrigerators?subCateId=CT50220009",
+                    "label": "페어설치키트"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/kimchi-refrigerators?subCateId=CT50210012",
+                    "label": "김치냉장고 세트"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/winecellar",
+                "label": "와인셀러",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/electric-ranges",
+                "label": "전기레인지",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/electric-ranges?subCateId=CT50000077",
+                    "label": "인덕션"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/electric-ranges?subCateId=CT50000078",
+                    "label": "하이브리드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/electric-ranges?subCateId=CT50210015",
+                    "label": "전기레인지 세트"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/dishwashers",
+                "label": "식기세척기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/dishwashers?subCateId=CT50220010",
+                    "label": "14인용"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/dishwashers?subCateId=CT50220011",
+                    "label": "12인용"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/dishwashers?subCateId=CT50210014",
+                    "label": "식기세척기 세트"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/microwaves-and-ovens",
+                "label": "광파오븐/전자레인지",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/microwaves-and-ovens?subCateId=CT50022012",
+                    "label": "광파오븐"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/microwaves-and-ovens?subCateId=CT50022013",
+                    "label": "전자레인지"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/water-purifiers",
+                "label": "정수기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/water-purifiers?subCateId=CT50250004",
+                    "label": "얼음정수기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/water-purifiers?subCateId=CT50000095",
+                    "label": "냉온정수기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/water-purifiers?subCateId=CT50000096",
+                    "label": "냉정수기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/water-purifiers?subCateId=CT50000097",
+                    "label": "정수전용"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/water-purifiers?subCateId=CT50250005",
+                    "label": "온정수기"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00011406",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/wash-tower",
+                "label": "워시타워",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/wash-tower?subCateId=CT50210002",
+                    "label": "워시타워"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/wash-tower?subCateId=CT50210004",
+                    "label": "워시타워 세트"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/wash-combo",
+                "label": "워시콤보",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/wash-combo?subCateId=CT50251000",
+                    "label": "워시콤보"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/wash-combo?subCateId=CT50261000",
+                    "label": "워시콤보 세트"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/washing-machines",
+                "label": "세탁기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/washing-machines?subCateId=CT50000102",
+                    "label": "드럼세탁기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/washing-machines?subCateId=CT50000103",
+                    "label": "통돌이"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/washing-machines?subCateId=CT50000104",
+                    "label": "미니세탁기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/washing-machines?subCateId=CT50210001",
+                    "label": "세탁기+건조기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/dryers",
+                "label": "의류건조기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/dryers?subCateId=CT50210005",
+                    "label": "건조기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/dryers?subCateId=CT50210006",
+                    "label": "건조기 세트"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/lg-styler",
+                "label": "의류관리기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/lg-styler?subCateId=CT50173000",
+                    "label": "스타일러"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/system-ironing",
+                "label": "시스템아이어닝",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/shoe-care",
+                "label": "신발관리기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/shoe-care?subCateId=CT50217000",
+                    "label": "슈케이스"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/shoe-care?subCateId=CT50217001",
+                    "label": "슈케어"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/massage-chairs",
+                "label": "안마의자",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/massage-chairs?subCateId=CT50220014",
+                    "label": "전신형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/massage-chairs?subCateId=CT50220015",
+                    "label": "가구형"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/vacuum-cleaners",
+                "label": "청소기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/vacuum-cleaners?subCateId=CT50000115",
+                    "label": "무선청소기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/vacuum-cleaners?subCateId=CT50000119",
+                    "label": "로봇청소기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/vacuum-cleaners?subCateId=CT50000120",
+                    "label": "유선청소기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/vacuum-cleaners?subCateId=CT50123000",
+                    "label": "상업용 청소기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/vacuum-cleaners?subCateId=CT50000112",
+                    "label": "액세사리"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00011407",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/air-conditioners",
+                "label": "에어컨",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/air-conditioners?subCateId=CT50000133",
+                    "label": "2in1"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/air-conditioners?subCateId=CT50000134",
+                    "label": "스탠드형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/air-conditioners?subCateId=CT50000135",
+                    "label": "벽걸이형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/air-conditioners?subCateId=CT50114000",
+                    "label": "창호형/이동식"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/system-air-conditioners",
+                "label": "시스템 에어컨",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/system-air-conditioners?subCateId=CT50045000",
+                    "label": "주거용 시스템 에어컨"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/system-air-conditioners?subCateId=CT50045002",
+                    "label": "상업용 시스템 에어컨"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/system-air-conditioners?subCateId=CT50045001",
+                    "label": "상업용 스탠드 에어컨"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/air-purifier",
+                "label": "공기청정기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/air-purifier?subCateId=CT50000144",
+                    "label": "360˚ 공기청정기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/air-purifier?subCateId=CT50218000",
+                    "label": "에어로시리즈"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/air-purifier?subCateId=CT50338000",
+                    "label": "스탠드 공기청정기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/dehumidifiers",
+                "label": "제습기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/humidifiers",
+                "label": "가습기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/humidifiers?subCateId=CT50222000",
+                    "label": "정수 가습기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/humidifiers?subCateId=CT50222001",
+                    "label": "자연기화 가습기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/ventilation-system",
+                "label": "환기 시스템",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/bath-air-system",
+                "label": "바스에어시스템",
+                "children": []
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00255400",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/aihome",
+                "label": "AI Home",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/home-iot-product",
+                "label": "AI Home 제품",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/home-iot-product?subCateId=CT50268013",
+                    "label": "허브"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-iot-product?subCateId=CT50275000",
+                    "label": "도어락"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-iot-product?subCateId=CT50268014",
+                    "label": "센서"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-iot-product?subCateId=CT50268015",
+                    "label": "스위치"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-iot-product?subCateId=CT50276001",
+                    "label": "버튼"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-iot-product?subCateId=CT50276000",
+                    "label": "플러그"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-iot-product?subCateId=CT50268016",
+                    "label": "조명"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-iot-product?subCateId=CT50313000",
+                    "label": "컨트롤러"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/home-iot-product?subCateId=CT50276003",
+                    "label": "AI Home 세트"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/aihome/ai-home-solution",
+                "label": "AI Home 솔루션",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/aihome/extension/bridgePage/pkg004",
+                    "label": "스마트스타트 스탠다드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/aihome/extension/bridgePage/pkg003",
+                    "label": "스마트스타트 올인원"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/aihome/extension/bridgePage/pkg001",
+                    "label": "웰슬리핑"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00012400",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/superCategory?superCategoryId=CT50020000",
+                "label": "전체",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/special-price-zone",
+                "label": "특가 Zone",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/lg-up-kit?main=Y",
+                "label": "LG UP Kit",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/vacuum-cleaners",
+                "label": "청소기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/a9-vacuum-cleaner",
+                    "label": "A9/A9S/A7 청소기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/a9-air-vacuum-cleaner",
+                    "label": "A9 Air/A5 청소기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/robotic-vacuum-cleaner",
+                    "label": "로봇청소기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/robotic-ai-allinone",
+                    "label": "로보킹 AI 올인원"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/other-vacuum-cleaner",
+                    "label": "기타 청소기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/air-conditioners",
+                "label": "에어컨",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/floor-standing-cooler",
+                    "label": "스탠드 에어컨"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/room-air-conditioner",
+                    "label": "벽걸이 에어컨"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/system-rooftop-air-conditioner",
+                    "label": "시스템/천장형 에어컨"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/window-portable-air-conditioner",
+                    "label": "창호형/이동식 에어컨"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/ventilation-system",
+                    "label": "환기 시스템"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/ceiling-fan",
+                    "label": "실링팬"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/air-purifier",
+                "label": "공기청정기/제습기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/360-air-purifier",
+                    "label": "360° 공기청정기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/aero-tower-furniture",
+                    "label": "에어로타워/퍼니처/부스터"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/aero-speaker-cattower",
+                    "label": "에어로스피커/캣타워"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/wallfit",
+                    "label": "월핏/스탠드 공기청정기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/other-air-purifier",
+                    "label": "몽블랑/기타 공기청정기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/dehumidifier",
+                    "label": "제습기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/dehumidifier-humidifier-air-washer",
+                    "label": "하이드로타워/에션셜"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/humidifier-air-washer",
+                    "label": "가습기/에어워셔"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/portable-air-purifier",
+                    "label": "휴대용 공기청정기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/puricare-mask",
+                    "label": "퓨리케어 마스크"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/mobile-devices",
+                "label": "톤프리",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/care-accessories/tv-and-av",
+                "label": "TV/AV",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/tv",
+                    "label": "TV"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/standbyme",
+                    "label": "스탠바이미"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/monitor",
+                    "label": "모니터"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/projector-minibeam-etc",
+                    "label": "빔 프로젝터"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/audio-equipment",
+                    "label": "음향기기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/monitors-and-notebooks",
+                "label": "노트북",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/laptop",
+                    "label": "노트북"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/desktop",
+                    "label": "데스크탑"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/tab-book",
+                    "label": "탭북"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/washing-machines",
+                "label": "세탁기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/front-load-washer",
+                    "label": "드럼 세탁기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/top-load-washer",
+                    "label": "통돌이 세탁기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/mini-washer",
+                    "label": "미니워시"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/dryer?main=Y",
+                "label": "건조기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/clothing-care",
+                "label": "의류관리기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/styler",
+                    "label": "스타일러"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/ironing",
+                    "label": "시스템 아이어닝"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/lg-shoe-care",
+                "label": "신발관리기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/shoe-case-lg",
+                    "label": "슈케이스"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/shoe-care-lg",
+                    "label": "슈케어"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/beauty-devices",
+                "label": "뷰티/의료기기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/pra-l",
+                    "label": "프라엘"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/medi-hair",
+                    "label": "메디헤어"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/eye-care",
+                    "label": "아이케어"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/medi-pain",
+                    "label": "메디페인"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/care-accessories/refrigerators",
+                "label": "냉장고",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/upper-lower-refrigeration",
+                    "label": "상냉장/하냉동"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/side-by-side-refrigerators",
+                    "label": "양문형 냉장고"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/kimchi-refrigerator",
+                    "label": "김치냉장고"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/refrigerator",
+                    "label": "일반형 냉장고"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/wineseller",
+                    "label": "와인셀러"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/commercial-refrigerators",
+                    "label": "업소용/비즈니스"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/freezer",
+                    "label": "냉동고"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/water-purifiers",
+                "label": "정수기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/cooking",
+                "label": "조리기기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/light-wave-oven-range",
+                    "label": "광파오븐레인지"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/electric-range",
+                    "label": "전자레인지"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/gas-range",
+                    "label": "가스레인지"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/gas-oven-range",
+                    "label": "가스오븐레인지"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/electric-cooker",
+                    "label": "전기레인지"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/dishwasher?main=Y",
+                "label": "식기세척기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/lg-homebrew?main=Y",
+                "label": "맥주제조기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/tiiun?main=Y",
+                "label": "식물생활가전",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/laserjet-inkjet-printer-printer?main=Y",
+                "label": "프린터",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/massage-chair?main=Y",
+                "label": "안마의자",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/furniture-type",
+                    "label": "가구형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-accessories/fullbody-type",
+                    "label": "전신형"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/comfort-kit?main=Y",
+                "label": "컴포트 키트",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-accessories/diy?main=Y",
+                "label": "고객자가수리",
+                "children": []
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00012544",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/signature?subCateId=CT50022019",
+                "label": "냉장고",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/signature?subCateId=CT50022020",
+                "label": "세탁건조기",
+                "children": []
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00012545",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50093000",
+                "label": "TV",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022005",
+                "label": "냉장고",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022006",
+                "label": "컨버터블 패키지",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022007",
+                "label": "김치냉장고",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50115001",
+                "label": "와인셀러",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50152000",
+                "label": "전기레인지",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022011",
+                "label": "식기세척기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022010",
+                "label": "광파오븐/전자레인지",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022014",
+                "label": "정수기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022008",
+                "label": "워시타워",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50360000",
+                "label": "워시콤보",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50097000",
+                "label": "세탁기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50097001",
+                "label": "의류건조기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022009",
+                "label": "의류관리기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022016",
+                "label": "청소기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50065001",
+                "label": "식물생활가전",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50149000",
+                "label": "안마의자",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50022015",
+                "label": "에어컨",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50058000",
+                "label": "공기청정기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50094001",
+                "label": "에어로타워",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50159000",
+                "label": "에어로퍼니처",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50128000",
+                "label": "맥주제조기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/object-collection?subCateId=CT50207000",
+                "label": "신발관리기",
+                "children": []
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00057400",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50099002",
+                "label": "냉장고",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50202001",
+                "label": "와인셀러",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50197000",
+                "label": "전기레인지",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50110000",
+                "label": "식기세척기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50126000",
+                "label": "정수기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50099003",
+                "label": "워시타워",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50361001",
+                "label": "워시콤보",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50099004",
+                "label": "세탁기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50099005",
+                "label": "의류건조기",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50099006",
+                "label": "의류관리기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50181001",
+                "label": "신발관리기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50146001",
+                "label": "청소기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50171000",
+                "label": "안마의자",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50099007",
+                "label": "에어컨",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50099008",
+                "label": "공기청정기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50159001",
+                "label": "에어로퍼니처",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/upappliance-list?subCateId=CT50099009",
+                "label": "에어로타워",
+                "children": []
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00266406",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/water-purifiers",
+                "label": "정수기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50281000",
+                    "label": "얼음정수기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50019007",
+                    "label": "냉온정수기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50019006",
+                    "label": "냉정수기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50019008",
+                    "label": "정수전용"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50273002",
+                    "label": "온정수기"
+                  },
+                  {
+                    "href": "/care-solutions/cstmSubItemIntro?categoryId=CT50000175",
+                    "label": "내게 맞는 정수기 찾기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/refrigerators",
+                "label": "냉장고",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50271000",
+                    "label": "STEM"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50227000",
+                    "label": "상냉장/하냉동"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50227001",
+                    "label": "양문형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50235001",
+                    "label": "일반형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50247000",
+                    "label": "컨버터블 패키지"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/kimchi-refrigerators",
+                "label": "김치냉장고",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/kimchi-refrigerators?subCateId=CT50224001",
+                    "label": "스탠드형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/kimchi-refrigerators?subCateId=CT50224002",
+                    "label": "뚜껑형"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00266427",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/air-conditioners",
+                "label": "에어컨",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-conditioners?subCateId=CT50129001",
+                    "label": "스탠드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-conditioners?subCateId=CT50129002",
+                    "label": "2in1"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-conditioners?subCateId=CT50129004",
+                    "label": "벽걸이형"
+                  },
+                  {
+                    "href": "/care-solutions/cstmSubItemIntro?categoryId=CT50080000",
+                    "label": "내게 맞는 에어컨 찾기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/system-air-conditioners",
+                "label": "시스템 에어컨",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/system-air-conditioners?subCateId=CT50332001",
+                    "label": "상업용 스탠드 에어컨"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/air-purifiers",
+                "label": "공기청정기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-purifiers?subCateId=CT50019010",
+                    "label": "360˚ 공기청정기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-purifiers?subCateId=CT50225000",
+                    "label": "에어로시리즈"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00266437",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/washing_machines",
+                "label": "세탁기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/washing_machines?subCateId=CT50175004",
+                    "label": "드럼세탁기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/washing_machines?subCateId=CT50175005",
+                    "label": "통돌이"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/washing_machines?subCateId=CT50267000",
+                    "label": "미니세탁기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/wash-tower",
+                "label": "워시타워",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/wash-tower?subCateId=CT50224005",
+                    "label": "워시타워"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/wash-tower?subCateId=CT50224006",
+                    "label": "워시타워 컴팩트"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/wash-combo",
+                "label": "워시콤보",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/dryers",
+                "label": "의류건조기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/lg-styler",
+                "label": "의류관리기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/shoe-care",
+                "label": "신발관리기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/vacuum-cleaners",
+                "label": "청소기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/vacuum-cleaners?subCateId=CT50224010",
+                    "label": "무선청소기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/vacuum-cleaners?subCateId=CT50224011",
+                    "label": "로봇청소기"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00266456",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/tvs",
+                "label": "TV",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/tvs?subCateId=CT50243002",
+                    "label": "올레드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/tvs?subCateId=CT50243003",
+                    "label": "QNED"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/tvs?subCateId=CT50255000",
+                    "label": "울트라 HD"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/tvs?subCateId=CT50352000",
+                    "label": "TV 세트"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00139402",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/rentalService",
+                "label": "구독 이용 가이드",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/rentalService-aboutcare",
+                "label": "케어 서비스",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/care-planner",
+                "label": "구독 요금 확인",
+                "children": []
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00139401",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/my-page/care-solution-contract-status",
+                "label": "계약 관리",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/my-page/care-solution-visit-notification",
+                "label": "방문/정기배송 일정",
+                "children": []
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "stateId": "gnb-care-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "menuId": "가전 구독",
+      "tabCount": 6,
+      "panelCount": 6,
+      "tabs": [
+        {
+          "id": "NV00266406",
+          "label": "주방가전"
+        },
+        {
+          "id": "NV00266427",
+          "label": "에어컨/에어케어"
+        },
+        {
+          "id": "NV00266437",
+          "label": "생활가전"
+        },
+        {
+          "id": "NV00266456",
+          "label": "TV/노트북"
+        },
+        {
+          "id": "NV00139402",
+          "label": "구독 안내/혜택"
+        },
+        {
+          "id": "NV00139401",
+          "label": "구독 관리"
+        }
+      ],
+      "panels": [
+        {
+          "id": "NV00266406",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/water-purifiers",
+                "label": "정수기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50281000",
+                    "label": "얼음정수기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50019007",
+                    "label": "냉온정수기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50019006",
+                    "label": "냉정수기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50019008",
+                    "label": "정수전용"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/water-purifiers?subCateId=CT50273002",
+                    "label": "온정수기"
+                  },
+                  {
+                    "href": "/care-solutions/cstmSubItemIntro?categoryId=CT50000175",
+                    "label": "내게 맞는 정수기 찾기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/refrigerators",
+                "label": "냉장고",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50271000",
+                    "label": "STEM"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50227000",
+                    "label": "상냉장/하냉동"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50227001",
+                    "label": "양문형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50235001",
+                    "label": "일반형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/refrigerators?subCateId=CT50247000",
+                    "label": "컨버터블 패키지"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/kimchi-refrigerators",
+                "label": "김치냉장고",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/kimchi-refrigerators?subCateId=CT50224001",
+                    "label": "스탠드형"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/kimchi-refrigerators?subCateId=CT50224002",
+                    "label": "뚜껑형"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00266427",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/air-conditioners",
+                "label": "에어컨",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-conditioners?subCateId=CT50129001",
+                    "label": "스탠드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-conditioners?subCateId=CT50129002",
+                    "label": "2in1"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-conditioners?subCateId=CT50129004",
+                    "label": "벽걸이형"
+                  },
+                  {
+                    "href": "/care-solutions/cstmSubItemIntro?categoryId=CT50080000",
+                    "label": "내게 맞는 에어컨 찾기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/system-air-conditioners",
+                "label": "시스템 에어컨",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/system-air-conditioners?subCateId=CT50332001",
+                    "label": "상업용 스탠드 에어컨"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/air-purifiers",
+                "label": "공기청정기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-purifiers?subCateId=CT50019010",
+                    "label": "360˚ 공기청정기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/air-purifiers?subCateId=CT50225000",
+                    "label": "에어로시리즈"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00266437",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/washing_machines",
+                "label": "세탁기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/washing_machines?subCateId=CT50175004",
+                    "label": "드럼세탁기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/washing_machines?subCateId=CT50175005",
+                    "label": "통돌이"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/washing_machines?subCateId=CT50267000",
+                    "label": "미니세탁기"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/wash-tower",
+                "label": "워시타워",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/wash-tower?subCateId=CT50224005",
+                    "label": "워시타워"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/wash-tower?subCateId=CT50224006",
+                    "label": "워시타워 컴팩트"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/wash-combo",
+                "label": "워시콤보",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/dryers",
+                "label": "의류건조기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/lg-styler",
+                "label": "의류관리기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/shoe-care",
+                "label": "신발관리기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/vacuum-cleaners",
+                "label": "청소기",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/vacuum-cleaners?subCateId=CT50224010",
+                    "label": "무선청소기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/vacuum-cleaners?subCateId=CT50224011",
+                    "label": "로봇청소기"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00266456",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/tvs",
+                "label": "TV",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/tvs?subCateId=CT50243002",
+                    "label": "올레드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/tvs?subCateId=CT50243003",
+                    "label": "QNED"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/tvs?subCateId=CT50255000",
+                    "label": "울트라 HD"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/care-solutions/tvs?subCateId=CT50352000",
+                    "label": "TV 세트"
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00139402",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/care-solutions/rentalService",
+                "label": "구독 이용 가이드",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/rentalService-aboutcare",
+                "label": "케어 서비스",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/care-solutions/care-planner",
+                "label": "구독 요금 확인",
+                "children": []
+              }
+            ]
+          ]
+        },
+        {
+          "id": "NV00139401",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/my-page/care-solution-contract-status",
+                "label": "계약 관리",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/my-page/care-solution-visit-notification",
+                "label": "방문/정기배송 일정",
+                "children": []
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "stateId": "gnb-support-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "menuId": "고객지원",
+      "tabCount": 0,
+      "panelCount": 1,
+      "tabs": [],
+      "panels": [
+        {
+          "id": "고객지원",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/support/solutions",
+                "label": "스스로 해결",
+                "children": []
+              },
+              {
+                "href": "#",
+                "label": "매뉴얼/소프트웨어",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/support/product-manuals",
+                    "label": "매뉴얼/소프트웨어 다운로드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/software",
+                    "label": "소프트웨어 업데이트 소식"
+                  }
+                ]
+              },
+              {
+                "href": "#",
+                "label": "서비스 전문 상담",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/support/request-call-reservation",
+                    "label": "상담 예약/문의"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/service-inquiry-reservation-status",
+                    "label": "예약 조회/변경"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "#",
+                "label": "서비스 예약",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/support/service-engineer-reservation",
+                    "label": "출장 서비스 예약"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/visit-center-reservation",
+                    "label": "센터 방문 예약"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/find-service-center",
+                    "label": "센터찾기"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/service-inquiry-reservation-status",
+                    "label": "예약 조회/변경"
+                  }
+                ]
+              },
+              {
+                "href": "#",
+                "label": "LG 베스트 케어",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/lg-best-care",
+                    "label": "LG 베스트 케어 소개"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/lg-best-care/home-appliance-cleaning",
+                    "label": "가전세척"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/lg-best-care/service-installation-removal",
+                    "label": "이전설치"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/lg-best-care/rentalService",
+                    "label": "가전 구독/케어십"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "#",
+                "label": "고객의 소리",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/support/all-feedback",
+                    "label": "칭찬해요"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/suggestions",
+                    "label": "개선해 주세요"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/suggestions-for-company",
+                    "label": "경영진에게 제안"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/email-inquiry",
+                    "label": "1:1 문의"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/my-status",
+                    "label": "나의 글 보기"
+                  }
+                ]
+              },
+              {
+                "href": "#",
+                "label": "고객지원 안내",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/support/notice",
+                    "label": "공지사항"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/rates-warranty-guide",
+                    "label": "요금/보증"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/support/recyclable-parts-notice",
+                    "label": "재생부품 가격"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/support/usage-guide-faq",
+                "label": "홈페이지 이용 방법",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/support/accessibility",
+                "label": "제품 접근성",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/benefits",
+                "label": "혜택/이벤트",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/benefits/newMembership",
+                "label": "멤버십",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/benefits/card-discount",
+                "label": "카드혜택",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/livecommerce",
+                "label": "라이브",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/benefits/affiliate-channel",
+                "label": "제휴혜택",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/story/quick-view",
+                "label": "1분퀵뷰",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/story/living-story",
+                "label": "Living Story",
+                "children": []
+              },
+              {
+                "href": "#",
+                "label": "가이드",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/story/buying-guide",
+                    "label": "구매가이드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/setup-guide",
+                    "label": "설치가이드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/user-guide",
+                    "label": "사용가이드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/faq",
+                    "label": "FAQ"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/story/tech-insight",
+                "label": "가전인사이트",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/story/life-tips",
+                "label": "생활팁",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/story/storyRecipeList",
+                "label": "레시피",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/story/hands-on-reviews",
+                "label": "리얼리뷰",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/ebook",
+                "label": "제품 카탈로그",
+                "children": []
+              },
+              {
+                "href": "https://jammy.lge.co.kr",
+                "label": "Jammy 커뮤니티",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/bestshop/store-finder",
+                "label": "매장 찾기",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/counselReserve/main/MC11420001?inflow=lgekor",
+                "label": "New 상담예약",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/reserveSearch",
+                "label": "매장 상담 예약 조회",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/event/eventshoplist",
+                "label": "행사 매장 안내",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/bestshop/event",
+                "label": "베스트샵 이벤트",
+                "children": []
+              },
+              {
+                "href": "#",
+                "label": "웨딩 고객 이벤트",
+                "children": [
+                  {
+                    "href": "https://bestshop.lge.co.kr/event/detail-EV10869001",
+                    "label": "웨딩 고객 이벤트 안내"
+                  },
+                  {
+                    "href": "https://bestshop.lge.co.kr/event/wedding-community",
+                    "label": "D5 웨딩 커뮤니티"
+                  }
+                ]
+              },
+              {
+                "href": "#",
+                "label": "아파트 입주 이벤트",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/bestshop/event/aptBenefitInfo",
+                    "label": "혜택 안내"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/bestshop/event/aptBenefitList",
+                    "label": "행사 아파트 리스트"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/lg-ai",
+                "label": "공감지능 AI",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%9B%8C%EC%8B%9C%ED%83%80%EC%9B%8C&amp;tab=all&amp;mode=GNB",
+                "label": "AI 워시타워",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%83%89%EC%9E%A5%EA%B3%A0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 냉장고",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%A1%9C%EB%B4%87%EC%B2%AD%EC%86%8C%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 로봇청소기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%97%90%EC%96%B4%EC%BB%A8&amp;tab=all&amp;mode=GNB",
+                "label": "AI 에어컨",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EA%B3%B5%EA%B8%B0%EC%B2%AD%EC%A0%95%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 공기청정기",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20TV&amp;tab=all&amp;mode=GNB",
+                "label": "AI TV",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%85%B8%ED%8A%B8%EB%B6%81&amp;tab=all&amp;mode=GNB",
+                "label": "AI 노트북",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%ED%97%88%EB%B8%8C&amp;tab=all&amp;mode=GNB",
+                "label": "ThinQ ON AI",
+                "children": []
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "stateId": "gnb-benefits-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "menuId": "혜택/이벤트",
+      "tabCount": 0,
+      "panelCount": 1,
+      "tabs": [],
+      "panels": [
+        {
+          "id": "혜택/이벤트",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/benefits",
+                "label": "혜택/이벤트",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/benefits/newMembership",
+                "label": "멤버십",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/benefits/card-discount",
+                "label": "카드혜택",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/livecommerce",
+                "label": "라이브",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/benefits/affiliate-channel",
+                "label": "제휴혜택",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/story/quick-view",
+                "label": "1분퀵뷰",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/story/living-story",
+                "label": "Living Story",
+                "children": []
+              },
+              {
+                "href": "#",
+                "label": "가이드",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/story/buying-guide",
+                    "label": "구매가이드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/setup-guide",
+                    "label": "설치가이드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/user-guide",
+                    "label": "사용가이드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/faq",
+                    "label": "FAQ"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/story/tech-insight",
+                "label": "가전인사이트",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/story/life-tips",
+                "label": "생활팁",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/story/storyRecipeList",
+                "label": "레시피",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/story/hands-on-reviews",
+                "label": "리얼리뷰",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/ebook",
+                "label": "제품 카탈로그",
+                "children": []
+              },
+              {
+                "href": "https://jammy.lge.co.kr",
+                "label": "Jammy 커뮤니티",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/bestshop/store-finder",
+                "label": "매장 찾기",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/counselReserve/main/MC11420001?inflow=lgekor",
+                "label": "New 상담예약",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/reserveSearch",
+                "label": "매장 상담 예약 조회",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/event/eventshoplist",
+                "label": "행사 매장 안내",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/bestshop/event",
+                "label": "베스트샵 이벤트",
+                "children": []
+              },
+              {
+                "href": "#",
+                "label": "웨딩 고객 이벤트",
+                "children": [
+                  {
+                    "href": "https://bestshop.lge.co.kr/event/detail-EV10869001",
+                    "label": "웨딩 고객 이벤트 안내"
+                  },
+                  {
+                    "href": "https://bestshop.lge.co.kr/event/wedding-community",
+                    "label": "D5 웨딩 커뮤니티"
+                  }
+                ]
+              },
+              {
+                "href": "#",
+                "label": "아파트 입주 이벤트",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/bestshop/event/aptBenefitInfo",
+                    "label": "혜택 안내"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/bestshop/event/aptBenefitList",
+                    "label": "행사 아파트 리스트"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/lg-ai",
+                "label": "공감지능 AI",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%9B%8C%EC%8B%9C%ED%83%80%EC%9B%8C&amp;tab=all&amp;mode=GNB",
+                "label": "AI 워시타워",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%83%89%EC%9E%A5%EA%B3%A0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 냉장고",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%A1%9C%EB%B4%87%EC%B2%AD%EC%86%8C%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 로봇청소기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%97%90%EC%96%B4%EC%BB%A8&amp;tab=all&amp;mode=GNB",
+                "label": "AI 에어컨",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EA%B3%B5%EA%B8%B0%EC%B2%AD%EC%A0%95%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 공기청정기",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20TV&amp;tab=all&amp;mode=GNB",
+                "label": "AI TV",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%85%B8%ED%8A%B8%EB%B6%81&amp;tab=all&amp;mode=GNB",
+                "label": "AI 노트북",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%ED%97%88%EB%B8%8C&amp;tab=all&amp;mode=GNB",
+                "label": "ThinQ ON AI",
+                "children": []
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "stateId": "gnb-story-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "menuId": "스토리",
+      "tabCount": 0,
+      "panelCount": 1,
+      "tabs": [],
+      "panels": [
+        {
+          "id": "스토리",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/story/quick-view",
+                "label": "1분퀵뷰",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/story/living-story",
+                "label": "Living Story",
+                "children": []
+              },
+              {
+                "href": "#",
+                "label": "가이드",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/story/buying-guide",
+                    "label": "구매가이드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/setup-guide",
+                    "label": "설치가이드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/user-guide",
+                    "label": "사용가이드"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/story/faq",
+                    "label": "FAQ"
+                  }
+                ]
+              },
+              {
+                "href": "https://www.lge.co.kr/story/tech-insight",
+                "label": "가전인사이트",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/story/life-tips",
+                "label": "생활팁",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/story/storyRecipeList",
+                "label": "레시피",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/story/hands-on-reviews",
+                "label": "리얼리뷰",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/ebook",
+                "label": "제품 카탈로그",
+                "children": []
+              },
+              {
+                "href": "https://jammy.lge.co.kr",
+                "label": "Jammy 커뮤니티",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/bestshop/store-finder",
+                "label": "매장 찾기",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/counselReserve/main/MC11420001?inflow=lgekor",
+                "label": "New 상담예약",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/reserveSearch",
+                "label": "매장 상담 예약 조회",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/event/eventshoplist",
+                "label": "행사 매장 안내",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/bestshop/event",
+                "label": "베스트샵 이벤트",
+                "children": []
+              },
+              {
+                "href": "#",
+                "label": "웨딩 고객 이벤트",
+                "children": [
+                  {
+                    "href": "https://bestshop.lge.co.kr/event/detail-EV10869001",
+                    "label": "웨딩 고객 이벤트 안내"
+                  },
+                  {
+                    "href": "https://bestshop.lge.co.kr/event/wedding-community",
+                    "label": "D5 웨딩 커뮤니티"
+                  }
+                ]
+              },
+              {
+                "href": "#",
+                "label": "아파트 입주 이벤트",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/bestshop/event/aptBenefitInfo",
+                    "label": "혜택 안내"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/bestshop/event/aptBenefitList",
+                    "label": "행사 아파트 리스트"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/lg-ai",
+                "label": "공감지능 AI",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%9B%8C%EC%8B%9C%ED%83%80%EC%9B%8C&amp;tab=all&amp;mode=GNB",
+                "label": "AI 워시타워",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%83%89%EC%9E%A5%EA%B3%A0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 냉장고",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%A1%9C%EB%B4%87%EC%B2%AD%EC%86%8C%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 로봇청소기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%97%90%EC%96%B4%EC%BB%A8&amp;tab=all&amp;mode=GNB",
+                "label": "AI 에어컨",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EA%B3%B5%EA%B8%B0%EC%B2%AD%EC%A0%95%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 공기청정기",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20TV&amp;tab=all&amp;mode=GNB",
+                "label": "AI TV",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%85%B8%ED%8A%B8%EB%B6%81&amp;tab=all&amp;mode=GNB",
+                "label": "AI 노트북",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%ED%97%88%EB%B8%8C&amp;tab=all&amp;mode=GNB",
+                "label": "ThinQ ON AI",
+                "children": []
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "stateId": "gnb-bestshop-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "menuId": "베스트샵",
+      "tabCount": 0,
+      "panelCount": 1,
+      "tabs": [],
+      "panels": [
+        {
+          "id": "베스트샵",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/bestshop/store-finder",
+                "label": "매장 찾기",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/counselReserve/main/MC11420001?inflow=lgekor",
+                "label": "New 상담예약",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/reserveSearch",
+                "label": "매장 상담 예약 조회",
+                "children": []
+              },
+              {
+                "href": "https://bestshop.lge.co.kr/event/eventshoplist",
+                "label": "행사 매장 안내",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/bestshop/event",
+                "label": "베스트샵 이벤트",
+                "children": []
+              },
+              {
+                "href": "#",
+                "label": "웨딩 고객 이벤트",
+                "children": [
+                  {
+                    "href": "https://bestshop.lge.co.kr/event/detail-EV10869001",
+                    "label": "웨딩 고객 이벤트 안내"
+                  },
+                  {
+                    "href": "https://bestshop.lge.co.kr/event/wedding-community",
+                    "label": "D5 웨딩 커뮤니티"
+                  }
+                ]
+              },
+              {
+                "href": "#",
+                "label": "아파트 입주 이벤트",
+                "children": [
+                  {
+                    "href": "https://www.lge.co.kr/bestshop/event/aptBenefitInfo",
+                    "label": "혜택 안내"
+                  },
+                  {
+                    "href": "https://www.lge.co.kr/bestshop/event/aptBenefitList",
+                    "label": "행사 아파트 리스트"
+                  }
+                ]
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/lg-ai",
+                "label": "공감지능 AI",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%9B%8C%EC%8B%9C%ED%83%80%EC%9B%8C&amp;tab=all&amp;mode=GNB",
+                "label": "AI 워시타워",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%83%89%EC%9E%A5%EA%B3%A0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 냉장고",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%A1%9C%EB%B4%87%EC%B2%AD%EC%86%8C%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 로봇청소기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%97%90%EC%96%B4%EC%BB%A8&amp;tab=all&amp;mode=GNB",
+                "label": "AI 에어컨",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EA%B3%B5%EA%B8%B0%EC%B2%AD%EC%A0%95%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 공기청정기",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20TV&amp;tab=all&amp;mode=GNB",
+                "label": "AI TV",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%85%B8%ED%8A%B8%EB%B6%81&amp;tab=all&amp;mode=GNB",
+                "label": "AI 노트북",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%ED%97%88%EB%B8%8C&amp;tab=all&amp;mode=GNB",
+                "label": "ThinQ ON AI",
+                "children": []
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "stateId": "gnb-lgai-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "menuId": "LG AI",
+      "tabCount": 0,
+      "panelCount": 1,
+      "tabs": [],
+      "panels": [
+        {
+          "id": "LG AI",
+          "columns": [
+            [
+              {
+                "href": "https://www.lge.co.kr/lg-ai",
+                "label": "공감지능 AI",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%9B%8C%EC%8B%9C%ED%83%80%EC%9B%8C&amp;tab=all&amp;mode=GNB",
+                "label": "AI 워시타워",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%83%89%EC%9E%A5%EA%B3%A0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 냉장고",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%A1%9C%EB%B4%87%EC%B2%AD%EC%86%8C%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 로봇청소기",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EC%97%90%EC%96%B4%EC%BB%A8&amp;tab=all&amp;mode=GNB",
+                "label": "AI 에어컨",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EA%B3%B5%EA%B8%B0%EC%B2%AD%EC%A0%95%EA%B8%B0&amp;tab=all&amp;mode=GNB",
+                "label": "AI 공기청정기",
+                "children": []
+              }
+            ],
+            [
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20TV&amp;tab=all&amp;mode=GNB",
+                "label": "AI TV",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%20%EB%85%B8%ED%8A%B8%EB%B6%81&amp;tab=all&amp;mode=GNB",
+                "label": "AI 노트북",
+                "children": []
+              },
+              {
+                "href": "https://www.lge.co.kr/sch?keyword=AI%ED%97%88%EB%B8%8C&amp;tab=all&amp;mode=GNB",
+                "label": "ThinQ ON AI",
+                "children": []
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "stateId": "hero-slide-1",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 1,
+      "headline": "",
+      "description": "",
+      "href": "/benefits/exhibitions/detail-PE00895007"
+    },
+    {
+      "stateId": "hero-slide-2",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 2,
+      "headline": "All New 세일 홈스타일 특가 최대 82% 할인",
+      "description": "시몬스, 한샘 등 인기 브랜드 모음",
+      "href": "/benefits/exhibitions/detail-PE00895007?tab=homestyle-brand"
+    },
+    {
+      "stateId": "hero-slide-3",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 3,
+      "headline": "공기청정기 대규모 할인 大청정 세일 시작!",
+      "description": "특가에 쿠폰 더한 지금이 기회",
+      "href": "/benefits/exhibitions/detail-PE00892015"
+    },
+    {
+      "stateId": "hero-slide-4",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 4,
+      "headline": "처음이라 더 특별한 구독",
+      "description": "첫 구독 시 멤버십 10만P 전원증정",
+      "href": "/benefits/exhibitions/detail-PE00721001"
+    },
+    {
+      "stateId": "hero-slide-5",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 5,
+      "headline": "2026 휘센 미리구매 페스티벌",
+      "description": "지금이 AI 업그레이드 타이밍",
+      "href": "/benefits/exhibitions/detail-PE00898013"
+    },
+    {
+      "stateId": "hero-slide-6",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 6,
+      "headline": "LGE.COM 인스타그램 오픈 소식 알리기",
+      "description": "네이버페이 포인트 당첨의 기회",
+      "href": "/benefits/event/detail-EV00009031?tab=sns-event"
+    },
+    {
+      "stateId": "hero-slide-7",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 7,
+      "headline": "LG 디오스 AI 오브제컬렉션 냉장고 사전 런칭 기획전",
+      "description": "혜택으로 먼저 만나는 AI 신선케어",
+      "href": "/benefits/exhibitions/detail-PE00894004"
+    },
+    {
+      "stateId": "hero-slide-8",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 8,
+      "headline": "역대 가장 빛나는 Micro RGB의 탄생",
+      "description": "혜택으로 만나는 LG TV 신모델",
+      "href": "/benefits/exhibitions/detail-PE00901007"
+    },
+    {
+      "stateId": "hero-slide-9",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 9,
+      "headline": "LG 퓨리케어 바스에어시스템 런칭",
+      "description": "환기 걱정 없는 욕실 관리의 시작",
+      "href": "/benefits/exhibitions/detail-PE00892017"
+    },
+    {
+      "stateId": "hero-slide-10",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 10,
+      "headline": "공간 맞춤 스마트 사운드 LG Sound Suite 런칭",
+      "description": "런칭 기념 10% 할인 쿠폰 증정",
+      "href": "/benefits/exhibitions/detail-PE00892018"
+    },
+    {
+      "stateId": "hero-slide-11",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 11,
+      "headline": "PREMIUM COOKING EDITION",
+      "description": "요리 완성도를 높여줄 쿠킹가전 쿠폰",
+      "href": "/benefits/exhibitions/detail-PE00878001"
+    },
+    {
+      "stateId": "hero-slide-12",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 12,
+      "headline": "200만대 돌파 기념 LG 스타일러 스팀 모델 특별전",
+      "description": "봄철 LG 스타일러가 활약할 순간",
+      "href": "/benefits/exhibitions/detail-PE00892010"
+    },
+    {
+      "stateId": "hero-slide-13",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 13,
+      "headline": "베스트 79 페스타 쿠폰팩 이벤트",
+      "description": "최대 116만 쿠폰팩 신청하기 >",
+      "href": "https://bestshop.lge.co.kr/event/couponInfo/EV10992000?inflow=lgekor&amp;utm_medium=banner&amp;utm_source=lgecom&amp;utm_campaign=20260327_EV10992000"
+    },
+    {
+      "stateId": "hero-slide-14",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 14,
+      "headline": "결혼 정보에 대한 모든 것 D5 웨딩 커뮤니티",
+      "description": "상담 예약하기 >",
+      "href": "https://bestshop.lge.co.kr/event/wedding-community"
+    },
+    {
+      "stateId": "hero-slide-15",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "slideIndex": 15,
+      "headline": "베스트 79 페스타 SALE",
+      "description": "상담 예약하기 >",
+      "href": "https://bestshop.lge.co.kr/counselReserve/main/MC11722008?inflow=lgekor&amp;utm_medium=banner&amp;utm_source=lgecom&amp;utm_campaign=2026327_MC11722008"
+    }
+  ]
+}

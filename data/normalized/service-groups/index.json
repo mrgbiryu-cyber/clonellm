@@ -1,0 +1,701 @@
+{
+  "generatedAt": "2026-04-10T01:34:52.209Z",
+  "entryCount": 12,
+  "entries": [
+    {
+      "pageId": "bestshop",
+      "viewportProfile": "mo",
+      "sourceType": "reference",
+      "sourceUrl": "https://www.lge.co.kr/bestshop",
+      "capturedUrl": "http://localhost:3000/reference-content/bestshop?viewportProfile=mo",
+      "extractedAt": "2026-04-10T01:26:15.014Z",
+      "title": "베스트샵 | LG전자",
+      "groups": {
+        "hero": {
+          "groupId": "hero",
+          "selector": ".hero-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 46,
+            "width": 430,
+            "height": 450
+          }
+        },
+        "shortcut": {
+          "groupId": "shortcut",
+          "selector": ".sub-main",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 46,
+            "width": 430,
+            "height": 1252
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "selector": ".main-review",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1022,
+            "width": 430,
+            "height": 59
+          }
+        },
+        "brandBanner": {
+          "groupId": "brandBanner",
+          "selector": ".brand-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": -430,
+            "y": 3159,
+            "width": 430,
+            "height": 311
+          }
+        }
+      }
+    },
+    {
+      "pageId": "bestshop",
+      "viewportProfile": "mo",
+      "sourceType": "working",
+      "sourceUrl": "https://www.lge.co.kr/bestshop",
+      "capturedUrl": "http://localhost:3000/clone-content/bestshop?viewportProfile=mo",
+      "extractedAt": "2026-04-10T01:34:51.734Z",
+      "title": "베스트샵 | LG전자",
+      "groups": {
+        "hero": {
+          "groupId": "hero",
+          "selector": ".hero-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 46,
+            "width": 430,
+            "height": 450
+          }
+        },
+        "shortcut": {
+          "groupId": "shortcut",
+          "selector": ".sub-main",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 46,
+            "width": 430,
+            "height": 1252
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "selector": ".main-review",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1022,
+            "width": 430,
+            "height": 59
+          }
+        },
+        "brandBanner": {
+          "groupId": "brandBanner",
+          "selector": ".brand-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": -430,
+            "y": 1210,
+            "width": 430,
+            "height": 311
+          }
+        }
+      }
+    },
+    {
+      "pageId": "bestshop",
+      "viewportProfile": "pc",
+      "sourceType": "reference",
+      "sourceUrl": "https://www.lge.co.kr/bestshop",
+      "capturedUrl": "http://localhost:3000/reference-content/bestshop?viewportProfile=pc",
+      "extractedAt": "2026-04-10T01:25:53.029Z",
+      "title": "베스트샵 | LG전자",
+      "groups": {
+        "hero": {
+          "groupId": "hero",
+          "selector": ".hero-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 121,
+            "width": 1445,
+            "height": 452
+          }
+        },
+        "shortcut": {
+          "groupId": "shortcut",
+          "selector": ".sub-main",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 121,
+            "width": 1445,
+            "height": 1832
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "selector": ".main-review",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1433,
+            "width": 1445,
+            "height": 86
+          }
+        },
+        "brandBanner": {
+          "groupId": "brandBanner",
+          "selector": null,
+          "matchCount": 0,
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "bestshop",
+      "viewportProfile": "pc",
+      "sourceType": "working",
+      "sourceUrl": "https://www.lge.co.kr/bestshop",
+      "capturedUrl": "http://localhost:3000/clone-content/bestshop?viewportProfile=pc",
+      "extractedAt": "2026-04-10T01:35:42.985Z",
+      "title": "베스트샵 | LG전자",
+      "groups": {
+        "hero": {
+          "groupId": "hero",
+          "selector": ".hero-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 121,
+            "width": 1445,
+            "height": 452
+          }
+        },
+        "shortcut": {
+          "groupId": "shortcut",
+          "selector": ".sub-main",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 121,
+            "width": 1445,
+            "height": 1832
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "selector": ".main-review",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1433,
+            "width": 1445,
+            "height": 86
+          }
+        },
+        "brandBanner": {
+          "groupId": "brandBanner",
+          "selector": null,
+          "matchCount": 0,
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "care-solutions",
+      "viewportProfile": "mo",
+      "sourceType": "reference",
+      "sourceUrl": "https://www.lge.co.kr/care-solutions",
+      "capturedUrl": "http://localhost:3000/reference-content/care-solutions?viewportProfile=mo",
+      "extractedAt": "2026-04-10T01:27:05.750Z",
+      "title": "가전 구독 | LG전자",
+      "groups": {
+        "hero": {
+          "groupId": "hero",
+          "selector": ".new-hero-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 46,
+            "width": 430,
+            "height": 215
+          }
+        },
+        "ranking": {
+          "groupId": "ranking",
+          "selector": ".caresolution-main-bestranking",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 513,
+            "width": 430,
+            "height": 680
+          }
+        },
+        "benefit": {
+          "groupId": "benefit",
+          "selector": ".caresolution-benefit",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1366,
+            "width": 430,
+            "height": 503
+          }
+        },
+        "tabs": {
+          "groupId": "tabs",
+          "selector": ".tabs-wrap-new",
+          "matchCount": 1,
+          "rect": {
+            "x": 13,
+            "y": 596,
+            "width": 417,
+            "height": 40
+          }
+        },
+        "careBanner": {
+          "groupId": "careBanner",
+          "selector": ".care-banner-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1919,
+            "width": 430,
+            "height": 151
+          }
+        }
+      }
+    },
+    {
+      "pageId": "care-solutions",
+      "viewportProfile": "mo",
+      "sourceType": "working",
+      "sourceUrl": "https://www.lge.co.kr/care-solutions",
+      "capturedUrl": "http://localhost:3000/clone-content/care-solutions?viewportProfile=mo",
+      "extractedAt": "2026-04-10T01:29:14.139Z",
+      "title": "가전 구독 | LG전자",
+      "groups": {
+        "hero": {
+          "groupId": "hero",
+          "selector": ".new-hero-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 46,
+            "width": 430,
+            "height": 215
+          }
+        },
+        "ranking": {
+          "groupId": "ranking",
+          "selector": ".caresolution-main-bestranking",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 513,
+            "width": 430,
+            "height": 680
+          }
+        },
+        "benefit": {
+          "groupId": "benefit",
+          "selector": ".caresolution-benefit",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1366,
+            "width": 430,
+            "height": 503
+          }
+        },
+        "tabs": {
+          "groupId": "tabs",
+          "selector": ".tabs-wrap-new",
+          "matchCount": 1,
+          "rect": {
+            "x": 13,
+            "y": 596,
+            "width": 417,
+            "height": 40
+          }
+        },
+        "careBanner": {
+          "groupId": "careBanner",
+          "selector": ".care-banner-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1919,
+            "width": 430,
+            "height": 151
+          }
+        }
+      }
+    },
+    {
+      "pageId": "care-solutions",
+      "viewportProfile": "pc",
+      "sourceType": "reference",
+      "sourceUrl": "https://www.lge.co.kr/care-solutions",
+      "capturedUrl": "http://localhost:3000/reference-content/care-solutions?viewportProfile=pc",
+      "extractedAt": "2026-04-10T01:26:37.051Z",
+      "title": "가전 구독 | LG전자",
+      "groups": {
+        "hero": {
+          "groupId": "hero",
+          "selector": ".new-hero-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 121,
+            "width": 1445,
+            "height": 377
+          }
+        },
+        "ranking": {
+          "groupId": "ranking",
+          "selector": ".caresolution-main-bestranking",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 753,
+            "width": 1445,
+            "height": 804
+          }
+        },
+        "benefit": {
+          "groupId": "benefit",
+          "selector": ".caresolution-benefit",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1863,
+            "width": 1445,
+            "height": 384
+          }
+        },
+        "tabs": {
+          "groupId": "tabs",
+          "selector": ".tabs-wrap-new",
+          "matchCount": 1,
+          "rect": {
+            "x": 36,
+            "y": 887,
+            "width": 1369,
+            "height": 52
+          }
+        },
+        "careBanner": {
+          "groupId": "careBanner",
+          "selector": ".care-banner-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 2327,
+            "width": 1445,
+            "height": 128
+          }
+        }
+      }
+    },
+    {
+      "pageId": "care-solutions",
+      "viewportProfile": "pc",
+      "sourceType": "working",
+      "sourceUrl": "https://www.lge.co.kr/care-solutions",
+      "capturedUrl": "http://localhost:3000/clone-content/care-solutions?viewportProfile=pc",
+      "extractedAt": "2026-04-10T01:28:52.294Z",
+      "title": "가전 구독 | LG전자",
+      "groups": {
+        "hero": {
+          "groupId": "hero",
+          "selector": ".new-hero-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1,
+            "width": 1445,
+            "height": 377
+          }
+        },
+        "ranking": {
+          "groupId": "ranking",
+          "selector": ".caresolution-main-bestranking",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 633,
+            "width": 1445,
+            "height": 804
+          }
+        },
+        "benefit": {
+          "groupId": "benefit",
+          "selector": ".caresolution-benefit",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1743,
+            "width": 1445,
+            "height": 384
+          }
+        },
+        "tabs": {
+          "groupId": "tabs",
+          "selector": ".tabs-wrap-new",
+          "matchCount": 1,
+          "rect": {
+            "x": 36,
+            "y": 767,
+            "width": 1369,
+            "height": 52
+          }
+        },
+        "careBanner": {
+          "groupId": "careBanner",
+          "selector": ".care-banner-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 2207,
+            "width": 1445,
+            "height": 128
+          }
+        }
+      }
+    },
+    {
+      "pageId": "support",
+      "viewportProfile": "mo",
+      "sourceType": "reference",
+      "sourceUrl": "https://www.lge.co.kr/support",
+      "capturedUrl": "http://localhost:3000/reference-content/support?viewportProfile=mo",
+      "extractedAt": "2026-04-10T01:25:31.349Z",
+      "title": "고객지원 | LG전자",
+      "groups": {
+        "mainService": {
+          "groupId": "mainService",
+          "selector": ".main-service-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 46,
+            "width": 1460,
+            "height": 360
+          }
+        },
+        "notice": {
+          "groupId": "notice",
+          "selector": ".home-notice-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 406,
+            "width": 1460,
+            "height": 80
+          }
+        },
+        "tipsBanner": {
+          "groupId": "tipsBanner",
+          "selector": ".common-banner.related-pages",
+          "matchCount": 1,
+          "rect": {
+            "x": 56,
+            "y": 964,
+            "width": 1348,
+            "height": 505
+          }
+        },
+        "bestcare": {
+          "groupId": "bestcare",
+          "selector": ".bestcare-section",
+          "matchCount": 1,
+          "rect": {
+            "x": 40,
+            "y": 5683,
+            "width": 1380,
+            "height": 347
+          }
+        }
+      }
+    },
+    {
+      "pageId": "support",
+      "viewportProfile": "mo",
+      "sourceType": "working",
+      "sourceUrl": "https://www.lge.co.kr/support",
+      "capturedUrl": "http://localhost:3000/clone-content/support?viewportProfile=mo",
+      "extractedAt": "2026-04-10T01:33:03.083Z",
+      "title": "고객지원 | LG전자",
+      "groups": {
+        "mainService": {
+          "groupId": "mainService",
+          "selector": ".main-service-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 46,
+            "width": 1460,
+            "height": 360
+          }
+        },
+        "notice": {
+          "groupId": "notice",
+          "selector": ".home-notice-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 406,
+            "width": 1460,
+            "height": 80
+          }
+        },
+        "tipsBanner": {
+          "groupId": "tipsBanner",
+          "selector": ".common-banner.related-pages",
+          "matchCount": 1,
+          "rect": {
+            "x": 56,
+            "y": 964,
+            "width": 1348,
+            "height": 505
+          }
+        },
+        "bestcare": {
+          "groupId": "bestcare",
+          "selector": ".bestcare-section",
+          "matchCount": 1,
+          "rect": {
+            "x": 40,
+            "y": 5683,
+            "width": 1380,
+            "height": 347
+          }
+        }
+      }
+    },
+    {
+      "pageId": "support",
+      "viewportProfile": "pc",
+      "sourceType": "reference",
+      "sourceUrl": "https://www.lge.co.kr/support",
+      "capturedUrl": "http://localhost:3000/reference-content/support?viewportProfile=pc",
+      "extractedAt": "2026-04-10T01:25:11.865Z",
+      "title": "고객지원 | LG전자",
+      "groups": {
+        "mainService": {
+          "groupId": "mainService",
+          "selector": ".main-service-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 121,
+            "width": 1460,
+            "height": 360
+          }
+        },
+        "notice": {
+          "groupId": "notice",
+          "selector": ".home-notice-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 481,
+            "width": 1460,
+            "height": 80
+          }
+        },
+        "tipsBanner": {
+          "groupId": "tipsBanner",
+          "selector": ".common-banner.related-pages",
+          "matchCount": 1,
+          "rect": {
+            "x": 40,
+            "y": 1039,
+            "width": 1380,
+            "height": 275
+          }
+        },
+        "bestcare": {
+          "groupId": "bestcare",
+          "selector": ".bestcare-section",
+          "matchCount": 1,
+          "rect": {
+            "x": 40,
+            "y": 2687,
+            "width": 1380,
+            "height": 300
+          }
+        }
+      }
+    },
+    {
+      "pageId": "support",
+      "viewportProfile": "pc",
+      "sourceType": "working",
+      "sourceUrl": "https://www.lge.co.kr/support",
+      "capturedUrl": "http://localhost:3000/clone-content/support?viewportProfile=pc",
+      "extractedAt": "2026-04-10T01:32:46.603Z",
+      "title": "고객지원 | LG전자",
+      "groups": {
+        "mainService": {
+          "groupId": "mainService",
+          "selector": ".main-service-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 121,
+            "width": 1460,
+            "height": 360
+          }
+        },
+        "notice": {
+          "groupId": "notice",
+          "selector": ".home-notice-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 481,
+            "width": 1460,
+            "height": 80
+          }
+        },
+        "tipsBanner": {
+          "groupId": "tipsBanner",
+          "selector": ".common-banner.related-pages",
+          "matchCount": 1,
+          "rect": {
+            "x": 40,
+            "y": 1039,
+            "width": 1380,
+            "height": 275
+          }
+        },
+        "bestcare": {
+          "groupId": "bestcare",
+          "selector": ".bestcare-section",
+          "matchCount": 1,
+          "rect": {
+            "x": 40,
+            "y": 2687,
+            "width": 1380,
+            "height": 300
+          }
+        }
+      }
+    }
+  ],
+  "errors": []
+}

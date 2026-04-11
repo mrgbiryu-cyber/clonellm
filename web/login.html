@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | LGE Prototype</title>
+    <style>
+      body { margin: 0; font-family: Arial, sans-serif; background: #f6f7fb; color: #141821; min-height: 100vh; display: grid; place-items: center; }
+      .card { width: min(420px, calc(100vw - 32px)); background: #fff; border: 1px solid #e7e9f2; border-radius: 14px; box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08); overflow: hidden; }
+      .head { padding: 18px 20px; background: #111827; color: #fff; }
+      .body { padding: 18px 20px; display: grid; gap: 18px; }
+      .panel { border: 1px solid #eceef7; border-radius: 10px; padding: 14px; }
+      .panel h2 { margin: 0 0 12px; font-size: 14px; }
+      label { display: block; font-size: 12px; color: #5d6476; margin-bottom: 6px; }
+      input { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid #dfe3f0; border-radius: 8px; font: inherit; }
+      .field { margin-bottom: 10px; }
+      button { border: 0; background: #1f4dd8; color: #fff; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; }
+      .alt { background: #c60c30; }
+      .status { font-size: 12px; color: #586075; min-height: 18px; }
+      .actions { display: flex; gap: 8px; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="head"><strong>LGE Prototype Login</strong></div>
+      <div class="body">
+        <section class="panel">
+          <h2>로그인</h2>
+          <div class="field">
+            <label for="loginId">아이디</label>
+            <input id="loginId" autocomplete="username" />
+          </div>
+          <div class="field">
+            <label for="loginPassword">비밀번호</label>
+            <input id="loginPassword" type="password" autocomplete="current-password" />
+          </div>
+          <div class="actions">
+            <button id="loginBtn">로그인</button>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>새 계정 만들기</h2>
+          <div class="field">
+            <label for="registerId">아이디</label>
+            <input id="registerId" autocomplete="username" />
+          </div>
+          <div class="field">
+            <label for="registerName">이름</label>
+            <input id="registerName" autocomplete="name" />
+          </div>
+          <div class="field">
+            <label for="registerPassword">비밀번호</label>
+            <input id="registerPassword" type="password" autocomplete="new-password" />
+          </div>
+          <div class="actions">
+            <button class="alt" id="registerBtn">계정 생성</button>
+          </div>
+        </section>
+        <div id="status" class="status"></div>
+      </div>
+    </div>
+    <script>
+      const statusEl = document.getElementById("status");
+      const setStatus = (text) => { statusEl.textContent = text; };
+
+      async function postJson(url, payload) {
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.detail || data.error || "request_failed");
+        return data;
+      }
+
+      document.getElementById("loginBtn").addEventListener("click", async () => {
+        try {
+          setStatus("로그인 중...");
+          await postJson("/api/auth/login", {
+            loginId: document.getElementById("loginId").value,
+            password: document.getElementById("loginPassword").value,
+          });
+          location.href = "/admin";
+        } catch (error) {
+          setStatus("로그인 실패: " + String(error));
+        }
+      });
+
+      document.getElementById("registerBtn").addEventListener("click", async () => {
+        try {
+          setStatus("계정 생성 중...");
+          await postJson("/api/auth/register", {
+            loginId: document.getElementById("registerId").value,
+            displayName: document.getElementById("registerName").value,
+            password: document.getElementById("registerPassword").value,
+          });
+          location.href = "/admin";
+        } catch (error) {
+          setStatus("계정 생성 실패: " + String(error));
+        }
+      });
+    </script>
+  </body>
+</html>

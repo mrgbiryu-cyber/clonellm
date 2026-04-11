@@ -1,0 +1,12 @@
+node_modules/
+
+tmp/
+*.log
+
+data/runtime/
+data/visual/
+data/debug/
+data/reports/
+
+.DS_Store
+Thumbs.db

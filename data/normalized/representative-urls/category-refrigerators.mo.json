@@ -1,0 +1,579 @@
+{
+  "pageId": "category-refrigerators",
+  "viewportProfile": "mo",
+  "url": "https://www.lge.co.kr/m/category/refrigerators",
+  "viewport": {
+    "profile": "mo",
+    "width": 430,
+    "height": 2200
+  },
+  "capturedAt": "2026-04-09T03:43:31.247Z",
+  "title": "냉장고 | LG전자 | 공식몰 LGE.COM",
+  "candidateCount": 1,
+  "selectedRowY": null,
+  "selectedCount": 0,
+  "representativeProducts": [],
+  "debug": {
+    "allAnchorCount": 287,
+    "runtimeCardCount": 2,
+    "topByArea": [
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00894004",
+        "pathname": "/benefits/exhibitions/detail-PE00894004",
+        "search": "",
+        "text": "LG 디오스 AI 냉장고 사전 런칭 기획전 20% 할인부터 3만 멤버십 포인트 혜택까지 확인하기",
+        "className": "",
+        "rect": {
+          "x": 16,
+          "y": -278,
+          "width": 398,
+          "height": 255
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 5,
+        "area": 101415,
+        "priceLike": true,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00869002",
+        "pathname": "/benefits/exhibitions/detail-PE00869002",
+        "search": "",
+        "text": "함께 사면 가전 번들 할인! 최대 750만원 캐시백에 멤버십 포인트 150만P 혜택까지",
+        "className": "",
+        "rect": {
+          "x": 414,
+          "y": -278,
+          "width": 398,
+          "height": 255
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 5,
+        "area": 101415,
+        "priceLike": true,
+        "skipped": true
+      },
+      {
+        "href": "https://homestyle.lge.co.kr/",
+        "pathname": "/",
+        "search": "",
+        "text": "프리미엄 공간을 위한 큐레이션 홈스타일 보러가기",
+        "className": "",
+        "rect": {
+          "x": -844,
+          "y": 76,
+          "width": 398,
+          "height": 69
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 5,
+        "area": 27462,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/lg-thinq",
+        "pathname": "/lg-thinq",
+        "search": "",
+        "text": "",
+        "className": "",
+        "rect": {
+          "x": -642,
+          "y": 1111,
+          "width": 196,
+          "height": 100
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 2,
+        "area": 19582,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/objet-collection",
+        "pathname": "/objet-collection",
+        "search": "",
+        "text": "",
+        "className": "",
+        "rect": {
+          "x": -642,
+          "y": 1006,
+          "width": 196,
+          "height": 99
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 2,
+        "area": 19447,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/m/category/refrigerators#none",
+        "pathname": "/m/category/refrigerators",
+        "search": "",
+        "text": "TV/오디오",
+        "className": "",
+        "rect": {
+          "x": -844,
+          "y": 202,
+          "width": 197,
+          "height": 42
+        },
+        "imgCount": 0,
+        "buttonCount": 0,
+        "descendants": 0,
+        "area": 8274,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/m/category/refrigerators#none",
+        "pathname": "/m/category/refrigerators",
+        "search": "",
+        "text": "PC/모니터",
+        "className": "",
+        "rect": {
+          "x": -643,
+          "y": 202,
+          "width": 197,
+          "height": 42
+        },
+        "imgCount": 0,
+        "buttonCount": 0,
+        "descendants": 0,
+        "area": 8274,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/m/category/refrigerators#none",
+        "pathname": "/m/category/refrigerators",
+        "search": "",
+        "text": "주방가전",
+        "className": "",
+        "rect": {
+          "x": -844,
+          "y": 244,
+          "width": 197,
+          "height": 42
+        },
+        "imgCount": 0,
+        "buttonCount": 0,
+        "descendants": 0,
+        "area": 8274,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/m/category/refrigerators#none",
+        "pathname": "/m/category/refrigerators",
+        "search": "",
+        "text": "생활가전",
+        "className": "",
+        "rect": {
+          "x": -643,
+          "y": 244,
+          "width": 197,
+          "height": 42
+        },
+        "imgCount": 0,
+        "buttonCount": 0,
+        "descendants": 0,
+        "area": 8274,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/m/category/refrigerators#none",
+        "pathname": "/m/category/refrigerators",
+        "search": "",
+        "text": "에어컨/에어케어",
+        "className": "",
+        "rect": {
+          "x": -844,
+          "y": 286,
+          "width": 197,
+          "height": 42
+        },
+        "imgCount": 0,
+        "buttonCount": 0,
+        "descendants": 0,
+        "area": 8274,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/m/category/refrigerators#none",
+        "pathname": "/m/category/refrigerators",
+        "search": "",
+        "text": "AI Home",
+        "className": "",
+        "rect": {
+          "x": -643,
+          "y": 286,
+          "width": 197,
+          "height": 42
+        },
+        "imgCount": 0,
+        "buttonCount": 0,
+        "descendants": 0,
+        "area": 8274,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/m/category/refrigerators#none",
+        "pathname": "/m/category/refrigerators",
+        "search": "",
+        "text": "케어용품/소모품",
+        "className": "",
+        "rect": {
+          "x": -844,
+          "y": 328,
+          "width": 197,
+          "height": 42
+        },
+        "imgCount": 0,
+        "buttonCount": 0,
+        "descendants": 0,
+        "area": 8274,
+        "priceLike": false,
+        "skipped": false
+      }
+    ],
+    "interestingBlocks": [
+      {
+        "className": "CommonMoFooter_footer_wrap__G6PbQ",
+        "text": "사이트맵 이용약관 이메일 무단수집거부 개인정보처리방침 이벤트개인정보처리방침 영상정보처리기기운영관리방침 LG전자 임직원 등록 LG계열사 임직원 등록 복지몰 제휴사 임직원 등록 LG전자 사업자몰 인증 정도경영 사이버 신문고 홈스타일 입점 신청 LG전자 대표번호 : 02-3777-1114 1:1 문의 LGE.COM 구매/서비스 문의 : (가전/소모품/구독) 1544-7777 홈스타일 문의 (가구/",
+        "rect": {
+          "x": 0,
+          "y": 1216,
+          "width": 430,
+          "height": 984
+        },
+        "imgCount": 10,
+        "area": 423120,
+        "priceLike": true
+      },
+      {
+        "className": "CommonMoFooter_footer_top__UdtJ5",
+        "text": "사이트맵 이용약관 이메일 무단수집거부 개인정보처리방침 이벤트개인정보처리방침 영상정보처리기기운영관리방침 LG전자 임직원 등록 LG계열사 임직원 등록 복지몰 제휴사 임직원 등록 LG전자 사업자몰 인증 정도경영 사이버 신문고 홈스타일 입점 신청 LG전자 대표번호 : 02-3777-1114 1:1 문의 LGE.COM 구매/서비스 문의 : (가전/소모품/구독) 1544-7777 홈스타일 문의 (가구/",
+        "rect": {
+          "x": 20,
+          "y": 1240,
+          "width": 390,
+          "height": 688
+        },
+        "imgCount": 1,
+        "area": 268320,
+        "priceLike": true
+      }
+    ],
+    "interestingClassCounts": {
+      "PlpMoTabsFlexible_tabs__2Az2Y PlpMoTabsFlexible_fixed__cdSnb": 1,
+      "PlpMoTabsFlexible_btn_expand__3bCi9": 1,
+      "PlpMoBillboardbannerArrow_bba__L_ahi": 1,
+      "PlpMoBillboardbannerArrow_top__K85BN": 2,
+      "PlpMoBillboardbannerArrow_bottom__xBRoo": 2,
+      "PlpMoBillboardbannerArrow_title__Teb_Y": 2,
+      "PlpMoBillboardbannerArrow_subtitle__C1fBy": 2,
+      "PlpMoGuideGate_guide__YZxaL": 1,
+      "PlpMoGuideGate_list__VSk45": 1,
+      "PlpMoGuideGate_container_info__yVbCI": 3,
+      "PlpMoGuideGate_small_title__0K9yy": 3,
+      "PlpMoGuideGate_title___u3vb": 3,
+      "PlpMoFilterQuickSkeleton_filter__FQ6QV PlpMoFilterQuickSkeleton_skeleton__ajCoH": 1,
+      "PlpMoFilterQuickSkeleton_filter_top___C64c": 1,
+      "PlpMoFilterQuickSkeleton_filter_check__Bv3_s": 1,
+      "CommonMoListUnitProduct_unit__AS11d": 1,
+      "CommonMoListUnitSkeleton_list_unit_product__yCgxX CommonMoListUnitSkeleton_twin_type__ZXLJd": 1,
+      "CommonMoListUnitSkeleton_skeleton__J5FAP CommonMoListUnitSkeleton_twin_type__ZXLJd": 4,
+      "CommonMoListUnitSkeleton_badge___AS49": 4,
+      "CommonMoListUnitSkeleton_img__yV_be": 4,
+      "CommonMoListUnitSkeleton_big__bZRxn": 16,
+      "CommonMoListUnitSkeleton_middle__A3NRL": 4,
+      "CommonMoSidemenu_item__GD3X2": 8
+    },
+    "resources": [
+      {
+        "name": "https://www.lge.co.kr/ai-commerce/adapter/getSessionId",
+        "initiatorType": "fetch",
+        "duration": 17720
+      },
+      {
+        "name": "https://static.lge.co.kr/winwin/winwinDspEventFlag.json",
+        "initiatorType": "fetch",
+        "duration": 148
+      },
+      {
+        "name": "https://www.lge.co.kr/kr/lottie/m_AIchat_40x40.json",
+        "initiatorType": "fetch",
+        "duration": 51
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/common/message?code=netfunnel_flag&locale=ko_KR",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3618
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category?pageUrl=%2Fm%2Fcategory%2Frefrigerators",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3670
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/plp/breadcrumb?requestUrl=%2Fm%2Fcategory%2Frefrigerators",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3745
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/plp/category-list?requestUrl=%2Fm%2Fcategory%2Frefrigerators",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3759
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000065/lineup",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3770
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/displaysvc/ajax/v1/display-spaces?displaySpaceIds=DP_LIVE_CT50000065_001&displaySpaceIds=DP_LIVE_CT50000065_002",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3759
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/mbanner?multiBannerGubun=event_top",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3759
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/mbanner?multiBannerGubun=event_bottom",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3759
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/common/message?code=component-searchResultUrl&locale=ko_KR",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3746
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/living-flag",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3744
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/displaysvc/ajax/v1/smartview/message?categoryId=CT50000065",
+        "initiatorType": "fetch",
+        "duration": 15467
+      },
+      {
+        "name": "https://www.lge.co.kr/m/category/refrigerators?subCateId=CT50000070&_rsc=qb8i9",
+        "initiatorType": "fetch",
+        "duration": 116
+      },
+      {
+        "name": "https://www.lge.co.kr/m/category/refrigerators?subCateId=CT50000069&_rsc=qb8i9",
+        "initiatorType": "fetch",
+        "duration": 289
+      },
+      {
+        "name": "https://www.lge.co.kr/m/category/refrigerators?subCateId=CT50000066&_rsc=qb8i9",
+        "initiatorType": "fetch",
+        "duration": 154
+      },
+      {
+        "name": "https://www.lge.co.kr/m/category/refrigerators?subCateId=CT50000067&_rsc=qb8i9",
+        "initiatorType": "fetch",
+        "duration": 407
+      },
+      {
+        "name": "https://www.lge.co.kr/m/category/refrigerators?subCateId=CT50220004&_rsc=qb8i9",
+        "initiatorType": "fetch",
+        "duration": 289
+      },
+      {
+        "name": "https://www.google.com/rmkt/collect/695745031/?random=1775706092714&cv=11&fst=1775706092714&fmt=8&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be6471v9100462526za200zd9100462526xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938465~115938469~116767281~118131809&u_w=430&u_h=2200&url=https%3A%2F%2Fwww.lge.co.kr%2Fm%2Fcategory%2Frefrigerators&frm=0&tiba=%EB%83%89%EC%9E%A5%EA%B3%A0%20%7C%20LG%EC%A0%84%EC%9E%90%20%7C%20%EA%B3%B5%EC%8B%9D%EB%AA%B0%20LGE.COM&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1846789237.1775706093&uaa=&uab=&uafvl=&uamb=0&uam=&uap=&uapv=&uaw=0&data=event%3Dgtag.config&gcp=5",
+        "initiatorType": "fetch",
+        "duration": 1347
+      },
+      {
+        "name": "https://www.google.com/ccm/collect?frm=0&en=page_view&dl=https%3A%2F%2Fwww.lge.co.kr%2Fm%2Fcategory%2Frefrigerators&scrsrc=www.googletagmanager.com&rnd=1999719543.1775706093&dt=%EB%83%89%EC%9E%A5%EA%B3%A0%20%7C%20LG%EC%A0%84%EC%9E%90%20%7C%20%EA%B3%B5%EC%8B%9D%EB%AA%B0%20LGE.COM&auid=1846789237.1775706093&navt=n&npa=0&gtm=45be6471v9100462526za200zd9100462526xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938465~115938469~118131809&apve=1&apvf=f&apvc=1&tids=AW-695745031&tid=AW-695745031&tft=1775706093011&tfd=50166",
+        "initiatorType": "fetch",
+        "duration": 1367
+      },
+      {
+        "name": "https://www.google.com/rmkt/collect/362582935/?random=1775706097609&cv=11&fst=1775706097609&fmt=8&bg=ffffff&guid=ON&async=1&en=gtag.config&gtm=45be6471v868842363za200zb9100462526zd9100462526xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938465~115938468~116767281&u_w=430&u_h=2200&url=https%3A%2F%2Fwww.lge.co.kr%2Fm%2Fcategory%2Frefrigerators&frm=0&tiba=%EB%83%89%EC%9E%A5%EA%B3%A0%20%7C%20LG%EC%A0%84%EC%9E%90%20%7C%20%EA%B3%B5%EC%8B%9D%EB%AA%B0%20LGE.COM&hn=www.googleadservices.com&npa=0&pscdl=noapi&auid=1846789237.1775706093&uaa=&uab=&uafvl=&uamb=0&uam=&uap=&uapv=&uaw=0&data=event%3Dgtag.config&gcp=5",
+        "initiatorType": "fetch",
+        "duration": 133
+      },
+      {
+        "name": "https://www.google.com/ccm/collect?frm=0&en=page_view&dl=https%3A%2F%2Fwww.lge.co.kr%2Fm%2Fcategory%2Frefrigerators&scrsrc=www.googletagmanager.com&rnd=1999719543.1775706093&dt=%EB%83%89%EC%9E%A5%EA%B3%A0%20%7C%20LG%EC%A0%84%EC%9E%90%20%7C%20%EA%B3%B5%EC%8B%9D%EB%AA%B0%20LGE.COM&auid=1846789237.1775706093&navt=n&npa=0&gtm=45be6471v868842363za200zb9100462526zd9100462526xec&gcd=13l3l3l3l1l1&dma=0&tag_exp=0~115938465~115938468&apve=1&apvf=f&apvc=0&tids=AW-362582935&tid=AW-362582935&tft=1775706100187&tfd=57334",
+        "initiatorType": "fetch",
+        "duration": 163
+      },
+      {
+        "name": "https://nam.veta.naver.com/nac/2",
+        "initiatorType": "xmlhttprequest",
+        "duration": 1187
+      },
+      {
+        "name": "https://analytics.google.com/g/collect?v=2&tid=G-ZBLV8D536G&gtm=45je6471v880721323z8838877278za20gzb838877278zd838877278&_p=1775706082183&_gaz=1&gcd=13l3l3l3l1l1&npa=0&dma=0&_eu=EAAAAGA&are=1&cid=1219943897.1775706103&frm=0&ir=1&pscdl=noapi&sr=430x2200&uaa=&uab=&uafvl=&uam=&uamb=0&uap=&uapv=&uaw=0&ul=ko-kr&_s=1&tag_exp=0~115938465~115938469~117512543~118442252~118449365&sid=1775706103&sct=1&seg=0&dl=https%3A%2F%2Fwww.lge.co.kr%2Fm%2Fcategory%2Frefrigerators&dt=%EB%83%89%EC%9E%A5%EA%B3%A0%20%7C%20LG%EC%A0%84%EC%9E%90%20%7C%20%EA%B3%B5%EC%8B%9D%EB%AA%B0%20LGE.COM&en=page_view&_fv=1&_nsi=1&_ss=2&ep.host_type=%ED%86%B5%ED%95%A9%EC%9B%B9&ep.full_url_without_param=www.lge.co.kr%2Fm%2Fcategory%2Frefrigerators&ep.site_category=%ED%86%B5%ED%95%A9%EC%82%AC%EC%9D%B4%ED%8A%B8&ep.full_referrer=&ep.browser_navigation_type=NAVIGATE&ep.browser_tab_type=Existing&ep.kakao_embeded=N&ep.user_agent=Mozilla%2F5.0%20(iPhone%3B%20CPU%20iPhone%20OS%2017_0%20like%20Mac%20OS%20X)%20AppleWebKit%2F605.1.15%20(KHTML%2C%20like%20Gecko)%20Version%2F17.0%20Mobile%2F15E148%20Safari%2F604.1&ep.local_time_full=2026.%2004.%2009.%2012%3A41%3A41%20GMT%2B09%3A00&epn.local_time_hour=12&ep.local_time_date=2026-04-09&ep.full_url_with_param_hash=www.lge.co.kr%2Fm%2Fcategory%2Frefrigerators&ep.interaction_hit=1&up.prefer_store_area_level1=null&up.prefer_store_area_level2=null&up.prefer_store=null&up.birth_year=null&up.gender=null&up.user_address=null&up.bm_biz_id=null&tfd=60666",
+        "initiatorType": "fetch",
+        "duration": 1625
+      },
+      {
+        "name": "https://typhoon.useinsider.com/?",
+        "initiatorType": "xmlhttprequest",
+        "duration": 1415
+      },
+      {
+        "name": "https://segment.api.useinsider.com/v4/segments/17757061057811576814d31.2874d2d5?partnerid=10004521&fields=16ffad8ec63932ecadf6203332c61801,ff307a1ca780ab12d1fdb2ae4f42633d,9bc0bc5a566209c88b4a6344aca580ca,f8a82ced9d1d6b82ae9fd7b5550dcbf5&",
+        "initiatorType": "xmlhttprequest",
+        "duration": 2857
+      },
+      {
+        "name": "https://locationv2.api.useinsider.com/?v=2&pId=10004521&",
+        "initiatorType": "xmlhttprequest",
+        "duration": 619
+      },
+      {
+        "name": "https://carrier.useinsider.com/v2/event/trigger-events/lgecokr/mobile?",
+        "initiatorType": "xmlhttprequest",
+        "duration": 1284
+      },
+      {
+        "name": "https://inference.api.useinsider.com/predict?pid=10004521&uid=17757061057811576814d31.2874d2d5&sid=odsvxg8r-cwcn-7785-q0a4-it5gm0mkkn3s_1775706106&a=ltpm",
+        "initiatorType": "xmlhttprequest",
+        "duration": 1356
+      },
+      {
+        "name": "https://www.lge.co.kr/m/category/refrigerators?subCateId=CT50210011&_rsc=qb8i9",
+        "initiatorType": "fetch",
+        "duration": 70
+      },
+      {
+        "name": "https://www.lge.co.kr/mkt/ajax/commonmodule/memberInfo?",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3150
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/hellobar/hello-bar-info?isInstall=Y&isMobile=Y",
+        "initiatorType": "xmlhttprequest",
+        "duration": 220
+      },
+      {
+        "name": "https://www.lge.co.kr/mkt/commonModule/miniCart.lgajax",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3102
+      },
+      {
+        "name": "https://www.lge.co.kr/shop/commonModule/miniCart.lgajax",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3078
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/living-flag",
+        "initiatorType": "xmlhttprequest",
+        "duration": 3083
+      }
+    ],
+    "networkBodies": [
+      {
+        "url": "https://www.lge.co.kr/m/category/refrigerators",
+        "mimeType": "text/html",
+        "type": "Document",
+        "length": 597442,
+        "sample": "<!DOCTYPE html><html lang=\"ko\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_youtube.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_insta.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_facebook.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_newsroom.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_kakao.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_blog.svg\"/><link rel=\"preload\" as=\"image\" href=\"https://www.lge.co.kr/kr/common/footer/ethics_logo.png\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/ce0af034b81afa7f.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/4232645f6e234064.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/cff8fc018c1d159e.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/032de89674664674.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/c"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/ce0af034b81afa7f.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 6453,
+        "sample": "@font-face{font-family:Pretendard;font-weight:400;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Regular.352c8e19.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Regular.03d8daed.woff) format(\"woff\")}@font-face{font-family:Pretendard;font-weight:500;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Medium.ce54de3a.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Medium.358ea39e.woff) format(\"woff\")}@font-face{font-family:Pretendard;font-weight:600;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-SemiBold.d67e7444.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-SemiBold.a7c8a0e1.woff) format(\"woff\")}@font-face{font-family:Pretendard;font-weight:700;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Bold.4fe33033.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Bold.ad31b300.woff) format(\"woff\")}@font-face{font-family:D-DIN Condensed;font-weight:400;font-display:swap;src:url(https"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/4232645f6e234064.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 97220,
+        "sample": "@keyframes CommonMoGnb_load__ntkyR{to{background-position:-100% 0}}@keyframes CommonMoGnb_load30__3Bkv1{0%{left:-200%}to{left:100%}}.CommonMoGnb_gnb__AS3RT{max-width:767px;margin:0 auto;width:100%;height:56px;padding:8px 12px 8px 4px;display:flex;justify-content:space-between;align-items:center;background:#fff;position:relative;font-family:var(--font-family--pretendard)}.CommonMoGnb_gnb__AS3RT *{font-family:inherit}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_open__i6evx){z-index:5}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_lft__f5PoE li:only-child) .CommonMoGnb_tit_wrap__etWvE{padding-left:0}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_rgh__tN4Bn li:only-child):has(.CommonMoGnb_lft__f5PoE li:only-child) .CommonMoGnb_lft__f5PoE{min-width:auto}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_rgh__tN4Bn li:only-child):has(.CommonMoGnb_lft__f5PoE li:only-child) .CommonMoGnb_tit_wrap__etWvE{padding-left:8px}.CommonMoGnb_gnb__AS3RT:not(:has(.CommonMoGnb_rgh__tN4Bn)){gap:8px}.CommonMoGnb_gnb__AS3RT:not(:has(.CommonMoGnb_rgh__tN4Bn)) .CommonMoGnb_lft__f5PoE{min-width:auto}.CommonMoGnb_gnb__AS3RT:not(:has(.CommonMoGnb_rgh__tN4Bn)) .CommonMoGnb_tit_wrap__etWvE{padding:0}.CommonMoGnb_gnb__AS3RT .CommonMoGnb_u"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/cff8fc018c1d159e.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 100566,
+        "sample": "@keyframes error-basic_load__i9_n9{to{background-position:-100% 0}}@keyframes error-basic_load30__8pVyw{0%{left:-200%}to{left:100%}}.error-basic_error_wrap___GIKX{display:flex;position:relative;width:100%;height:100vh;align-items:center;justify-content:center}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc{text-align:center}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_title__EaySl{font-size:27px;line-height:122.2222222222%;font-weight:var(--fw--700);margin-bottom:16px}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_desc__UfQBz{font-size:15px;line-height:146.6666666667%;min-height:110px;margin-bottom:60px}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_ci__GKhAn{margin:0 auto;font-size:0;width:76px;height:21px;background:url(https://www.lge.co.kr/lg5-common/images/header/logo.svg) no-repeat}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_btn__9bZBe{position:fixed;bottom:40px;left:16px;right:16px}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_btn__9bZBe a,.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-bas"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/032de89674664674.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 5359,
+        "sample": "@keyframes SearchMoInput_load__HhBWA{to{background-position:-100% 0}}@keyframes SearchMoInput_load30__bq31B{0%{left:-200%}to{left:100%}}.SearchMoInput_search_bar__iqHU4{position:-webkit-sticky;position:sticky;top:0;z-index:10;display:flex;align-items:center;width:100%;max-width:767px;margin:0 auto;padding:8px 12px 8px 4px;background-color:var(--color-set--white);font-family:var(--font-family--pretendard)}.SearchMoInput_search_bar__iqHU4 *{font-family:inherit}.SearchMoInput_search_bar__iqHU4 a:focus,.SearchMoInput_search_bar__iqHU4 a:focus-visible,.SearchMoInput_search_bar__iqHU4 button:focus,.SearchMoInput_search_bar__iqHU4 button:focus-visible{outline-color:#000}.SearchMoInput_search_bar__iqHU4.SearchMoInput_search_bar_layer__P_s4i{padding:8px 20px 8px 4px}.SearchMoInput_search_bar__iqHU4.SearchMoInput_search_bar_layer__P_s4i .SearchMoInput_search_utility__ld57w{display:none}.SearchMoInput_search_bar__iqHU4:has([class*=search_input_layer_wrap]){flex-direction:column;z-index:121;gap:0;height:100vh;padding:0}.SearchMoInput_search_bar__iqHU4:has([class*=search_input_layer_wrap]) .SearchMoInput_search_wrap__7sEYt{padding:8px 20px 8px 4px}.SearchMoInput_search_bar__iqHU4:has([class*=se"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/5be585dca501b42f.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 100816,
+        "sample": "@keyframes PlpPcPopupLayerSearch_load__isylU{to{background-position:-100% 0}}@keyframes PlpPcPopupLayerSearch_load30__wM9ae{0%{left:-200%}to{left:100%}}.PlpPcPopupLayerSearch_layer_search__qZpRr{width:100%}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_input_keyword__CT4sS input{width:calc(100% - 42px);padding:0 0 0 32px!important;height:58px;font-size:18px;line-height:26px;border:0;border-radius:58px;background:var(--color-set--gray200)!important}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_input_keyword__CT4sS button[class*=btn_search]{right:0;width:32px;height:32px}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK{margin-top:32px}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK .PlpPcPopupLayerSearch_count__De9iB,.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK .PlpPcPopupLayerSearch_count__De9iB em{font-size:14px;line-height:20px}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK .PlpPcPopupLayerSearch_count__De9iB em.PlpPcPopupLayerSearch_red__tdyoQ{color:var(--color-set--red)}.P"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/99b496e77f3e700f.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 40570,
+        "sample": "@keyframes CommonPcGnb_load__hS09v{to{background-position:-100% 0}}@keyframes CommonPcGnb_load30__2DVMl{0%{left:-200%}to{left:100%}}.CommonPcGnb_header__MMuNW{position:relative;min-width:1460px;background:var(--color-set--white);font-family:var(--font-family--pretendard);color:var(--color-set--black111);z-index:12}.CommonPcGnb_header__MMuNW:has([class*=active]){z-index:122}.CommonPcGnb_header__MMuNW *{font-family:inherit;color:inherit}.CommonPcGnb_header__MMuNW .CommonPcGnb_inner__11s6U{position:relative;max-width:1760px;width:100%;margin:0 auto}.CommonPcGnb_header__MMuNW .CommonPcGnb_bg___BHPF{position:absolute;left:0;right:0;top:0;background:var(--color-set--white);z-index:11}.CommonPcGnb_header__MMuNW.CommonPcGnb_open__rPJxU .CommonPcGnb_bg___BHPF{display:block}.CommonPcGnb_header__MMuNW:after{content:\"\";display:block;height:1px;background:var(--color-set--gray500);position:absolute;left:0;right:0;z-index:11}.CommonPcGnb_header__MMuNW .CommonPcGnb_dimmed__Ov8s5{position:fixed;width:100vw;left:50%;transform:translateX(-50%);top:0;bottom:0;background:var(--color-set--black);opacity:.7;z-index:10}.CommonPcGnb_header__MMuNW a{outline-offset:-1px}.CommonPcGnb_header__MMuNW .CommonPcG"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/6e2696d0f9788933.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 99636,
+        "sample": "@keyframes PlpPcToolbar_load__B6vuf{to{background-position:-100% 0}}@keyframes PlpPcToolbar_load30__o_3Xi{0%{left:-200%}to{left:100%}}.PlpPcToolbar_toolbar__wJzCe{min-width:1130px;width:1130px;margin:0 auto 16px;display:flex;justify-content:flex-start;align-items:flex-start;height:32px}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_filter_select___C2qT [class*=select_trigger]:focus{outline:none!important}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_filter_select___C2qT[class*=outline] [class*=select_trigger]:focus{outline:1px solid #000!important}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_total_num__YhXqo{font-size:14px;line-height:32px;display:flex;align-items:center;flex-shrink:0}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_total_num__YhXqo span{font-size:14px;line-height:32px;margin-left:3px;font-weight:var(--fw--700)}.PlpPcToolbar_toolbar_list_wrap___2b82{display:flex;align-items:center;gap:8px;margin:0 24px;flex-shrink:1;min-width:0}.PlpPcToolbar_toolbar_list_wrap___2b82:has(div[class*=swiper-wrapper]:empty){display:none}.PlpPcToolbar_toolbar_list_wrap___2b82 .PlpPcToolbar_filter_selected_list__HAgp4{width:auto;max-width:100%}.PlpPcToolbar_toolbar_list_wrap___2b82 .PlpPcToolbar_filter"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/6f8d0ee24381d2ad.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 73290,
+        "sample": "@keyframes CommonMoSearchLayer_load__VPcne{to{background-position:-100% 0}}@keyframes CommonMoSearchLayer_load30__PqRXU{0%{left:-200%}to{left:100%}}.CommonMoSearchLayer_search_layer_wrap__1fRFw{display:block;width:100vw;height:100dvh;max-height:100vh;margin:0 auto;z-index:105;background-color:var(--color-set--white);overflow:hidden}.CommonMoSearchLayer_search_layer_wrap__1fRFw.CommonMoSearchLayer_search_input_layer_wrap__fPw2J .CommonMoSearchLayer_inner__zq7ig{padding-bottom:50px}.CommonMoSearchLayer_search_layer_wrap__1fRFw.CommonMoSearchLayer_search_input_layer_wrap__fPw2J .CommonMoSearchLayer_inner__zq7ig .CommonMoSearchLayer_btn_close__xS2Mf{position:relative;top:auto;right:16px;left:auto;display:flex;width:auto;height:auto;font-weight:var(--fw--700);font-size:12px;line-height:17px;transform:rotate(0);text-decoration:underline;background:none}.CommonMoSearchLayer_search_layer_wrap__1fRFw .CommonMoSearchLayer_inner__zq7ig{padding:0;position:relative}.CommonMoSearchLayer_search_layer_wrap__1fRFw .CommonMoSearchLayer_inner__zq7ig .CommonMoSearchLayer_input_keyword_wrap__Bisyk{display:flex;flex-wrap:wrap;flex-direction:column}.CommonMoSearchLayer_search_layer_wrap__1fRFw .CommonMoS"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/096f9b8fc60f9b62.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 37829,
+        "sample": "@keyframes CommonPcSearchLayer_load__T8pmA{to{background-position:-100% 0}}@keyframes CommonPcSearchLayer_load30__TbMvH{0%{left:-200%}to{left:100%}}.CommonPcSearchLayer_search_layer_wrap__odMyZ{position:fixed;left:calc(50% + 90px);top:18px;right:auto;bottom:auto;max-height:calc(100% - 18px);transform:translateX(-50%);display:block;width:100%;overflow-y:auto;max-width:920px;border:1px solid var(--color-set--gray200);border-radius:20px;box-shadow:4px 2px 8px 0 rgba(0,0,0,.15);background-color:var(--color-set--white)}@media screen and (min-width:1468px)and (max-width:1760px){.CommonPcSearchLayer_search_layer_wrap__odMyZ{left:auto;transform:none;right:338px}}.CommonPcSearchLayer_search_layer_wrap__odMyZ.CommonPcSearchLayer_search_input_layer_wrap__tBlRZ{position:absolute;top:83px;right:auto;left:50%;max-width:688px;height:auto;max-height:calc(100vh - 220px);transform:translateX(-50%)}.CommonPcSearchLayer_search_layer_wrap__odMyZ.CommonPcSearchLayer_search_input_layer_wrap__tBlRZ .CommonPcSearchLayer_inner__tYdHG{display:flex;flex-direction:column;padding:40px 40px 20px}.CommonPcSearchLayer_search_layer_wrap__odMyZ.CommonPcSearchLayer_search_input_layer_wrap__tBlRZ .CommonPcSearchLayer_"
+      }
+    ],
+    "topCandidates": [
+      {
+        "href": "https://www.lge.co.kr/sitemap",
+        "pathname": "/sitemap",
+        "text": "사이트맵 이용약관 이메일 무단수집거부 개인정보처리방침 이벤트개인정보처리방침 영상정보처리기기운영관리방침 LG전자 임직원 등록 LG계열사 임직원 등록 복지몰 제휴사 임직원 등록 LG전자 사업자몰 인증 정도경영 사이버 신문고 홈스타일 입점 신청 LG전자 대표번호 : 02-3777-1114 1:1 문의 LGE.COM 구매/서비스 문의 : (가전/소모품/구독) 1544-7777 홈스타일 문의 (가구/",
+        "className": "CommonMoFooter_footer_wrap__G6PbQ",
+        "rect": {
+          "x": 0,
+          "y": 1216,
+          "width": 430,
+          "height": 984
+        },
+        "imgCount": 10,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      }
+    ],
+    "firstRows": []
+  }
+}

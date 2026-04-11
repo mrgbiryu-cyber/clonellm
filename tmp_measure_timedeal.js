@@ -1,0 +1,39 @@
+const { chromium } = require('playwright');
+
+async function measure(url) {
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage({ viewport: { width: 1460, height: 2200 } });
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.waitForTimeout(2500);
+  const data = await page.evaluate(() => {
+    const pickRect = (el) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: Math.round(r.x), y: Math.round(r.y), width: Math.round(r.width), height: Math.round(r.height) };
+    };
+    const slot = document.querySelector('[data-codex-slot="timedeal"]') || document.querySelector('section[class*="HomeMoTimedeal_timedeal__"]');
+    if (!slot) return { missing: true };
+    const slides = Array.from(slot.querySelectorAll('.swiper-slide')).slice(0, 2);
+    return {
+      slot: pickRect(slot),
+      slides: slides.map((slide, index) => ({
+        index: index + 1,
+        slide: pickRect(slide),
+        card: pickRect(slide.querySelector('.HomeMoTimedeal_timedeal_item__rwiPz') || slide),
+        content: pickRect(slide.querySelector('.HomeMoTimedeal_item_cont__2UOQW')),
+        info: pickRect(slide.querySelector('.HomeMoTimedeal_info___A_ao')),
+        imageWrap: pickRect(slide.querySelector('.HomeMoTimedeal_image__M6OoV')),
+        image: pickRect(slide.querySelector('.product-card-image_image img')),
+        bottom: pickRect(slide.querySelector('.HomeMoTimedeal_item_bottom__YMRu9')),
+      }))
+    };
+  });
+  await browser.close();
+  return data;
+}
+
+(async () => {
+  const reference = await measure('http://localhost:3000/reference-content/home');
+  const working = await measure('http://localhost:3000/clone-content/home');
+  console.log(JSON.stringify({ reference, working }, null, 2));
+})();

@@ -1,0 +1,1589 @@
+{
+  "pageId": "category-refrigerators",
+  "viewportProfile": "pc",
+  "url": "https://www.lge.co.kr/category/refrigerators",
+  "viewport": {
+    "profile": "pc",
+    "width": 1460,
+    "height": 2200
+  },
+  "capturedAt": "2026-04-09T02:50:02.727Z",
+  "title": "냉장고 | LG전자 | 공식몰 LGE.COM",
+  "candidateCount": 26,
+  "selectedRowY": 433,
+  "selectedCount": 3,
+  "representativeProducts": [
+    {
+      "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+      "pathname": "/refrigerators/t873mee111",
+      "search": "",
+      "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 클레이 민트/베이지 LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 T873MEE111 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 31% 할인금액 1,890,000 원 원래금액 2,",
+      "rect": {
+        "x": 291,
+        "y": 433,
+        "width": 376,
+        "height": 666
+      },
+      "score": 14
+    },
+    {
+      "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+      "pathname": "/refrigerators/t875mee412",
+      "search": "",
+      "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) 865L 2등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.3kWh/월 냉동367L 냉장498L 모델명 T875MEE412 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 22% 할인금액 2,300,000 원 원래금액 2,950",
+      "rect": {
+        "x": 667,
+        "y": 433,
+        "width": 376,
+        "height": 666
+      },
+      "score": 14
+    },
+    {
+      "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+      "pathname": "/refrigerators/h875gbb111",
+      "search": "",
+      "text": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 H875GBB111 평점 5점 만점 중 5.0 리뷰 개수 (566) 할인율 9% 할인금액 3,250,000 원 원래금액 3,608,000원 최대혜택가 2,855,100 원 내일배송 위시리스트 미등록 ",
+      "rect": {
+        "x": 1043,
+        "y": 433,
+        "width": 376,
+        "height": 666
+      },
+      "score": 14
+    }
+  ],
+  "debug": {
+    "allAnchorCount": 662,
+    "runtimeCardCount": 58,
+    "topByArea": [
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00894004",
+        "pathname": "/benefits/exhibitions/detail-PE00894004",
+        "search": "",
+        "text": "LG 디오스 AI 냉장고 사전 런칭 기획전 20% 할인부터 3만 멤버십 포인트 혜택까지 확인하기",
+        "className": "item",
+        "rect": {
+          "x": 40,
+          "y": -1958,
+          "width": 680,
+          "height": 440
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 5,
+        "area": 299285,
+        "priceLike": true,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00869002",
+        "pathname": "/benefits/exhibitions/detail-PE00869002",
+        "search": "",
+        "text": "함께 사면 가전 번들 할인! 최대 750만원 캐시백에 멤버십 포인트 150만P 혜택까지",
+        "className": "item",
+        "rect": {
+          "x": 740,
+          "y": -1958,
+          "width": 680,
+          "height": 440
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 5,
+        "area": 299285,
+        "priceLike": true,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00893010",
+        "pathname": "/benefits/exhibitions/detail-PE00893010",
+        "search": "",
+        "text": "정품 공기청정기 필터/무빙휠",
+        "className": "banner_box",
+        "rect": {
+          "x": 1099,
+          "y": -1999,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00893009",
+        "pathname": "/benefits/exhibitions/detail-PE00893009",
+        "search": "",
+        "text": "청소기 흡입구/배터리 반납 이벤트",
+        "className": "banner_box",
+        "rect": {
+          "x": 1420,
+          "y": -1999,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00893011",
+        "pathname": "/benefits/exhibitions/detail-PE00893011",
+        "search": "",
+        "text": "에어컨 필터 얼리버드 특가",
+        "className": "banner_box",
+        "rect": {
+          "x": 1741,
+          "y": -1999,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00893008",
+        "pathname": "/benefits/exhibitions/detail-PE00893008",
+        "search": "",
+        "text": "리빙 케어 소모품 컬렉션",
+        "className": "banner_box",
+        "rect": {
+          "x": 2062,
+          "y": -1999,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00892021",
+        "pathname": "/benefits/exhibitions/detail-PE00892021",
+        "search": "",
+        "text": "식세기 고수들의 필수템 활용법",
+        "className": "banner_box",
+        "rect": {
+          "x": 2383,
+          "y": -1999,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/m876gbb231",
+        "pathname": "/refrigerators/m876gbb231",
+        "search": "",
+        "text": "1위 LG 디오스 AI 오브제컬렉션 냉장고 (더블매직스페이스) 871L 1등급 모델명 M876GBB231 할인율 9% 할인금액 4,400,000 원 최대혜택가 3,924,600 원",
+        "className": "",
+        "rect": {
+          "x": 40,
+          "y": -876,
+          "width": 240,
+          "height": 370
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 26,
+        "area": 88800,
+        "priceLike": true,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+        "pathname": "/refrigerators/t873mee111",
+        "search": "",
+        "text": "2위 LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 모델명 T873MEE111 할인율 31% 할인금액 1,890,000 원 최대혜택가 1,664,700 원",
+        "className": "",
+        "rect": {
+          "x": 325,
+          "y": -876,
+          "width": 240,
+          "height": 370
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 26,
+        "area": 88800,
+        "priceLike": true,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/m626gbb032",
+        "pathname": "/refrigerators/m626gbb032",
+        "search": "",
+        "text": "3위 LG 디오스 오브제컬렉션 냉장고 Fit & Max 613L 2등급 모델명 M626GBB032 할인율 9% 할인금액 3,650,000 원 최대혜택가 3,227,100 원",
+        "className": "",
+        "rect": {
+          "x": 610,
+          "y": -876,
+          "width": 240,
+          "height": 370
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 26,
+        "area": 88800,
+        "priceLike": true,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/m616gbb0m1",
+        "pathname": "/refrigerators/m616gbb0m1",
+        "search": "",
+        "text": "4위 LG 디오스 AI 오브제컬렉션 냉장고 Fit & Max 609L 1등급 모델명 M616GBB0M1 할인율 26% 할인금액 2,670,000 원 최대혜택가 2,371,500 원",
+        "className": "",
+        "rect": {
+          "x": 895,
+          "y": -876,
+          "width": 240,
+          "height": 370
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 26,
+        "area": 88800,
+        "priceLike": true,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/t875mee011",
+        "pathname": "/refrigerators/t875mee011",
+        "search": "",
+        "text": "5위 LG 디오스 AI 오브제컬렉션 베이직 냉장고 870L 1등급 모델명 T875MEE011 할인율 30% 할인금액 1,850,000 원 최대혜택가 1,627,500 원",
+        "className": "",
+        "rect": {
+          "x": 1180,
+          "y": -876,
+          "width": 240,
+          "height": 370
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 26,
+        "area": 88800,
+        "priceLike": true,
+        "skipped": false
+      }
+    ],
+    "interestingBlocks": [
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "다른 고객님들이 많이 본 다품목 혜택 제품 LG 디오스 AI 오브제컬렉션 냉장고 Fit & Max 모델명 M616GBB0M1 할인율 26% 할인금액 2,670,000 원 LG 디오스 AI 오브제컬렉션 냉장고 (더블매직스페이스) 모델명 M876GBB231 할인율 9% 할인금액 4,400,000 원 LG 디오스 오브제컬렉션 냉장고 Fit & Max 모델명 M626GBB032 할인율 9% 할인금액",
+        "rect": {
+          "x": 291,
+          "y": 1765,
+          "width": 1128,
+          "height": 457
+        },
+        "imgCount": 5,
+        "area": 515496,
+        "priceLike": true
+      },
+      {
+        "className": "PlpPcListUnitDiscount_unit_discount__7bgXj",
+        "text": "다른 고객님들이 많이 본 다품목 혜택 제품 LG 디오스 AI 오브제컬렉션 냉장고 Fit & Max 모델명 M616GBB0M1 할인율 26% 할인금액 2,670,000 원 LG 디오스 AI 오브제컬렉션 냉장고 (더블매직스페이스) 모델명 M876GBB231 할인율 9% 할인금액 4,400,000 원 LG 디오스 오브제컬렉션 냉장고 Fit & Max 모델명 M626GBB032 할인율 9% 할인금액",
+        "rect": {
+          "x": 291,
+          "y": 1765,
+          "width": 1127,
+          "height": 456
+        },
+        "imgCount": 5,
+        "area": 513912,
+        "priceLike": true
+      },
+      {
+        "className": "PlpPcListUnitDiscount_unit_discount_wrap__W0xU2",
+        "text": "다른 고객님들이 많이 본 다품목 혜택 제품 LG 디오스 AI 오브제컬렉션 냉장고 Fit & Max 모델명 M616GBB0M1 할인율 26% 할인금액 2,670,000 원 LG 디오스 AI 오브제컬렉션 냉장고 (더블매직스페이스) 모델명 M876GBB231 할인율 9% 할인금액 4,400,000 원 LG 디오스 오브제컬렉션 냉장고 Fit & Max 모델명 M626GBB032 할인율 9% 할인금액",
+        "rect": {
+          "x": 292,
+          "y": 1813,
+          "width": 1126,
+          "height": 344
+        },
+        "imgCount": 5,
+        "area": 387344,
+        "priceLike": true
+      },
+      {
+        "className": "PlpPcListUnitDiscount_list_wrap__cIaBT",
+        "text": "LG 디오스 AI 오브제컬렉션 냉장고 Fit & Max 모델명 M616GBB0M1 할인율 26% 할인금액 2,670,000 원 LG 디오스 AI 오브제컬렉션 냉장고 (더블매직스페이스) 모델명 M876GBB231 할인율 9% 할인금액 4,400,000 원 LG 디오스 오브제컬렉션 냉장고 Fit & Max 모델명 M626GBB032 할인율 9% 할인금액 3,650,000 원 LG 디오스 AI 오",
+        "rect": {
+          "x": 332,
+          "y": 1861,
+          "width": 1046,
+          "height": 296
+        },
+        "imgCount": 5,
+        "area": 309616,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "다품목할인 LG SIGNATURE 상냉장고 905L 1등급 색상샤이니 유니버스 도어재질솔리드(스테인리스) 주요 기능노크온,인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동335L 냉장570L 모델명 F904ND79E 평점 5점 만점 중 4.9 리뷰 개수 (43) 할인금액 9,000,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 291,
+          "y": 3517,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "area": 250792,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "퓨어 슈퍼 화이트 LG 냉동고 200L 색상퓨어 냉동200L 모델명 A202S 평점 5점 만점 중 4.9 리뷰 개수 (250) 할인금액 650,000 원 원래금액 680,000원 최대혜택가 576,600 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 667,
+          "y": 3517,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "area": 250792,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "다품목할인 LG SIGNATURE 얼음정수 냉장고 840L 3등급 색상샤이니 유니버스 도어재질솔리드(스테인리스) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.6kWh/월 냉동335L 냉장505L 모델명 J842ND79 평점 5점 만점 중 4.7 리뷰 개수 (23) 할인금액 11,000,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 1043,
+          "y": 3517,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "area": 250792,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "퓨어 슈퍼 화이트 LG 일반냉장고 90L 4등급 색상퓨어 소비전력19.4kWh/월 냉장90L 모델명 B103S14 평점 5점 만점 중 4.9 리뷰 개수 (82) 할인율 12% 할인금액 280,000 원 원래금액 320,000원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 291,
+          "y": 4184,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "area": 250792,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "닷컴 ONLY 퓨어 화이트 LG 일반냉장고 317L 1등급 색상화이트 도어재질네이처(메탈) 소비전력27.8kWh/월 냉동79L 냉장238L 모델명 B312W31 평점 5점 만점 중 4.9 리뷰 개수 (254) 할인율 24% 할인금액 529,000 원 원래금액 700,000원 최대혜택가 499,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 667,
+          "y": 4184,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "area": 250792,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "다품목할인 LG 디오스 오브제컬렉션 냉장고 Fit & Max 613L 2등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능UV청정탈취필터+,도어쿨링+,인버터 리니어 컴프레서 소비전력38.0kWh/월 냉동229L 냉장384L 모델명 M626GBB032 평점 5점 만점 중 5.0 리뷰 개수 (723) 할인율 9% 할인금액 3,650,000 원 원래금액 4,052,000원 최대혜택가 3,22",
+        "rect": {
+          "x": 1043,
+          "y": 4184,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "area": 250792,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "다품목할인 베이지/베이지 에센스 화이트/에센스 화이트 토프/아몬드 LG 디오스 AI 오브제컬렉션 냉장고 (더블매직스페이스) 871L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능UV청정탈취필터+,도어쿨링+,퓨어 프레시 필터 소비전력43kWh/월 냉동367L 냉장504L 모델명 M876GBB231 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 9% 할인금액 4,400,0",
+        "rect": {
+          "x": 291,
+          "y": 4851,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "area": 250792,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "LG 일반냉장고 오브제컬렉션 317L 1등급 색상베이지 도어재질네이처(메탈) 소비전력27.8kWh/월 냉동79L 냉장238 모델명 D312MBE31 평점 5점 만점 중 5.0 리뷰 개수 (324) 할인율 21% 할인금액 670,000 원 원래금액 850,000원 최대혜택가 595,200 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 667,
+          "y": 4851,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "area": 250792,
+        "priceLike": true
+      }
+    ],
+    "interestingClassCounts": {
+      "CommonPcGnb_item__ooPqg": 7,
+      "CommonPcGnb_scroll_item__bXHY9": 11,
+      "CommonPcGnb_scroll_item__bXHY9 CommonPcGnb_spr__x3Px_": 5,
+      "CommonPcGnb_hashtag_item__XtaKn": 11,
+      "PlpPcCategoryTitleTabs_ctt__x702O": 1,
+      "PlpPcCategoryTitleTabs_ctt_tit__wl3fs": 1,
+      "PlpPcCategoryTitleTabs_ctt_list__9jxo4": 1,
+      "PlpPcCategoryTitleTabs_active__8U_BR": 1,
+      "PlpPcBillboardbannerArrow_bba__SkJ4M": 1,
+      "item": 2,
+      "PlpPcBillboardbannerArrow_top__jyoin": 2,
+      "PlpPcBillboardbannerArrow_bottom__9N_mI": 2,
+      "PlpPcBillboardbannerArrow_title__TGIzV": 2,
+      "PlpPcBillboardbannerArrow_subtitle__VQd8o": 2,
+      "PlpPcListCircleArrow_lca__mEuRq": 1,
+      "PlpPcListCircleArrow_list__n1NQU": 5,
+      "PlpPcListCircleArrow_outer__QTAIw": 5,
+      "PlpPcListCircleArrow_container_img__xElSu": 5,
+      "PlpPcListCircleArrow_container_info__kkQo5": 5,
+      "PlpPcListCircleArrow_title__SB2Lh": 5,
+      "PlpPcListCircleArrow_subtitle__AB3EZ": 5,
+      "PlpPcGuideGate_guide__hsy3Q": 1,
+      "PlpPcGuideGate_inner__hHELl": 3,
+      "PlpPcGuideGate_container_info__9XUUz": 3,
+      "PlpPcGuideGate_small_title__EwJhF": 3,
+      "PlpPcGuideGate_title__wslqX": 3,
+      "PlpPcGuideGate_description__GgEvR": 3,
+      "PlpPcBestranking_ranking_type__l1w9t": 1,
+      "PlpPcBestranking_container__dzLNw": 1,
+      "PlpPcBestranking_title_wrap__of52y": 1,
+      "PlpPcBestranking_title__3xbRW": 1,
+      "PlpPcBestranking_unit_wrap__RCr1_": 1,
+      "PlpPcBestranking_unit_item__lnMdk": 5,
+      "PlpPcBestranking_recommend_num__ZCWaP": 5,
+      "PlpPcBestranking_container_img__NDGUD": 5,
+      "PlpPcBestranking_info__xf0aq": 5,
+      "product-card-title_product-card-title__CwsCk": 40,
+      "product-card-title_box": 40,
+      "product-card-title_headline": 40,
+      "product-card-title_description": 40,
+      "product-card-title_sub": 40,
+      "product-card-title_sku": 40,
+      "product-card-price_product-card-price__tVsuw": 40,
+      "PlpPcBestranking_ranking_type_more__cm3QT": 1,
+      "PlpPcTabsFlexible_tabs__kchYI PlpPcTabsFlexible_fixed__NtLL9": 1,
+      "PlpPcContainer_container__L8y3U": 1,
+      "PlpPcFilterTotal_filter__cAXIH": 1,
+      "PlpPcFilterTotal_container___moqq PlpPcFilterTotal_top__ap0Kl": 1,
+      "PlpPcFilterTotal_check_wrap__apGUY": 6,
+      "PlpPcFilterTotal_tooltip_balloon__u_nc1 PlpPcFilterTotal_ani__TOf0v": 1,
+      "PlpPcFilterTotal_text__bSIYL": 1,
+      "PlpPcFilterTotal_close__h1yPT": 1,
+      "checkbox_checkbox__esv9y PlpPcFilterTotal_delivery_flag__K2Pl1": 1,
+      "PlpPcFilterTotal_container___moqq PlpPcFilterTotal_accordion__N6jIU": 15,
+      "accordion_item": 25,
+      "PlpPcFilterTotal_filter_title__5AGBf": 16,
+      "PlpPcFilterTotal_badge__GSOZa": 3,
+      "PlpPcFilterTotal_container___moqq PlpPcFilterTotal_slider__OyVPa": 1,
+      "PlpPcFilterTotal_title__yR_e7": 1,
+      "PlpPcFilterTotal_input_wrap__B1KDb": 1,
+      "PlpPcFilterTotal_field__t7b_T": 1,
+      "PlpPcFilterTotal_caution__vQiij": 1,
+      "PlpPcFilterTotal_btn_apply__uLxQi": 1,
+      "PlpPcContainer_list_cont__tBF9C": 1,
+      "PlpPcToolbar_toolbar__wJzCe": 1,
+      "PlpPcToolbar_total_num__YhXqo": 1,
+      "PlpPcToolbar_filter_select___C2qT": 1,
+      "CommonPcListUnitProduct_list_unit_product__AeuOT": 1,
+      "CommonPcListUnitProduct_unit__h6bSJ": 31,
+      "CommonPcListUnitProduct_badge_list__Vfr0t": 30,
+      "CommonPcListUnitProduct_img_wrap__4haVO": 30,
+      "CommonPcListUnitProduct_option_container_scroll__HI3MX": 30,
+      "CommonPcListUnitProduct_option_area__4r0SK": 16,
+      "CommonPcListUnitProduct_color_wrap__ZnHsm": 16,
+      "CommonPcListUnitProduct_navigation__zO3T0": 3,
+      "CommonPcListUnitProduct_prev__xVMvS CommonPcListUnitProduct_disabled__ivq52": 2,
+      "CommonPcListUnitProduct_next__decOK": 2,
+      "CommonPcListUnitProduct_recently_viewed__GCIsS": 30,
+      "CommonPcListUnitProduct_title_wrap__4P_gA undefined": 30,
+      "product-card-title_product-card-title__p39Ff": 30,
+      "CommonPcListUnitProduct_spec_wrap__Ip9DX": 30,
+      "CommonPcListUnitProduct_spec_option__9joyS": 156,
+      "product-card-title_rating": 29,
+      "product-card-title_score": 29,
+      "product-card-title_total": 29,
+      "CommonPcListUnitProduct_price_wrap__52oXD": 30,
+      "CommonPcListUnitProduct_delivery_wrap__8lUDa": 29,
+      "CommonPcListUnitProduct_cta_wrap__8hkpP": 30,
+      "CommonPcListUnitProduct_unit_product_cta_rs__HoQ7d": 30,
+      "CommonPcListUnitProduct_btn_wish__11JcB": 30,
+      "CommonPcListUnitProduct_btn_compare__N8_2b": 30,
+      "CommonPcListUnitProduct_delivery_info__8HHeq CommonPcListUnitProduct_gray__PDXQA": 2,
+      "PlpPcListUnitDiscount_unit_discount__7bgXj": 1,
+      "PlpPcListUnitDiscount_unit_discount_wrap__W0xU2": 1,
+      "PlpPcListUnitDiscount_title_wrap__w8Dq_": 1,
+      "PlpPcListUnitDiscount_title__uXjn2": 1,
+      "PlpPcListUnitDiscount_list_wrap__cIaBT": 1,
+      "PlpPcListUnitDiscount_container_img__iWl5s": 5,
+      "PlpPcListUnitDiscount_info__9cO_x": 5,
+      "PlpPcListUnitDiscount_more_btn__2taXF": 1,
+      "CommonPcListUnitProduct_prev__xVMvS": 1,
+      "CommonPcListUnitProduct_next__decOK CommonPcListUnitProduct_disabled__ivq52": 1,
+      "product-card-title_sku_link": 1,
+      "PlpPcButtonMore_btn_wrap__KAt14": 1,
+      "PlpPcButtonMore_more_btn__B_a_V": 1,
+      "PlpPcButtonMore_text__AenNT": 1,
+      "PlpPcButtonMore_count__AT2J8": 1,
+      "PlpPcListFaq_list_faq__1n1L3": 1,
+      "PlpPcListFaq_more_btn__rZnvR": 1,
+      "PlpPcPopupBottomComparison_comparison__Fa0Vv": 1,
+      "PlpPcPopupBottomComparison_comparison_wrap__3Nr66": 1,
+      "PlpPcPopupBottomComparison_comparison_title__FPEIr": 1,
+      "PlpPcPopupBottomComparison_title_text__6cBAn": 1,
+      "PlpPcPopupBottomComparison_count__Rxj3o": 1,
+      "PlpPcPopupBottomComparison_right_cont__4mwHg": 1,
+      "PlpPcPopupBottomComparison_btn_more_arrow__GuLMJ PlpPcPopupBottomComparison_close__LBKIT": 1,
+      "PlpPcPopupBottomComparison_comparison_content__I1UA3": 1,
+      "PlpPcPopupBottomComparison_comparison_list__G8Wgf": 1,
+      "PlpPcPopupBottomComparison_btn_group__0IJuy": 1,
+      "PlpPcPopupToast_toast_message__sVv3m": 1,
+      "PlpPcPopupToast_toast_message_inner__q6Iwi": 1,
+      "PlpPcPopupToast_toast_text__qOwX8": 1,
+      "PlpPcPopupToast_btn_area__w7aeA": 1
+    },
+    "resources": [
+      {
+        "name": "https://www.lge.co.kr/ai-commerce/adapter/getSessionId",
+        "initiatorType": "fetch",
+        "duration": 129
+      },
+      {
+        "name": "https://static.lge.co.kr/winwin/winwinDspEventFlag.json",
+        "initiatorType": "fetch",
+        "duration": 133
+      },
+      {
+        "name": "https://www.lge.co.kr/kr/lottie/pc_AIchat_56x56.json",
+        "initiatorType": "fetch",
+        "duration": 46
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/common/message?code=netfunnel_flag&locale=ko_KR",
+        "initiatorType": "xmlhttprequest",
+        "duration": 363
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/company-menu",
+        "initiatorType": "xmlhttprequest",
+        "duration": 271
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/mypage-menu",
+        "initiatorType": "xmlhttprequest",
+        "duration": 329
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category?pageUrl=%2Fcategory%2Frefrigerators",
+        "initiatorType": "xmlhttprequest",
+        "duration": 363
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000065/lineup",
+        "initiatorType": "xmlhttprequest",
+        "duration": 329
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/displaysvc/ajax/v1/display-spaces?displaySpaceIds=DP_LIVE_CT50000065_001&displaySpaceIds=DP_LIVE_CT50000065_002",
+        "initiatorType": "xmlhttprequest",
+        "duration": 299
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/common/message?code=component-searchResultUrl&locale=ko_KR",
+        "initiatorType": "xmlhttprequest",
+        "duration": 363
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/living-flag",
+        "initiatorType": "xmlhttprequest",
+        "duration": 328
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/displaysvc/ajax/v1/smartview/message?categoryId=CT50000065",
+        "initiatorType": "fetch",
+        "duration": 364
+      },
+      {
+        "name": "https://www.lge.co.kr/category/refrigerators?subCateId=CT50000070&_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 92
+      },
+      {
+        "name": "https://www.lge.co.kr/category/refrigerators?subCateId=CT50000069&_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 79
+      },
+      {
+        "name": "https://www.lge.co.kr/category/refrigerators?subCateId=CT50000066&_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 96
+      },
+      {
+        "name": "https://www.lge.co.kr/category/refrigerators?subCateId=CT50000067&_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 95
+      },
+      {
+        "name": "https://www.lge.co.kr/category/refrigerators?subCateId=CT50220004&_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 84
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000065/filter?b2cYn=Y",
+        "initiatorType": "xmlhttprequest",
+        "duration": 114
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/common/code?commonCodeGroupId=plp_sort_new_type_product",
+        "initiatorType": "xmlhttprequest",
+        "duration": 125
+      },
+      {
+        "name": "https://www.lge.co.kr/mkt/ajax/commonmodule/memberInfo?",
+        "initiatorType": "xmlhttprequest",
+        "duration": 161
+      },
+      {
+        "name": "https://www.lge.co.kr/category/refrigerators?subCateId=CT50210011&_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 90
+      },
+      {
+        "name": "https://www.lge.co.kr/category/convertible-refrigerators?_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 67
+      },
+      {
+        "name": "https://www.lge.co.kr/category/kimchi-refrigerators?_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 79
+      },
+      {
+        "name": "https://www.lge.co.kr/category/winecellar?_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 70
+      },
+      {
+        "name": "https://www.lge.co.kr/category/electric-ranges?_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 67
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000065/multi-item-discount-model?b2cYn=Y",
+        "initiatorType": "xmlhttprequest",
+        "duration": 74
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000065/model",
+        "initiatorType": "xmlhttprequest",
+        "duration": 339
+      },
+      {
+        "name": "https://www.lge.co.kr/mkt/commonModule/miniCart.lgajax",
+        "initiatorType": "xmlhttprequest",
+        "duration": 60
+      },
+      {
+        "name": "https://www.lge.co.kr/shop/commonModule/miniCart.lgajax",
+        "initiatorType": "xmlhttprequest",
+        "duration": 64
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000065/best-ranking-model?rankingType=todays&b2cYn=Y",
+        "initiatorType": "xmlhttprequest",
+        "duration": 61
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/living-flag",
+        "initiatorType": "xmlhttprequest",
+        "duration": 29
+      },
+      {
+        "name": "https://www.lge.co.kr/category/dishwashers?_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 48
+      },
+      {
+        "name": "https://www.lge.co.kr/category/microwaves-and-ovens?_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 82
+      },
+      {
+        "name": "https://www.lge.co.kr/category/water-purifiers?_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 86
+      },
+      {
+        "name": "https://www.lge.co.kr/category/lg-homebrew?_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 97
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tumbler-cleaner?_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 125
+      },
+      {
+        "name": "https://www.lge.co.kr/category/refrigerators?lineupId=CD00000701&_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 91
+      },
+      {
+        "name": "https://www.lge.co.kr/category/refrigerators?lineupId=CD00000881&_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 81
+      },
+      {
+        "name": "https://www.lge.co.kr/category/refrigerators?lineupId=CD00000016&_rsc=f7c91",
+        "initiatorType": "fetch",
+        "duration": 71
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/hellobar/hello-bar-info?isInstall=N&isMobile=N",
+        "initiatorType": "xmlhttprequest",
+        "duration": 64
+      }
+    ],
+    "networkBodies": [
+      {
+        "url": "https://www.lge.co.kr/category/refrigerators",
+        "mimeType": "text/html",
+        "type": "Document",
+        "length": 493212,
+        "sample": "<!DOCTYPE html><html lang=\"ko\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_youtube.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_insta.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_facebook.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_newsroom.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_kakao.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_blog.svg\"/><link rel=\"preload\" as=\"image\" href=\"https://www.lge.co.kr/kr/common/footer/ethics_logo.png\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/ce0af034b81afa7f.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/4232645f6e234064.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/cff8fc018c1d159e.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/032de89674664674.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/c"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/ce0af034b81afa7f.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 6453,
+        "sample": "@font-face{font-family:Pretendard;font-weight:400;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Regular.352c8e19.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Regular.03d8daed.woff) format(\"woff\")}@font-face{font-family:Pretendard;font-weight:500;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Medium.ce54de3a.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Medium.358ea39e.woff) format(\"woff\")}@font-face{font-family:Pretendard;font-weight:600;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-SemiBold.d67e7444.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-SemiBold.a7c8a0e1.woff) format(\"woff\")}@font-face{font-family:Pretendard;font-weight:700;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Bold.4fe33033.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Bold.ad31b300.woff) format(\"woff\")}@font-face{font-family:D-DIN Condensed;font-weight:400;font-display:swap;src:url(https"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/4232645f6e234064.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 97220,
+        "sample": "@keyframes CommonMoGnb_load__ntkyR{to{background-position:-100% 0}}@keyframes CommonMoGnb_load30__3Bkv1{0%{left:-200%}to{left:100%}}.CommonMoGnb_gnb__AS3RT{max-width:767px;margin:0 auto;width:100%;height:56px;padding:8px 12px 8px 4px;display:flex;justify-content:space-between;align-items:center;background:#fff;position:relative;font-family:var(--font-family--pretendard)}.CommonMoGnb_gnb__AS3RT *{font-family:inherit}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_open__i6evx){z-index:5}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_lft__f5PoE li:only-child) .CommonMoGnb_tit_wrap__etWvE{padding-left:0}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_rgh__tN4Bn li:only-child):has(.CommonMoGnb_lft__f5PoE li:only-child) .CommonMoGnb_lft__f5PoE{min-width:auto}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_rgh__tN4Bn li:only-child):has(.CommonMoGnb_lft__f5PoE li:only-child) .CommonMoGnb_tit_wrap__etWvE{padding-left:8px}.CommonMoGnb_gnb__AS3RT:not(:has(.CommonMoGnb_rgh__tN4Bn)){gap:8px}.CommonMoGnb_gnb__AS3RT:not(:has(.CommonMoGnb_rgh__tN4Bn)) .CommonMoGnb_lft__f5PoE{min-width:auto}.CommonMoGnb_gnb__AS3RT:not(:has(.CommonMoGnb_rgh__tN4Bn)) .CommonMoGnb_tit_wrap__etWvE{padding:0}.CommonMoGnb_gnb__AS3RT .CommonMoGnb_u"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/cff8fc018c1d159e.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 100566,
+        "sample": "@keyframes error-basic_load__i9_n9{to{background-position:-100% 0}}@keyframes error-basic_load30__8pVyw{0%{left:-200%}to{left:100%}}.error-basic_error_wrap___GIKX{display:flex;position:relative;width:100%;height:100vh;align-items:center;justify-content:center}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc{text-align:center}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_title__EaySl{font-size:27px;line-height:122.2222222222%;font-weight:var(--fw--700);margin-bottom:16px}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_desc__UfQBz{font-size:15px;line-height:146.6666666667%;min-height:110px;margin-bottom:60px}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_ci__GKhAn{margin:0 auto;font-size:0;width:76px;height:21px;background:url(https://www.lge.co.kr/lg5-common/images/header/logo.svg) no-repeat}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_btn__9bZBe{position:fixed;bottom:40px;left:16px;right:16px}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_btn__9bZBe a,.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-bas"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/032de89674664674.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 5359,
+        "sample": "@keyframes SearchMoInput_load__HhBWA{to{background-position:-100% 0}}@keyframes SearchMoInput_load30__bq31B{0%{left:-200%}to{left:100%}}.SearchMoInput_search_bar__iqHU4{position:-webkit-sticky;position:sticky;top:0;z-index:10;display:flex;align-items:center;width:100%;max-width:767px;margin:0 auto;padding:8px 12px 8px 4px;background-color:var(--color-set--white);font-family:var(--font-family--pretendard)}.SearchMoInput_search_bar__iqHU4 *{font-family:inherit}.SearchMoInput_search_bar__iqHU4 a:focus,.SearchMoInput_search_bar__iqHU4 a:focus-visible,.SearchMoInput_search_bar__iqHU4 button:focus,.SearchMoInput_search_bar__iqHU4 button:focus-visible{outline-color:#000}.SearchMoInput_search_bar__iqHU4.SearchMoInput_search_bar_layer__P_s4i{padding:8px 20px 8px 4px}.SearchMoInput_search_bar__iqHU4.SearchMoInput_search_bar_layer__P_s4i .SearchMoInput_search_utility__ld57w{display:none}.SearchMoInput_search_bar__iqHU4:has([class*=search_input_layer_wrap]){flex-direction:column;z-index:121;gap:0;height:100vh;padding:0}.SearchMoInput_search_bar__iqHU4:has([class*=search_input_layer_wrap]) .SearchMoInput_search_wrap__7sEYt{padding:8px 20px 8px 4px}.SearchMoInput_search_bar__iqHU4:has([class*=se"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/5be585dca501b42f.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 100816,
+        "sample": "@keyframes PlpPcPopupLayerSearch_load__isylU{to{background-position:-100% 0}}@keyframes PlpPcPopupLayerSearch_load30__wM9ae{0%{left:-200%}to{left:100%}}.PlpPcPopupLayerSearch_layer_search__qZpRr{width:100%}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_input_keyword__CT4sS input{width:calc(100% - 42px);padding:0 0 0 32px!important;height:58px;font-size:18px;line-height:26px;border:0;border-radius:58px;background:var(--color-set--gray200)!important}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_input_keyword__CT4sS button[class*=btn_search]{right:0;width:32px;height:32px}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK{margin-top:32px}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK .PlpPcPopupLayerSearch_count__De9iB,.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK .PlpPcPopupLayerSearch_count__De9iB em{font-size:14px;line-height:20px}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK .PlpPcPopupLayerSearch_count__De9iB em.PlpPcPopupLayerSearch_red__tdyoQ{color:var(--color-set--red)}.P"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/99b496e77f3e700f.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 40570,
+        "sample": "@keyframes CommonPcGnb_load__hS09v{to{background-position:-100% 0}}@keyframes CommonPcGnb_load30__2DVMl{0%{left:-200%}to{left:100%}}.CommonPcGnb_header__MMuNW{position:relative;min-width:1460px;background:var(--color-set--white);font-family:var(--font-family--pretendard);color:var(--color-set--black111);z-index:12}.CommonPcGnb_header__MMuNW:has([class*=active]){z-index:122}.CommonPcGnb_header__MMuNW *{font-family:inherit;color:inherit}.CommonPcGnb_header__MMuNW .CommonPcGnb_inner__11s6U{position:relative;max-width:1760px;width:100%;margin:0 auto}.CommonPcGnb_header__MMuNW .CommonPcGnb_bg___BHPF{position:absolute;left:0;right:0;top:0;background:var(--color-set--white);z-index:11}.CommonPcGnb_header__MMuNW.CommonPcGnb_open__rPJxU .CommonPcGnb_bg___BHPF{display:block}.CommonPcGnb_header__MMuNW:after{content:\"\";display:block;height:1px;background:var(--color-set--gray500);position:absolute;left:0;right:0;z-index:11}.CommonPcGnb_header__MMuNW .CommonPcGnb_dimmed__Ov8s5{position:fixed;width:100vw;left:50%;transform:translateX(-50%);top:0;bottom:0;background:var(--color-set--black);opacity:.7;z-index:10}.CommonPcGnb_header__MMuNW a{outline-offset:-1px}.CommonPcGnb_header__MMuNW .CommonPcG"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/6e2696d0f9788933.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 99636,
+        "sample": "@keyframes PlpPcToolbar_load__B6vuf{to{background-position:-100% 0}}@keyframes PlpPcToolbar_load30__o_3Xi{0%{left:-200%}to{left:100%}}.PlpPcToolbar_toolbar__wJzCe{min-width:1130px;width:1130px;margin:0 auto 16px;display:flex;justify-content:flex-start;align-items:flex-start;height:32px}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_filter_select___C2qT [class*=select_trigger]:focus{outline:none!important}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_filter_select___C2qT[class*=outline] [class*=select_trigger]:focus{outline:1px solid #000!important}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_total_num__YhXqo{font-size:14px;line-height:32px;display:flex;align-items:center;flex-shrink:0}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_total_num__YhXqo span{font-size:14px;line-height:32px;margin-left:3px;font-weight:var(--fw--700)}.PlpPcToolbar_toolbar_list_wrap___2b82{display:flex;align-items:center;gap:8px;margin:0 24px;flex-shrink:1;min-width:0}.PlpPcToolbar_toolbar_list_wrap___2b82:has(div[class*=swiper-wrapper]:empty){display:none}.PlpPcToolbar_toolbar_list_wrap___2b82 .PlpPcToolbar_filter_selected_list__HAgp4{width:auto;max-width:100%}.PlpPcToolbar_toolbar_list_wrap___2b82 .PlpPcToolbar_filter"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/6f8d0ee24381d2ad.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 73290,
+        "sample": "@keyframes CommonMoSearchLayer_load__VPcne{to{background-position:-100% 0}}@keyframes CommonMoSearchLayer_load30__PqRXU{0%{left:-200%}to{left:100%}}.CommonMoSearchLayer_search_layer_wrap__1fRFw{display:block;width:100vw;height:100dvh;max-height:100vh;margin:0 auto;z-index:105;background-color:var(--color-set--white);overflow:hidden}.CommonMoSearchLayer_search_layer_wrap__1fRFw.CommonMoSearchLayer_search_input_layer_wrap__fPw2J .CommonMoSearchLayer_inner__zq7ig{padding-bottom:50px}.CommonMoSearchLayer_search_layer_wrap__1fRFw.CommonMoSearchLayer_search_input_layer_wrap__fPw2J .CommonMoSearchLayer_inner__zq7ig .CommonMoSearchLayer_btn_close__xS2Mf{position:relative;top:auto;right:16px;left:auto;display:flex;width:auto;height:auto;font-weight:var(--fw--700);font-size:12px;line-height:17px;transform:rotate(0);text-decoration:underline;background:none}.CommonMoSearchLayer_search_layer_wrap__1fRFw .CommonMoSearchLayer_inner__zq7ig{padding:0;position:relative}.CommonMoSearchLayer_search_layer_wrap__1fRFw .CommonMoSearchLayer_inner__zq7ig .CommonMoSearchLayer_input_keyword_wrap__Bisyk{display:flex;flex-wrap:wrap;flex-direction:column}.CommonMoSearchLayer_search_layer_wrap__1fRFw .CommonMoS"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/096f9b8fc60f9b62.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 37829,
+        "sample": "@keyframes CommonPcSearchLayer_load__T8pmA{to{background-position:-100% 0}}@keyframes CommonPcSearchLayer_load30__TbMvH{0%{left:-200%}to{left:100%}}.CommonPcSearchLayer_search_layer_wrap__odMyZ{position:fixed;left:calc(50% + 90px);top:18px;right:auto;bottom:auto;max-height:calc(100% - 18px);transform:translateX(-50%);display:block;width:100%;overflow-y:auto;max-width:920px;border:1px solid var(--color-set--gray200);border-radius:20px;box-shadow:4px 2px 8px 0 rgba(0,0,0,.15);background-color:var(--color-set--white)}@media screen and (min-width:1468px)and (max-width:1760px){.CommonPcSearchLayer_search_layer_wrap__odMyZ{left:auto;transform:none;right:338px}}.CommonPcSearchLayer_search_layer_wrap__odMyZ.CommonPcSearchLayer_search_input_layer_wrap__tBlRZ{position:absolute;top:83px;right:auto;left:50%;max-width:688px;height:auto;max-height:calc(100vh - 220px);transform:translateX(-50%)}.CommonPcSearchLayer_search_layer_wrap__odMyZ.CommonPcSearchLayer_search_input_layer_wrap__tBlRZ .CommonPcSearchLayer_inner__tYdHG{display:flex;flex-direction:column;padding:40px 40px 20px}.CommonPcSearchLayer_search_layer_wrap__odMyZ.CommonPcSearchLayer_search_input_layer_wrap__tBlRZ .CommonPcSearchLayer_"
+      }
+    ],
+    "topCandidates": [
+      {
+        "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+        "pathname": "/refrigerators/t873mee111",
+        "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 클레이 민트/베이지 LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 T873MEE111 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 31% 할인금액 1,890,000 원 원래금액 2,",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 433,
+          "width": 376,
+          "height": 666
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+        "pathname": "/refrigerators/t875mee412",
+        "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) 865L 2등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.3kWh/월 냉동367L 냉장498L 모델명 T875MEE412 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 22% 할인금액 2,300,000 원 원래금액 2,950",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 433,
+          "width": 376,
+          "height": 666
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+        "pathname": "/refrigerators/h875gbb111",
+        "text": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 H875GBB111 평점 5점 만점 중 5.0 리뷰 개수 (566) 할인율 9% 할인금액 3,250,000 원 원래금액 3,608,000원 최대혜택가 2,855,100 원 내일배송 위시리스트 미등록 ",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 433,
+          "width": 376,
+          "height": 666
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/h875gbb012",
+        "pathname": "/refrigerators/h875gbb012",
+        "text": "베이지/베이지 클레이 브라운/베이지 LG 디오스 오브제컬렉션 베이직 냉장고 870L 2등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능인버터 리니어 컴프레서 소비전력56.8kWh/월 냉동367L 냉장503L 모델명 H875GBB012 평점 5점 만점 중 5.0 리뷰 개수 (52) 할인율 9% 할인금액 2,850,000 원 원래금액 3,164,000원 최대혜택가 2,538,900 원 4",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 1099,
+          "width": 376,
+          "height": 666
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/s836mee022",
+        "pathname": "/refrigerators/s836mee022",
+        "text": "닷컴 ONLY 에센스 화이트/에센스 화이트 프라임 실버 베이지/베이지 LG 디오스 AI 오브제컬렉션 냉장고 (양문형) 832L 2등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능퓨어 프레시 필터 소비전력49.0kWh/월 냉동308L 냉장524L 모델명 S836MEE022 평점 5점 만점 중 5.0 리뷰 개수 (536) 할인율 28% 할인금액 1,250,000 원 원래금액 1,750,00",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 1099,
+          "width": 376,
+          "height": 666
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/s834mte011",
+        "pathname": "/refrigerators/s834mte011",
+        "text": "닷컴 ONLY LG 디오스 AI 오브제컬렉션 냉장고 (양문형) 832L 1등급 색상클레이 민트/베이지 도어재질네이처(메탈) 주요 기능도어쿨링+,인버터 리니어 컴프레서 소비전력40.2kWh/월 냉동308L 냉장524L 모델명 S834MTE011 평점 5점 만점 중 5.0 리뷰 개수 (61) 할인율 19% 할인금액 1,650,000 원 원래금액 2,050,000원 최대혜택가 1,441,500 원",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 1099,
+          "width": 376,
+          "height": 666
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/m616mqq0m1",
+        "pathname": "/refrigerators/m616mqq0m1",
+        "text": "LG 디오스 AI 오브제컬렉션 냉장고 Fit & Max 모델명 M616MQQ0M1 할인율 16% 할인금액 2,720,000 원",
+        "className": "",
+        "rect": {
+          "x": 971,
+          "y": 1861,
+          "width": 194,
+          "height": 296
+        },
+        "imgCount": 1,
+        "priceLike": true
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/m616gbb0j1",
+        "pathname": "/refrigerators/m616gbb0j1",
+        "text": "LG 디오스 AI 오브제컬렉션 냉장고 Fit & Max 모델명 M616GBB0J1 할인율 9% 할인금액 3,800,000 원",
+        "className": "",
+        "rect": {
+          "x": 1184,
+          "y": 1861,
+          "width": 194,
+          "height": 296
+        },
+        "imgCount": 1,
+        "priceLike": true
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/q343mhhf33",
+        "pathname": "/refrigerators/q343mhhf33",
+        "text": "클레이 민트/베이지 크림 화이트/크림 화이트 프라임 실버 LG 모던엣지 냉장고 오브제컬렉션 344L 3등급 색상크림 화이트 도어재질네이처(메탈) 주요 기능도어쿨링+ 소비전력25.5kWh/월 냉장234L 모델명 Q343MHHF33 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 30% 할인금액 770,000 원 원래금액 1,100,000원 최대혜택가 688,200 원 내일배송 위시리스",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 2222,
+          "width": 376,
+          "height": 647
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/d463mrr33",
+        "pathname": "/refrigerators/d463mrr33",
+        "text": "닷컴 ONLY 크림 화이트/크림 화이트 베이지/베이지 크림 그레이/크림 그레이 LG 일반냉장고 오브제컬렉션 461L 3등급 색상크림 그레이 도어재질네이처(메탈) 주요 기능도어쿨링+ 소비전력29.0kWh/월 냉장361L 모델명 D463MRR33 평점 5점 만점 중 4.9 리뷰 개수 (501) 할인율 12% 할인금액 700,000 원 원래금액 800,000원 최대혜택가 623,100 원 내일배송",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 2222,
+          "width": 376,
+          "height": 647
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/d502mee33",
+        "pathname": "/refrigerators/d502mee33",
+        "text": "LG 일반냉장고 오브제컬렉션 507L 3등급 색상네이처 베이지 도어재질네이처(메탈) 주요 기능도어쿨링+ 소비전력37.3kWh/월 냉동121L 냉장376L 모델명 D502MEE33 평점 5점 만점 중 4.9 리뷰 개수 (195) 할인율 15% 할인금액 800,000 원 원래금액 950,000원 최대혜택가 716,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 2222,
+          "width": 376,
+          "height": 647
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/m402nd",
+        "pathname": "/refrigerators/m402nd",
+        "text": "LG SIGNATURE 냉장고 403L 3등급 색상난방향 스테인리스 도어재질솔리드(스테인리스) 주요 기능노크온,음성인식 소비전력30.3kWh/월 냉동112L 냉장291L 모델명 M402ND 평점 5점 만점 중 5.0 리뷰 개수 (1) 할인금액 6,700,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 2869,
+          "width": 376,
+          "height": 648
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/q343meef53",
+        "pathname": "/refrigerators/q343meef53",
+        "text": "LG 모던엣지 냉장고 오브제컬렉션 344L 3등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능UV청정탈취필터+,도어쿨링+ 소비전력25.5kWh/월 냉장234L 모델명 Q343MEEF53 평점 5점 만점 중 4.9 리뷰 개수 (118) 할인율 14% 할인금액 1,115,000 원 원래금액 1,300,000원 최대혜택가 1,009,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 2869,
+          "width": 376,
+          "height": 648
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/q343gic183s",
+        "pathname": "/refrigerators/q343gic183s",
+        "text": "다품목할인 크림 라벤더/크림 라벤더 크림 화이트 크림 스카이 크림 레몬 크림 피치 핑크 클레이 브라운 베이지 LG 모던엣지 냉장고 오브제컬렉션 노크온 349L 3등급 색상클레이 브라운 도어재질미스트(글라스) 주요 기능도어쿨링+,노크온 소비전력27.1kWh/월 냉동110L 냉장239L 모델명 Q343GIC183S 평점 5점 만점 중 5.0 리뷰 개수 (107) 할인율 17% 할인금액 1,650",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 2869,
+          "width": 376,
+          "height": 648
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/f904nd79e",
+        "pathname": "/refrigerators/f904nd79e",
+        "text": "다품목할인 LG SIGNATURE 상냉장고 905L 1등급 색상샤이니 유니버스 도어재질솔리드(스테인리스) 주요 기능노크온,인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동335L 냉장570L 모델명 F904ND79E 평점 5점 만점 중 4.9 리뷰 개수 (43) 할인금액 9,000,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 3517,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/a202s",
+        "pathname": "/refrigerators/a202s",
+        "text": "퓨어 슈퍼 화이트 LG 냉동고 200L 색상퓨어 냉동200L 모델명 A202S 평점 5점 만점 중 4.9 리뷰 개수 (250) 할인금액 650,000 원 원래금액 680,000원 최대혜택가 576,600 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 3517,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/j842nd79",
+        "pathname": "/refrigerators/j842nd79",
+        "text": "다품목할인 LG SIGNATURE 얼음정수 냉장고 840L 3등급 색상샤이니 유니버스 도어재질솔리드(스테인리스) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.6kWh/월 냉동335L 냉장505L 모델명 J842ND79 평점 5점 만점 중 4.7 리뷰 개수 (23) 할인금액 11,000,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 3517,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/b103s14",
+        "pathname": "/refrigerators/b103s14",
+        "text": "퓨어 슈퍼 화이트 LG 일반냉장고 90L 4등급 색상퓨어 소비전력19.4kWh/월 냉장90L 모델명 B103S14 평점 5점 만점 중 4.9 리뷰 개수 (82) 할인율 12% 할인금액 280,000 원 원래금액 320,000원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 4184,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/b312w31",
+        "pathname": "/refrigerators/b312w31",
+        "text": "닷컴 ONLY 퓨어 화이트 LG 일반냉장고 317L 1등급 색상화이트 도어재질네이처(메탈) 소비전력27.8kWh/월 냉동79L 냉장238L 모델명 B312W31 평점 5점 만점 중 4.9 리뷰 개수 (254) 할인율 24% 할인금액 529,000 원 원래금액 700,000원 최대혜택가 499,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 4184,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/refrigerators/m626gbb032",
+        "pathname": "/refrigerators/m626gbb032",
+        "text": "다품목할인 LG 디오스 오브제컬렉션 냉장고 Fit & Max 613L 2등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능UV청정탈취필터+,도어쿨링+,인버터 리니어 컴프레서 소비전력38.0kWh/월 냉동229L 냉장384L 모델명 M626GBB032 평점 5점 만점 중 5.0 리뷰 개수 (723) 할인율 9% 할인금액 3,650,000 원 원래금액 4,052,000원 최대혜택가 3,22",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 4184,
+          "width": 376,
+          "height": 667
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      }
+    ],
+    "firstRows": [
+      {
+        "y": 433,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+            "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 클레이 민트/베이지 LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 T873MEE111 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 31% 할인금액 1,890,000 원 원래금액 2,",
+            "rect": {
+              "x": 291,
+              "y": 433,
+              "width": 376,
+              "height": 666
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+            "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) 865L 2등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.3kWh/월 냉동367L 냉장498L 모델명 T875MEE412 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 22% 할인금액 2,300,000 원 원래금액 2,950",
+            "rect": {
+              "x": 667,
+              "y": 433,
+              "width": 376,
+              "height": 666
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+            "text": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 H875GBB111 평점 5점 만점 중 5.0 리뷰 개수 (566) 할인율 9% 할인금액 3,250,000 원 원래금액 3,608,000원 최대혜택가 2,855,100 원 내일배송 위시리스트 미등록 ",
+            "rect": {
+              "x": 1043,
+              "y": 433,
+              "width": 376,
+              "height": 666
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 1099,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/refrigerators/h875gbb012",
+            "text": "베이지/베이지 클레이 브라운/베이지 LG 디오스 오브제컬렉션 베이직 냉장고 870L 2등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능인버터 리니어 컴프레서 소비전력56.8kWh/월 냉동367L 냉장503L 모델명 H875GBB012 평점 5점 만점 중 5.0 리뷰 개수 (52) 할인율 9% 할인금액 2,850,000 원 원래금액 3,164,000원 최대혜택가 2,538,900 원 4",
+            "rect": {
+              "x": 291,
+              "y": 1099,
+              "width": 376,
+              "height": 666
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/s836mee022",
+            "text": "닷컴 ONLY 에센스 화이트/에센스 화이트 프라임 실버 베이지/베이지 LG 디오스 AI 오브제컬렉션 냉장고 (양문형) 832L 2등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능퓨어 프레시 필터 소비전력49.0kWh/월 냉동308L 냉장524L 모델명 S836MEE022 평점 5점 만점 중 5.0 리뷰 개수 (536) 할인율 28% 할인금액 1,250,000 원 원래금액 1,750,00",
+            "rect": {
+              "x": 667,
+              "y": 1099,
+              "width": 376,
+              "height": 666
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/s834mte011",
+            "text": "닷컴 ONLY LG 디오스 AI 오브제컬렉션 냉장고 (양문형) 832L 1등급 색상클레이 민트/베이지 도어재질네이처(메탈) 주요 기능도어쿨링+,인버터 리니어 컴프레서 소비전력40.2kWh/월 냉동308L 냉장524L 모델명 S834MTE011 평점 5점 만점 중 5.0 리뷰 개수 (61) 할인율 19% 할인금액 1,650,000 원 원래금액 2,050,000원 최대혜택가 1,441,500 원",
+            "rect": {
+              "x": 1043,
+              "y": 1099,
+              "width": 376,
+              "height": 666
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 2222,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/refrigerators/q343mhhf33",
+            "text": "클레이 민트/베이지 크림 화이트/크림 화이트 프라임 실버 LG 모던엣지 냉장고 오브제컬렉션 344L 3등급 색상크림 화이트 도어재질네이처(메탈) 주요 기능도어쿨링+ 소비전력25.5kWh/월 냉장234L 모델명 Q343MHHF33 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 30% 할인금액 770,000 원 원래금액 1,100,000원 최대혜택가 688,200 원 내일배송 위시리스",
+            "rect": {
+              "x": 291,
+              "y": 2222,
+              "width": 376,
+              "height": 647
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/d463mrr33",
+            "text": "닷컴 ONLY 크림 화이트/크림 화이트 베이지/베이지 크림 그레이/크림 그레이 LG 일반냉장고 오브제컬렉션 461L 3등급 색상크림 그레이 도어재질네이처(메탈) 주요 기능도어쿨링+ 소비전력29.0kWh/월 냉장361L 모델명 D463MRR33 평점 5점 만점 중 4.9 리뷰 개수 (501) 할인율 12% 할인금액 700,000 원 원래금액 800,000원 최대혜택가 623,100 원 내일배송",
+            "rect": {
+              "x": 667,
+              "y": 2222,
+              "width": 376,
+              "height": 647
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/d502mee33",
+            "text": "LG 일반냉장고 오브제컬렉션 507L 3등급 색상네이처 베이지 도어재질네이처(메탈) 주요 기능도어쿨링+ 소비전력37.3kWh/월 냉동121L 냉장376L 모델명 D502MEE33 평점 5점 만점 중 4.9 리뷰 개수 (195) 할인율 15% 할인금액 800,000 원 원래금액 950,000원 최대혜택가 716,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 1043,
+              "y": 2222,
+              "width": 376,
+              "height": 647
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 2869,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/refrigerators/m402nd",
+            "text": "LG SIGNATURE 냉장고 403L 3등급 색상난방향 스테인리스 도어재질솔리드(스테인리스) 주요 기능노크온,음성인식 소비전력30.3kWh/월 냉동112L 냉장291L 모델명 M402ND 평점 5점 만점 중 5.0 리뷰 개수 (1) 할인금액 6,700,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 2869,
+              "width": 376,
+              "height": 648
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/q343meef53",
+            "text": "LG 모던엣지 냉장고 오브제컬렉션 344L 3등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능UV청정탈취필터+,도어쿨링+ 소비전력25.5kWh/월 냉장234L 모델명 Q343MEEF53 평점 5점 만점 중 4.9 리뷰 개수 (118) 할인율 14% 할인금액 1,115,000 원 원래금액 1,300,000원 최대혜택가 1,009,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록",
+            "rect": {
+              "x": 667,
+              "y": 2869,
+              "width": 376,
+              "height": 648
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/q343gic183s",
+            "text": "다품목할인 크림 라벤더/크림 라벤더 크림 화이트 크림 스카이 크림 레몬 크림 피치 핑크 클레이 브라운 베이지 LG 모던엣지 냉장고 오브제컬렉션 노크온 349L 3등급 색상클레이 브라운 도어재질미스트(글라스) 주요 기능도어쿨링+,노크온 소비전력27.1kWh/월 냉동110L 냉장239L 모델명 Q343GIC183S 평점 5점 만점 중 5.0 리뷰 개수 (107) 할인율 17% 할인금액 1,650",
+            "rect": {
+              "x": 1043,
+              "y": 2869,
+              "width": 376,
+              "height": 648
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 3517,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/refrigerators/f904nd79e",
+            "text": "다품목할인 LG SIGNATURE 상냉장고 905L 1등급 색상샤이니 유니버스 도어재질솔리드(스테인리스) 주요 기능노크온,인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동335L 냉장570L 모델명 F904ND79E 평점 5점 만점 중 4.9 리뷰 개수 (43) 할인금액 9,000,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 3517,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/a202s",
+            "text": "퓨어 슈퍼 화이트 LG 냉동고 200L 색상퓨어 냉동200L 모델명 A202S 평점 5점 만점 중 4.9 리뷰 개수 (250) 할인금액 650,000 원 원래금액 680,000원 최대혜택가 576,600 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 667,
+              "y": 3517,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/j842nd79",
+            "text": "다품목할인 LG SIGNATURE 얼음정수 냉장고 840L 3등급 색상샤이니 유니버스 도어재질솔리드(스테인리스) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.6kWh/월 냉동335L 냉장505L 모델명 J842ND79 평점 5점 만점 중 4.7 리뷰 개수 (23) 할인금액 11,000,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 1043,
+              "y": 3517,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 4184,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/refrigerators/b103s14",
+            "text": "퓨어 슈퍼 화이트 LG 일반냉장고 90L 4등급 색상퓨어 소비전력19.4kWh/월 냉장90L 모델명 B103S14 평점 5점 만점 중 4.9 리뷰 개수 (82) 할인율 12% 할인금액 280,000 원 원래금액 320,000원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 4184,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/b312w31",
+            "text": "닷컴 ONLY 퓨어 화이트 LG 일반냉장고 317L 1등급 색상화이트 도어재질네이처(메탈) 소비전력27.8kWh/월 냉동79L 냉장238L 모델명 B312W31 평점 5점 만점 중 4.9 리뷰 개수 (254) 할인율 24% 할인금액 529,000 원 원래금액 700,000원 최대혜택가 499,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 667,
+              "y": 4184,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/m626gbb032",
+            "text": "다품목할인 LG 디오스 오브제컬렉션 냉장고 Fit & Max 613L 2등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능UV청정탈취필터+,도어쿨링+,인버터 리니어 컴프레서 소비전력38.0kWh/월 냉동229L 냉장384L 모델명 M626GBB032 평점 5점 만점 중 5.0 리뷰 개수 (723) 할인율 9% 할인금액 3,650,000 원 원래금액 4,052,000원 최대혜택가 3,22",
+            "rect": {
+              "x": 1043,
+              "y": 4184,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 4851,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/refrigerators/m876gbb231",
+            "text": "다품목할인 베이지/베이지 에센스 화이트/에센스 화이트 토프/아몬드 LG 디오스 AI 오브제컬렉션 냉장고 (더블매직스페이스) 871L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능UV청정탈취필터+,도어쿨링+,퓨어 프레시 필터 소비전력43kWh/월 냉동367L 냉장504L 모델명 M876GBB231 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 9% 할인금액 4,400,0",
+            "rect": {
+              "x": 291,
+              "y": 4851,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/d312mbe31",
+            "text": "LG 일반냉장고 오브제컬렉션 317L 1등급 색상베이지 도어재질네이처(메탈) 소비전력27.8kWh/월 냉동79L 냉장238 모델명 D312MBE31 평점 5점 만점 중 5.0 리뷰 개수 (324) 할인율 21% 할인금액 670,000 원 원래금액 850,000원 최대혜택가 595,200 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 667,
+              "y": 4851,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/q342gbb133s",
+            "text": "베이지/베이지 핑크/베이지 클레이 브라운/베이지 핑크/클레이 브라운 핑크/핑크 클레이 브라운/클레이 브라운 LG 모던엣지 냉장고 오브제컬렉션 344L 3등급 색상베이지 도어재질미스트(글라스) 소비전력25.5kWh/월 냉동110L 냉장234L 모델명 Q342GBB133S (본체 모델명 Q342AAA133) 평점 5점 만점 중 4.9 리뷰 개수 (104) 할인율 42% 할인금액 869,000 원",
+            "rect": {
+              "x": 1043,
+              "y": 4851,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 5518,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/refrigerators/q342gbb153",
+            "text": "베이지/베이지 핑크/핑크 핑크/베이지 핑크/클레이 브라운 클레이 브라운/클레이 브라운 클레이 브라운/베이지 크림 피치/베이지 크림 화이트/크림 화이트 크림 라벤더/크림 라벤더 크림 레몬 크림 스카이 LG 모던엣지 냉장고 오브제컬렉션 344L 3등급 색상베이지 도어재질미스트(글라스) 주요 기능도어쿨링+ 소비전력25.5kWh/월 냉동110L 냉장234L 모델명 Q342GBB153 평점 5점 만점",
+            "rect": {
+              "x": 291,
+              "y": 5518,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/d332mbe34",
+            "text": "베이지 클레이 민트 LG 일반냉장고 오브제컬렉션 335L 4등급 색상베이지 도어재질네이처(메탈) 소비전력30kWh/월 냉동79L 냉장256L 모델명 D332MBE34 평점 5점 만점 중 4.9 리뷰 개수 (198) 할인율 29% 할인금액 600,000 원 원래금액 850,000원 최대혜택가 530,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 667,
+              "y": 5518,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/refrigerators/m616gbb0m1",
+            "text": "다품목할인 닷컴 ONLY LG 디오스 AI 오브제컬렉션 냉장고 Fit & Max 609L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능UV청정탈취필터+,퓨어 프레시 필터 소비전력29.5kWh/월 냉동229L 냉장380L 모델명 M616GBB0M1 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 26% 할인금액 2,670,000 원 원래금액 3,650,000원 최대혜택가 ",
+            "rect": {
+              "x": 1043,
+              "y": 5518,
+              "width": 376,
+              "height": 667
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      }
+    ]
+  }
+}

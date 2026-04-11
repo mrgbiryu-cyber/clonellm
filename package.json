@@ -1,0 +1,45 @@
+{
+  "name": "lge-site-analysis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "fetch:sitemaps": "python3 scripts/fetch_lge_sitemaps.py",
+    "build:seeds": "python3 scripts/build_seed_urls.py",
+    "archive:pages": "python3 scripts/archive_pages.py --limit 12",
+    "normalize": "python3 scripts/normalize_archive.py",
+    "build:slots": "python3 scripts/build_slot_snapshots.py",
+    "build:interactions": "python3 scripts/build_interaction_snapshots.py",
+    "extract:gnb": "node scripts/extract_gnb_state.mjs",
+    "extract:representatives": "node scripts/extract_representative_urls.mjs",
+    "build:representative-pdps": "node scripts/build_pdp_representative_sets.mjs",
+    "build:workbench-targets": "node scripts/build_workbench_target_registry.mjs",
+    "capture:plp": "node scripts/capture_plp_representatives.mjs",
+    "capture:pdp": "node scripts/capture_pdp_representatives.mjs",
+    "capture:service-pages": "node scripts/capture_service_pages.mjs",
+    "extract:service-groups": "node scripts/extract_service_groups.mjs",
+    "extract:plp-groups": "node scripts/extract_plp_groups.mjs",
+    "extract:pdp-groups": "node scripts/extract_pdp_groups.mjs",
+    "queue:list": "node scripts/job_queue.mjs list",
+    "queue:run-next": "node scripts/job_queue.mjs run-next",
+    "queue:run-all": "node scripts/job_queue.mjs run-all",
+    "queue:seed-pdp-groups": "node scripts/job_queue.mjs seed-pdp-groups",
+    "queue:reset": "node scripts/job_queue.mjs reset",
+    "capture:visual": "python3 scripts/capture_visual_snapshots.py home",
+    "capture:visual-batch": "node scripts/capture_visual_batch.mjs",
+    "capture:home-lower": "node scripts/capture_home_lower_sections.mjs",
+    "verify:home-links": "node scripts/verify_home_link_coverage.mjs",
+    "capture:states": "node scripts/capture_states.mjs",
+    "dev:web": "node server.js",
+    "check:git-upload": "bash scripts/check_git_upload_prep.sh"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.59.1"
+  }
+}

@@ -1,0 +1,284 @@
+{
+  "seedUrls": [
+    {
+      "url": "https://www.lge.co.kr/home",
+      "pageGroup": "home"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/refrigerators",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/care-solutions",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/support",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/bestshop",
+      "pageGroup": "bestshop"
+    },
+    {
+      "url": "https://www.lge.co.kr/lg-signature/info",
+      "pageGroup": "brand"
+    },
+    {
+      "url": "https://www.lge.co.kr/objet-collection/story",
+      "pageGroup": "brand"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/stan-by-me",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tumbler-cleaner",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tumbler-cleaner?subCateId=CT50317003",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50000026",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50000028",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50000029",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50000030",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50029007",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50041000",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50220000",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50368000",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50368001",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/tvs?subCateId=CT50368002",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/projectors",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/projectors?subCateId=CT50000033",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/projectors?subCateId=CT50077001",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/projectors?subCateId=CT50256007",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/projectors?subCateId=CT50308000",
+      "pageGroup": "category"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/care-solutions/water-purifiers",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/care-solutions/water-purifiers?subCateId=CT50019006",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/care-solutions/water-purifiers?subCateId=CT50019007",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/care-solutions/water-purifiers?subCateId=CT50019008",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/care-solutions/water-purifiers?subCateId=CT50273002",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/care-solutions/water-purifiers?subCateId=CT50281000",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/care-solutions/refrigerators",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/care-solutions/refrigerators?subCateId=CT50227000",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/category/care-solutions/refrigerators?subCateId=CT50227001",
+      "pageGroup": "care-solution"
+    },
+    {
+      "url": "https://www.lge.co.kr/lg-thinq",
+      "pageGroup": "brand"
+    },
+    {
+      "url": "https://www.lge.co.kr/support/usage-guide-faq#caresolution",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/support/service-engineer-reservation",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/support/solutions",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/support/product-manuals",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/support/software",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/support/request-call-reservation",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/support/visit-center-reservation",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/support/find-service-center",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/support/service-inquiry-reservation-status",
+      "pageGroup": "support"
+    },
+    {
+      "url": "https://www.lge.co.kr/bestshop/store-finder",
+      "pageGroup": "bestshop"
+    },
+    {
+      "url": "https://www.lge.co.kr/bestshop/event",
+      "pageGroup": "bestshop"
+    },
+    {
+      "url": "https://www.lge.co.kr/bestshop/event/aptBenefitInfo",
+      "pageGroup": "bestshop"
+    },
+    {
+      "url": "https://www.lge.co.kr/bestshop/reserveSearch",
+      "pageGroup": "bestshop"
+    },
+    {
+      "url": "https://www.lge.co.kr/bestshop/newShopList",
+      "pageGroup": "bestshop"
+    },
+    {
+      "url": "https://www.lge.co.kr/my-page/care-solution-contract-status",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/my-page/care-solution-visit-notification",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://bestshop.lge.co.kr/event/detail-EV10869001",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://bestshop.lge.co.kr/event/adCampaigns",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/tvs",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/projectors",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/home-audio",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/displays",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/notebook",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/monitors",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/all-in-one-pc-and-desktop",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/refrigerators",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/convertible-refrigerators",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/kimchi-refrigerators",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/winecellar",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/electric-ranges",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/dishwashers",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/microwaves-and-ovens",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/lg-homebrew",
+      "pageGroup": "product-detail"
+    },
+    {
+      "url": "https://www.lge.co.kr/business/wash-tower",
+      "pageGroup": "product-detail"
+    }
+  ]
+}

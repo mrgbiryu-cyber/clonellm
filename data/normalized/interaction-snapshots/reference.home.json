@@ -1,0 +1,522 @@
+{
+  "pageId": "home",
+  "source": "reference",
+  "url": "https://www.lge.co.kr/m/home",
+  "visualUrl": "https://www.lge.co.kr/m/home",
+  "structuralUrl": "https://www.lge.co.kr/home",
+  "mode": "hybrid",
+  "interactions": [
+    {
+      "interactionId": "logo-home-nav",
+      "kind": "navigation",
+      "slotId": "header-top",
+      "trigger": {
+        "type": "click",
+        "target": "logo"
+      },
+      "result": {
+        "targetKey": "home",
+        "targetUrl": "/clone/home"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "header-search-open",
+      "kind": "search-open",
+      "slotId": "header-top",
+      "trigger": {
+        "type": "click",
+        "target": "search-button"
+      },
+      "result": {
+        "overlay": "search"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "header-cart-nav",
+      "kind": "navigation",
+      "slotId": "header-top",
+      "trigger": {
+        "type": "click",
+        "target": "cart-link"
+      },
+      "result": {
+        "targetKey": "cart",
+        "targetUrl": "/shop/cart/index"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-default",
+      "kind": "quickmenu-default",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "default",
+        "target": "quickmenu"
+      },
+      "result": {
+        "itemCount": 10,
+        "rowCount": 2,
+        "columnCount": 5
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "gnb-product-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "trigger": {
+        "type": "hover-or-click",
+        "target": "제품/소모품"
+      },
+      "result": {
+        "menuLabel": "제품/소모품"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "gnb-care-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "trigger": {
+        "type": "hover-or-click",
+        "target": "가전 구독"
+      },
+      "result": {
+        "menuLabel": "가전 구독"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "gnb-support-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "trigger": {
+        "type": "hover-or-click",
+        "target": "고객지원"
+      },
+      "result": {
+        "menuLabel": "고객지원"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "gnb-benefits-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "trigger": {
+        "type": "hover-or-click",
+        "target": "혜택/이벤트"
+      },
+      "result": {
+        "menuLabel": "혜택/이벤트"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "gnb-story-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "trigger": {
+        "type": "hover-or-click",
+        "target": "스토리"
+      },
+      "result": {
+        "menuLabel": "스토리"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "gnb-bestshop-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "trigger": {
+        "type": "hover-or-click",
+        "target": "베스트샵"
+      },
+      "result": {
+        "menuLabel": "베스트샵"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "gnb-lgai-open",
+      "kind": "gnb-open",
+      "slotId": "header-bottom",
+      "trigger": {
+        "type": "hover-or-click",
+        "target": "LG AI"
+      },
+      "result": {
+        "menuLabel": "LG AI"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-1",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 1,
+        "headline": "",
+        "targetUrl": "/benefits/exhibitions/detail-PE00895007"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-2",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 2,
+        "headline": "All New 세일 홈스타일 특가 최대 82% 할인",
+        "targetUrl": "/benefits/exhibitions/detail-PE00895007?tab=homestyle-brand"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-3",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 3,
+        "headline": "공기청정기 대규모 할인 大청정 세일 시작!",
+        "targetUrl": "/benefits/exhibitions/detail-PE00892015"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-4",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 4,
+        "headline": "처음이라 더 특별한 구독",
+        "targetUrl": "/benefits/exhibitions/detail-PE00721001"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-5",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 5,
+        "headline": "2026 휘센 미리구매 페스티벌",
+        "targetUrl": "/benefits/exhibitions/detail-PE00898013"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-6",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 6,
+        "headline": "LGE.COM 인스타그램 오픈 소식 알리기",
+        "targetUrl": "/benefits/event/detail-EV00009031?tab=sns-event"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-7",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 7,
+        "headline": "LG 디오스 AI 오브제컬렉션 냉장고 사전 런칭 기획전",
+        "targetUrl": "/benefits/exhibitions/detail-PE00894004"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-8",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 8,
+        "headline": "역대 가장 빛나는 Micro RGB의 탄생",
+        "targetUrl": "/benefits/exhibitions/detail-PE00901007"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-9",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 9,
+        "headline": "LG 퓨리케어 바스에어시스템 런칭",
+        "targetUrl": "/benefits/exhibitions/detail-PE00892017"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-10",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 10,
+        "headline": "공간 맞춤 스마트 사운드 LG Sound Suite 런칭",
+        "targetUrl": "/benefits/exhibitions/detail-PE00892018"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-11",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 11,
+        "headline": "PREMIUM COOKING EDITION",
+        "targetUrl": "/benefits/exhibitions/detail-PE00878001"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-12",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 12,
+        "headline": "200만대 돌파 기념 LG 스타일러 스팀 모델 특별전",
+        "targetUrl": "/benefits/exhibitions/detail-PE00892010"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-13",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 13,
+        "headline": "베스트 79 페스타 쿠폰팩 이벤트",
+        "targetUrl": "https://bestshop.lge.co.kr/event/couponInfo/EV10992000?inflow=lgekor&amp;utm_medium=banner&amp;utm_source=lgecom&amp;utm_campaign=20260327_EV10992000"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-14",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 14,
+        "headline": "결혼 정보에 대한 모든 것 D5 웨딩 커뮤니티",
+        "targetUrl": "https://bestshop.lge.co.kr/event/wedding-community"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "hero-slide-15",
+      "kind": "hero-slide",
+      "slotId": "hero",
+      "trigger": {
+        "type": "swipe-or-pagination",
+        "target": "hero-carousel"
+      },
+      "result": {
+        "slideIndex": 15,
+        "headline": "베스트 79 페스타 SALE",
+        "targetUrl": "https://bestshop.lge.co.kr/counselReserve/main/MC11722008?inflow=lgekor&amp;utm_medium=banner&amp;utm_source=lgecom&amp;utm_campaign=2026327_MC11722008"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-1",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-1",
+        "label": "올뉴세일"
+      },
+      "result": {
+        "targetUrl": "/benefits/exhibitions/detail-PE00895007"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-2",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-2",
+        "label": "혜택/이벤트"
+      },
+      "result": {
+        "targetUrl": "/benefits"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-3",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-3",
+        "label": "다품목 할인"
+      },
+      "result": {
+        "targetUrl": "/benefits/exhibitions/multiple-products"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-4",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-4",
+        "label": "라이브"
+      },
+      "result": {
+        "targetUrl": "/livecommerce"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-5",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-5",
+        "label": "카드혜택"
+      },
+      "result": {
+        "targetUrl": "/benefits/card-discount/lgeshinhancard"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-6",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-6",
+        "label": "가전 구독"
+      },
+      "result": {
+        "targetUrl": "/care-solutions"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-7",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-7",
+        "label": "소모품"
+      },
+      "result": {
+        "targetUrl": "/superCategory?superCategoryId=CT50020000#"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-8",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-8",
+        "label": "홈스타일"
+      },
+      "result": {
+        "targetUrl": "https://homestyle.lge.co.kr/home"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-9",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-9",
+        "label": "고객지원"
+      },
+      "result": {
+        "targetUrl": "/support"
+      },
+      "coverageStatus": "captured"
+    },
+    {
+      "interactionId": "quickmenu-nav-10",
+      "kind": "navigation",
+      "slotId": "quickmenu",
+      "trigger": {
+        "type": "click",
+        "target": "quickmenu-item-10",
+        "label": "사업자몰"
+      },
+      "result": {
+        "targetUrl": "/business"
+      },
+      "coverageStatus": "captured"
+    }
+  ]
+}

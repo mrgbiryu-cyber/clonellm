@@ -1,0 +1,2727 @@
+{
+  "generatedAt": "2026-04-09T09:22:10.255Z",
+  "entryCount": 22,
+  "entries": [
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+      "pathname": "/refrigerators/h875gbb111",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:19:54.637Z",
+      "capturedUrl": "https://www.lge.co.kr/refrigerators/h875gbb111",
+      "fallbackFromViewportProfile": "pc",
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) | H875GBB111 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 1678,
+            "right": 430,
+            "bottom": 2152,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 683,
+            "width": 398,
+            "height": 265,
+            "right": 414,
+            "bottom": 948,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 601,
+            "width": 398,
+            "height": 1551,
+            "right": 414,
+            "bottom": 2152,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 12760,
+            "width": 430,
+            "height": 90,
+            "right": 430,
+            "bottom": 12850,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+      "pathname": "/refrigerators/t873mee111",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:20:15.789Z",
+      "capturedUrl": "https://www.lge.co.kr/refrigerators/t873mee111",
+      "fallbackFromViewportProfile": "pc",
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) | T873MEE111 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 1804,
+            "right": 430,
+            "bottom": 2278,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 703,
+            "width": 398,
+            "height": 265,
+            "right": 414,
+            "bottom": 968,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 621,
+            "width": 398,
+            "height": 1657,
+            "right": 414,
+            "bottom": 2278,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 14118,
+            "width": 430,
+            "height": 5549,
+            "right": 430,
+            "bottom": 19667,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+      "pathname": "/refrigerators/t875mee412",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:20:31.722Z",
+      "capturedUrl": "https://www.lge.co.kr/refrigerators/t875mee412",
+      "fallbackFromViewportProfile": "pc",
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) | T875MEE412 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 1771,
+            "right": 430,
+            "bottom": 2245,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 683,
+            "width": 398,
+            "height": 265,
+            "right": 414,
+            "bottom": 948,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 601,
+            "width": 398,
+            "height": 1644,
+            "right": 414,
+            "bottom": 2245,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 14229,
+            "width": 430,
+            "height": 5649,
+            "right": 430,
+            "bottom": 19878,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+      "pathname": "/refrigerators/h875gbb111",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:20:45.179Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Fh875gbb111",
+      "fallbackFromViewportProfile": "pc",
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) | H875GBB111 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Fh875gbb111",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 1782,
+            "right": 430,
+            "bottom": 2256,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 683,
+            "width": 398,
+            "height": 265,
+            "right": 414,
+            "bottom": 948,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 601,
+            "width": 398,
+            "height": 1655,
+            "right": 414,
+            "bottom": 2256,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 14455,
+            "width": 430,
+            "height": 5232,
+            "right": 430,
+            "bottom": 19687,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": {
+            "x": 0,
+            "y": 19687,
+            "width": 430,
+            "height": 483,
+            "right": 430,
+            "bottom": 20170,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+      "pathname": "/refrigerators/t873mee111",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:20:52.667Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Ft873mee111",
+      "fallbackFromViewportProfile": "pc",
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) | T873MEE111 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Ft873mee111",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 1802,
+            "right": 430,
+            "bottom": 2276,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 703,
+            "width": 398,
+            "height": 265,
+            "right": 414,
+            "bottom": 968,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 621,
+            "width": 398,
+            "height": 1655,
+            "right": 414,
+            "bottom": 2276,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 14652,
+            "width": 430,
+            "height": 5584,
+            "right": 430,
+            "bottom": 20236,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+      "pathname": "/refrigerators/t875mee412",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:22:09.852Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Ft875mee412",
+      "fallbackFromViewportProfile": "pc",
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) | T875MEE412 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Ft875mee412",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 1769,
+            "right": 430,
+            "bottom": 2243,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 683,
+            "width": 398,
+            "height": 265,
+            "right": 414,
+            "bottom": 948,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 601,
+            "width": 398,
+            "height": 1642,
+            "right": 414,
+            "bottom": 2243,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 14723,
+            "width": 430,
+            "height": 5684,
+            "right": 430,
+            "bottom": 20407,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": {
+            "x": 0,
+            "y": 20407,
+            "width": 430,
+            "height": 486,
+            "right": 430,
+            "bottom": 20893,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+      "pathname": "/refrigerators/h875gbb111",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:18:39.684Z",
+      "capturedUrl": "https://www.lge.co.kr/refrigerators/h875gbb111",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) | H875GBB111 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 2266,
+            "right": 1405,
+            "bottom": 2485,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 477,
+            "width": 560,
+            "height": 308,
+            "right": 1405,
+            "bottom": 785,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 367,
+            "width": 560,
+            "height": 2036,
+            "right": 1405,
+            "bottom": 2403,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 12942,
+            "width": 1445,
+            "height": 140,
+            "right": 1445,
+            "bottom": 13082,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+      "pathname": "/refrigerators/t873mee111",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:18:57.439Z",
+      "capturedUrl": "https://www.lge.co.kr/refrigerators/t873mee111",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) | T873MEE111 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 2428,
+            "right": 1405,
+            "bottom": 2647,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 499,
+            "width": 560,
+            "height": 308,
+            "right": 1405,
+            "bottom": 807,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 389,
+            "width": 560,
+            "height": 2176,
+            "right": 1405,
+            "bottom": 2565,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 16249,
+            "width": 1445,
+            "height": 6164,
+            "right": 1445,
+            "bottom": 22413,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+      "pathname": "/refrigerators/t875mee412",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:19:07.591Z",
+      "capturedUrl": "https://www.lge.co.kr/refrigerators/t875mee412",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) | T875MEE412 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 2400,
+            "right": 1405,
+            "bottom": 2619,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 477,
+            "width": 560,
+            "height": 308,
+            "right": 1405,
+            "bottom": 785,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 367,
+            "width": 560,
+            "height": 2170,
+            "right": 1405,
+            "bottom": 2537,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 15069,
+            "width": 1445,
+            "height": 6732,
+            "right": 1445,
+            "bottom": 21801,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+      "pathname": "/refrigerators/h875gbb111",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:19:20.111Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Fh875gbb111",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) | H875GBB111 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Fh875gbb111",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 2406,
+            "right": 1405,
+            "bottom": 2625,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 477,
+            "width": 560,
+            "height": 308,
+            "right": 1405,
+            "bottom": 785,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 367,
+            "width": 560,
+            "height": 2176,
+            "right": 1405,
+            "bottom": 2543,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 15572,
+            "width": 1445,
+            "height": 6096,
+            "right": 1445,
+            "bottom": 21668,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": {
+            "x": 0,
+            "y": 21668,
+            "width": 1445,
+            "height": 1526,
+            "right": 1445,
+            "bottom": 23194,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+      "pathname": "/refrigerators/t873mee111",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:19:27.697Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Ft873mee111",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) | T873MEE111 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Ft873mee111",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 2428,
+            "right": 1405,
+            "bottom": 2647,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 499,
+            "width": 560,
+            "height": 308,
+            "right": 1405,
+            "bottom": 807,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 389,
+            "width": 560,
+            "height": 2176,
+            "right": 1405,
+            "bottom": 2565,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 16542,
+            "width": 1445,
+            "height": 6224,
+            "right": 1445,
+            "bottom": 22766,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+      "pathname": "/refrigerators/t875mee412",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:19:34.798Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Ft875mee412",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) | T875MEE412 | 냉장고 | 주방가전 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-refrigerators&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Frefrigerators%2Ft875mee412",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 2400,
+            "right": 1405,
+            "bottom": 2619,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 477,
+            "width": 560,
+            "height": 308,
+            "right": 1405,
+            "bottom": 785,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 367,
+            "width": 560,
+            "height": 2170,
+            "right": 1405,
+            "bottom": 2537,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 15091,
+            "width": 1445,
+            "height": 6792,
+            "right": 1445,
+            "bottom": 21883,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": {
+            "x": 0,
+            "y": 21883,
+            "width": 1445,
+            "height": 1526,
+            "right": 1445,
+            "bottom": 23409,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/tvs/32lq635bkna-stand",
+      "pathname": "/tvs/32lq635bkna-stand",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:17:47.077Z",
+      "capturedUrl": "https://www.lge.co.kr/tvs/32lq635bkna-stand",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 일반 LED TV (스탠드형) | 32LQ635BKNA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/tvs/32lq635bkna-stand",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 538,
+            "width": 430,
+            "height": 708,
+            "right": 430,
+            "bottom": 1246,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 721,
+            "width": 398,
+            "height": 145,
+            "right": 414,
+            "bottom": 866,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 639,
+            "width": 398,
+            "height": 607,
+            "right": 414,
+            "bottom": 1246,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 12202,
+            "width": 430,
+            "height": 90,
+            "right": 430,
+            "bottom": 12292,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+      "pathname": "/tvs/oled97g5kna-stand",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:18:05.104Z",
+      "capturedUrl": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 올레드 evo AI (스탠드형) | OLED97G5KNA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 1560,
+            "right": 430,
+            "bottom": 2034,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 703,
+            "width": 398,
+            "height": 247,
+            "right": 414,
+            "bottom": 950,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 621,
+            "width": 398,
+            "height": 1413,
+            "right": 414,
+            "bottom": 2034,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 33053,
+            "width": 430,
+            "height": 5481,
+            "right": 430,
+            "bottom": 38534,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/tvs/32lq635bkna-stand",
+      "pathname": "/tvs/32lq635bkna-stand",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:18:18.460Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2F32lq635bkna-stand",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 일반 LED TV (스탠드형) | 32LQ635BKNA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2F32lq635bkna-stand",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 538,
+            "width": 430,
+            "height": 706,
+            "right": 430,
+            "bottom": 1244,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 721,
+            "width": 398,
+            "height": 145,
+            "right": 414,
+            "bottom": 866,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 639,
+            "width": 398,
+            "height": 605,
+            "right": 414,
+            "bottom": 1244,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 13722,
+            "width": 430,
+            "height": 4932,
+            "right": 430,
+            "bottom": 18654,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": {
+            "x": 0,
+            "y": 18654,
+            "width": 430,
+            "height": 483,
+            "right": 430,
+            "bottom": 19137,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "mo",
+      "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+      "pathname": "/tvs/oled97g5kna-stand",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:18:25.569Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2Foled97g5kna-stand",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 올레드 evo AI (스탠드형) | OLED97G5KNA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=mo&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2Foled97g5kna-stand",
+        "viewportWidth": 430,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#mobile_summary_gallery",
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516,
+            "right": 430,
+            "bottom": 474,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 1558,
+            "right": 430,
+            "bottom": 2032,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 16,
+            "y": 703,
+            "width": 398,
+            "height": 247,
+            "right": 414,
+            "bottom": 950,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 16,
+            "y": 621,
+            "width": 398,
+            "height": 1411,
+            "right": 414,
+            "bottom": 2032,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 385,
+            "y": 8,
+            "width": 34,
+            "height": 34,
+            "right": 419,
+            "bottom": 42,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 32175,
+            "width": 430,
+            "height": 5536,
+            "right": 430,
+            "bottom": 37711,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": {
+            "x": 0,
+            "y": 37711,
+            "width": 430,
+            "height": 489,
+            "right": 430,
+            "bottom": 38200,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+      "pathname": "/tvs/oled97g5kna-stand",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:16:27.605Z",
+      "capturedUrl": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 올레드 evo AI (스탠드형) | OLED97G5KNA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 1982,
+            "right": 1405,
+            "bottom": 2201,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 499,
+            "width": 560,
+            "height": 282,
+            "right": 1405,
+            "bottom": 781,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 389,
+            "width": 560,
+            "height": 1730,
+            "right": 1405,
+            "bottom": 2119,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 34890,
+            "width": 1445,
+            "height": 140,
+            "right": 1445,
+            "bottom": 35030,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/tvs/oled97g6kna-stand",
+      "pathname": "/tvs/oled97g6kna-stand",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:16:45.031Z",
+      "capturedUrl": "https://www.lge.co.kr/tvs/oled97g6kna-stand",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 올레드 evo AI (스탠드형) | OLED97G6KNA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/tvs/oled97g6kna-stand",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 1789,
+            "right": 1405,
+            "bottom": 2008,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 463,
+            "width": 560,
+            "height": 308,
+            "right": 1405,
+            "bottom": 771,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 353,
+            "width": 560,
+            "height": 1573,
+            "right": 1405,
+            "bottom": 1926,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 31952,
+            "width": 1445,
+            "height": 6437,
+            "right": 1445,
+            "bottom": 38389,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/tvs/vc23ga",
+      "pathname": "/tvs/vc23ga",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-09T09:17:00.876Z",
+      "capturedUrl": "https://www.lge.co.kr/tvs/vc23ga",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 스마트 캠 | VC23GA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "https://www.lge.co.kr/tvs/vc23ga",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 967,
+            "right": 1405,
+            "bottom": 1186,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 331,
+            "width": 560,
+            "height": 172,
+            "right": 1405,
+            "bottom": 503,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 331,
+            "width": 560,
+            "height": 773,
+            "right": 1405,
+            "bottom": 1104,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 11270,
+            "width": 1445,
+            "height": 4965,
+            "right": 1445,
+            "bottom": 16235,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+      "pathname": "/tvs/oled97g5kna-stand",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:17:14.521Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2Foled97g5kna-stand",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 올레드 evo AI (스탠드형) | OLED97G5KNA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2Foled97g5kna-stand",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 2122,
+            "right": 1405,
+            "bottom": 2341,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 499,
+            "width": 560,
+            "height": 282,
+            "right": 1405,
+            "bottom": 781,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 389,
+            "width": 560,
+            "height": 1870,
+            "right": 1405,
+            "bottom": 2259,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 34602,
+            "width": 1445,
+            "height": 6315,
+            "right": 1445,
+            "bottom": 40917,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/tvs/oled97g6kna-stand",
+      "pathname": "/tvs/oled97g6kna-stand",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:17:22.129Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2Foled97g6kna-stand",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 올레드 evo AI (스탠드형) | OLED97G6KNA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2Foled97g6kna-stand",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 1789,
+            "right": 1405,
+            "bottom": 2008,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 463,
+            "width": 560,
+            "height": 308,
+            "right": 1405,
+            "bottom": 771,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 353,
+            "width": 560,
+            "height": 1573,
+            "right": 1405,
+            "bottom": 1926,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 33303,
+            "width": 1445,
+            "height": 6497,
+            "right": 1445,
+            "bottom": 39800,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": {
+            "x": 0,
+            "y": 39800,
+            "width": 1445,
+            "height": 1526,
+            "right": 1445,
+            "bottom": 41326,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "href": "https://www.lge.co.kr/tvs/vc23ga",
+      "pathname": "/tvs/vc23ga",
+      "sourceType": "working",
+      "extractedAt": "2026-04-09T09:17:29.571Z",
+      "capturedUrl": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2Fvc23ga",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "LG 스마트 캠 | VC23GA | TV | TV/오디오 | 제품/소모품 | LG전자",
+        "href": "http://localhost:3000/clone-product-content?pageId=category-tvs&viewportProfile=pc&href=https%3A%2F%2Fwww.lge.co.kr%2Ftvs%2Fvc23ga",
+        "viewportWidth": 1460,
+        "viewportHeight": 3200
+      },
+      "groups": {
+        "gallery": {
+          "groupId": "gallery",
+          "found": true,
+          "selector": "#desktop_summary_gallery",
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779,
+            "right": 700,
+            "bottom": 998,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "summary": {
+          "groupId": "summary",
+          "found": true,
+          "selector": ".pdp-info-area",
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 967,
+            "right": 1405,
+            "bottom": 1186,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "price": {
+          "groupId": "price",
+          "found": true,
+          "selector": "[class*=\"price\"]",
+          "rect": {
+            "x": 845,
+            "y": 331,
+            "width": 560,
+            "height": 172,
+            "right": 1405,
+            "bottom": 503,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "option": {
+          "groupId": "option",
+          "found": true,
+          "selector": "[class*=\"option\"]",
+          "rect": {
+            "x": 845,
+            "y": 331,
+            "width": 560,
+            "height": 773,
+            "right": 1405,
+            "bottom": 1104,
+            "display": "block",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        },
+        "sticky": {
+          "groupId": "sticky",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 1242,
+            "y": 24,
+            "width": 24,
+            "height": 24,
+            "right": 1266,
+            "bottom": 48,
+            "display": "inline-block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "found": true,
+          "selector": "[id*=\"review\"]",
+          "rect": {
+            "x": 0,
+            "y": 11266,
+            "width": 1445,
+            "height": 4965,
+            "right": 1445,
+            "bottom": 16231,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "found": true,
+          "selector": "[id*=\"qna\"]",
+          "rect": {
+            "x": 0,
+            "y": 16231,
+            "width": 1445,
+            "height": 1276,
+            "right": 1445,
+            "bottom": 17507,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    }
+  ],
+  "errors": []
+}

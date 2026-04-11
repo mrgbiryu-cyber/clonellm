@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Preview | LGE Prototype</title>
+    <style>
+      :root { --bg: #f4f6fb; --ink: #1b2130; --line: #e8ebf5; --primary: #c60c30; }
+      body { margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); }
+      header { background: linear-gradient(90deg, #111827, #1e293b); color: #fff; padding: 18px 20px; }
+      .top { max-width: 1120px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+      .start { background: #fff; color: #111827; text-decoration: none; padding: 8px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; }
+      main { padding: 16px; max-width: 1120px; margin: 0 auto; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; }
+      .card { background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(17, 24, 39, 0.06); }
+      .thumb { aspect-ratio: 16 / 9; background: #e9edf5; overflow: hidden; }
+      .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .content { padding: 14px; }
+      .meta { font-size: 12px; color: #5d6476; margin: 6px 0 10px; }
+      .btn { display: inline-block; padding: 8px 10px; background: var(--primary); color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; }
+      .badge { display: inline-flex; align-items: center; min-height: 22px; padding: 0 8px; border-radius: 999px; font-size: 11px; font-weight: 700; border: 1px solid #d8def0; }
+      .badge.captured { background: #ecfdf3; border-color: #abefc6; color: #067647; }
+      .badge.partial { background: #fffaeb; border-color: #fedf89; color: #b54708; }
+      .badge.missing { background: #f2f4f7; border-color: #eaecf0; color: #667085; }
+      .hero { margin: 12px 0 16px; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); background: #fff; min-height: 160px; }
+      .hero img { width: 100%; height: 240px; object-fit: cover; display: block; }
+      .hero .fallback { padding: 18px; font-size: 14px; color: #475068; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="top">
+        <strong>LGE Prototype Preview</strong>
+        <a id="startBtn" class="start" href="/p/home">Start from Home</a>
+      </div>
+    </header>
+    <main>
+      <section id="hero" class="hero"><div class="fallback">Loading home visual...</div></section>
+      <div id="grid" class="grid">Loading...</div>
+    </main>
+    <script>
+      const gridEl = document.getElementById("grid");
+      const heroEl = document.getElementById("hero");
+      const startBtn = document.getElementById("startBtn");
+      fetch("/api/data")
+        .then((r) => r.json())
+        .then((data) => {
+          const pages = data.pages || [];
+          const homePageId = data.homePageId || "home";
+          const heroSrc = (data.heroMap || {})[homePageId];
+          const coverageMap = data.coverageMap || {};
+          startBtn.href = `/p/${homePageId}`;
+          if (heroSrc) {
+            heroEl.innerHTML = `<img src="${heroSrc}" alt="home visual" />`;
+          } else {
+            heroEl.innerHTML = `<div class="fallback">No home image captured yet.</div>`;
+          }
+          gridEl.innerHTML = pages.map((p) => `
+            <article class="card">
+              <div class="thumb">${(data.heroMap || {})[p.id] ? `<img src="${(data.heroMap || {})[p.id]}" alt="${p.title || p.id}" />` : ""}</div>
+              <div class="content">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                  <strong>${p.title || p.id}</strong>
+                  <span class="badge ${coverageMap[p.id]?.pageStatus || "missing"}">${coverageMap[p.id]?.pageStatus || "missing"}</span>
+                </div>
+                <div class="meta">${p.pageGroup} | sections: ${p.sections.length}</div>
+                <a class="btn" href="/clone/${p.id}">Open clone</a>
+              </div>
+            </article>
+          `).join("");
+        })
+        .catch((error) => {
+          gridEl.textContent = "Failed to load: " + String(error);
+        });
+    </script>
+  </body>
+</html>

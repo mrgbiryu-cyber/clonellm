@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page | LGE Prototype</title>
+    <style>
+      :root { --bg: #edf1f7; --ink: #111827; --line: #e2e7f3; --primary: #c60c30; }
+      body { margin: 0; font-family: Arial, sans-serif; background: var(--bg); color: var(--ink); }
+      .wrap { max-width: 1080px; margin: 0 auto; padding: 16px; }
+      .page-title { margin: 0 0 12px; }
+      .hero { border: 1px solid var(--line); border-radius: 12px; background: #fff; overflow: hidden; margin: 10px 0 14px; }
+      .hero img { width: 100%; height: 260px; object-fit: cover; display: block; }
+      .hero .fallback { padding: 18px; color: #5d6476; font-size: 14px; }
+      .links { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+      .link { font-size: 12px; padding: 7px 10px; border-radius: 16px; border: 1px solid #d8def0; background: #fff; text-decoration: none; color: #334155; }
+      .link:hover { border-color: var(--primary); color: #7a0d24; }
+      .section { background: #fff; border: 1px solid #e2e7f3; border-radius: 10px; margin: 10px 0; padding: 12px; }
+      .meta { color: #667085; font-size: 12px; }
+      .asset { display: inline-block; margin: 6px 6px 0 0; font-size: 12px; padding: 4px 6px; border-radius: 4px; background: #edf2ff; }
+      .placeholder { background: #fff8e8; border-color: #f4ddb1; }
+      .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+      .home { background: var(--primary); color: #fff; text-decoration: none; padding: 8px 10px; border-radius: 6px; font-size: 13px; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap" id="app">Loading...</div>
+    <script>
+      const app = document.getElementById("app");
+      const pageId = decodeURIComponent(location.pathname.split("/p/")[1] || "");
+
+      function prettyTitle(id) {
+        return (id || "").replace(/-/g, " ");
+      }
+
+      fetch(`/api/page?id=${encodeURIComponent(pageId)}`)
+        .then((r) => r.json())
+        .then((page) => {
+          if (page.error) {
+            app.innerHTML = `<h1>Page not found</h1><p>${pageId}</p>`;
+            return;
+          }
+          const sorted = [...(page.sections || [])].sort((a, b) => a.order - b.order);
+          const links = page.linkedPageIds || [];
+          const hero = page.heroImage
+            ? `<section class="hero"><img src="${page.heroImage}" alt="${page.title || page.id}" /></section>`
+            : `<section class="hero"><div class="fallback">No captured image. Run asset capture for this page.</div></section>`;
+          app.innerHTML = `
+            <div class="topbar">
+              <h1 class="page-title">${page.title || page.id}</h1>
+              <a class="home" href="/preview">Back to Preview</a>
+            </div>
+            <div class="meta">${page.pageGroup} | ${page.url || ""}</div>
+            ${hero}
+            <div class="meta">Connected pages from source links</div>
+            <nav class="links">
+              ${links.length ? links.map((id) => `<a class="link" href="/p/${id}">${prettyTitle(id)}</a>`).join("") : "<span class='meta'>No linked page mapped.</span>"}
+            </nav>
+            ${sorted.map((s) => `
+              <section class="section ${s.componentType === "restricted-page-placeholder" ? "placeholder" : ""}">
+                <div><strong>${s.name}</strong></div>
+                <div class="meta">component: ${s.componentType}</div>
+                <div class="meta">visible: ${s.visible} | order: ${s.order}</div>
+                <div class="meta">source: ${s.props?.sourceUrl || ""}</div>
+              </section>
+            `).join("")}
+          `;
+        })
+        .catch((error) => {
+          app.textContent = "Failed to load page: " + String(error);
+        });
+    </script>
+  </body>
+</html>

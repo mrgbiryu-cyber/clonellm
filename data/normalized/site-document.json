@@ -1,0 +1,410 @@
+{
+  "siteId": "lge-co-kr",
+  "source": "crawl",
+  "pages": [
+    {
+      "id": "home",
+      "url": "https://www.lge.co.kr/home",
+      "crawlStatus": "captured",
+      "pageGroup": "home",
+      "title": "LGE.COM | LG전자",
+      "sections": [
+        {
+          "id": "home-section-1",
+          "name": "Header",
+          "componentType": "global-header",
+          "instanceId": "home-instance-1",
+          "visible": true,
+          "order": 1,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          },
+          "assetIds": [],
+          "interactions": []
+        },
+        {
+          "id": "home-section-2",
+          "name": "Hero Banner",
+          "componentType": "hero-banner",
+          "instanceId": "home-instance-2",
+          "visible": true,
+          "order": 2,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          },
+          "assetIds": [
+            "home-asset-1",
+            "home-asset-2",
+            "home-asset-3",
+            "home-asset-4",
+            "home-asset-5",
+            "home-asset-6",
+            "home-asset-7",
+            "home-asset-8",
+            "home-asset-9",
+            "home-asset-10",
+            "home-asset-11",
+            "home-asset-12",
+            "home-asset-13",
+            "home-asset-14",
+            "home-asset-15",
+            "home-asset-16",
+            "home-asset-17",
+            "home-asset-18",
+            "home-asset-19",
+            "home-asset-20"
+          ],
+          "interactions": []
+        },
+        {
+          "id": "home-section-3",
+          "name": "Promotion Carousel",
+          "componentType": "promo-carousel",
+          "instanceId": "home-instance-3",
+          "visible": true,
+          "order": 3,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          },
+          "assetIds": [],
+          "interactions": []
+        },
+        {
+          "id": "home-section-4",
+          "name": "Featured Products",
+          "componentType": "product-card-grid",
+          "instanceId": "home-instance-4",
+          "visible": true,
+          "order": 4,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          },
+          "assetIds": [],
+          "interactions": []
+        },
+        {
+          "id": "home-section-5",
+          "name": "CTA Banner",
+          "componentType": "cta-banner",
+          "instanceId": "home-instance-5",
+          "visible": true,
+          "order": 5,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          },
+          "assetIds": [],
+          "interactions": []
+        },
+        {
+          "id": "home-section-6",
+          "name": "Footer",
+          "componentType": "global-footer",
+          "instanceId": "home-instance-6",
+          "visible": true,
+          "order": 6,
+          "props": {
+            "pageTitle": "LGE.COM | LG전자",
+            "sourceUrl": "https://www.lge.co.kr/home"
+          },
+          "assetIds": [],
+          "interactions": []
+        }
+      ],
+      "overlays": [],
+      "responsive": {
+        "desktop": {
+          "direction": "column"
+        },
+        "mobile": {
+          "direction": "column",
+          "stack": true
+        }
+      }
+    }
+  ],
+  "components": [
+    {
+      "type": "category-nav",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "cta-banner",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "filter-sort-bar",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "global-footer",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "global-header",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "hero-banner",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "link-dense-section",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "price-benefit-panel",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "product-card-grid",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "promo-carousel",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "restricted-page-placeholder",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    },
+    {
+      "type": "support-shortcuts",
+      "category": "content",
+      "editableProps": [
+        "pageTitle",
+        "sourceUrl"
+      ]
+    }
+  ],
+  "componentInstances": [],
+  "assets": [
+    {
+      "id": "home-asset-1",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/images/nextjs/lg_logo_213x56.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__000.png",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-2",
+      "kind": "icon",
+      "sourceUrl": "https://www.lge.co.kr//lg5-common/images/header/logo-signature.svg",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__001.svg",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-3",
+      "kind": "icon",
+      "sourceUrl": "https://www.lge.co.kr//lg5-common/images/header/logo-objet-collection.svg",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__002.svg",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-4",
+      "kind": "icon",
+      "sourceUrl": "https://www.lge.co.kr//lg5-common/images/header/logo-thinq.svg",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__003.svg",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-5",
+      "kind": "icon",
+      "sourceUrl": "https://www.lge.co.kr//lg5-common/images/header/logo-lets-gram.svg",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__004.svg",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-6",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/Home_Hero_PC_1760x500_20260331_153421.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__005.png",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-7",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/03r_20260331_153016.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__006.png",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-8",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/homemainhero_pc_1760x500_homestylebrand_260331_v2_20260331_174637.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__007.png",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-9",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/04r_20260306_173744.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__008.png",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-10",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/PC_20260306_185815.jpg",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__009.jpg",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-11",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/가전구독r_20260130_175316.png",
+      "localPath": null,
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-12",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/homemain_hero_pc_ 1_20260227_164209.jpg",
+      "localPath": null,
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-13",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/04r_20260113_151034.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__012.png",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-14",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/PC_20260123_180808.jpg",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__013.jpg",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-15",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/07r_20260320_163707.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__014.png",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-16",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/homemain_hero_pc 4_20260401_171950.png",
+      "localPath": null,
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-17",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/01r_20260402_173215.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__016.png",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-18",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/HeroBanner_pc_20260402_173215.jpg",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__017.jpg",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-19",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/01r_20251014_111653.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__018.png",
+      "sourcePageId": "home"
+    },
+    {
+      "id": "home-asset-20",
+      "kind": "image",
+      "sourceUrl": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/Bath_PC_20260126_163123.png",
+      "localPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/raw/assets/home__0e543daa3aa8__019.png",
+      "sourcePageId": "home"
+    }
+  ],
+  "componentCandidates": [
+    {
+      "pageId": "home",
+      "pageGroup": "home",
+      "title": "LGE.COM | LG전자",
+      "candidates": [
+        {
+          "type": "hero-banner",
+          "reason": "many visual assets"
+        },
+        {
+          "type": "link-dense-section",
+          "reason": "many internal links"
+        }
+      ]
+    }
+  ],
+  "analysisSummary": {
+    "pageCountByGroup": {
+      "home": 1
+    },
+    "componentUsage": {
+      "global-header": 1,
+      "hero-banner": 1,
+      "promo-carousel": 1,
+      "product-card-grid": 1,
+      "cta-banner": 1,
+      "global-footer": 1
+    },
+    "assetKindCounts": {
+      "image": 16,
+      "icon": 4
+    },
+    "pagesByGroup": {
+      "home": [
+        "home"
+      ]
+    }
+  }
+}

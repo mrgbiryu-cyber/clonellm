@@ -1,0 +1,759 @@
+{
+  "generatedAt": "2026-04-10T00:57:20.708Z",
+  "entryCount": 8,
+  "entries": [
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-10T00:55:48.848Z",
+      "capturedUrl": "http://localhost:3000/reference-content/category-refrigerators?viewportProfile=mo",
+      "sourceUrl": "https://www.lge.co.kr/m/category/refrigerators",
+      "fallbackFromViewportProfile": "pc",
+      "page": {
+        "title": "냉장고 | LG전자 | 공식몰 LGE.COM",
+        "href": "http://localhost:3000/reference-content/category-refrigerators?viewportProfile=mo",
+        "viewportWidth": 430,
+        "viewportHeight": 2400
+      },
+      "matchedProductCount": 4,
+      "groups": {
+        "filter": {
+          "groupId": "filter",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "sort": {
+          "groupId": "sort",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "productGrid": {
+          "groupId": "productGrid",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": -1,
+            "y": 751,
+            "width": 477,
+            "height": 2151,
+            "right": 476,
+            "bottom": 2902,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstRow": {
+          "groupId": "firstRow",
+          "found": true,
+          "selector": "representativeProducts",
+          "rect": {
+            "x": 328,
+            "y": 751,
+            "width": 148,
+            "height": 286,
+            "right": 476,
+            "bottom": 1037,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstProduct": {
+          "groupId": "firstProduct",
+          "found": true,
+          "selector": "representativeProducts[0]",
+          "rect": {
+            "x": 328,
+            "y": 751,
+            "width": 148,
+            "height": 286,
+            "right": 476,
+            "bottom": 1037,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "banner": {
+          "groupId": "banner",
+          "found": true,
+          "selector": "[data-area*=\"구매가이드\"]",
+          "rect": {
+            "x": 0,
+            "y": 559,
+            "width": 430,
+            "height": 115,
+            "right": 430,
+            "bottom": 674,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "sourceType": "working",
+      "extractedAt": "2026-04-10T00:56:44.358Z",
+      "capturedUrl": "http://localhost:3000/clone-content/category-refrigerators?viewportProfile=mo",
+      "sourceUrl": "https://www.lge.co.kr/m/category/refrigerators",
+      "fallbackFromViewportProfile": "pc",
+      "page": {
+        "title": "냉장고 | LG전자 | 공식몰 LGE.COM",
+        "href": "http://localhost:3000/clone-content/category-refrigerators?viewportProfile=mo",
+        "viewportWidth": 430,
+        "viewportHeight": 2400
+      },
+      "matchedProductCount": 4,
+      "groups": {
+        "filter": {
+          "groupId": "filter",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "sort": {
+          "groupId": "sort",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "productGrid": {
+          "groupId": "productGrid",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": -1,
+            "y": 751,
+            "width": 477,
+            "height": 2151,
+            "right": 476,
+            "bottom": 2902,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstRow": {
+          "groupId": "firstRow",
+          "found": true,
+          "selector": "representativeProducts",
+          "rect": {
+            "x": 328,
+            "y": 751,
+            "width": 148,
+            "height": 286,
+            "right": 476,
+            "bottom": 1037,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstProduct": {
+          "groupId": "firstProduct",
+          "found": true,
+          "selector": "representativeProducts[0]",
+          "rect": {
+            "x": 328,
+            "y": 751,
+            "width": 148,
+            "height": 286,
+            "right": 476,
+            "bottom": 1037,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "banner": {
+          "groupId": "banner",
+          "found": true,
+          "selector": "[data-area*=\"구매가이드\"]",
+          "rect": {
+            "x": 0,
+            "y": 559,
+            "width": 430,
+            "height": 115,
+            "right": 430,
+            "bottom": 674,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-10T00:56:18.865Z",
+      "capturedUrl": "http://localhost:3000/reference-content/category-refrigerators?viewportProfile=pc",
+      "sourceUrl": "https://www.lge.co.kr/category/refrigerators",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "냉장고 | LG전자 | 공식몰 LGE.COM",
+        "href": "http://localhost:3000/reference-content/category-refrigerators?viewportProfile=pc",
+        "viewportWidth": 1460,
+        "viewportHeight": 2400
+      },
+      "matchedProductCount": 4,
+      "groups": {
+        "filter": {
+          "groupId": "filter",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "sort": {
+          "groupId": "sort",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "productGrid": {
+          "groupId": "productGrid",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 291,
+            "y": 1202,
+            "width": 1128,
+            "height": 1858,
+            "right": 1419,
+            "bottom": 3060,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstRow": {
+          "groupId": "firstRow",
+          "found": true,
+          "selector": "representativeProducts",
+          "rect": {
+            "x": 610,
+            "y": 1202,
+            "width": 240,
+            "height": 394,
+            "right": 850,
+            "bottom": 1596,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstProduct": {
+          "groupId": "firstProduct",
+          "found": true,
+          "selector": "representativeProducts[0]",
+          "rect": {
+            "x": 610,
+            "y": 1202,
+            "width": 240,
+            "height": 394,
+            "right": 850,
+            "bottom": 1596,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "banner": {
+          "groupId": "banner",
+          "found": true,
+          "selector": "[data-area*=\"구매가이드\"]",
+          "rect": {
+            "x": 0,
+            "y": 953,
+            "width": 1460,
+            "height": 93,
+            "right": 1460,
+            "bottom": 1046,
+            "display": "flex",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "sourceType": "working",
+      "extractedAt": "2026-04-10T00:57:11.161Z",
+      "capturedUrl": "http://localhost:3000/clone-content/category-refrigerators?viewportProfile=pc",
+      "sourceUrl": "https://www.lge.co.kr/category/refrigerators",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "냉장고 | LG전자 | 공식몰 LGE.COM",
+        "href": "http://localhost:3000/clone-content/category-refrigerators?viewportProfile=pc",
+        "viewportWidth": 1460,
+        "viewportHeight": 2400
+      },
+      "matchedProductCount": 4,
+      "groups": {
+        "filter": {
+          "groupId": "filter",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "sort": {
+          "groupId": "sort",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "productGrid": {
+          "groupId": "productGrid",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 291,
+            "y": 1200,
+            "width": 1128,
+            "height": 1858,
+            "right": 1419,
+            "bottom": 3058,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstRow": {
+          "groupId": "firstRow",
+          "found": true,
+          "selector": "representativeProducts",
+          "rect": {
+            "x": 610,
+            "y": 1200,
+            "width": 240,
+            "height": 394,
+            "right": 850,
+            "bottom": 1594,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstProduct": {
+          "groupId": "firstProduct",
+          "found": true,
+          "selector": "representativeProducts[0]",
+          "rect": {
+            "x": 610,
+            "y": 1200,
+            "width": 240,
+            "height": 394,
+            "right": 850,
+            "bottom": 1594,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "banner": {
+          "groupId": "banner",
+          "found": true,
+          "selector": "[data-area*=\"구매가이드\"]",
+          "rect": {
+            "x": 0,
+            "y": 951,
+            "width": 1460,
+            "height": 93,
+            "right": 1460,
+            "bottom": 1044,
+            "display": "flex",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "mo",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-10T00:55:57.557Z",
+      "capturedUrl": "http://localhost:3000/reference-content/category-tvs?viewportProfile=mo",
+      "sourceUrl": "https://www.lge.co.kr/m/category/tvs",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "TV | LG전자 | 공식몰 LGE.COM",
+        "href": "http://localhost:3000/reference-content/category-tvs?viewportProfile=mo",
+        "viewportWidth": 430,
+        "viewportHeight": 2400
+      },
+      "matchedProductCount": 3,
+      "groups": {
+        "filter": {
+          "groupId": "filter",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "sort": {
+          "groupId": "sort",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "productGrid": {
+          "groupId": "productGrid",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": -1,
+            "y": 639,
+            "width": 321,
+            "height": 1839,
+            "right": 320,
+            "bottom": 2478,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstRow": {
+          "groupId": "firstRow",
+          "found": true,
+          "selector": "representativeProducts",
+          "rect": {
+            "x": 172,
+            "y": 639,
+            "width": 148,
+            "height": 268,
+            "right": 320,
+            "bottom": 907,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstProduct": {
+          "groupId": "firstProduct",
+          "found": true,
+          "selector": "representativeProducts[0]",
+          "rect": {
+            "x": 172,
+            "y": 639,
+            "width": 148,
+            "height": 268,
+            "right": 320,
+            "bottom": 907,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "banner": {
+          "groupId": "banner",
+          "found": true,
+          "selector": "[data-area*=\"구매가이드\"]",
+          "rect": {
+            "x": 0,
+            "y": 447,
+            "width": 430,
+            "height": 115,
+            "right": 430,
+            "bottom": 562,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "mo",
+      "sourceType": "working",
+      "extractedAt": "2026-04-10T00:56:51.564Z",
+      "capturedUrl": "http://localhost:3000/clone-content/category-tvs?viewportProfile=mo",
+      "sourceUrl": "https://www.lge.co.kr/m/category/tvs",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "TV | LG전자 | 공식몰 LGE.COM",
+        "href": "http://localhost:3000/clone-content/category-tvs?viewportProfile=mo",
+        "viewportWidth": 430,
+        "viewportHeight": 2400
+      },
+      "matchedProductCount": 3,
+      "groups": {
+        "filter": {
+          "groupId": "filter",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "sort": {
+          "groupId": "sort",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "productGrid": {
+          "groupId": "productGrid",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": -1,
+            "y": 639,
+            "width": 321,
+            "height": 1839,
+            "right": 320,
+            "bottom": 2478,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstRow": {
+          "groupId": "firstRow",
+          "found": true,
+          "selector": "representativeProducts",
+          "rect": {
+            "x": 172,
+            "y": 639,
+            "width": 148,
+            "height": 268,
+            "right": 320,
+            "bottom": 907,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstProduct": {
+          "groupId": "firstProduct",
+          "found": true,
+          "selector": "representativeProducts[0]",
+          "rect": {
+            "x": 172,
+            "y": 639,
+            "width": 148,
+            "height": 268,
+            "right": 320,
+            "bottom": 907,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "banner": {
+          "groupId": "banner",
+          "found": true,
+          "selector": "[data-area*=\"구매가이드\"]",
+          "rect": {
+            "x": 0,
+            "y": 447,
+            "width": 430,
+            "height": 115,
+            "right": 430,
+            "bottom": 562,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "sourceType": "reference",
+      "extractedAt": "2026-04-10T00:56:28.643Z",
+      "capturedUrl": "http://localhost:3000/reference-content/category-tvs?viewportProfile=pc",
+      "sourceUrl": "https://www.lge.co.kr/category/tvs",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "TV | LG전자 | 공식몰 LGE.COM",
+        "href": "http://localhost:3000/reference-content/category-tvs?viewportProfile=pc",
+        "viewportWidth": 1460,
+        "viewportHeight": 2400
+      },
+      "matchedProductCount": 6,
+      "groups": {
+        "filter": {
+          "groupId": "filter",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "sort": {
+          "groupId": "sort",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "productGrid": {
+          "groupId": "productGrid",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 40,
+            "y": 869,
+            "width": 1379,
+            "height": 2975,
+            "right": 1419,
+            "bottom": 3844,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstRow": {
+          "groupId": "firstRow",
+          "found": true,
+          "selector": "representativeProducts",
+          "rect": {
+            "x": 40,
+            "y": 869,
+            "width": 525,
+            "height": 370,
+            "right": 565,
+            "bottom": 1239,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstProduct": {
+          "groupId": "firstProduct",
+          "found": true,
+          "selector": "representativeProducts[0]",
+          "rect": {
+            "x": 40,
+            "y": 869,
+            "width": 240,
+            "height": 370,
+            "right": 280,
+            "bottom": 1239,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "banner": {
+          "groupId": "banner",
+          "found": true,
+          "selector": "[data-area*=\"구매가이드\"]",
+          "rect": {
+            "x": 0,
+            "y": 620,
+            "width": 1460,
+            "height": 93,
+            "right": 1460,
+            "bottom": 713,
+            "display": "flex",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        }
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "sourceType": "working",
+      "extractedAt": "2026-04-10T00:57:20.218Z",
+      "capturedUrl": "http://localhost:3000/clone-content/category-tvs?viewportProfile=pc",
+      "sourceUrl": "https://www.lge.co.kr/category/tvs",
+      "fallbackFromViewportProfile": null,
+      "page": {
+        "title": "TV | LG전자 | 공식몰 LGE.COM",
+        "href": "http://localhost:3000/clone-content/category-tvs?viewportProfile=pc",
+        "viewportWidth": 1460,
+        "viewportHeight": 2400
+      },
+      "matchedProductCount": 6,
+      "groups": {
+        "filter": {
+          "groupId": "filter",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "sort": {
+          "groupId": "sort",
+          "found": false,
+          "selector": null,
+          "rect": null
+        },
+        "productGrid": {
+          "groupId": "productGrid",
+          "found": true,
+          "selector": null,
+          "rect": {
+            "x": 40,
+            "y": 867,
+            "width": 1379,
+            "height": 2975,
+            "right": 1419,
+            "bottom": 3842,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstRow": {
+          "groupId": "firstRow",
+          "found": true,
+          "selector": "representativeProducts",
+          "rect": {
+            "x": 40,
+            "y": 867,
+            "width": 525,
+            "height": 370,
+            "right": 565,
+            "bottom": 1237,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "firstProduct": {
+          "groupId": "firstProduct",
+          "found": true,
+          "selector": "representativeProducts[0]",
+          "rect": {
+            "x": 40,
+            "y": 867,
+            "width": 240,
+            "height": 370,
+            "right": 280,
+            "bottom": 1237,
+            "display": "block",
+            "position": "relative",
+            "zIndex": "auto"
+          }
+        },
+        "banner": {
+          "groupId": "banner",
+          "found": true,
+          "selector": "[data-area*=\"구매가이드\"]",
+          "rect": {
+            "x": 0,
+            "y": 618,
+            "width": 1460,
+            "height": 93,
+            "right": 1460,
+            "bottom": 711,
+            "display": "flex",
+            "position": "static",
+            "zIndex": "auto"
+          }
+        }
+      }
+    }
+  ],
+  "errors": []
+}

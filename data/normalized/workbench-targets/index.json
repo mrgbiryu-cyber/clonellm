@@ -1,0 +1,320 @@
+{
+  "generatedAt": "2026-04-09T03:47:07.526Z",
+  "source": {
+    "representativeUrlsDir": "/mnt/c/Users/mrgbi/lge-site-analysis/data/normalized/representative-urls",
+    "representativePdpsPath": "/mnt/c/Users/mrgbi/lge-site-analysis/data/normalized/representative-pdps/index.json"
+  },
+  "plpTargets": [
+    {
+      "targetId": "plp:category-refrigerators:mo",
+      "targetType": "plp",
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "sourceUrl": "https://www.lge.co.kr/m/category/refrigerators",
+      "title": "냉장고 | LG전자 | 공식몰 LGE.COM",
+      "representativeCount": 3,
+      "representativeProducts": [
+        {
+          "order": 1,
+          "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+          "pathname": "/refrigerators/t873mee111",
+          "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 클레이 민트/베이지 LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 T873MEE111 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 31% 할인금액 1,890,000 원 원래금액 2,",
+          "rect": {
+            "x": 291,
+            "y": 433,
+            "width": 376,
+            "height": 666
+          },
+          "fallbackFromViewportProfile": "pc"
+        },
+        {
+          "order": 2,
+          "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+          "pathname": "/refrigerators/t875mee412",
+          "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) 865L 2등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.3kWh/월 냉동367L 냉장498L 모델명 T875MEE412 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 22% 할인금액 2,300,000 원 원래금액 2,950",
+          "rect": {
+            "x": 667,
+            "y": 433,
+            "width": 376,
+            "height": 666
+          },
+          "fallbackFromViewportProfile": "pc"
+        },
+        {
+          "order": 3,
+          "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+          "pathname": "/refrigerators/h875gbb111",
+          "text": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 H875GBB111 평점 5점 만점 중 5.0 리뷰 개수 (566) 할인율 9% 할인금액 3,250,000 원 원래금액 3,608,000원 최대혜택가 2,855,100 원 내일배송 위시리스트 미등록 ",
+          "rect": {
+            "x": 1043,
+            "y": 433,
+            "width": 376,
+            "height": 666
+          },
+          "fallbackFromViewportProfile": "pc"
+        }
+      ],
+      "fallbackFromViewportProfile": "pc",
+      "fallbackReason": "mobile representative extraction returned empty set"
+    },
+    {
+      "targetId": "plp:category-refrigerators:pc",
+      "targetType": "plp",
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "sourceUrl": "https://www.lge.co.kr/category/refrigerators",
+      "title": "냉장고 | LG전자 | 공식몰 LGE.COM",
+      "representativeCount": 3,
+      "representativeProducts": [
+        {
+          "order": 1,
+          "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+          "pathname": "/refrigerators/t873mee111",
+          "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 클레이 민트/베이지 LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 T873MEE111 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 31% 할인금액 1,890,000 원 원래금액 2,",
+          "rect": {
+            "x": 291,
+            "y": 433,
+            "width": 376,
+            "height": 666
+          }
+        },
+        {
+          "order": 2,
+          "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+          "pathname": "/refrigerators/t875mee412",
+          "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) 865L 2등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.3kWh/월 냉동367L 냉장498L 모델명 T875MEE412 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 22% 할인금액 2,300,000 원 원래금액 2,950",
+          "rect": {
+            "x": 667,
+            "y": 433,
+            "width": 376,
+            "height": 666
+          }
+        },
+        {
+          "order": 3,
+          "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+          "pathname": "/refrigerators/h875gbb111",
+          "text": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 H875GBB111 평점 5점 만점 중 5.0 리뷰 개수 (566) 할인율 9% 할인금액 3,250,000 원 원래금액 3,608,000원 최대혜택가 2,855,100 원 내일배송 위시리스트 미등록 ",
+          "rect": {
+            "x": 1043,
+            "y": 433,
+            "width": 376,
+            "height": 666
+          }
+        }
+      ]
+    },
+    {
+      "targetId": "plp:category-tvs:mo",
+      "targetType": "plp",
+      "pageId": "category-tvs",
+      "viewportProfile": "mo",
+      "sourceUrl": "https://www.lge.co.kr/m/category/tvs",
+      "title": "TV | LG전자 | 공식몰 LGE.COM",
+      "representativeCount": 2,
+      "representativeProducts": [
+        {
+          "order": 1,
+          "href": "https://www.lge.co.kr/tvs/32lq635bkna-stand",
+          "pathname": "/tvs/32lq635bkna-stand",
+          "text": "스탠드형 벽걸이형 LG 일반 LED TV (스탠드형) 80cm 모델명 32LQ635BKNA 평점 5점 만점 중 4.9 리뷰 개수 (96) 타임딜 12:09:18 33개 남음 할인율 31% 할인금액 310,000 원 해상도HD 스피커 출력10W 위시리스트 미등록 비교하기 선택 시 등록 됨",
+          "rect": {
+            "x": -1,
+            "y": 581,
+            "width": 243,
+            "height": 472
+          }
+        },
+        {
+          "order": 2,
+          "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+          "pathname": "/tvs/oled97g5kna-stand",
+          "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 245cm 모델명 OLED97G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 42,900,000 원 최대혜택가 40,720,000 원 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 위시리스트 미등록 비교하기 선택 시 등록 됨",
+          "rect": {
+            "x": 242,
+            "y": 581,
+            "width": 243,
+            "height": 472
+          }
+        }
+      ]
+    },
+    {
+      "targetId": "plp:category-tvs:pc",
+      "targetType": "plp",
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "sourceUrl": "https://www.lge.co.kr/category/tvs",
+      "title": "TV | LG전자 | 공식몰 LGE.COM",
+      "representativeCount": 3,
+      "representativeProducts": [
+        {
+          "order": 1,
+          "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+          "pathname": "/tvs/oled97g5kna-stand",
+          "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 42,900,000 원 최대혜택가 40,720,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+          "rect": {
+            "x": 291,
+            "y": 801,
+            "width": 376,
+            "height": 629
+          }
+        },
+        {
+          "order": 2,
+          "href": "https://www.lge.co.kr/tvs/oled97g6kna-stand",
+          "pathname": "/tvs/oled97g6kna-stand",
+          "text": "2026년출시 다품목할인 사은품 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G6KNA 평점 5점 만점 중 5.0 리뷰 개수 (92) 할인율 14% 할인금액 42,900,000 원 원래금액 50,384,000원 최대혜택가 39,720,000 원 내일배송 위시리스트 미",
+          "rect": {
+            "x": 667,
+            "y": 801,
+            "width": 376,
+            "height": 629
+          }
+        },
+        {
+          "order": 3,
+          "href": "https://www.lge.co.kr/tvs/vc23ga",
+          "pathname": "/tvs/vc23ga",
+          "text": "LG 스마트 캠 크기80x35.4x23.1mm 무게38g 모델명 VC23GA 평점 5점 만점 중 4.6 리뷰 개수 (11) 할인율 9% 할인금액 129,000 원 원래금액 142,000원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+          "rect": {
+            "x": 1043,
+            "y": 801,
+            "width": 376,
+            "height": 629
+          }
+        }
+      ]
+    }
+  ],
+  "pdpTargets": [
+    {
+      "targetId": "pdp:category-refrigerators:mo",
+      "targetType": "pdp",
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "representativeCount": 3,
+      "fallbackUsed": true,
+      "representativeProducts": [
+        {
+          "order": 1,
+          "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+          "pathname": "/refrigerators/t873mee111",
+          "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 클레이 민트/베이지 LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 T873MEE111 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 31% 할인금액 1,890,000 원 원래금액 2,",
+          "family": "refrigerators",
+          "fallbackFromViewportProfile": "pc"
+        },
+        {
+          "order": 2,
+          "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+          "pathname": "/refrigerators/t875mee412",
+          "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) 865L 2등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.3kWh/월 냉동367L 냉장498L 모델명 T875MEE412 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 22% 할인금액 2,300,000 원 원래금액 2,950",
+          "family": "refrigerators",
+          "fallbackFromViewportProfile": "pc"
+        },
+        {
+          "order": 3,
+          "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+          "pathname": "/refrigerators/h875gbb111",
+          "text": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 H875GBB111 평점 5점 만점 중 5.0 리뷰 개수 (566) 할인율 9% 할인금액 3,250,000 원 원래금액 3,608,000원 최대혜택가 2,855,100 원 내일배송 위시리스트 미등록 ",
+          "family": "refrigerators",
+          "fallbackFromViewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "targetId": "pdp:category-refrigerators:pc",
+      "targetType": "pdp",
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "representativeCount": 3,
+      "fallbackUsed": false,
+      "representativeProducts": [
+        {
+          "order": 1,
+          "href": "https://www.lge.co.kr/refrigerators/t873mee111",
+          "pathname": "/refrigerators/t873mee111",
+          "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 클레이 민트/베이지 LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 T873MEE111 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 31% 할인금액 1,890,000 원 원래금액 2,",
+          "family": "refrigerators",
+          "fallbackFromViewportProfile": null
+        },
+        {
+          "order": 2,
+          "href": "https://www.lge.co.kr/refrigerators/t875mee412",
+          "pathname": "/refrigerators/t875mee412",
+          "text": "닷컴 ONLY 베이지/베이지 크림 화이트/크림 화이트 LG 디오스 오브제컬렉션 냉장고 (노크온 매직스페이스) 865L 2등급 색상베이지/베이지 도어재질네이처(메탈) 주요 기능노크온,인버터 리니어 컴프레서 소비전력56.3kWh/월 냉동367L 냉장498L 모델명 T875MEE412 평점 5점 만점 중 4.9 리뷰 개수 (999+) 할인율 22% 할인금액 2,300,000 원 원래금액 2,950",
+          "family": "refrigerators",
+          "fallbackFromViewportProfile": null
+        },
+        {
+          "order": 3,
+          "href": "https://www.lge.co.kr/refrigerators/h875gbb111",
+          "pathname": "/refrigerators/h875gbb111",
+          "text": "LG 디오스 오브제컬렉션 냉장고 (매직스페이스) 870L 1등급 색상베이지/베이지 도어재질미스트(글라스) 주요 기능인버터 리니어 컴프레서 소비전력43.7kWh/월 냉동367L 냉장503L 모델명 H875GBB111 평점 5점 만점 중 5.0 리뷰 개수 (566) 할인율 9% 할인금액 3,250,000 원 원래금액 3,608,000원 최대혜택가 2,855,100 원 내일배송 위시리스트 미등록 ",
+          "family": "refrigerators",
+          "fallbackFromViewportProfile": null
+        }
+      ]
+    },
+    {
+      "targetId": "pdp:category-tvs:mo",
+      "targetType": "pdp",
+      "pageId": "category-tvs",
+      "viewportProfile": "mo",
+      "representativeCount": 2,
+      "fallbackUsed": false,
+      "representativeProducts": [
+        {
+          "order": 1,
+          "href": "https://www.lge.co.kr/tvs/32lq635bkna-stand",
+          "pathname": "/tvs/32lq635bkna-stand",
+          "text": "스탠드형 벽걸이형 LG 일반 LED TV (스탠드형) 80cm 모델명 32LQ635BKNA 평점 5점 만점 중 4.9 리뷰 개수 (96) 타임딜 12:09:18 33개 남음 할인율 31% 할인금액 310,000 원 해상도HD 스피커 출력10W 위시리스트 미등록 비교하기 선택 시 등록 됨",
+          "family": "tvs",
+          "fallbackFromViewportProfile": null
+        },
+        {
+          "order": 2,
+          "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+          "pathname": "/tvs/oled97g5kna-stand",
+          "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 245cm 모델명 OLED97G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 42,900,000 원 최대혜택가 40,720,000 원 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 위시리스트 미등록 비교하기 선택 시 등록 됨",
+          "family": "tvs",
+          "fallbackFromViewportProfile": null
+        }
+      ]
+    },
+    {
+      "targetId": "pdp:category-tvs:pc",
+      "targetType": "pdp",
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "representativeCount": 3,
+      "fallbackUsed": false,
+      "representativeProducts": [
+        {
+          "order": 1,
+          "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+          "pathname": "/tvs/oled97g5kna-stand",
+          "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 42,900,000 원 최대혜택가 40,720,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+          "family": "tvs",
+          "fallbackFromViewportProfile": null
+        },
+        {
+          "order": 2,
+          "href": "https://www.lge.co.kr/tvs/oled97g6kna-stand",
+          "pathname": "/tvs/oled97g6kna-stand",
+          "text": "2026년출시 다품목할인 사은품 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G6KNA 평점 5점 만점 중 5.0 리뷰 개수 (92) 할인율 14% 할인금액 42,900,000 원 원래금액 50,384,000원 최대혜택가 39,720,000 원 내일배송 위시리스트 미",
+          "family": "tvs",
+          "fallbackFromViewportProfile": null
+        },
+        {
+          "order": 3,
+          "href": "https://www.lge.co.kr/tvs/vc23ga",
+          "pathname": "/tvs/vc23ga",
+          "text": "LG 스마트 캠 크기80x35.4x23.1mm 무게38g 모델명 VC23GA 평점 5점 만점 중 4.6 리뷰 개수 (11) 할인율 9% 할인금액 129,000 원 원래금액 142,000원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+          "family": "tvs",
+          "fallbackFromViewportProfile": null
+        }
+      ]
+    }
+  ]
+}

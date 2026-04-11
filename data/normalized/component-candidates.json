@@ -1,0 +1,17 @@
+[
+  {
+    "pageId": "home",
+    "pageGroup": "home",
+    "title": "LGE.COM | LG전자",
+    "candidates": [
+      {
+        "type": "hero-banner",
+        "reason": "many visual assets"
+      },
+      {
+        "type": "link-dense-section",
+        "reason": "many internal links"
+      }
+    ]
+  }
+]

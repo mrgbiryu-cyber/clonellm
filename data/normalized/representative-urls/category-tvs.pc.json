@@ -1,0 +1,1567 @@
+{
+  "pageId": "category-tvs",
+  "viewportProfile": "pc",
+  "url": "https://www.lge.co.kr/category/tvs",
+  "viewport": {
+    "profile": "pc",
+    "width": 1460,
+    "height": 2200
+  },
+  "capturedAt": "2026-04-09T02:50:30.246Z",
+  "title": "TV | LG전자 | 공식몰 LGE.COM",
+  "candidateCount": 28,
+  "selectedRowY": 801,
+  "selectedCount": 3,
+  "representativeProducts": [
+    {
+      "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+      "pathname": "/tvs/oled97g5kna-stand",
+      "search": "",
+      "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 42,900,000 원 최대혜택가 40,720,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+      "rect": {
+        "x": 291,
+        "y": 801,
+        "width": 376,
+        "height": 629
+      },
+      "score": 14
+    },
+    {
+      "href": "https://www.lge.co.kr/tvs/oled97g6kna-stand",
+      "pathname": "/tvs/oled97g6kna-stand",
+      "search": "",
+      "text": "2026년출시 다품목할인 사은품 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G6KNA 평점 5점 만점 중 5.0 리뷰 개수 (92) 할인율 14% 할인금액 42,900,000 원 원래금액 50,384,000원 최대혜택가 39,720,000 원 내일배송 위시리스트 미",
+      "rect": {
+        "x": 667,
+        "y": 801,
+        "width": 376,
+        "height": 629
+      },
+      "score": 14
+    },
+    {
+      "href": "https://www.lge.co.kr/tvs/vc23ga",
+      "pathname": "/tvs/vc23ga",
+      "search": "",
+      "text": "LG 스마트 캠 크기80x35.4x23.1mm 무게38g 모델명 VC23GA 평점 5점 만점 중 4.6 리뷰 개수 (11) 할인율 9% 할인금액 129,000 원 원래금액 142,000원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+      "rect": {
+        "x": 1043,
+        "y": 801,
+        "width": 376,
+        "height": 629
+      },
+      "score": 14
+    }
+  ],
+  "debug": {
+    "allAnchorCount": 654,
+    "runtimeCardCount": 58,
+    "topByArea": [
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00356001",
+        "pathname": "/benefits/exhibitions/detail-PE00356001",
+        "search": "",
+        "text": "사면 살수록 혜택이 UP! 2품목 이상 구매/구독 시 놓치면 안 될 혜택",
+        "className": "item",
+        "rect": {
+          "x": 40,
+          "y": -1233,
+          "width": 680,
+          "height": 440
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 5,
+        "area": 299285,
+        "priceLike": true,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00714002",
+        "pathname": "/benefits/exhibitions/detail-PE00714002",
+        "search": "",
+        "text": "MD 추천의 필수 가전은? 이유 있는 필수 가전, 지금 확인해보세요.",
+        "className": "item",
+        "rect": {
+          "x": 740,
+          "y": -1233,
+          "width": 680,
+          "height": 440
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 5,
+        "area": 299285,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00893010",
+        "pathname": "/benefits/exhibitions/detail-PE00893010",
+        "search": "",
+        "text": "정품 공기청정기 필터/무빙휠",
+        "className": "banner_box",
+        "rect": {
+          "x": 778,
+          "y": -1274,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00893009",
+        "pathname": "/benefits/exhibitions/detail-PE00893009",
+        "search": "",
+        "text": "청소기 흡입구/배터리 반납 이벤트",
+        "className": "banner_box",
+        "rect": {
+          "x": 1099,
+          "y": -1274,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00893011",
+        "pathname": "/benefits/exhibitions/detail-PE00893011",
+        "search": "",
+        "text": "에어컨 필터 얼리버드 특가",
+        "className": "banner_box",
+        "rect": {
+          "x": 1420,
+          "y": -1274,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00893008",
+        "pathname": "/benefits/exhibitions/detail-PE00893008",
+        "search": "",
+        "text": "리빙 케어 소모품 컬렉션",
+        "className": "banner_box",
+        "rect": {
+          "x": 1741,
+          "y": -1274,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/benefits/exhibitions/detail-PE00892021",
+        "pathname": "/benefits/exhibitions/detail-PE00892021",
+        "search": "",
+        "text": "식세기 고수들의 필수템 활용법",
+        "className": "banner_box",
+        "rect": {
+          "x": 2062,
+          "y": -1274,
+          "width": 321,
+          "height": 289
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 4,
+        "area": 92919,
+        "priceLike": false,
+        "skipped": true
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled97g6kna-wall",
+        "pathname": "/tvs/oled97g6kna-wall",
+        "search": "",
+        "text": "1위 LG 올레드 evo AI (벽걸이형) 245cm 모델명 OLED97G6KNA 할인율 11% 할인금액 42,900,000 원 최대혜택가 39,720,000 원",
+        "className": "",
+        "rect": {
+          "x": 40,
+          "y": -484,
+          "width": 240,
+          "height": 370
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 25,
+        "area": 88800,
+        "priceLike": true,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+        "pathname": "/tvs/oled97g5kna-stand",
+        "search": "",
+        "text": "2위 LG 올레드 evo AI (스탠드형) G5 245cm 모델명 OLED97G5KNA 할인금액 42,900,000 원 최대혜택가 40,720,000 원",
+        "className": "",
+        "rect": {
+          "x": 325,
+          "y": -484,
+          "width": 240,
+          "height": 370
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 24,
+        "area": 88800,
+        "priceLike": true,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled83g5kna-stand",
+        "pathname": "/tvs/oled83g5kna-stand",
+        "search": "",
+        "text": "4위 LG 올레드 evo AI (스탠드형) G5 209cm 모델명 OLED83G5KNA 할인금액 13,000,000 원 최대혜택가 11,820,000 원",
+        "className": "",
+        "rect": {
+          "x": 895,
+          "y": -484,
+          "width": 240,
+          "height": 370
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 24,
+        "area": 88800,
+        "priceLike": true,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled48c6kna-stand",
+        "pathname": "/tvs/oled48c6kna-stand",
+        "search": "",
+        "text": "",
+        "className": "",
+        "rect": {
+          "x": 291,
+          "y": 223,
+          "width": 375,
+          "height": 230
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 1,
+        "area": 86250,
+        "priceLike": false,
+        "skipped": false
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/32lq635bcna",
+        "pathname": "/tvs/32lq635bcna",
+        "search": "",
+        "text": "",
+        "className": "",
+        "rect": {
+          "x": 667,
+          "y": 223,
+          "width": 375,
+          "height": 230
+        },
+        "imgCount": 1,
+        "buttonCount": 0,
+        "descendants": 1,
+        "area": 86250,
+        "priceLike": false,
+        "skipped": false
+      }
+    ],
+    "interestingBlocks": [
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "다른 고객님들이 많이 본 다품목 혜택 제품 LG 올레드 evo AI (스탠드형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원 LG 올레드 evo AI (벽걸이형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원 LG 올레드 evo AI (스탠드형) 모델명 OLED65G6KNA 할인율 17% 할인금액 4,290,000 원 LG 올레드 evo",
+        "rect": {
+          "x": 291,
+          "y": 2059,
+          "width": 1128,
+          "height": 433
+        },
+        "imgCount": 5,
+        "area": 488424,
+        "priceLike": true
+      },
+      {
+        "className": "PlpPcListUnitDiscount_unit_discount__7bgXj",
+        "text": "다른 고객님들이 많이 본 다품목 혜택 제품 LG 올레드 evo AI (스탠드형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원 LG 올레드 evo AI (벽걸이형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원 LG 올레드 evo AI (스탠드형) 모델명 OLED65G6KNA 할인율 17% 할인금액 4,290,000 원 LG 올레드 evo",
+        "rect": {
+          "x": 291,
+          "y": 2059,
+          "width": 1127,
+          "height": 432
+        },
+        "imgCount": 5,
+        "area": 486864,
+        "priceLike": true
+      },
+      {
+        "className": "PlpPcListUnitDiscount_unit_discount_wrap__W0xU2",
+        "text": "다른 고객님들이 많이 본 다품목 혜택 제품 LG 올레드 evo AI (스탠드형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원 LG 올레드 evo AI (벽걸이형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원 LG 올레드 evo AI (스탠드형) 모델명 OLED65G6KNA 할인율 17% 할인금액 4,290,000 원 LG 올레드 evo",
+        "rect": {
+          "x": 292,
+          "y": 2107,
+          "width": 1126,
+          "height": 320
+        },
+        "imgCount": 5,
+        "area": 360320,
+        "priceLike": true
+      },
+      {
+        "className": "PlpPcListUnitDiscount_list_wrap__cIaBT",
+        "text": "LG 올레드 evo AI (스탠드형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원 LG 올레드 evo AI (벽걸이형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원 LG 올레드 evo AI (스탠드형) 모델명 OLED65G6KNA 할인율 17% 할인금액 4,290,000 원 LG 올레드 evo AI (스탠드형) 모델명 OLED97G6K",
+        "rect": {
+          "x": 332,
+          "y": 2155,
+          "width": 1046,
+          "height": 272
+        },
+        "imgCount": 5,
+        "area": 284512,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "스탠드형 벽걸이형 LG QNED evo AI (벽걸이형) 189cm 해상도4K 스피커 출력20W 인공지능 프로세서알파8 AI 모델명 75QNED85AKA 평점 5점 만점 중 4.9 리뷰 개수 (373) 타임딜 12:10:53 15개 남음 할인율 34% 할인금액 2,490,000 원 원래금액 3,790,000원 최대혜택가 2,204,100 원 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 291,
+          "y": 2492,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "area": 241768,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "스탠드형 벽걸이형 LG QNED evo AI (벽걸이형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파8 AI 모델명 86QNED85AKA 평점 5점 만점 중 4.9 리뷰 개수 (373) 타임딜 12:10:53 14개 남음 할인율 28% 할인금액 3,590,000 원 원래금액 4,990,000원 최대혜택가 3,171,300 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 ",
+        "rect": {
+          "x": 667,
+          "y": 2492,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "area": 241768,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "다품목할인 스탠드형 벽걸이형 LG QNED TV (스탠드형) 247cm 해상도4K 스피커 출력40W 인공지능 프로세서알파8 AI 모델명 98QNED89TKA 평점 5점 만점 중 4.8 리뷰 개수 (44) 할인율 29% 할인금액 5,490,000 원 원래금액 7,800,000원 최대혜택가 4,938,300 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 1043,
+          "y": 2492,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "area": 241768,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "닷컴 ONLY 스탠드형 벽걸이형 LG 나노셀 AI (스탠드형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 86NANO80AEA 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 51% 할인금액 1,890,000 원 원래금액 3,890,000원 최대혜택가 1,664,700 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 291,
+          "y": 3135,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "area": 241768,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "2026년출시 사은품 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) 138cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED55G6KNA 평점 5점 만점 중 5.0 리뷰 개수 (92) 할인율 5% 할인금액 3,490,000 원 원래금액 3,689,000원 최대혜택가 3,078,300 원 내일배송 위시리스트 미등록 비교하기 선택",
+        "rect": {
+          "x": 667,
+          "y": 3135,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "area": 241768,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "닷컴 ONLY 스탠드형 벽걸이형 LG 올레드 evo (스탠드형) C4 163cm 해상도4K 스피커 출력20W 인공지능 프로세서알파9 AI 모델명 OLED65C4ENA 평점 5점 만점 중 5.0 리뷰 개수 (552) 타임딜 12:10:53 14개 남음 할인율 28% 할인금액 2,490,000 원 원래금액 3,490,000원 최대혜택가 2,204,100 원 내일배송 위시리스트 미등록 비교하기 선",
+        "rect": {
+          "x": 1043,
+          "y": 3135,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "area": 241768,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "스탠드형 벽걸이형 LG 울트라 HD TV (스탠드형) 247cm 해상도4K 스피커 출력40W 인공지능 프로세서알파8 AI 모델명 98UT9300KNA 평점 5점 만점 중 4.9 리뷰 개수 (473) 타임딜 12:10:53 5개 남음 할인율 25% 할인금액 3,790,000 원 원래금액 5,090,000원 최대혜택가 3,357,300 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 291,
+          "y": 3778,
+          "width": 376,
+          "height": 642
+        },
+        "imgCount": 1,
+        "area": 241392,
+        "priceLike": true
+      },
+      {
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "text": "스탠드형 벽걸이형 LG QNED AI (벽걸이형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 86QNED65ABA 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 30% 할인금액 2,690,000 원 원래금액 3,890,000원 최대혜택가 2,390,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "rect": {
+          "x": 667,
+          "y": 3778,
+          "width": 376,
+          "height": 642
+        },
+        "imgCount": 1,
+        "area": 241392,
+        "priceLike": true
+      }
+    ],
+    "interestingClassCounts": {
+      "CommonPcGnb_item__ooPqg": 7,
+      "CommonPcGnb_scroll_item__bXHY9": 11,
+      "CommonPcGnb_scroll_item__bXHY9 CommonPcGnb_spr__x3Px_": 5,
+      "CommonPcGnb_hashtag_item__XtaKn": 11,
+      "PlpPcCategoryTitleTabs_ctt__x702O": 1,
+      "PlpPcCategoryTitleTabs_ctt_tit__wl3fs": 1,
+      "PlpPcCategoryTitleTabs_ctt_list__9jxo4": 1,
+      "PlpPcCategoryTitleTabs_active__8U_BR": 1,
+      "PlpPcBillboardbannerArrow_bba__SkJ4M": 1,
+      "item": 2,
+      "PlpPcBillboardbannerArrow_top__jyoin": 2,
+      "PlpPcBillboardbannerArrow_bottom__9N_mI": 2,
+      "PlpPcBillboardbannerArrow_title__TGIzV": 2,
+      "PlpPcBillboardbannerArrow_subtitle__VQd8o": 2,
+      "PlpPcGuideGate_guide__hsy3Q": 1,
+      "PlpPcGuideGate_inner__hHELl": 3,
+      "PlpPcGuideGate_container_info__9XUUz": 3,
+      "PlpPcGuideGate_small_title__EwJhF": 3,
+      "PlpPcGuideGate_title__wslqX": 3,
+      "PlpPcGuideGate_description__GgEvR": 3,
+      "PlpPcBestranking_ranking_type__l1w9t": 1,
+      "PlpPcBestranking_container__dzLNw": 1,
+      "PlpPcBestranking_title_wrap__of52y": 1,
+      "PlpPcBestranking_title__3xbRW": 1,
+      "PlpPcBestranking_unit_wrap__RCr1_": 1,
+      "PlpPcBestranking_unit_item__lnMdk": 5,
+      "PlpPcBestranking_recommend_num__ZCWaP": 5,
+      "PlpPcBestranking_container_img__NDGUD": 5,
+      "PlpPcBestranking_info__xf0aq": 5,
+      "product-card-title_product-card-title__CwsCk": 40,
+      "product-card-title_box": 40,
+      "product-card-title_headline": 40,
+      "product-card-title_description": 40,
+      "product-card-title_sub": 40,
+      "product-card-title_sku": 40,
+      "product-card-price_product-card-price__tVsuw": 40,
+      "PlpPcBestranking_ranking_type_more__cm3QT": 1,
+      "PlpPcTabsFlexible_tabs__kchYI PlpPcTabsFlexible_fixed__NtLL9": 1,
+      "PlpPcContainer_container__L8y3U": 1,
+      "PlpPcFilterTotal_filter__cAXIH": 1,
+      "PlpPcFilterTotal_container___moqq PlpPcFilterTotal_top__ap0Kl": 1,
+      "PlpPcFilterTotal_check_wrap__apGUY": 5,
+      "PlpPcFilterTotal_tooltip_balloon__u_nc1 PlpPcFilterTotal_ani__TOf0v": 1,
+      "PlpPcFilterTotal_text__bSIYL": 1,
+      "PlpPcFilterTotal_close__h1yPT": 1,
+      "checkbox_checkbox__esv9y PlpPcFilterTotal_delivery_flag__K2Pl1": 1,
+      "PlpPcFilterTotal_container___moqq PlpPcFilterTotal_accordion__N6jIU": 9,
+      "accordion_item": 9,
+      "PlpPcFilterTotal_filter_title__5AGBf": 10,
+      "PlpPcFilterTotal_filter_check_tooltip_wrap__Q8EnJ": 1,
+      "PlpPcFilterTotal_tit_tooltip__92l_C": 1,
+      "PlpPcFilterTotal_ico_wrap__85TL5": 1,
+      "PlpPcFilterTotal_container___moqq PlpPcFilterTotal_slider__OyVPa": 1,
+      "PlpPcFilterTotal_title__yR_e7": 1,
+      "PlpPcFilterTotal_input_wrap__B1KDb": 1,
+      "PlpPcFilterTotal_field__t7b_T": 1,
+      "PlpPcFilterTotal_caution__vQiij": 1,
+      "PlpPcFilterTotal_btn_apply__uLxQi": 1,
+      "PlpPcContainer_list_cont__tBF9C": 1,
+      "PlpPcToolbar_toolbar__wJzCe": 1,
+      "PlpPcToolbar_total_num__YhXqo": 1,
+      "PlpPcToolbar_filter_select___C2qT": 1,
+      "CommonPcListUnitProduct_list_unit_product__AeuOT": 1,
+      "CommonPcListUnitProduct_unit__h6bSJ": 31,
+      "CommonPcListUnitProduct_badge_list__Vfr0t": 30,
+      "CommonPcListUnitProduct_img_wrap__4haVO": 30,
+      "CommonPcListUnitProduct_option_container_scroll__HI3MX": 30,
+      "CommonPcListUnitProduct_option_area__4r0SK": 27,
+      "CommonPcListUnitProduct_opt_wrap__1zgIC": 27,
+      "CommonPcListUnitProduct_btn_opt__egACS": 61,
+      "CommonPcListUnitProduct_recently_viewed__GCIsS": 30,
+      "CommonPcListUnitProduct_title_wrap__4P_gA undefined": 30,
+      "product-card-title_product-card-title__p39Ff": 30,
+      "CommonPcListUnitProduct_spec_wrap__Ip9DX": 30,
+      "CommonPcListUnitProduct_spec_option__9joyS": 87,
+      "product-card-title_rating": 30,
+      "product-card-title_score": 30,
+      "product-card-title_total": 30,
+      "CommonPcListUnitProduct_price_wrap__52oXD": 30,
+      "CommonPcListUnitProduct_delivery_wrap__8lUDa": 28,
+      "CommonPcListUnitProduct_cta_wrap__8hkpP": 30,
+      "CommonPcListUnitProduct_unit_product_cta_rs__HoQ7d": 30,
+      "CommonPcListUnitProduct_btn_wish__11JcB": 30,
+      "CommonPcListUnitProduct_btn_compare__N8_2b": 30,
+      "CommonPcListUnitProduct_timedeal__PG3Bi": 7,
+      "CommonPcListUnitProduct_timedeal_info__kEpw8": 7,
+      "CommonPcListUnitProduct_timedeal_text__DixJ2": 7,
+      "CommonPcListUnitProduct_timedeal_countdown__4X8hi": 7,
+      "CommonPcListUnitProduct_timedeal_count__CVdG7": 7,
+      "CommonPcListUnitProduct_navigation__zO3T0": 7,
+      "CommonPcListUnitProduct_prev__xVMvS CommonPcListUnitProduct_disabled__ivq52": 7,
+      "CommonPcListUnitProduct_next__decOK": 7,
+      "PlpPcListUnitDiscount_unit_discount__7bgXj": 1,
+      "PlpPcListUnitDiscount_unit_discount_wrap__W0xU2": 1,
+      "PlpPcListUnitDiscount_title_wrap__w8Dq_": 1,
+      "PlpPcListUnitDiscount_title__uXjn2": 1,
+      "PlpPcListUnitDiscount_list_wrap__cIaBT": 1,
+      "PlpPcListUnitDiscount_container_img__iWl5s": 5,
+      "PlpPcListUnitDiscount_info__9cO_x": 5,
+      "PlpPcListUnitDiscount_more_btn__2taXF": 1,
+      "PlpPcButtonMore_btn_wrap__KAt14": 1,
+      "PlpPcButtonMore_more_btn__B_a_V": 1,
+      "PlpPcButtonMore_text__AenNT": 1,
+      "PlpPcButtonMore_count__AT2J8": 1,
+      "PlpPcPopupBottomComparison_comparison__Fa0Vv": 1,
+      "PlpPcPopupBottomComparison_comparison_wrap__3Nr66": 1,
+      "PlpPcPopupBottomComparison_comparison_title__FPEIr": 1,
+      "PlpPcPopupBottomComparison_title_text__6cBAn": 1,
+      "PlpPcPopupBottomComparison_count__Rxj3o": 1,
+      "PlpPcPopupBottomComparison_right_cont__4mwHg": 1,
+      "PlpPcPopupBottomComparison_btn_more_arrow__GuLMJ PlpPcPopupBottomComparison_close__LBKIT": 1,
+      "PlpPcPopupBottomComparison_comparison_content__I1UA3": 1,
+      "PlpPcPopupBottomComparison_comparison_list__G8Wgf": 1,
+      "PlpPcPopupBottomComparison_btn_group__0IJuy": 1,
+      "PlpPcPopupToast_toast_message__sVv3m": 1,
+      "PlpPcPopupToast_toast_message_inner__q6Iwi": 1,
+      "PlpPcPopupToast_toast_text__qOwX8": 1,
+      "PlpPcPopupToast_btn_area__w7aeA": 1
+    },
+    "resources": [
+      {
+        "name": "https://www.lge.co.kr/ai-commerce/adapter/getSessionId",
+        "initiatorType": "fetch",
+        "duration": 87
+      },
+      {
+        "name": "https://static.lge.co.kr/winwin/winwinDspEventFlag.json",
+        "initiatorType": "fetch",
+        "duration": 185
+      },
+      {
+        "name": "https://www.lge.co.kr/kr/lottie/pc_AIchat_56x56.json",
+        "initiatorType": "fetch",
+        "duration": 71
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/common/message?code=netfunnel_flag&locale=ko_KR",
+        "initiatorType": "xmlhttprequest",
+        "duration": 344
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/company-menu",
+        "initiatorType": "xmlhttprequest",
+        "duration": 355
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/mypage-menu",
+        "initiatorType": "xmlhttprequest",
+        "duration": 356
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category?pageUrl=%2Fcategory%2Ftvs",
+        "initiatorType": "xmlhttprequest",
+        "duration": 326
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000025/lineup",
+        "initiatorType": "xmlhttprequest",
+        "duration": 394
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/displaysvc/ajax/v1/display-spaces?displaySpaceIds=DP_LIVE_CT50000025_001&displaySpaceIds=DP_LIVE_CT50000025_002",
+        "initiatorType": "xmlhttprequest",
+        "duration": 364
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/common/message?code=component-searchResultUrl&locale=ko_KR",
+        "initiatorType": "xmlhttprequest",
+        "duration": 365
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/living-flag",
+        "initiatorType": "xmlhttprequest",
+        "duration": 381
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/displaysvc/ajax/v1/smartview/message?categoryId=CT50000025",
+        "initiatorType": "fetch",
+        "duration": 246
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tvs?subCateId=CT50000028&_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 75
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tvs?subCateId=CT50368000&_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 102
+      },
+      {
+        "name": "https://www.lge.co.kr/mkt/ajax/commonmodule/memberInfo?",
+        "initiatorType": "xmlhttprequest",
+        "duration": 157
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tvs?subCateId=CT50041000&_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 89
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tvs?subCateId=CT50000029&_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 88
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tvs?subCateId=CT50368002&_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 127
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000025/filter?b2cYn=Y",
+        "initiatorType": "xmlhttprequest",
+        "duration": 29
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/common/code?commonCodeGroupId=plp_sort_new_type_product",
+        "initiatorType": "xmlhttprequest",
+        "duration": 94
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tvs?subCateId=CT50000030&_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 49
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tvs?subCateId=CT50000026&_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 60
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tvs?subCateId=CT50029007&_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 99
+      },
+      {
+        "name": "https://www.lge.co.kr/category/tvs?subCateId=CT50220000&_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 109
+      },
+      {
+        "name": "https://www.lge.co.kr/category/stan-by-me?_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 97
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000025/multi-item-discount-model?b2cYn=Y",
+        "initiatorType": "xmlhttprequest",
+        "duration": 63
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000025/model",
+        "initiatorType": "xmlhttprequest",
+        "duration": 371
+      },
+      {
+        "name": "https://www.lge.co.kr/mkt/commonModule/miniCart.lgajax",
+        "initiatorType": "xmlhttprequest",
+        "duration": 91
+      },
+      {
+        "name": "https://www.lge.co.kr/shop/commonModule/miniCart.lgajax",
+        "initiatorType": "xmlhttprequest",
+        "duration": 84
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/plpsvc/ajax/v1/plp/category/CT50000025/best-ranking-model?rankingType=todays&b2cYn=Y",
+        "initiatorType": "xmlhttprequest",
+        "duration": 79
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/gnb/living-flag",
+        "initiatorType": "xmlhttprequest",
+        "duration": 34
+      },
+      {
+        "name": "https://www.lge.co.kr/category/projectors?_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 160
+      },
+      {
+        "name": "https://www.lge.co.kr/category/home-audio?_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 203
+      },
+      {
+        "name": "https://www.lge.co.kr/category/displays?_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 204
+      },
+      {
+        "name": "https://www.lge.co.kr/category/mindwellness?_rsc=1p8l4",
+        "initiatorType": "fetch",
+        "duration": 215
+      },
+      {
+        "name": "https://apiv2.lge.co.kr/commonsvc/ajax/v1/hellobar/hello-bar-info?isInstall=N&isMobile=N",
+        "initiatorType": "xmlhttprequest",
+        "duration": 42
+      }
+    ],
+    "networkBodies": [
+      {
+        "url": "https://www.lge.co.kr/category/tvs",
+        "mimeType": "text/html",
+        "type": "Document",
+        "length": 456201,
+        "sample": "<!DOCTYPE html><html lang=\"ko\"><head><meta charSet=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_youtube.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_insta.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_facebook.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_newsroom.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_kakao.svg\"/><link rel=\"preload\" as=\"image\" href=\"/kr/common/footer/sns_blog.svg\"/><link rel=\"preload\" as=\"image\" href=\"https://www.lge.co.kr/kr/common/footer/ethics_logo.png\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/ce0af034b81afa7f.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/4232645f6e234064.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/cff8fc018c1d159e.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/category/_next/static/css/032de89674664674.css\" data-precedence=\"next\"/><link rel=\"stylesheet\" href=\"https://www.lge.co.kr/c"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/manifest.webmanifest",
+        "mimeType": "application/manifest+json",
+        "type": "Manifest",
+        "length": 204,
+        "sample": "{\n  \"name\": \"LGE.COM\",\n  \"start_url\": \"/\",\n  \"related_applications\": [\n    {\n      \"platform\": \"play\",\n      \"id\": \"kr.co.lge.android\",\n      \"url\": \"/\"\n    }\n  ],\n  \"prefer_related_applications\": true\n}\n"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/ce0af034b81afa7f.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 6453,
+        "sample": "@font-face{font-family:Pretendard;font-weight:400;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Regular.352c8e19.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Regular.03d8daed.woff) format(\"woff\")}@font-face{font-family:Pretendard;font-weight:500;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Medium.ce54de3a.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Medium.358ea39e.woff) format(\"woff\")}@font-face{font-family:Pretendard;font-weight:600;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-SemiBold.d67e7444.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-SemiBold.a7c8a0e1.woff) format(\"woff\")}@font-face{font-family:Pretendard;font-weight:700;font-display:swap;src:url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Bold.4fe33033.woff2) format(\"woff2\"),url(https://www.lge.co.kr/category/_next/static/media/Pretendard-Bold.ad31b300.woff) format(\"woff\")}@font-face{font-family:D-DIN Condensed;font-weight:400;font-display:swap;src:url(https"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/4232645f6e234064.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 97220,
+        "sample": "@keyframes CommonMoGnb_load__ntkyR{to{background-position:-100% 0}}@keyframes CommonMoGnb_load30__3Bkv1{0%{left:-200%}to{left:100%}}.CommonMoGnb_gnb__AS3RT{max-width:767px;margin:0 auto;width:100%;height:56px;padding:8px 12px 8px 4px;display:flex;justify-content:space-between;align-items:center;background:#fff;position:relative;font-family:var(--font-family--pretendard)}.CommonMoGnb_gnb__AS3RT *{font-family:inherit}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_open__i6evx){z-index:5}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_lft__f5PoE li:only-child) .CommonMoGnb_tit_wrap__etWvE{padding-left:0}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_rgh__tN4Bn li:only-child):has(.CommonMoGnb_lft__f5PoE li:only-child) .CommonMoGnb_lft__f5PoE{min-width:auto}.CommonMoGnb_gnb__AS3RT:has(.CommonMoGnb_rgh__tN4Bn li:only-child):has(.CommonMoGnb_lft__f5PoE li:only-child) .CommonMoGnb_tit_wrap__etWvE{padding-left:8px}.CommonMoGnb_gnb__AS3RT:not(:has(.CommonMoGnb_rgh__tN4Bn)){gap:8px}.CommonMoGnb_gnb__AS3RT:not(:has(.CommonMoGnb_rgh__tN4Bn)) .CommonMoGnb_lft__f5PoE{min-width:auto}.CommonMoGnb_gnb__AS3RT:not(:has(.CommonMoGnb_rgh__tN4Bn)) .CommonMoGnb_tit_wrap__etWvE{padding:0}.CommonMoGnb_gnb__AS3RT .CommonMoGnb_u"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/cff8fc018c1d159e.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 100566,
+        "sample": "@keyframes error-basic_load__i9_n9{to{background-position:-100% 0}}@keyframes error-basic_load30__8pVyw{0%{left:-200%}to{left:100%}}.error-basic_error_wrap___GIKX{display:flex;position:relative;width:100%;height:100vh;align-items:center;justify-content:center}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc{text-align:center}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_title__EaySl{font-size:27px;line-height:122.2222222222%;font-weight:var(--fw--700);margin-bottom:16px}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_desc__UfQBz{font-size:15px;line-height:146.6666666667%;min-height:110px;margin-bottom:60px}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_ci__GKhAn{margin:0 auto;font-size:0;width:76px;height:21px;background:url(https://www.lge.co.kr/lg5-common/images/header/logo.svg) no-repeat}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_btn__9bZBe{position:fixed;bottom:40px;left:16px;right:16px}.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-basic_btn__9bZBe a,.error-basic_error_wrap___GIKX .error-basic_error_inner__XSskc .error-bas"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/032de89674664674.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 5359,
+        "sample": "@keyframes SearchMoInput_load__HhBWA{to{background-position:-100% 0}}@keyframes SearchMoInput_load30__bq31B{0%{left:-200%}to{left:100%}}.SearchMoInput_search_bar__iqHU4{position:-webkit-sticky;position:sticky;top:0;z-index:10;display:flex;align-items:center;width:100%;max-width:767px;margin:0 auto;padding:8px 12px 8px 4px;background-color:var(--color-set--white);font-family:var(--font-family--pretendard)}.SearchMoInput_search_bar__iqHU4 *{font-family:inherit}.SearchMoInput_search_bar__iqHU4 a:focus,.SearchMoInput_search_bar__iqHU4 a:focus-visible,.SearchMoInput_search_bar__iqHU4 button:focus,.SearchMoInput_search_bar__iqHU4 button:focus-visible{outline-color:#000}.SearchMoInput_search_bar__iqHU4.SearchMoInput_search_bar_layer__P_s4i{padding:8px 20px 8px 4px}.SearchMoInput_search_bar__iqHU4.SearchMoInput_search_bar_layer__P_s4i .SearchMoInput_search_utility__ld57w{display:none}.SearchMoInput_search_bar__iqHU4:has([class*=search_input_layer_wrap]){flex-direction:column;z-index:121;gap:0;height:100vh;padding:0}.SearchMoInput_search_bar__iqHU4:has([class*=search_input_layer_wrap]) .SearchMoInput_search_wrap__7sEYt{padding:8px 20px 8px 4px}.SearchMoInput_search_bar__iqHU4:has([class*=se"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/5be585dca501b42f.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 100816,
+        "sample": "@keyframes PlpPcPopupLayerSearch_load__isylU{to{background-position:-100% 0}}@keyframes PlpPcPopupLayerSearch_load30__wM9ae{0%{left:-200%}to{left:100%}}.PlpPcPopupLayerSearch_layer_search__qZpRr{width:100%}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_input_keyword__CT4sS input{width:calc(100% - 42px);padding:0 0 0 32px!important;height:58px;font-size:18px;line-height:26px;border:0;border-radius:58px;background:var(--color-set--gray200)!important}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_input_keyword__CT4sS button[class*=btn_search]{right:0;width:32px;height:32px}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK{margin-top:32px}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK .PlpPcPopupLayerSearch_count__De9iB,.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK .PlpPcPopupLayerSearch_count__De9iB em{font-size:14px;line-height:20px}.PlpPcPopupLayerSearch_layer_search__qZpRr .PlpPcPopupLayerSearch_search_model_top__lg3SK .PlpPcPopupLayerSearch_count__De9iB em.PlpPcPopupLayerSearch_red__tdyoQ{color:var(--color-set--red)}.P"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/99b496e77f3e700f.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 40570,
+        "sample": "@keyframes CommonPcGnb_load__hS09v{to{background-position:-100% 0}}@keyframes CommonPcGnb_load30__2DVMl{0%{left:-200%}to{left:100%}}.CommonPcGnb_header__MMuNW{position:relative;min-width:1460px;background:var(--color-set--white);font-family:var(--font-family--pretendard);color:var(--color-set--black111);z-index:12}.CommonPcGnb_header__MMuNW:has([class*=active]){z-index:122}.CommonPcGnb_header__MMuNW *{font-family:inherit;color:inherit}.CommonPcGnb_header__MMuNW .CommonPcGnb_inner__11s6U{position:relative;max-width:1760px;width:100%;margin:0 auto}.CommonPcGnb_header__MMuNW .CommonPcGnb_bg___BHPF{position:absolute;left:0;right:0;top:0;background:var(--color-set--white);z-index:11}.CommonPcGnb_header__MMuNW.CommonPcGnb_open__rPJxU .CommonPcGnb_bg___BHPF{display:block}.CommonPcGnb_header__MMuNW:after{content:\"\";display:block;height:1px;background:var(--color-set--gray500);position:absolute;left:0;right:0;z-index:11}.CommonPcGnb_header__MMuNW .CommonPcGnb_dimmed__Ov8s5{position:fixed;width:100vw;left:50%;transform:translateX(-50%);top:0;bottom:0;background:var(--color-set--black);opacity:.7;z-index:10}.CommonPcGnb_header__MMuNW a{outline-offset:-1px}.CommonPcGnb_header__MMuNW .CommonPcG"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/6e2696d0f9788933.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 99636,
+        "sample": "@keyframes PlpPcToolbar_load__B6vuf{to{background-position:-100% 0}}@keyframes PlpPcToolbar_load30__o_3Xi{0%{left:-200%}to{left:100%}}.PlpPcToolbar_toolbar__wJzCe{min-width:1130px;width:1130px;margin:0 auto 16px;display:flex;justify-content:flex-start;align-items:flex-start;height:32px}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_filter_select___C2qT [class*=select_trigger]:focus{outline:none!important}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_filter_select___C2qT[class*=outline] [class*=select_trigger]:focus{outline:1px solid #000!important}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_total_num__YhXqo{font-size:14px;line-height:32px;display:flex;align-items:center;flex-shrink:0}.PlpPcToolbar_toolbar__wJzCe .PlpPcToolbar_total_num__YhXqo span{font-size:14px;line-height:32px;margin-left:3px;font-weight:var(--fw--700)}.PlpPcToolbar_toolbar_list_wrap___2b82{display:flex;align-items:center;gap:8px;margin:0 24px;flex-shrink:1;min-width:0}.PlpPcToolbar_toolbar_list_wrap___2b82:has(div[class*=swiper-wrapper]:empty){display:none}.PlpPcToolbar_toolbar_list_wrap___2b82 .PlpPcToolbar_filter_selected_list__HAgp4{width:auto;max-width:100%}.PlpPcToolbar_toolbar_list_wrap___2b82 .PlpPcToolbar_filter"
+      },
+      {
+        "url": "https://www.lge.co.kr/category/_next/static/css/6f8d0ee24381d2ad.css",
+        "mimeType": "text/css",
+        "type": "Stylesheet",
+        "length": 73290,
+        "sample": "@keyframes CommonMoSearchLayer_load__VPcne{to{background-position:-100% 0}}@keyframes CommonMoSearchLayer_load30__PqRXU{0%{left:-200%}to{left:100%}}.CommonMoSearchLayer_search_layer_wrap__1fRFw{display:block;width:100vw;height:100dvh;max-height:100vh;margin:0 auto;z-index:105;background-color:var(--color-set--white);overflow:hidden}.CommonMoSearchLayer_search_layer_wrap__1fRFw.CommonMoSearchLayer_search_input_layer_wrap__fPw2J .CommonMoSearchLayer_inner__zq7ig{padding-bottom:50px}.CommonMoSearchLayer_search_layer_wrap__1fRFw.CommonMoSearchLayer_search_input_layer_wrap__fPw2J .CommonMoSearchLayer_inner__zq7ig .CommonMoSearchLayer_btn_close__xS2Mf{position:relative;top:auto;right:16px;left:auto;display:flex;width:auto;height:auto;font-weight:var(--fw--700);font-size:12px;line-height:17px;transform:rotate(0);text-decoration:underline;background:none}.CommonMoSearchLayer_search_layer_wrap__1fRFw .CommonMoSearchLayer_inner__zq7ig{padding:0;position:relative}.CommonMoSearchLayer_search_layer_wrap__1fRFw .CommonMoSearchLayer_inner__zq7ig .CommonMoSearchLayer_input_keyword_wrap__Bisyk{display:flex;flex-wrap:wrap;flex-direction:column}.CommonMoSearchLayer_search_layer_wrap__1fRFw .CommonMoS"
+      }
+    ],
+    "topCandidates": [
+      {
+        "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+        "pathname": "/tvs/oled97g5kna-stand",
+        "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 42,900,000 원 최대혜택가 40,720,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 801,
+          "width": 376,
+          "height": 629
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled97g6kna-stand",
+        "pathname": "/tvs/oled97g6kna-stand",
+        "text": "2026년출시 다품목할인 사은품 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G6KNA 평점 5점 만점 중 5.0 리뷰 개수 (92) 할인율 14% 할인금액 42,900,000 원 원래금액 50,384,000원 최대혜택가 39,720,000 원 내일배송 위시리스트 미",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 801,
+          "width": 376,
+          "height": 629
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/vc23ga",
+        "pathname": "/tvs/vc23ga",
+        "text": "LG 스마트 캠 크기80x35.4x23.1mm 무게38g 모델명 VC23GA 평점 5점 만점 중 4.6 리뷰 개수 (11) 할인율 9% 할인금액 129,000 원 원래금액 142,000원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 801,
+          "width": 376,
+          "height": 629
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/43lm6350kna-stand",
+        "pathname": "/tvs/43lm6350kna-stand",
+        "text": "스탠드형 벽걸이형 LG 일반 LED TV (스탠드형) 107cm 해상도FHD 스피커 출력20W 인공지능 프로세서4세대 알파5 모델명 43LM6350KNA 평점 5점 만점 중 5.0 리뷰 개수 (44) 할인금액 670,000 원 최대혜택가 640,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 1430,
+          "width": 376,
+          "height": 629
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled83g5kna-stand",
+        "pathname": "/tvs/oled83g5kna-stand",
+        "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 209cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED83G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 13,000,000 원 최대혜택가 11,820,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 1430,
+          "width": 376,
+          "height": 629
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled77g5kna-stand",
+        "pathname": "/tvs/oled77g5kna-stand",
+        "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 194cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED77G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 8,200,000 원 최대혜택가 7,720,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 1430,
+          "width": 376,
+          "height": 629
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled77g6kna-stand",
+        "pathname": "/tvs/oled77g6kna-stand",
+        "text": "LG 올레드 evo AI (스탠드형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원",
+        "className": "",
+        "rect": {
+          "x": 332,
+          "y": 2155,
+          "width": 194,
+          "height": 272
+        },
+        "imgCount": 1,
+        "priceLike": true
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled77g6kna-wall",
+        "pathname": "/tvs/oled77g6kna-wall",
+        "text": "LG 올레드 evo AI (벽걸이형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원",
+        "className": "",
+        "rect": {
+          "x": 545,
+          "y": 2155,
+          "width": 194,
+          "height": 272
+        },
+        "imgCount": 1,
+        "priceLike": true
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled65g6kna-stand",
+        "pathname": "/tvs/oled65g6kna-stand",
+        "text": "LG 올레드 evo AI (스탠드형) 모델명 OLED65G6KNA 할인율 17% 할인금액 4,290,000 원",
+        "className": "",
+        "rect": {
+          "x": 758,
+          "y": 2155,
+          "width": 194,
+          "height": 272
+        },
+        "imgCount": 1,
+        "priceLike": true
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled77c6sna-stand",
+        "pathname": "/tvs/oled77c6sna-stand",
+        "text": "LG 올레드 evo AI (스탠드형) 모델명 OLED77C6SNA 할인율 15% 할인금액 6,190,000 원",
+        "className": "",
+        "rect": {
+          "x": 1184,
+          "y": 2155,
+          "width": 194,
+          "height": 272
+        },
+        "imgCount": 1,
+        "priceLike": true
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/75qned85aka-wall",
+        "pathname": "/tvs/75qned85aka-wall",
+        "text": "스탠드형 벽걸이형 LG QNED evo AI (벽걸이형) 189cm 해상도4K 스피커 출력20W 인공지능 프로세서알파8 AI 모델명 75QNED85AKA 평점 5점 만점 중 4.9 리뷰 개수 (373) 타임딜 12:10:53 15개 남음 할인율 34% 할인금액 2,490,000 원 원래금액 3,790,000원 최대혜택가 2,204,100 원 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 2492,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/86qned85aka-wall",
+        "pathname": "/tvs/86qned85aka-wall",
+        "text": "스탠드형 벽걸이형 LG QNED evo AI (벽걸이형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파8 AI 모델명 86QNED85AKA 평점 5점 만점 중 4.9 리뷰 개수 (373) 타임딜 12:10:53 14개 남음 할인율 28% 할인금액 3,590,000 원 원래금액 4,990,000원 최대혜택가 3,171,300 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 ",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 2492,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/98qned89tka-stand",
+        "pathname": "/tvs/98qned89tka-stand",
+        "text": "다품목할인 스탠드형 벽걸이형 LG QNED TV (스탠드형) 247cm 해상도4K 스피커 출력40W 인공지능 프로세서알파8 AI 모델명 98QNED89TKA 평점 5점 만점 중 4.8 리뷰 개수 (44) 할인율 29% 할인금액 5,490,000 원 원래금액 7,800,000원 최대혜택가 4,938,300 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 2492,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/86nano80aea-stand",
+        "pathname": "/tvs/86nano80aea-stand",
+        "text": "닷컴 ONLY 스탠드형 벽걸이형 LG 나노셀 AI (스탠드형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 86NANO80AEA 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 51% 할인금액 1,890,000 원 원래금액 3,890,000원 최대혜택가 1,664,700 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 3135,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled55g6kna-stand",
+        "pathname": "/tvs/oled55g6kna-stand",
+        "text": "2026년출시 사은품 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) 138cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED55G6KNA 평점 5점 만점 중 5.0 리뷰 개수 (92) 할인율 5% 할인금액 3,490,000 원 원래금액 3,689,000원 최대혜택가 3,078,300 원 내일배송 위시리스트 미등록 비교하기 선택",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 3135,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled65c4ena-stand",
+        "pathname": "/tvs/oled65c4ena-stand",
+        "text": "닷컴 ONLY 스탠드형 벽걸이형 LG 올레드 evo (스탠드형) C4 163cm 해상도4K 스피커 출력20W 인공지능 프로세서알파9 AI 모델명 OLED65C4ENA 평점 5점 만점 중 5.0 리뷰 개수 (552) 타임딜 12:10:53 14개 남음 할인율 28% 할인금액 2,490,000 원 원래금액 3,490,000원 최대혜택가 2,204,100 원 내일배송 위시리스트 미등록 비교하기 선",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 3135,
+          "width": 376,
+          "height": 643
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/98ut9300kna-stand1",
+        "pathname": "/tvs/98ut9300kna-stand1",
+        "text": "스탠드형 벽걸이형 LG 울트라 HD TV (스탠드형) 247cm 해상도4K 스피커 출력40W 인공지능 프로세서알파8 AI 모델명 98UT9300KNA 평점 5점 만점 중 4.9 리뷰 개수 (473) 타임딜 12:10:53 5개 남음 할인율 25% 할인금액 3,790,000 원 원래금액 5,090,000원 최대혜택가 3,357,300 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 3778,
+          "width": 376,
+          "height": 642
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/86qned65aba-wall",
+        "pathname": "/tvs/86qned65aba-wall",
+        "text": "스탠드형 벽걸이형 LG QNED AI (벽걸이형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 86QNED65ABA 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 30% 할인금액 2,690,000 원 원래금액 3,890,000원 최대혜택가 2,390,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 667,
+          "y": 3778,
+          "width": 376,
+          "height": 642
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/86qned70aea-stand",
+        "pathname": "/tvs/86qned70aea-stand",
+        "text": "닷컴 ONLY 스탠드형 벽걸이형 LG QNED AI (스탠드형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 86QNED70AEA 평점 5점 만점 중 4.9 리뷰 개수 (999+) 타임딜 12:10:53 19개 남음 할인율 35% 할인금액 2,440,000 원 원래금액 3,790,000원 최대혜택가 2,157,600 원 내일배송 위시리스트 미등록 비교하기 선택 ",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 1043,
+          "y": 3778,
+          "width": 376,
+          "height": 642
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      },
+      {
+        "href": "https://www.lge.co.kr/tvs/oled65b5ena-stand",
+        "pathname": "/tvs/oled65b5ena-stand",
+        "text": "스탠드형 벽걸이형 LG 올레드 AI (스탠드형) B5 163cm 해상도4K 스피커 출력20W 인공지능 프로세서알파8 AI 모델명 OLED65B5ENA 평점 5점 만점 중 4.9 리뷰 개수 (15) 할인율 24% 할인금액 2,190,000 원 원래금액 2,900,000원 최대혜택가 1,925,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+        "className": "CommonPcListUnitProduct_unit__h6bSJ",
+        "rect": {
+          "x": 291,
+          "y": 4420,
+          "width": 376,
+          "height": 599
+        },
+        "imgCount": 1,
+        "priceLike": true,
+        "dataset": {
+          "modelId": "",
+          "sku": "",
+          "productId": ""
+        }
+      }
+    ],
+    "firstRows": [
+      {
+        "y": 801,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+            "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 42,900,000 원 최대혜택가 40,720,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 801,
+              "width": 376,
+              "height": 629
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/oled97g6kna-stand",
+            "text": "2026년출시 다품목할인 사은품 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) 245cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED97G6KNA 평점 5점 만점 중 5.0 리뷰 개수 (92) 할인율 14% 할인금액 42,900,000 원 원래금액 50,384,000원 최대혜택가 39,720,000 원 내일배송 위시리스트 미",
+            "rect": {
+              "x": 667,
+              "y": 801,
+              "width": 376,
+              "height": 629
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/vc23ga",
+            "text": "LG 스마트 캠 크기80x35.4x23.1mm 무게38g 모델명 VC23GA 평점 5점 만점 중 4.6 리뷰 개수 (11) 할인율 9% 할인금액 129,000 원 원래금액 142,000원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 1043,
+              "y": 801,
+              "width": 376,
+              "height": 629
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 1430,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/tvs/43lm6350kna-stand",
+            "text": "스탠드형 벽걸이형 LG 일반 LED TV (스탠드형) 107cm 해상도FHD 스피커 출력20W 인공지능 프로세서4세대 알파5 모델명 43LM6350KNA 평점 5점 만점 중 5.0 리뷰 개수 (44) 할인금액 670,000 원 최대혜택가 640,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 1430,
+              "width": 376,
+              "height": 629
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/oled83g5kna-stand",
+            "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 209cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED83G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 13,000,000 원 최대혜택가 11,820,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 667,
+              "y": 1430,
+              "width": 376,
+              "height": 629
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/oled77g5kna-stand",
+            "text": "다품목할인 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) G5 194cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED77G5KNA 평점 5점 만점 중 5.0 리뷰 개수 (257) 할인금액 8,200,000 원 최대혜택가 7,720,000 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 1043,
+              "y": 1430,
+              "width": 376,
+              "height": 629
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 2155,
+        "count": 4,
+        "averageScore": 13,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/tvs/oled77g6kna-stand",
+            "text": "LG 올레드 evo AI (스탠드형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원",
+            "rect": {
+              "x": 332,
+              "y": 2155,
+              "width": 194,
+              "height": 272
+            },
+            "score": 13,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/oled77g6kna-wall",
+            "text": "LG 올레드 evo AI (벽걸이형) 모델명 OLED77G6KNA 할인율 20% 할인금액 9,000,000 원",
+            "rect": {
+              "x": 545,
+              "y": 2155,
+              "width": 194,
+              "height": 272
+            },
+            "score": 13,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/oled65g6kna-stand",
+            "text": "LG 올레드 evo AI (스탠드형) 모델명 OLED65G6KNA 할인율 17% 할인금액 4,290,000 원",
+            "rect": {
+              "x": 758,
+              "y": 2155,
+              "width": 194,
+              "height": 272
+            },
+            "score": 13,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/oled77c6sna-stand",
+            "text": "LG 올레드 evo AI (스탠드형) 모델명 OLED77C6SNA 할인율 15% 할인금액 6,190,000 원",
+            "rect": {
+              "x": 1184,
+              "y": 2155,
+              "width": 194,
+              "height": 272
+            },
+            "score": 13,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 2492,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/tvs/75qned85aka-wall",
+            "text": "스탠드형 벽걸이형 LG QNED evo AI (벽걸이형) 189cm 해상도4K 스피커 출력20W 인공지능 프로세서알파8 AI 모델명 75QNED85AKA 평점 5점 만점 중 4.9 리뷰 개수 (373) 타임딜 12:10:53 15개 남음 할인율 34% 할인금액 2,490,000 원 원래금액 3,790,000원 최대혜택가 2,204,100 원 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 2492,
+              "width": 376,
+              "height": 643
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/86qned85aka-wall",
+            "text": "스탠드형 벽걸이형 LG QNED evo AI (벽걸이형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파8 AI 모델명 86QNED85AKA 평점 5점 만점 중 4.9 리뷰 개수 (373) 타임딜 12:10:53 14개 남음 할인율 28% 할인금액 3,590,000 원 원래금액 4,990,000원 최대혜택가 3,171,300 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 ",
+            "rect": {
+              "x": 667,
+              "y": 2492,
+              "width": 376,
+              "height": 643
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/98qned89tka-stand",
+            "text": "다품목할인 스탠드형 벽걸이형 LG QNED TV (스탠드형) 247cm 해상도4K 스피커 출력40W 인공지능 프로세서알파8 AI 모델명 98QNED89TKA 평점 5점 만점 중 4.8 리뷰 개수 (44) 할인율 29% 할인금액 5,490,000 원 원래금액 7,800,000원 최대혜택가 4,938,300 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 1043,
+              "y": 2492,
+              "width": 376,
+              "height": 643
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 3135,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/tvs/86nano80aea-stand",
+            "text": "닷컴 ONLY 스탠드형 벽걸이형 LG 나노셀 AI (스탠드형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 86NANO80AEA 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 51% 할인금액 1,890,000 원 원래금액 3,890,000원 최대혜택가 1,664,700 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 3135,
+              "width": 376,
+              "height": 643
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/oled55g6kna-stand",
+            "text": "2026년출시 사은품 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) 138cm 해상도4K 스피커 출력60W 인공지능 프로세서알파11 AI 모델명 OLED55G6KNA 평점 5점 만점 중 5.0 리뷰 개수 (92) 할인율 5% 할인금액 3,490,000 원 원래금액 3,689,000원 최대혜택가 3,078,300 원 내일배송 위시리스트 미등록 비교하기 선택",
+            "rect": {
+              "x": 667,
+              "y": 3135,
+              "width": 376,
+              "height": 643
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/oled65c4ena-stand",
+            "text": "닷컴 ONLY 스탠드형 벽걸이형 LG 올레드 evo (스탠드형) C4 163cm 해상도4K 스피커 출력20W 인공지능 프로세서알파9 AI 모델명 OLED65C4ENA 평점 5점 만점 중 5.0 리뷰 개수 (552) 타임딜 12:10:53 14개 남음 할인율 28% 할인금액 2,490,000 원 원래금액 3,490,000원 최대혜택가 2,204,100 원 내일배송 위시리스트 미등록 비교하기 선",
+            "rect": {
+              "x": 1043,
+              "y": 3135,
+              "width": 376,
+              "height": 643
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 3778,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/tvs/98ut9300kna-stand1",
+            "text": "스탠드형 벽걸이형 LG 울트라 HD TV (스탠드형) 247cm 해상도4K 스피커 출력40W 인공지능 프로세서알파8 AI 모델명 98UT9300KNA 평점 5점 만점 중 4.9 리뷰 개수 (473) 타임딜 12:10:53 5개 남음 할인율 25% 할인금액 3,790,000 원 원래금액 5,090,000원 최대혜택가 3,357,300 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 3778,
+              "width": 376,
+              "height": 642
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/86qned65aba-wall",
+            "text": "스탠드형 벽걸이형 LG QNED AI (벽걸이형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 86QNED65ABA 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 30% 할인금액 2,690,000 원 원래금액 3,890,000원 최대혜택가 2,390,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 667,
+              "y": 3778,
+              "width": 376,
+              "height": 642
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/86qned70aea-stand",
+            "text": "닷컴 ONLY 스탠드형 벽걸이형 LG QNED AI (스탠드형) 217cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 86QNED70AEA 평점 5점 만점 중 4.9 리뷰 개수 (999+) 타임딜 12:10:53 19개 남음 할인율 35% 할인금액 2,440,000 원 원래금액 3,790,000원 최대혜택가 2,157,600 원 내일배송 위시리스트 미등록 비교하기 선택 ",
+            "rect": {
+              "x": 1043,
+              "y": 3778,
+              "width": 376,
+              "height": 642
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 4420,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/tvs/oled65b5ena-stand",
+            "text": "스탠드형 벽걸이형 LG 올레드 AI (스탠드형) B5 163cm 해상도4K 스피커 출력20W 인공지능 프로세서알파8 AI 모델명 OLED65B5ENA 평점 5점 만점 중 4.9 리뷰 개수 (15) 할인율 24% 할인금액 2,190,000 원 원래금액 2,900,000원 최대혜택가 1,925,100 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 4420,
+              "width": 376,
+              "height": 599
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/oled55c6kna-stand",
+            "text": "2026년출시 사은품 스탠드형 벽걸이형 (일반) 벽걸이형 (벽밀착) LG 올레드 evo AI (스탠드형) 138cm 해상도4K 스피커 출력40W 인공지능 프로세서알파11 AI 모델명 OLED55C6KNA 평점 5점 만점 중 5.0 리뷰 개수 (17) 할인율 6% 할인금액 2,790,000 원 원래금액 2,989,000원 최대혜택가 2,483,100 원 내일배송 위시리스트 미등록 비교하기 선택",
+            "rect": {
+              "x": 667,
+              "y": 4420,
+              "width": 376,
+              "height": 599
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/75qned65aba-stand",
+            "text": "스탠드형 벽걸이형 LG QNED AI (스탠드형) 189cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 75QNED65ABA 평점 5점 만점 중 5.0 리뷰 개수 (999+) 할인율 32% 할인금액 1,840,000 원 원래금액 2,740,000원 최대혜택가 1,618,200 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 1043,
+              "y": 4420,
+              "width": 376,
+              "height": 599
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      },
+      {
+        "y": 5019,
+        "count": 3,
+        "averageScore": 14,
+        "items": [
+          {
+            "href": "https://www.lge.co.kr/tvs/oled65b4nna-stand",
+            "text": "스탠드형 벽걸이형 LG 올레드 TV (스탠드형) B4 163cm 해상도4K 스피커 출력20W 인공지능 프로세서알파8 AI 모델명 OLED65B4NNA 평점 5점 만점 중 5.0 리뷰 개수 (399) 타임딜 12:10:53 18개 남음 할인율 34% 할인금액 1,890,000 원 원래금액 2,890,000원 최대혜택가 1,664,700 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 291,
+              "y": 5019,
+              "width": 376,
+              "height": 642
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/75qned75aea-stand",
+            "text": "스탠드형 벽걸이형 LG QNED AI (스탠드형) 189cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 75QNED75AEA 평점 5점 만점 중 4.9 리뷰 개수 (656) 할인율 31% 할인금액 1,990,000 원 원래금액 2,890,000원 최대혜택가 1,757,700 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 667,
+              "y": 5019,
+              "width": 376,
+              "height": 642
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          },
+          {
+            "href": "https://www.lge.co.kr/tvs/75nano90aka-wall",
+            "text": "스탠드형 벽걸이형 LG 나노셀 AI (벽걸이형) 189cm 해상도4K 스피커 출력20W 인공지능 프로세서알파7 AI 모델명 75NANO90AKA 평점 5점 만점 중 4.9 리뷰 개수 (122) 할인율 34% 할인금액 1,890,000 원 원래금액 2,890,000원 최대혜택가 1,664,700 원 내일배송 위시리스트 미등록 비교하기 선택 시 등록 됨",
+            "rect": {
+              "x": 1043,
+              "y": 5019,
+              "width": 376,
+              "height": 642
+            },
+            "score": 14,
+            "priceLike": true,
+            "imgCount": 1
+          }
+        ]
+      }
+    ]
+  }
+}
