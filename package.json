@@ -39,6 +39,7 @@
     "check:care-header": "node scripts/check_care_solutions_header.mjs",
     "report:acceptance-pack": "node scripts/build_acceptance_review_pack.mjs",
     "report:acceptance-diff": "node scripts/build_acceptance_diff_report.mjs",
+    "report:acceptance-objective": "node scripts/report_acceptance_objective_findings.mjs",
     "acceptance:list": "node scripts/manage_acceptance.mjs list",
     "acceptance:set": "node scripts/manage_acceptance.mjs set"
   },

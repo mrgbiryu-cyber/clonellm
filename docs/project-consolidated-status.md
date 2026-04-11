@@ -6394,3 +6394,33 @@ acceptance는 `/admin`에서만 기록할 수 있어도 되지만, 로컬 작업
 - home lower acceptance 우선순위는 여전히 중요하지만, 실제 수정 대상은 `smart-life / subscription / summary-banner-2` 쪽으로 좁혀졌다.
 - `brand-showroom / latest-product-news`는 capture artifact 비중이 컸고 현재는 상대적으로 안정적이다.
 - 다음 구현 우선순위는 `home-lower-primary`의 남은 hotspot과 `PLP pc` 보정이다.
+
+### 22.88 Objective Acceptance Findings Added
+
+diff 퍼센트만으로는 무엇을 먼저 고쳐야 하는지 모호할 수 있다. 그래서 geometry metadata와 representative product metadata를 함께 읽어 구조 차이와 스타일 차이를 분리하는 보조 리포트를 추가했다.
+
+추가:
+
+1. `scripts/report_acceptance_objective_findings.mjs`
+2. `package.json`
+   - `npm run report:acceptance-objective`
+3. output
+   - `docs/acceptance-objective-findings.md`
+
+핵심 결과:
+
+1. `space-renewal`
+   - mismatch `6.44%`
+   - clone height가 live보다 `142.27px` 더 큼
+   - 즉 구조/높이 mismatch가 실제로 남아 있다
+2. `smart-life`, `subscription`, `summary-banner-2`
+   - 높이 차이는 `0~1px`
+   - 남은 diff는 layout spacing, image crop, typography, styling 쪽일 가능성이 높다
+3. `category-tvs:pc`, `category-refrigerators:pc`
+   - representative product metadata는 already match
+   - 높은 diff는 grid item 위치보다 page shell, banner, filter/sort block, typography 차이 가능성이 높다
+
+의미:
+
+- `home-lower-primary` 내부에서도 `space-renewal`은 구조 수정, `smart-life/subscription`은 시각 보정으로 분리해서 다뤄야 한다.
+- `PLP pc`는 product card grid를 다시 짜기보다 상단 shell과 filter/sort/banner 쪽부터 봐야 한다.

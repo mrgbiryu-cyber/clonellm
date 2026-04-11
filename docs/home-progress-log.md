@@ -2181,3 +2181,22 @@
   3. PLP 우선순위는 유지:
      - `category-tvs:pc 30.41%`
      - `category-refrigerators:pc 21.77%`
+
+### 2026-04-12 026
+
+- objective acceptance finding 리포트 추가
+- 추가:
+  1. `scripts/report_acceptance_objective_findings.mjs`
+  2. `npm run report:acceptance-objective`
+  3. `docs/acceptance-objective-findings.md`
+- 핵심 결과:
+  1. `space-renewal`
+     - mismatch `6.44%`
+     - clone height가 live보다 `142.27px` 더 큼
+     - 즉 시각 차이 이전에 구조/높이 보정이 우선
+  2. `smart-life`, `subscription`, `summary-banner-2`
+     - 높이 차이는 `0~1px`
+     - 남은 diff는 spacing, image crop, text rhythm, styling 쪽일 가능성이 큼
+  3. `category-tvs:pc`, `category-refrigerators:pc`
+     - representative product rect/text는 live와 동일
+     - 큰 diff는 product grid geometry보다 shell/banner/filter/sort/typography 쪽일 가능성이 큼
