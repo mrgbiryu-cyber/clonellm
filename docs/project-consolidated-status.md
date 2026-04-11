@@ -6285,3 +6285,29 @@ acceptance API는 인증이 필요한 반면, 운영자는 현재 실제 기록 
 
 - `care-solutions`의 known issue는 자동 체크 기준으로는 해소 상태다.
 - 최종 acceptance에서는 전체 page compare만 다시 보면 된다.
+
+### 22.84 Acceptance Review Pack Added
+
+남은 acceptance는 단순 bundle 이름 목록만으로는 느리다. 각 bundle마다 바로 열어야 할 compare URL과 실제 artifact 경로가 한 문서에 묶여 있어야 검수 속도가 올라간다.
+
+추가:
+
+1. `scripts/build_acceptance_review_pack.mjs`
+2. `package.json`
+   - `npm run report:acceptance-pack`
+3. output
+   - `docs/acceptance-review-pack.md`
+
+핵심:
+
+1. `home-lower-primary`, `home-lower-secondary`
+   - section별 live/working/metadata 경로 정리
+2. `support`, `bestshop`, `care-solutions`
+   - `pc/mo` reference/working screenshot 경로 정리
+3. `category-tvs`, `category-refrigerators`
+   - `pc/mo` reference/working screenshot 경로 정리
+
+의미:
+
+- 남은 acceptance는 이제 문서 한 장으로 바로 따라갈 수 있다.
+- 다음 단계는 실제 `pass/fail/pending` 기록을 채우는 운영이다.

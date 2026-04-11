@@ -2119,3 +2119,16 @@
   1. `pc` `captureVisibleCount=0`
   2. `mo` `captureVisibleCount=0`
   3. shell header만 visible
+
+### 2026-04-12 022
+
+- acceptance review pack 스크립트 추가
+- 추가:
+  1. `scripts/build_acceptance_review_pack.mjs`
+  2. `npm run report:acceptance-pack`
+  3. `docs/acceptance-review-pack.md`
+- 결과:
+  1. 8개 bundle의 compare URL 정리
+  2. home lower section artifact 경로 정리
+  3. service/plp pc/mo screenshot 경로 정리
+  4. 현재 recorded acceptance 상태와 함께 검수 진입점 고정
