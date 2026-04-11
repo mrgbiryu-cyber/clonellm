@@ -121,6 +121,9 @@
 
 1. shell header 아래 second header block 비노출
 2. `hero/ranking/benefit/tabs/careBanner` 묶음의 pc/mo compare
+3. 자동 체크 증거
+   - `docs/care-solutions-header-check.md`
+   - `pc/mo` 모두 `captureVisibleCount = 0`
 
 ### Category
 

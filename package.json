@@ -35,7 +35,8 @@
     "capture:states": "node scripts/capture_states.mjs",
     "dev:web": "node server.js",
     "check:git-upload": "bash scripts/check_git_upload_prep.sh",
-    "report:acceptance": "node scripts/report_acceptance_status.mjs --write docs/acceptance-current-state.md"
+    "report:acceptance": "node scripts/report_acceptance_status.mjs --write docs/acceptance-current-state.md",
+    "check:care-header": "node scripts/check_care_solutions_header.mjs"
   },
   "keywords": [],
   "author": "",

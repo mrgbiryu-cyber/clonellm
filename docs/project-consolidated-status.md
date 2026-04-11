@@ -6257,3 +6257,31 @@ acceptance API는 인증이 필요한 반면, 운영자는 현재 실제 기록 
 
 - acceptance는 아직 거의 시작 단계다.
 - 실제 남은 작업은 `home-lower-primary`부터 순서대로 bundle 검수를 채우는 것이다.
+
+### 22.83 Care Solutions Header Check Added
+
+`care-solutions`의 duplicate GNB 문제는 시각 acceptance 전에도 최소한 "captured header가 실제로 보이는가"를 자동으로 확인할 필요가 있다. shell suppress가 코드상으로만 존재하는지, 실제 clone page에서 먹히는지를 브라우저 기준으로 확인하는 스크립트를 두는 것이 맞다.
+
+추가:
+
+1. `scripts/check_care_solutions_header.mjs`
+2. `package.json`
+   - `npm run check:care-header`
+3. output
+   - `docs/care-solutions-header-check.md`
+
+결과:
+
+1. `pc`
+   - `captureVisibleCount = 0`
+2. `mo`
+   - `captureVisibleCount = 0`
+3. shell selectors
+   - `.shell-top`
+   - `.shell-bottom`
+   만 visible
+
+의미:
+
+- `care-solutions`의 known issue는 자동 체크 기준으로는 해소 상태다.
+- 최종 acceptance에서는 전체 page compare만 다시 보면 된다.

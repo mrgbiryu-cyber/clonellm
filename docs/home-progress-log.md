@@ -2107,3 +2107,15 @@
   3. `pending=1`
   4. `unreviewed=6`
   5. next actionable bundle = `home-lower-primary`
+
+### 2026-04-12 021
+
+- `care-solutions` duplicate header 자동 체크 추가
+- 추가:
+  1. `scripts/check_care_solutions_header.mjs`
+  2. `npm run check:care-header`
+  3. `docs/care-solutions-header-check.md`
+- 결과:
+  1. `pc` `captureVisibleCount=0`
+  2. `mo` `captureVisibleCount=0`
+  3. shell header만 visible
