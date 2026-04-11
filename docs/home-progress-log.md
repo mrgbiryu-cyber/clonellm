@@ -2082,3 +2082,14 @@
   3. 주요 route
   4. 핵심 명령
   5. data include/exclude 정책
+
+### 2026-04-12 019
+
+- acceptance backlog 문서 추가
+- 추가:
+  1. `docs/acceptance-backlog.md`
+- 내용:
+  1. 현재 recorded acceptance 상태
+  2. 8개 bundle 정의
+  3. recommended review order
+  4. bundle별 review focus
