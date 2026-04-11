@@ -7,6 +7,7 @@ const ROOT = "/mnt/c/Users/mrgbi/lge-site-analysis";
 const OUT_DIR = path.join(ROOT, "data", "visual", "home-lower");
 const CHROME = path.join(os.homedir(), ".cache/ms-playwright/chromium-1217/chrome-linux64/chrome");
 const BASE_URL = process.env.VISUAL_BASE_URL || "http://localhost:3000";
+const HOME_CLONE_MO_BASE = `${BASE_URL}/clone-content/home?viewportProfile=mo`;
 
 const VIEWPORT = {
   width: 430,
@@ -22,56 +23,74 @@ const SECTION_CONFIG = {
   "brand-showroom": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 브랜드 쇼룸 영역"]',
-    cloneUrl: `${BASE_URL}/clone-content/home?homeSandbox=brand-showroom`,
+    cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=brand-showroom`,
     cloneSelector: '[data-codex-slot="brand-showroom"]',
+    clonePrepareMode: "isolate-mobile-section",
+    cloneCaptureSelector: "#__codex_capture_target",
   },
   "latest-product-news": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 최신 제품 소식 영역"]',
-    cloneUrl: `${BASE_URL}/clone-content/home?homeSandbox=latest-product-news`,
+    cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=latest-product-news`,
     cloneSelector: '[data-codex-slot="latest-product-news"]',
+    clonePrepareMode: "isolate-mobile-section",
+    cloneCaptureSelector: "#__codex_capture_target",
   },
   "space-renewal": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 추천 상품 영역"]',
-    cloneUrl: `${BASE_URL}/clone-content/home?homeSandbox=space-renewal`,
+    cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=space-renewal`,
     cloneSelector: '[data-codex-slot="space-renewal"], .codex-home-space-renewal',
+    clonePrepareMode: "isolate-mobile-section",
+    cloneCaptureSelector: "#__codex_capture_target",
   },
   subscription: {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 가전 구독 영역"]',
-    cloneUrl: `${BASE_URL}/clone-content/home?device=pc`,
+    cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=subscription`,
     cloneSelector: '[data-codex-slot="subscription"]',
+    clonePrepareMode: "isolate-mobile-section",
+    cloneCaptureSelector: "#__codex_capture_target",
   },
   "smart-life": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 슬기로운 가전생활 영역"]',
-    cloneUrl: `${BASE_URL}/clone-content/home?homeSandbox=smart-life`,
+    cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=smart-life`,
     cloneSelector: '[data-codex-slot="smart-life"]',
+    clonePrepareMode: "isolate-mobile-section",
+    cloneCaptureSelector: "#__codex_capture_target",
   },
   "missed-benefits": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 놓치면 아쉬운 혜택 영역"]',
-    cloneUrl: `${BASE_URL}/clone-content/home?homeSandbox=missed-benefits`,
+    cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=missed-benefits`,
     cloneSelector: '[data-codex-slot="missed-benefits"]',
+    clonePrepareMode: "isolate-mobile-section",
+    cloneCaptureSelector: "#__codex_capture_target",
   },
   "lg-best-care": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 베스트 케어 영역"]',
-    cloneUrl: `${BASE_URL}/clone-content/home?homeSandbox=lg-best-care`,
+    cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=lg-best-care`,
     cloneSelector: '[data-codex-slot="lg-best-care"]',
+    clonePrepareMode: "isolate-mobile-section",
+    cloneCaptureSelector: "#__codex_capture_target",
   },
   "bestshop-guide": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 베스트샵 이용안내 영역"]',
-    cloneUrl: `${BASE_URL}/clone-content/home?homeSandbox=bestshop-guide`,
+    cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=bestshop-guide`,
     cloneSelector: '[data-codex-slot="bestshop-guide"]',
+    clonePrepareMode: "isolate-mobile-section",
+    cloneCaptureSelector: "#__codex_capture_target",
   },
   "summary-banner-2": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 하단 배너 영역"]',
-    cloneUrl: `${BASE_URL}/clone-content/home?device=pc`,
+    cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=summary-banner-2`,
     cloneSelector: '[data-codex-slot="summary-banner-2"]',
+    clonePrepareMode: "isolate-mobile-section",
+    cloneCaptureSelector: "#__codex_capture_target",
   },
 };
 
@@ -244,6 +263,53 @@ async function getSelectorRect(client, selector) {
   return result?.result?.value || null;
 }
 
+async function prepareCaptureSurface(client, selector, mode) {
+  if (mode !== "isolate-mobile-section") return;
+  const expression = `
+    (() => {
+      const source = document.querySelector(${JSON.stringify(selector)});
+      if (!source) return { ok: false, reason: 'source_not_found' };
+      document.body.style.margin = '0';
+      document.body.style.padding = '0';
+      document.documentElement.style.background = '#fff';
+      document.body.style.background = '#fff';
+      Array.from(document.body.children).forEach((node) => {
+        node.style.display = 'none';
+      });
+      const existing = document.getElementById('__codex_capture_root');
+      if (existing) existing.remove();
+      const root = document.createElement('div');
+      root.id = '__codex_capture_root';
+      root.style.position = 'relative';
+      root.style.width = '430px';
+      root.style.maxWidth = '430px';
+      root.style.margin = '0';
+      root.style.padding = '0';
+      root.style.background = '#fff';
+      root.style.boxSizing = 'border-box';
+      root.style.display = 'block';
+      const clone = source.cloneNode(true);
+      clone.id = '__codex_capture_target';
+      clone.style.width = '430px';
+      clone.style.maxWidth = '430px';
+      clone.style.margin = '0';
+      clone.style.left = '0';
+      clone.style.right = 'auto';
+      clone.style.boxSizing = 'border-box';
+      root.appendChild(clone);
+      document.body.appendChild(root);
+      root.style.display = 'block';
+      return { ok: true };
+    })()
+  `;
+  await client.send("Runtime.evaluate", {
+    expression,
+    returnByValue: true,
+    awaitPromise: true,
+  });
+  await sleep(200);
+}
+
 function padClip(rect) {
   const pad = 16;
   return {
@@ -266,20 +332,22 @@ async function captureClip(client, clip, outputPath) {
   fs.writeFileSync(outputPath, Buffer.from(screenshot.data, "base64"));
 }
 
-async function captureSection(url, selector, outputPath) {
+async function captureSection(url, selector, outputPath, options = {}) {
   const session = await launchChromeSession();
   try {
     await navigate(session.client, url);
+    await prepareCaptureSurface(session.client, selector, options.prepareMode);
+    const captureSelector = options.captureSelector || selector;
     let rect = null;
     for (let i = 0; i < 12; i += 1) {
-      rect = await getSelectorRect(session.client, selector);
+      rect = await getSelectorRect(session.client, captureSelector);
       if (rect) break;
       await sleep(500);
     }
-    if (!rect) throw new Error(`selector_not_found:${selector}`);
+    if (!rect) throw new Error(`selector_not_found:${captureSelector}`);
     const clip = padClip(rect);
     await captureClip(session.client, clip, outputPath);
-    return { url, selector, rect, clip, path: outputPath };
+    return { url, selector: captureSelector, rect, clip, path: outputPath };
   } finally {
     await session.close();
   }
@@ -309,6 +377,10 @@ async function main() {
         config.cloneUrl,
         config.cloneSelector,
         path.join(dir, "working.png"),
+        {
+          prepareMode: config.clonePrepareMode,
+          captureSelector: config.cloneCaptureSelector,
+        },
       );
       fs.writeFileSync(
         path.join(dir, "metadata.json"),
