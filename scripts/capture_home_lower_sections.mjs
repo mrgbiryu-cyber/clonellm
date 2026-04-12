@@ -19,6 +19,25 @@ const VIEWPORT = {
   platform: "iPhone",
 };
 
+const HOME_SMART_LIFE_ITEMS = [
+  {
+    title: "우리 가족의 생활 패턴에 알맞은 빌트인 스타일 냉장고는?",
+    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/ListThumbnail_20260127_152537.jpg",
+  },
+  {
+    title: "옷감 수축 걱정 없어 외출용 옷도 안심하고 건조해요",
+    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/lglife-in-wash-combo-2-thumb-266x200_20241106_151959.jpg",
+  },
+  {
+    title: "곧은 선 사이 간결하게 채운 컬러",
+    image: "https://www.lge.co.kr/kr/story/lifestyle/interiortip/mmk_og/04/og.jpg",
+  },
+  {
+    title: "요리부터 관리까지 손쉬운 광파오븐 노하우",
+    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/smartway-stan-by-me-2-thumb-266x200_20260115_115830.jpg",
+  },
+];
+
 const SECTION_CONFIG = {
   "brand-showroom": {
     liveUrl: "https://www.lge.co.kr/m/home",
@@ -63,10 +82,13 @@ const SECTION_CONFIG = {
   "smart-life": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 슬기로운 가전생활 영역"]',
+    liveAwaitVisualReady: true,
+    liveTemplateImages: HOME_SMART_LIFE_ITEMS,
     livePrepareMode: "isolate-mobile-section",
     liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=smart-life`,
     cloneSelector: '[data-codex-slot="smart-life"]',
+    cloneAwaitVisualReady: true,
     clonePrepareMode: "isolate-mobile-section",
     cloneCaptureSelector: "#__codex_capture_target",
   },
@@ -399,13 +421,123 @@ async function primeSection(client, selector) {
   await waitForImages(client, selector);
 }
 
+async function waitForVisualReady(client, selector, attempts = 12, delay = 500) {
+  const expression = `
+    (() => {
+      const root = document.querySelector(${JSON.stringify(selector)});
+      if (!root) return { ok: false, reason: 'root_not_found' };
+      const templates = root.querySelectorAll('template[data-dgst]').length;
+      const images = root.querySelectorAll('img').length;
+      const pictures = root.querySelectorAll('picture').length;
+      const backgroundNodes = Array.from(root.querySelectorAll('*')).filter((node) => {
+        const style = window.getComputedStyle(node);
+        return style && style.backgroundImage && style.backgroundImage !== 'none';
+      }).length;
+      const ready = templates === 0 || images > 0 || pictures > 0 || backgroundNodes > 0;
+      return { ok: true, ready, templates, images, pictures, backgroundNodes };
+    })()
+  `;
+  for (let index = 0; index < attempts; index += 1) {
+    const result = await client.send("Runtime.evaluate", {
+      expression,
+      returnByValue: true,
+      awaitPromise: true,
+    });
+    const value = result?.result?.value || null;
+    if (value?.ready) {
+      await sleep(400);
+      return value;
+    }
+    await sleep(delay);
+  }
+  return null;
+}
+
+async function injectTemplateImages(client, selector, products = []) {
+  if (!Array.isArray(products) || !products.length) return;
+  const expression = `
+    (() => {
+      const root = document.querySelector(${JSON.stringify(selector)});
+      if (!root) return { ok: false, reason: 'root_not_found' };
+      const templates = Array.from(root.querySelectorAll('template[data-dgst]'));
+      let imageIndex = 0;
+      for (const template of templates) {
+        const parent = template.parentElement;
+        if (!parent) continue;
+        const product = ${JSON.stringify(products)}[imageIndex] || {};
+        imageIndex += 1;
+        const existingImage = parent.querySelector('img');
+        if (existingImage) continue;
+        const img = document.createElement('img');
+        img.src = product.image || '';
+        img.alt = product.title || '';
+        img.loading = 'eager';
+        img.style.display = 'block';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        img.style.borderRadius = 'inherit';
+        parent.innerHTML = '';
+        parent.appendChild(img);
+      }
+      return { ok: true, templateCount: templates.length };
+    })()
+  `;
+  await client.send("Runtime.evaluate", {
+    expression,
+    returnByValue: true,
+    awaitPromise: true,
+  });
+  await sleep(400);
+}
+
+async function fillMissingImageSources(client, selector, products = []) {
+  if (!Array.isArray(products) || !products.length) return;
+  const expression = `
+    (() => {
+      const root = document.querySelector(${JSON.stringify(selector)});
+      if (!root) return { ok: false, reason: 'root_not_found' };
+      const seeds = ${JSON.stringify(products)};
+      const images = Array.from(root.querySelectorAll('img')).filter((img) => {
+        const src = img.getAttribute('src') || '';
+        return !src.trim();
+      });
+      images.forEach((img, index) => {
+        const seed = seeds[index];
+        if (!seed?.image) return;
+        img.setAttribute('src', seed.image);
+        img.setAttribute('loading', 'eager');
+        img.style.visibility = 'visible';
+        img.style.opacity = '1';
+      });
+      return { ok: true, imageCount: images.length };
+    })()
+  `;
+  await client.send("Runtime.evaluate", {
+    expression,
+    returnByValue: true,
+    awaitPromise: true,
+  });
+  await sleep(400);
+}
+
 async function captureSection(url, selector, outputPath, options = {}) {
   const session = await launchChromeSession();
   try {
     await navigate(session.client, url);
     await primeSection(session.client, selector);
+    if (options.awaitVisualReady) {
+      await waitForVisualReady(session.client, selector);
+    }
+    if (options.templateImages) {
+      await injectTemplateImages(session.client, selector, options.templateImages);
+      await fillMissingImageSources(session.client, selector, options.templateImages);
+    }
     await prepareCaptureSurface(session.client, selector, options.prepareMode);
     const captureSelector = options.captureSelector || selector;
+    if (options.awaitVisualReady) {
+      await waitForVisualReady(session.client, captureSelector, 8, 400);
+    }
     await waitForImages(session.client, captureSelector);
     let rect = null;
     for (let i = 0; i < 12; i += 1) {
@@ -442,6 +574,8 @@ async function main() {
         config.liveSelector,
         path.join(dir, "live-reference.png"),
         {
+          awaitVisualReady: config.liveAwaitVisualReady,
+          templateImages: config.liveTemplateImages,
           prepareMode: config.livePrepareMode,
           captureSelector: config.liveCaptureSelector,
         },
@@ -451,6 +585,8 @@ async function main() {
         config.cloneSelector,
         path.join(dir, "working.png"),
         {
+          awaitVisualReady: config.cloneAwaitVisualReady,
+          templateImages: config.cloneTemplateImages,
           prepareMode: config.clonePrepareMode,
           captureSelector: config.cloneCaptureSelector,
         },

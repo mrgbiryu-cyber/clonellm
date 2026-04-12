@@ -2297,3 +2297,9 @@
 - `subscription` live reference recaptured with correct section targeting: diff `8.92% -> 4.69%`.
 - `smart-life` live reference recaptured: diff `11.52% -> 9.42%`.
 - `summary-banner-2` live reference refreshed: diff `6.17% -> 5.13%`.
+
+## 2026-04-12 034
+- `smart-life` current live mobile story data(title/subtitle/href/image)를 clone data에 동기화했다.
+- client-only image/template placeholder를 home-lower capture에서 채워 `smart-life` diff를 `9.42% -> 6.41%`로 낮췄다.
+- `space-renewal` current diff는 `4.72%`까지 내려와 acceptance 후보 수준이다.
+- `subscription`, `summary-banner-2`는 image injection 시 reference가 불안정해져 각각 현재 안정값 `4.69%`, `5.13%`를 유지한다.

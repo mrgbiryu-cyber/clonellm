@@ -4627,24 +4627,28 @@ const HOME_LATEST_PRODUCT_NEWS_ITEMS = [
 
 const HOME_SMART_LIFE_ITEMS = [
   {
-    title: "우리 가족의 생활 패턴에 알맞은 빌트인 스타일 냉장고는?",
-    url: "https://www.lge.co.kr/story/buying-guide/choicecrossroad-fit-and-max-refrigerator",
-    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/ListThumbnail_20260127_152537.jpg",
+    subtitle: "사용가이드",
+    title: "사계절 매일 쓰는 스타일러 일상",
+    url: "https://www.lge.co.kr/story/user-guide/lg-styler-4season-course",
+    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/lg-styler-4season-thumb-266x200_20250528_152225.jpg",
   },
   {
-    title: "옷감 수축 걱정 없어 외출용 옷도 안심하고 건조해요",
-    url: "https://www.lge.co.kr/story/hands-on-reviews/lglife-in-wash-combo-2",
-    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/lglife-in-wash-combo-2-thumb-266x200_20241106_151959.jpg",
+    subtitle: "가전인사이트",
+    title: "나만 몰랐던 스탠바이미 2 활용 꿀팁",
+    url: "https://www.lge.co.kr/story/tech-insight/smartway-stan-by-me-2",
+    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/smartway-stan-by-me-2-thumb-266x200_20260115_131019.jpg",
   },
   {
-    title: "곧은 선 사이 간결하게 채운 컬러",
-    url: "https://www.lge.co.kr/story/lifestyle/interiortip-mmk-04",
-    image: "https://www.lge.co.kr/kr/story/lifestyle/interiortip/mmk_og/04/og.jpg",
+    subtitle: "가전인사이트",
+    title: "주방 인테리어의 새로운 기준, Fit & Max",
+    url: "https://www.lge.co.kr/story/tech-insight/designlg-fit-and-max",
+    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/MainThumbnail_MO_%EA%B0%80%EC%A0%84%EB%AF%B8%ED%95%99_ep.01_20251210_162623.jpg",
   },
   {
-    title: "요리부터 관리까지 손쉬운 광파오븐 노하우",
-    url: "https://www.lge.co.kr/story/tech-insight/smartway-microwaves-and-ovens",
-    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/smartway-stan-by-me-2-thumb-266x200_20260115_115830.jpg",
+    subtitle: "리뷰",
+    title: "TV와 모니터가 하나로 합쳐진 제가 찾던 모니터예요!",
+    url: "https://www.lge.co.kr/story/hands-on-reviews/lglife-in-smart-monitor-15",
+    image: "https://www.lge.co.kr/kr/upload/admin/storyThumbnail/lglife-in-smart-monitor-15-thumb-266x200_20250227_153943.jpg",
   },
 ];
 
@@ -4836,6 +4840,36 @@ function injectTemplateImagesIntoSection(sectionHtml, products) {
         return `<span class="codex-home-template-fallback" aria-hidden="true"></span>`;
       }
       return `<img src="${imageUrl}" alt="${alt}" loading="lazy" class="codex-home-template-image"/>`;
+    }
+  );
+}
+
+function syncHomeStoryListSection(sectionHtml, items = []) {
+  if (!sectionHtml || !Array.isArray(items) || !items.length) return sectionHtml || "";
+  let itemIndex = 0;
+  return String(sectionHtml).replace(
+    /<li class="HomeMoListVerticaltype_list_verticaltype_item__[^"]*">[\s\S]*?<\/li>/g,
+    (itemHtml) => {
+      const item = items[itemIndex];
+      itemIndex += 1;
+      if (!item) return itemHtml;
+      let next = String(itemHtml);
+      if (item.url) {
+        next = next.replace(/<a href="[^"]+"/, `<a href="${escapeHtml(item.url)}"`);
+      }
+      if (item.subtitle) {
+        next = next.replace(
+          /<span class="HomeMoListVerticaltype_sub_title__[^"]*">[\s\S]*?<\/span>/,
+          `<span class="HomeMoListVerticaltype_sub_title__UF_nM">${escapeHtml(item.subtitle)}</span>`
+        );
+      }
+      if (item.title) {
+        next = next.replace(
+          /<strong class="HomeMoListVerticaltype_title__[^"]*">[\s\S]*?<\/strong>/,
+          `<strong class="HomeMoListVerticaltype_title__6mBcs">${escapeHtml(item.title)}</strong>`
+        );
+      }
+      return next;
     }
   );
 }
@@ -6799,7 +6833,10 @@ function getHomeLowerSlotRegistry(editableData = null) {
       render: (data, _options, slot) =>
         applyHomeLowerSectionPatch(
           markHomeLowerReplay(
-            injectTemplateImagesIntoSection(data.smartLifeSection, data.smartLifeProducts),
+            injectTemplateImagesIntoSection(
+              syncHomeStoryListSection(data.smartLifeSection, data.smartLifeProducts),
+              data.smartLifeProducts
+            ),
             "smart-life",
             slot.activeSourceId
           ),
