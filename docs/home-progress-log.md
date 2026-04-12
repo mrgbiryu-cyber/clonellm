@@ -2285,3 +2285,15 @@
   - `category-tvs:mo 4.30%`
   - `category-refrigerators:mo 16.28%`
 - Remaining PLP hotspot is `category-refrigerators:mo`, currently driven by top app banner visibility/state delta.
+
+## 2026-04-12 032
+- `category-refrigerators:mo` clone diff reduced `16.28% -> 4.43%`.
+- Cause was top app promo visibility mismatch in clone mobile PLP content.
+- `rewriteCloneHtml()` now suppresses `.CommonMoBannerTopinfo_*` for `category-refrigerators + mo`.
+- PLP bundle is now effectively aligned across `category-tvs/category-refrigerators` pc/mo.
+
+## 2026-04-12 033
+- `capture_home_lower_sections.mjs` stabilized by: live isolate mode, source section priming, and image decode/load wait.
+- `subscription` live reference recaptured with correct section targeting: diff `8.92% -> 4.69%`.
+- `smart-life` live reference recaptured: diff `11.52% -> 9.42%`.
+- `summary-banner-2` live reference refreshed: diff `6.17% -> 5.13%`.

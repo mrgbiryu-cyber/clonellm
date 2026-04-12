@@ -23,6 +23,8 @@ const SECTION_CONFIG = {
   "brand-showroom": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 브랜드 쇼룸 영역"]',
+    livePrepareMode: "isolate-mobile-section",
+    liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=brand-showroom`,
     cloneSelector: '[data-codex-slot="brand-showroom"]',
     clonePrepareMode: "isolate-mobile-section",
@@ -31,6 +33,8 @@ const SECTION_CONFIG = {
   "latest-product-news": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 최신 제품 소식 영역"]',
+    livePrepareMode: "isolate-mobile-section",
+    liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=latest-product-news`,
     cloneSelector: '[data-codex-slot="latest-product-news"]',
     clonePrepareMode: "isolate-mobile-section",
@@ -39,6 +43,8 @@ const SECTION_CONFIG = {
   "space-renewal": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 추천 상품 영역"]',
+    livePrepareMode: "isolate-mobile-section",
+    liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=space-renewal`,
     cloneSelector: '[data-codex-slot="space-renewal"], .codex-home-space-renewal',
     clonePrepareMode: "isolate-mobile-section",
@@ -47,6 +53,8 @@ const SECTION_CONFIG = {
   subscription: {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 가전 구독 영역"]',
+    livePrepareMode: "isolate-mobile-section",
+    liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=subscription`,
     cloneSelector: '[data-codex-slot="subscription"]',
     clonePrepareMode: "isolate-mobile-section",
@@ -55,6 +63,8 @@ const SECTION_CONFIG = {
   "smart-life": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 슬기로운 가전생활 영역"]',
+    livePrepareMode: "isolate-mobile-section",
+    liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=smart-life`,
     cloneSelector: '[data-codex-slot="smart-life"]',
     clonePrepareMode: "isolate-mobile-section",
@@ -63,6 +73,8 @@ const SECTION_CONFIG = {
   "missed-benefits": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 놓치면 아쉬운 혜택 영역"]',
+    livePrepareMode: "isolate-mobile-section",
+    liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=missed-benefits`,
     cloneSelector: '[data-codex-slot="missed-benefits"]',
     clonePrepareMode: "isolate-mobile-section",
@@ -71,6 +83,8 @@ const SECTION_CONFIG = {
   "lg-best-care": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 베스트 케어 영역"]',
+    livePrepareMode: "isolate-mobile-section",
+    liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=lg-best-care`,
     cloneSelector: '[data-codex-slot="lg-best-care"]',
     clonePrepareMode: "isolate-mobile-section",
@@ -79,6 +93,8 @@ const SECTION_CONFIG = {
   "bestshop-guide": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 베스트샵 이용안내 영역"]',
+    livePrepareMode: "isolate-mobile-section",
+    liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=bestshop-guide`,
     cloneSelector: '[data-codex-slot="bestshop-guide"]',
     clonePrepareMode: "isolate-mobile-section",
@@ -87,6 +103,8 @@ const SECTION_CONFIG = {
   "summary-banner-2": {
     liveUrl: "https://www.lge.co.kr/m/home",
     liveSelector: 'section[data-area="메인 하단 배너 영역"]',
+    livePrepareMode: "isolate-mobile-section",
+    liveCaptureSelector: "#__codex_capture_target",
     cloneUrl: `${HOME_CLONE_MO_BASE}&homeSandbox=summary-banner-2`,
     cloneSelector: '[data-codex-slot="summary-banner-2"]',
     clonePrepareMode: "isolate-mobile-section",
@@ -288,16 +306,15 @@ async function prepareCaptureSurface(client, selector, mode) {
       root.style.background = '#fff';
       root.style.boxSizing = 'border-box';
       root.style.display = 'block';
-      const clone = source.cloneNode(true);
-      clone.id = '__codex_capture_target';
-      clone.style.width = '430px';
-      clone.style.maxWidth = '430px';
-      clone.style.margin = '0';
-      clone.style.left = '0';
-      clone.style.right = 'auto';
-      clone.style.boxSizing = 'border-box';
-      root.appendChild(clone);
+      source.id = '__codex_capture_target';
+      source.style.width = '430px';
+      source.style.maxWidth = '430px';
+      source.style.margin = '0';
+      source.style.left = '0';
+      source.style.right = 'auto';
+      source.style.boxSizing = 'border-box';
       document.body.appendChild(root);
+      root.appendChild(source);
       root.style.display = 'block';
       return { ok: true };
     })()
@@ -332,12 +349,64 @@ async function captureClip(client, clip, outputPath) {
   fs.writeFileSync(outputPath, Buffer.from(screenshot.data, "base64"));
 }
 
+async function waitForImages(client, selector) {
+  const expression = `
+    (async () => {
+      const root = document.querySelector(${JSON.stringify(selector)});
+      if (!root) return { ok: false, reason: 'root_not_found' };
+      const images = Array.from(root.querySelectorAll('img'));
+      await Promise.all(images.map(async (img) => {
+        if (!img.getAttribute('src') && img.getAttribute('data-src')) {
+          img.setAttribute('src', img.getAttribute('data-src'));
+        }
+        if (img.loading === 'lazy') img.loading = 'eager';
+        try { await img.decode?.(); } catch {}
+        if (!img.complete) {
+          await new Promise((resolve) => {
+            const done = () => resolve();
+            img.addEventListener('load', done, { once: true });
+            img.addEventListener('error', done, { once: true });
+            setTimeout(resolve, 2000);
+          });
+        }
+      }));
+      return { ok: true, imageCount: images.length };
+    })()
+  `;
+  await client.send("Runtime.evaluate", {
+    expression,
+    returnByValue: true,
+    awaitPromise: true,
+  });
+  await sleep(400);
+}
+
+async function primeSection(client, selector) {
+  const expression = `
+    (() => {
+      const node = document.querySelector(${JSON.stringify(selector)});
+      if (!node) return { ok: false, reason: 'source_not_found' };
+      node.scrollIntoView({ block: 'center', inline: 'nearest' });
+      return { ok: true };
+    })()
+  `;
+  await client.send("Runtime.evaluate", {
+    expression,
+    returnByValue: true,
+    awaitPromise: true,
+  });
+  await sleep(1200);
+  await waitForImages(client, selector);
+}
+
 async function captureSection(url, selector, outputPath, options = {}) {
   const session = await launchChromeSession();
   try {
     await navigate(session.client, url);
+    await primeSection(session.client, selector);
     await prepareCaptureSurface(session.client, selector, options.prepareMode);
     const captureSelector = options.captureSelector || selector;
+    await waitForImages(session.client, captureSelector);
     let rect = null;
     for (let i = 0; i < 12; i += 1) {
       rect = await getSelectorRect(session.client, captureSelector);
@@ -372,6 +441,10 @@ async function main() {
         config.liveUrl,
         config.liveSelector,
         path.join(dir, "live-reference.png"),
+        {
+          prepareMode: config.livePrepareMode,
+          captureSelector: config.liveCaptureSelector,
+        },
       );
       const clone = await captureSection(
         config.cloneUrl,

@@ -7235,6 +7235,13 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       body { background: #fff; visibility: visible !important; opacity: 1 !important; }
       img[style*="visibility:hidden"][src]:not([src=""]) { visibility: visible !important; }
       img[style*="opacity:0"][src]:not([src=""]) { opacity: 1 !important; }
+      ${pageId === "category-refrigerators" && viewportProfile === "mo"
+        ? `
+      .CommonMoBannerTopinfo_hello_bar__jV54K,
+      .CommonMoBannerTopinfo_app__8C1kq {
+        display: none !important;
+      }`
+        : ""}
       [hidden][data-codex-force-visible] { display: initial !important; }
       .skip_nav,
       .skip-nav {
