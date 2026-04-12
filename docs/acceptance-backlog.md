@@ -93,11 +93,11 @@
    - diff hotspot:
      - `smart-life 11.64%`
      - `subscription 7.71%`
-     - `space-renewal 6.44%`
+     - `space-renewal 6.43%`
 2. `category-tvs-pcmo`
    - 이유: `pc 30.41%`로 현재 PLP 중 가장 큰 차이
 3. `category-refrigerators-pcmo`
-   - 이유: `pc 21.77%`로 다음 우선순위
+   - 이유: `pc 21.56%`, `mo 20.28%`로 pc/mo 모두 큰 차이가 남음
 4. `home-lower-secondary`
    - 이유: 홈 하단 마무리 묶음이며 `summary-banner-2`와 하단 가이드 계열 차이가 남아 있음
    - diff hotspot:
@@ -133,6 +133,8 @@
    - `smart-life`
    - `space-renewal`
    - `subscription`
+   - 현재 구조 메모:
+     - `space-renewal` live 대비 높이 delta는 `+17px`까지 줄어든 상태
 3. `home-lower-secondary`
    - 하단 배너/혜택/가이드 묶음의 순서, 간격, 폭
 

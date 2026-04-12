@@ -7175,6 +7175,7 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
 
 function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {}) {
   const editableData = options.editableData || readEditableData();
+  const showEditorChrome = options.editorEnabled === true;
   const archiveMap = buildArchivePageMap();
   const archive = archiveMap[pageId];
   const pageTitle = archive?.title || pageId;
@@ -7715,6 +7716,55 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       }
       .codex-home-lower-replay .product-card-image_image img {
         visibility: visible !important;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] {
+        width: calc(100vw - 28px) !important;
+        max-width: 430px;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_list_inner__"] {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_item__"] {
+        list-style: none;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_item__"] + [class*="HomeMoListBannertype_list_bannertype_item__"] {
+        margin-top: 12px;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_item__"] > a {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 132px;
+        gap: 14px;
+        align-items: center;
+        text-decoration: none;
+        color: inherit;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_box__"] {
+        min-width: 0;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_image__"] {
+        width: 132px;
+        min-width: 132px;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_image__"] .product-card-image_image,
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_image__"] .image {
+        display: block;
+        width: 132px;
+        height: 132px;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_image__"] img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] .product-card-title_headline {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        line-height: 1.35;
       }
       .codex-home-lower-replay .codex-home-template-image {
         display: block;
@@ -8597,9 +8647,8 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
     </script>
   `;
   html = html.replace(/<head([^>]*)>/i, `<head$1>${injectedHead}`);
-  html = html.replace(
-    /<body([^>]*)>/i,
-    `<body$1><div class="codex-gnb-overlay" data-codex-interaction-id="home.gnb.open" data-codex-open-state="closed" aria-hidden="true"></div><div class="codex-page-pill">${pageTitle}</div>
+  const injectedBodyChrome = showEditorChrome
+    ? `<div class="codex-page-pill">${pageTitle}</div>
     <button class="codex-chat-launcher" type="button" aria-label="Open editor">Edit</button>
     <div class="codex-link-toast" aria-live="polite"></div>
     <section class="codex-chat-panel" aria-label="Prototype editor">
@@ -8632,6 +8681,10 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
         </div>
       </form>
     </section>`
+    : `<div class="codex-link-toast" aria-live="polite"></div>`;
+  html = html.replace(
+    /<body([^>]*)>/i,
+    `<body$1><div class="codex-gnb-overlay" data-codex-interaction-id="home.gnb.open" data-codex-open-state="closed" aria-hidden="true"></div>${injectedBodyChrome}`
   );
   html = html.replace(
     /<\/body>/i,
@@ -8683,6 +8736,7 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
 
         function setOpen(next) {
           state.open = next;
+          if (!panel) return;
           panel.classList.toggle('is-open', next);
         }
 
@@ -8749,8 +8803,8 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
           return response.json();
         }
 
-        launcher.addEventListener('click', () => setOpen(true));
-        closer.addEventListener('click', () => setOpen(false));
+        if (launcher) launcher.addEventListener('click', () => setOpen(true));
+        if (closer) closer.addEventListener('click', () => setOpen(false));
 
         const gnbBannerCatalog = ${JSON.stringify(readReferenceGnbBannerCatalog())};
         const gnbBannerCatalogByHref = Object.values(gnbBannerCatalog).reduce((acc, item) => {
@@ -9622,6 +9676,7 @@ function sendCloneContent(req, res, pageId, requestUrl = null) {
     const viewportProfile = String(requestUrl?.searchParams?.get("viewportProfile") || "pc").trim() || "pc";
     const homeSandbox = String(requestUrl?.searchParams?.get("homeSandbox") || "").trim();
     const homeVariant = String(requestUrl?.searchParams?.get("homeVariant") || "").trim();
+    const editorEnabled = String(requestUrl?.searchParams?.get("editor") || "").trim() === "1";
     const { data: editableData } = readDataForRequest(req);
     const rawHtml = readCloneSourceHtmlByPageId(pageId, viewportProfile);
     if (!rawHtml) {
@@ -9631,7 +9686,12 @@ function sendCloneContent(req, res, pageId, requestUrl = null) {
         `<!doctype html><html><head><meta charset="utf-8"><title>Clone not found</title></head><body><h1>Clone not found</h1><p>${pageId}</p><p><a href="/preview">Back to preview</a></p></body></html>`
       );
     }
-    const transformed = rewriteCloneHtml(rawHtml, pageId, viewportProfile, { homeSandbox, homeVariant, editableData });
+    const transformed = rewriteCloneHtml(rawHtml, pageId, viewportProfile, {
+      homeSandbox,
+      homeVariant,
+      editableData,
+      editorEnabled,
+    });
     return sendRawHtml(res, 200, transformed);
   } catch (error) {
     return sendRawHtml(

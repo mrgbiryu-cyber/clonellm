@@ -5,10 +5,10 @@
 ## Home Lower
 
 - `space-renewal`
-  - mismatch: `6.44%`
+  - mismatch: `6.43%`
   - live height: `616`
-  - clone height: `758.265625`
-  - height delta: `142.27`
+  - clone height: `633`
+  - height delta: `17`
 - `smart-life`
   - mismatch: `11.64%`
   - live height: `558`
@@ -41,7 +41,7 @@
   - representative count: `3`
   - representative rects/text match: `true`
 - `category-refrigerators:pc`
-  - mismatch: `21.77%`
+  - mismatch: `21.56%`
   - representative count: `3`
   - representative rects/text match: `true`
 

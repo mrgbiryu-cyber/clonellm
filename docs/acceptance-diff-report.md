@@ -1,6 +1,6 @@
 # Acceptance Diff Report
 
-- generatedAt: `2026-04-11T16:16:01.573Z`
+- generatedAt: `2026-04-12T01:25:29.755Z`
 - note: screenshot diff is heuristic; it helps prioritize review but does not replace visual acceptance.
 
 ## Home
@@ -14,7 +14,7 @@
 - `smart-life` mismatch=`11.64%`
 - `subscription` mismatch=`7.71%`
 - `summary-banner-2` mismatch=`7.32%`
-- `space-renewal` mismatch=`6.44%`
+- `space-renewal` mismatch=`6.43%`
 - `bestshop-guide` mismatch=`5.46%`
 - `lg-best-care` mismatch=`4.92%`
 - `missed-benefits` mismatch=`3.89%`
@@ -33,7 +33,7 @@
 ## PLP Pages
 
 - `category-tvs:pc` mismatch=`30.41%`
-- `category-refrigerators:pc` mismatch=`21.77%`
-- `category-refrigerators:mo` mismatch=`6.82%`
-- `category-tvs:mo` mismatch=`5.35%`
+- `category-refrigerators:pc` mismatch=`21.56%`
+- `category-refrigerators:mo` mismatch=`20.28%`
+- `category-tvs:mo` mismatch=`5.40%`
 

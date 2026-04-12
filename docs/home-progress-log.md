@@ -2200,3 +2200,37 @@
   3. `category-tvs:pc`, `category-refrigerators:pc`
      - representative product rect/text는 live와 동일
      - 큰 diff는 product grid geometry보다 shell/banner/filter/sort/typography 쪽일 가능성이 큼
+
+### 2026-04-12 027
+
+- `space-renewal` raw mobile replay에 mobile card layout shim 추가
+- 목적:
+  1. `HomeMoListBannertype` 섹션이 clone에서 live보다 과하게 길어지는 구조 차이 축소
+  2. item/card가 mobile row layout으로 유지되게 강제
+- 결과:
+  1. `space-renewal` clone height
+     - `758.27 -> 633`
+  2. live 대비 delta
+     - `+142.27px -> +17px`
+  3. mismatch
+     - `6.44% -> 6.43%`
+- 의미:
+  - `space-renewal`은 여전히 구조 보정 대상이지만, 큰 높이 붕괴는 대부분 정리됐다.
+  - 이제 남은 차이는 full structural break보다는 세부 spacing/visual tuning에 가깝다.
+
+### 2026-04-12 028
+
+- `clone-content` 기본 경로에서 editor chrome을 비활성화
+- 변경:
+  1. `codex-page-pill`
+  2. `codex-chat-launcher`
+  3. `codex-chat-panel`
+  4. 위 3개는 `editor=1`일 때만 주입
+- 검증:
+  1. 기본 `/clone-content/category-tvs?viewportProfile=pc`
+     - body에 page pill/chat 없음
+  2. `/clone-content/category-tvs?viewportProfile=pc&editor=1`
+     - body에 page pill/chat 존재
+- 의미:
+  - acceptance screenshot diff에서 실제 clone 화면과 무관한 overlay 오염을 줄였다.
+  - PLP diff는 여전히 높지만, 이제 오버레이가 기본 원인은 아니다.
