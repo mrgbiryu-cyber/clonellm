@@ -122,7 +122,11 @@
             <section class="section">
               <h2 class="section-title">Captured Sections</h2>
               <div class="clone-blocks">
-                ${(page.sections || []).sort((a, b) => a.order - b.order).map(renderSectionBlock).join("")}
+                ${(page.sections || [])
+                  .filter((section) => section.visible !== false)
+                  .sort((a, b) => a.order - b.order)
+                  .map(renderSectionBlock)
+                  .join("")}
               </div>
             </section>
 

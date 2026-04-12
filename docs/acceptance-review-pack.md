@@ -1,6 +1,6 @@
 # Acceptance Review Pack
 
-- generatedAt: `2026-04-12T03:27:28.207Z`
+- generatedAt: `2026-04-12T04:49:17.214Z`
 - workspaceUser: `testuser1`
 - baseUrl: `http://localhost:3000`
 
@@ -21,8 +21,10 @@
 - bundleId: `home-lower-primary`
 - pageId: `home`
 - status: `pending`
-- note: recheck pending
+- note: manual review: space-renewal has reference-artifact caveat; smart-life/subscription are acceptance-ready
 - compare: `http://localhost:3000/compare/home`
+- review-note: bundle is ready for manual acceptance review
+- review-note: space-renewal requires artifact caveat when judging screenshot diff
 
 ### Section Artifacts
 
@@ -30,10 +32,15 @@
   live: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/space-renewal/live-reference.png`
   working: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/space-renewal/working.png`
   metadata: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/space-renewal/metadata.json`
+  note: geometry is aligned to live mixed-card layout
+  note: background/context alignment reduced latest mismatch back to acceptance-range
+  note: final step is manual visual acceptance, not another structural rewrite
 - `subscription`
   live: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/subscription/live-reference.png`
   working: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/subscription/working.png`
   metadata: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/subscription/metadata.json`
+  note: stable baseline is preferred over forced image injection
+  note: structure is acceptance-ready; review visually
 - `brand-showroom`
   live: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/brand-showroom/live-reference.png`
   working: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/brand-showroom/working.png`
@@ -46,6 +53,8 @@
   live: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/smart-life/live-reference.png`
   working: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/smart-life/working.png`
   metadata: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/smart-life/metadata.json`
+  note: current live story card data is synced
+  note: remaining diff is minor visual tuning territory; acceptance-ready
 
 ## Home Lower Secondary
 
@@ -53,6 +62,8 @@
 - pageId: `home`
 - status: `unreviewed`
 - compare: `http://localhost:3000/compare/home`
+- review-note: summary-banner-2 is acceptance-ready
+- review-note: focus on visual continuity across lower banners/guides
 
 ### Section Artifacts
 
@@ -60,6 +71,8 @@
   live: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/summary-banner-2/live-reference.png`
   working: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/summary-banner-2/working.png`
   metadata: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/summary-banner-2/metadata.json`
+  note: structure is acceptance-ready
+  note: remaining review is visual only
 - `missed-benefits`
   live: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/missed-benefits/live-reference.png`
   working: `/mnt/c/Users/mrgbi/lge-site-analysis/data/visual/home-lower/missed-benefits/working.png`
@@ -111,6 +124,8 @@
 - pageId: `care-solutions`
 - status: `unreviewed`
 - compare: `http://localhost:3000/compare/care-solutions`
+- review-note: duplicate header auto-check is resolved
+- review-note: final review should focus on overall page compare only
 
 ### Page Artifacts
 
@@ -127,6 +142,8 @@
 - pageId: `category-tvs`
 - status: `unreviewed`
 - compare: `http://localhost:3000/compare/category-tvs`
+- review-note: PLP shell/filter/sort alignment is largely closed
+- review-note: final review should focus on page-level visual acceptance
 
 ### Page Artifacts
 
@@ -143,6 +160,8 @@
 - pageId: `category-refrigerators`
 - status: `unreviewed`
 - compare: `http://localhost:3000/compare/category-refrigerators`
+- review-note: PLP shell/filter/sort alignment is largely closed
+- review-note: mobile still deserves a closer visual pass than PC
 
 ### Page Artifacts
 

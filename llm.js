@@ -111,7 +111,8 @@ function buildDefaultHomeSlotRegistry() {
         sources: [
           { sourceId: "mobile-derived", sourceType: "mobile-derived", renderer: "component", status: "active" },
           { sourceId: "custom-home-space-renewal-v1", sourceType: "custom", renderer: "component", status: "draft" },
-          { sourceId: "figma-home-space-renewal-v1", sourceType: "figma-derived", renderer: "component", status: "draft" }
+          { sourceId: "figma-home-space-renewal-v1", sourceType: "figma-derived", renderer: "component", status: "draft" },
+          { sourceId: "hybrid-home-space-renewal-v1", sourceType: "custom", renderer: "component", status: "draft" }
         ]
       },
       {
@@ -311,13 +312,123 @@ function writeEditableData(data) {
   fs.writeFileSync(DATA_PATH, `${JSON.stringify(normalizeEditableData(data), null, 2)}\n`, "utf-8");
 }
 
+function findSlotRegistry(data, pageId) {
+  return (data.slotRegistries || []).find((item) => item.pageId === pageId) || null;
+}
+
+function findSlotConfig(data, pageId, slotId) {
+  const registry = findSlotRegistry(data, pageId);
+  return (registry?.slots || []).find((slot) => slot.slotId === slotId) || null;
+}
+
+function listComponentPatches(data, pageId = "") {
+  const patches = Array.isArray(data?.componentPatches) ? data.componentPatches : [];
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return patches;
+  return patches.filter((entry) => String(entry.pageId || "").trim() === normalizedPageId);
+}
+
+function findComponentPatch(data, pageId, componentId, sourceId = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedComponentId = String(componentId || "").trim();
+  const normalizedSourceId = String(sourceId || "").trim();
+  const patches = listComponentPatches(data, normalizedPageId);
+  if (!normalizedComponentId) return null;
+  const exact =
+    patches.find(
+      (entry) =>
+        String(entry.componentId || "").trim() === normalizedComponentId &&
+        String(entry.sourceId || "").trim() === normalizedSourceId
+    ) || null;
+  if (exact) return exact;
+  return (
+    patches.find(
+      (entry) =>
+        String(entry.componentId || "").trim() === normalizedComponentId &&
+        !String(entry.sourceId || "").trim()
+    ) || null
+  );
+}
+
+function upsertComponentPatch(data, pageId, componentId, sourceId, patch) {
+  const nextData = JSON.parse(JSON.stringify(data || {}));
+  nextData.componentPatches = Array.isArray(nextData.componentPatches) ? nextData.componentPatches : [];
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedComponentId = String(componentId || "").trim();
+  const normalizedSourceId = String(sourceId || "").trim();
+  const nextPatch = patch && typeof patch === "object" ? JSON.parse(JSON.stringify(patch)) : {};
+  const existingIndex = nextData.componentPatches.findIndex(
+    (entry) =>
+      String(entry.pageId || "").trim() === normalizedPageId &&
+      String(entry.componentId || "").trim() === normalizedComponentId &&
+      String(entry.sourceId || "").trim() === normalizedSourceId
+  );
+  const record = {
+    pageId: normalizedPageId,
+    componentId: normalizedComponentId,
+    sourceId: normalizedSourceId,
+    patch: nextPatch,
+    updatedAt: new Date().toISOString(),
+  };
+  if (existingIndex >= 0) nextData.componentPatches[existingIndex] = record;
+  else nextData.componentPatches.push(record);
+  return nextData;
+}
+
+function mergeComponentPatch(currentPatch, partialPatch) {
+  const base = currentPatch && typeof currentPatch === "object" ? currentPatch : {};
+  const next = { ...base };
+  for (const [key, value] of Object.entries(partialPatch || {})) {
+    if (key === "styles" && value && typeof value === "object") {
+      next.styles = { ...(base.styles || {}), ...value };
+      continue;
+    }
+    next[key] = value;
+  }
+  return next;
+}
+
+function resolveComponentId(pageId, slotId) {
+  return `${String(pageId || "").trim()}.${String(slotId || "").trim()}`;
+}
+
+function setSlotComponentPatch(data, pageId, slotId, sourceId, partialPatch) {
+  const componentId = resolveComponentId(pageId, slotId);
+  const existing = findComponentPatch(data, pageId, componentId, sourceId)?.patch || {};
+  const merged = mergeComponentPatch(existing, partialPatch);
+  return upsertComponentPatch(data, pageId, componentId, sourceId, merged);
+}
+
+function buildLlmSlotContext(data) {
+  return (data.slotRegistries || []).map((registry) => ({
+    pageId: registry.pageId,
+    slots: (registry.slots || []).map((slot) => ({
+      slotId: slot.slotId,
+      componentType: slot.componentType,
+      activeSourceId: slot.activeSourceId,
+      sources: (slot.sources || []).map((source) => ({
+        sourceId: source.sourceId,
+        sourceType: source.sourceType,
+        status: source.status,
+      })),
+      componentId: resolveComponentId(registry.pageId, slot.slotId),
+      currentPatch:
+        findComponentPatch(data, registry.pageId, resolveComponentId(registry.pageId, slot.slotId), slot.activeSourceId)?.patch || null,
+    })),
+  }));
+}
+
 function buildSystemPrompt() {
   return [
     "You are an assistant that edits a page prototype JSON.",
     "Return valid JSON only.",
     "You must output an object with keys: summary, operations.",
     "operations must be an array of structured edits.",
-    "Allowed actions: rename_section, toggle_section, reorder_section, update_page_title.",
+    "Allowed actions: rename_section, toggle_section, reorder_section, update_page_title, update_slot_text, update_slot_image, update_hero_field, toggle_slot_source.",
+    "Use slot operations when the request is about hero/banner copy, section copy, or switching captured/custom/figma sources.",
+    "Use update_hero_field for the home hero badge/headline/description/ctaHref/imageSrc/imageAlt.",
+    "Use update_slot_text for generic slot title/subtitle text edits.",
+    "Use toggle_slot_source only with a sourceId that exists in the provided slot registry.",
     "Do not invent page ids or section ids that do not exist.",
     "Keep changes minimal and targeted to the request.",
   ].join(" ");
@@ -338,6 +449,7 @@ function buildUserPrompt(requestText, data) {
         order: section.order,
       })),
     })),
+    slotRegistries: buildLlmSlotContext(data),
   };
 
   return JSON.stringify(
@@ -349,12 +461,18 @@ function buildUserPrompt(requestText, data) {
         summary: "short summary string",
         operations: [
           {
-            action: "rename_section | toggle_section | reorder_section | update_page_title",
+            action:
+              "rename_section | toggle_section | reorder_section | update_page_title | update_slot_text | update_slot_image | update_hero_field | toggle_slot_source",
             pageId: "string",
             sectionId: "string when needed",
+            slotId: "string when needed",
             value: "new value when needed",
+            field: "title | subtitle | badge | headline | description | ctaHref | imageSrc | imageAlt when needed",
             visible: "boolean when action is toggle_section",
             order: "number when action is reorder_section",
+            sourceId: "string when action is toggle_slot_source",
+            imageSrc: "string when action is update_slot_image",
+            imageAlt: "string when action is update_slot_image",
           },
         ],
       },
@@ -364,9 +482,253 @@ function buildUserPrompt(requestText, data) {
   );
 }
 
+function isDemoLlmEnabled() {
+  return process.env.DEMO_MODE === "1" || process.env.LLM_DEMO_BYPASS === "1" || process.env.LLM_DEMO_FALLBACK === "1";
+}
+
+function normalizeCompareText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/["'`]/g, "");
+}
+
+function inferTargetPage(data, requestText) {
+  const text = normalizeCompareText(requestText);
+  const pages = Array.isArray(data.pages) ? data.pages : [];
+  for (const page of pages) {
+    const candidates = [page.id, page.title, page.pageGroup].map(normalizeCompareText).filter(Boolean);
+    if (candidates.some((candidate) => candidate && text.includes(candidate))) {
+      return page;
+    }
+  }
+  const registryPageIds = Array.isArray(data.slotRegistries)
+    ? data.slotRegistries.map((registry) => String(registry.pageId || "").trim()).filter(Boolean)
+    : [];
+  for (const pageId of registryPageIds) {
+    const candidate = normalizeCompareText(pageId);
+    if (!candidate || !text.includes(candidate)) continue;
+    return pages.find((page) => page.id === pageId) || { id: pageId, title: pageId, pageGroup: pageId, sections: [] };
+  }
+  return pages.find((page) => page.id === "home") || pages[0] || null;
+}
+
+function inferTargetSection(page, requestText) {
+  const text = normalizeCompareText(requestText);
+  const sections = Array.isArray(page?.sections) ? page.sections : [];
+  for (const section of sections) {
+    const candidates = [section.id, section.name, section.componentType].map(normalizeCompareText).filter(Boolean);
+    if (candidates.some((candidate) => candidate && text.includes(candidate))) {
+      return section;
+    }
+  }
+  return sections[0] || null;
+}
+
+function getSlotAliases(slotId = "") {
+  const aliases = {
+    hero: ["hero", "히어로", "메인배너", "메인 배너", "배너"],
+    quickmenu: ["quickmenu", "quick menu", "퀵메뉴", "바로가기"],
+    "header-top": ["header top", "상단헤더", "헤더상단"],
+    "header-bottom": ["header bottom", "하단헤더", "헤더하단", "gnb", "메뉴"],
+    banner: ["banner", "배너"],
+    review: ["review", "리뷰"],
+    notice: ["notice", "공지"],
+    shortcut: ["shortcut", "쇼트컷", "바로가기"],
+    mainService: ["main service", "메인서비스", "메인 서비스"],
+    bestcare: ["bestcare", "best care", "베스트케어", "베스트 케어"],
+    tabs: ["tabs", "tab", "탭"],
+    productGrid: ["product grid", "상품그리드", "상품 그리드", "grid", "그리드"],
+    firstProduct: ["first product", "첫상품", "첫 상품"],
+    filter: ["filter", "필터"],
+    sort: ["sort", "정렬"],
+  };
+  return aliases[slotId] || [];
+}
+
+function inferTargetSlot(data, page, requestText) {
+  const text = normalizeCompareText(requestText);
+  const slots = Array.isArray(findSlotRegistry(data, page?.id)?.slots) ? findSlotRegistry(data, page.id).slots : [];
+  for (const slot of slots) {
+    const candidates = [slot.slotId, slot.componentType, `${page.id}.${slot.slotId}`, ...getSlotAliases(slot.slotId)]
+      .map(normalizeCompareText)
+      .filter(Boolean);
+    if (candidates.some((candidate) => candidate && text.includes(candidate))) {
+      return slot;
+    }
+  }
+  if (/(hero|히어로|배너)/.test(text)) {
+    return slots.find((slot) => slot.slotId === "hero") || null;
+  }
+  return slots[0] || null;
+}
+
+function extractQuotedValue(requestText) {
+  const match = String(requestText || "").match(/["“”'‘’]([^"“”'‘’]+)["“”'‘’]/);
+  return match ? String(match[1] || "").trim() : "";
+}
+
+function extractUrlValue(requestText) {
+  const match = String(requestText || "").match(/https?:\/\/[^\s"'“”‘’<>]+/i);
+  return match ? String(match[0] || "").trim() : "";
+}
+
+function extractValueAfterPattern(requestText, pattern) {
+  const match = String(requestText || "").match(pattern);
+  return match ? String(match[1] || "").trim() : "";
+}
+
+function resolveRequestedSource(slot, requestText) {
+  const text = normalizeCompareText(requestText);
+  const sources = Array.isArray(slot?.sources) ? slot.sources : [];
+  if (!sources.length) return null;
+  const requestedType =
+    /(figma|피그마)/.test(text)
+      ? "figma-derived"
+      : /(custom|커스텀|사용자|직접편집|수정본)/.test(text)
+        ? "custom"
+        : /(captured|capture|캡처|원본|기존소스|실캡처)/.test(text)
+          ? "captured"
+          : /(mobilederived|mobile-derived|모바일derived|모바일기반)/.test(text)
+            ? "mobile-derived"
+            : null;
+  if (requestedType) {
+    return sources.find((source) => source.sourceType === requestedType) || null;
+  }
+  const requestedSourceId = sources.find((source) => normalizeCompareText(source.sourceId) && text.includes(normalizeCompareText(source.sourceId)));
+  return requestedSourceId || null;
+}
+
+function callDemoLlm(requestText, data) {
+  const page = inferTargetPage(data, requestText);
+  if (!page) {
+    return { summary: "Demo fallback could not find a page", operations: [] };
+  }
+  const section = inferTargetSection(page, requestText);
+  const slot = inferTargetSlot(data, page, requestText);
+  const text = String(requestText || "");
+  const normalized = normalizeCompareText(text);
+  const quoted = extractQuotedValue(text);
+  const urlValue = extractUrlValue(text);
+
+  if (/(pagetitle|pagetitle|페이지제목|타이틀)/.test(normalized)) {
+    const titleValue =
+      quoted ||
+      text.replace(/.*(?:page title|페이지 제목|타이틀)(?:을|를)?\s*/i, "").trim() ||
+      `[Demo] ${page.title}`;
+    return {
+      summary: `Demo fallback updated page title for ${page.id}`,
+      operations: [{ action: "update_page_title", pageId: page.id, value: titleValue }],
+    };
+  }
+
+  if (slot) {
+    const requestedSource = resolveRequestedSource(slot, text);
+    if (requestedSource) {
+      return {
+        summary: `Demo fallback switched ${page.id}.${slot.slotId} to ${requestedSource.sourceId}`,
+        operations: [{ action: "toggle_slot_source", pageId: page.id, slotId: slot.slotId, sourceId: requestedSource.sourceId }],
+      };
+    }
+  }
+
+  if (slot && page.id === "home" && slot.slotId === "hero") {
+    if (/(이미지|image|img|배경이미지|heroimage)/.test(normalized) && urlValue) {
+      return {
+        summary: "Demo fallback updated home hero image",
+        operations: [{ action: "update_slot_image", pageId: page.id, slotId: slot.slotId, imageSrc: urlValue }],
+      };
+    }
+    if (/(링크|link|cta|href|버튼)/.test(normalized)) {
+      const value = urlValue || quoted || extractValueAfterPattern(text, /(?:링크|link|cta|href)(?:를|을)?\s+(.+)$/i) || "/clone/home";
+      return {
+        summary: "Demo fallback updated home hero CTA",
+        operations: [{ action: "update_hero_field", pageId: page.id, slotId: slot.slotId, field: "ctaHref", value }],
+      };
+    }
+    if (/(badge|뱃지|배지)/.test(normalized)) {
+      const value = quoted || extractValueAfterPattern(text, /(?:badge|뱃지|배지)(?:를|을)?\s+(.+)$/i) || "[Demo] Badge";
+      return {
+        summary: "Demo fallback updated home hero badge",
+        operations: [{ action: "update_hero_field", pageId: page.id, slotId: slot.slotId, field: "badge", value }],
+      };
+    }
+    if (/(description|desc|설명|카피설명|서브카피)/.test(normalized)) {
+      const value = quoted || extractValueAfterPattern(text, /(?:description|desc|설명)(?:을|를)?\s+(.+)$/i) || "[Demo] Hero description";
+      return {
+        summary: "Demo fallback updated home hero description",
+        operations: [{ action: "update_hero_field", pageId: page.id, slotId: slot.slotId, field: "description", value }],
+      };
+    }
+    if (/(headline|headcopy|heading|헤드라인|메인카피|메인 카피|타이틀카피)/.test(normalized)) {
+      const value = quoted || extractValueAfterPattern(text, /(?:headline|heading|헤드라인|메인카피|메인 카피)(?:을|를)?\s+(.+)$/i) || "[Demo] Hero headline";
+      return {
+        summary: "Demo fallback updated home hero headline",
+        operations: [{ action: "update_hero_field", pageId: page.id, slotId: slot.slotId, field: "headline", value }],
+      };
+    }
+  }
+
+  if (slot && /(title|headline|heading|제목|타이틀|헤드라인|subtitle|sub title|서브타이틀|서브 타이틀|설명|description)/.test(normalized)) {
+    const isSubtitle = /(subtitle|sub title|서브타이틀|서브 타이틀|설명|description)/.test(normalized);
+    const field = isSubtitle ? "subtitle" : "title";
+    const fallbackValue = isSubtitle ? `[Demo] ${slot.slotId} subtitle` : `[Demo] ${slot.slotId} title`;
+    const value =
+      quoted ||
+      extractValueAfterPattern(
+        text,
+        isSubtitle
+          ? /(?:subtitle|sub title|서브타이틀|서브 타이틀|설명|description)(?:을|를)?\s+(.+)$/i
+          : /(?:title|headline|heading|제목|타이틀|헤드라인)(?:을|를)?\s+(.+)$/i
+      ) ||
+      fallbackValue;
+    return {
+      summary: `Demo fallback updated ${page.id}.${slot.slotId} ${field}`,
+      operations: [{ action: "update_slot_text", pageId: page.id, slotId: slot.slotId, field, value }],
+    };
+  }
+
+  if (!section) {
+    return { summary: "Demo fallback could not find a section or slot", operations: [] };
+  }
+
+  if (/(숨기|hide|제거|비노출)/.test(normalized)) {
+    return {
+      summary: `Demo fallback hid section ${section.id}`,
+      operations: [{ action: "toggle_section", pageId: page.id, sectionId: section.id, visible: false }],
+    };
+  }
+
+  if (/(보이게|show|노출|표시)/.test(normalized)) {
+    return {
+      summary: `Demo fallback showed section ${section.id}`,
+      operations: [{ action: "toggle_section", pageId: page.id, sectionId: section.id, visible: true }],
+    };
+  }
+
+  if (/(맨위|top|first|첫번째|첫 번째|위로|reorder|move)/.test(normalized)) {
+    return {
+      summary: `Demo fallback moved section ${section.id} to top`,
+      operations: [{ action: "reorder_section", pageId: page.id, sectionId: section.id, order: 1 }],
+    };
+  }
+
+  const renameValue =
+    quoted ||
+    text.replace(/.*(?:rename|이름변경|이름을|제목을|섹션명을|rename section to)\s*/i, "").trim() ||
+    `[Demo] ${section.name}`;
+  return {
+    summary: `Demo fallback renamed section ${section.id}`,
+    operations: [{ action: "rename_section", pageId: page.id, sectionId: section.id, value: renameValue }],
+  };
+}
+
 async function callOpenRouter(requestText, data) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
+    if (isDemoLlmEnabled()) {
+      return callDemoLlm(requestText, data);
+    }
     throw new Error("OPENROUTER_API_KEY is not set");
   }
 
@@ -408,9 +770,77 @@ async function callOpenRouter(requestText, data) {
 }
 
 function applyOperations(data, operations) {
-  const next = JSON.parse(JSON.stringify(data));
+  let next = JSON.parse(JSON.stringify(data));
 
   for (const op of operations || []) {
+    if (op.action === "toggle_slot_source") {
+      const slot = findSlotConfig(next, op.pageId, op.slotId);
+      const sources = Array.isArray(slot?.sources) ? slot.sources : [];
+      const requestedSource =
+        sources.find((source) => String(source.sourceId || "").trim() === String(op.sourceId || "").trim()) ||
+        sources.find((source) => String(source.sourceType || "").trim() === String(op.sourceType || "").trim()) ||
+        null;
+      if (!slot || !requestedSource) continue;
+      slot.activeSourceId = requestedSource.sourceId;
+      slot.sources = sources.map((source) => ({
+        ...source,
+        status:
+          source.sourceId === requestedSource.sourceId
+            ? "active"
+            : source.sourceType === "captured"
+              ? "validated"
+              : "draft",
+      }));
+      continue;
+    }
+
+    if (op.action === "update_hero_field") {
+      const slotId = String(op.slotId || "hero").trim() || "hero";
+      const slot = findSlotConfig(next, op.pageId, slotId);
+      if (!slot) continue;
+      const field = String(op.field || "").trim();
+      if (!["badge", "headline", "description", "ctaHref", "imageSrc", "imageAlt", "visibility"].includes(field)) continue;
+      const sourceId = String(slot.activeSourceId || "").trim();
+      const patchValue = field === "visibility" ? Boolean(op.visible ?? op.value) : op.value;
+      if (typeof patchValue === "undefined") continue;
+      next = setSlotComponentPatch(next, op.pageId, slotId, sourceId, { [field]: patchValue });
+      continue;
+    }
+
+    if (op.action === "update_slot_text") {
+      const slot = findSlotConfig(next, op.pageId, op.slotId);
+      if (!slot || typeof op.value !== "string") continue;
+      const field = String(op.field || "title").trim();
+      const sourceId = String(slot.activeSourceId || "").trim();
+      if (slot.slotId === "hero" && ["badge", "headline", "description", "ctaHref"].includes(field)) {
+        next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, { [field]: op.value });
+        continue;
+      }
+      const patchField =
+        field === "headline"
+          ? "title"
+          : field === "description"
+            ? "subtitle"
+            : field === "title" || field === "subtitle"
+              ? field
+              : null;
+      if (!patchField) continue;
+      next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, { [patchField]: op.value });
+      continue;
+    }
+
+    if (op.action === "update_slot_image") {
+      const slot = findSlotConfig(next, op.pageId, op.slotId);
+      if (!slot) continue;
+      const sourceId = String(slot.activeSourceId || "").trim();
+      const imagePatch = {};
+      if (typeof op.imageSrc === "string" && op.imageSrc.trim()) imagePatch.imageSrc = op.imageSrc.trim();
+      if (typeof op.imageAlt === "string") imagePatch.imageAlt = op.imageAlt;
+      if (!Object.keys(imagePatch).length) continue;
+      next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, imagePatch);
+      continue;
+    }
+
     const page = (next.pages || []).find((item) => item.id === op.pageId);
     if (!page) continue;
 

@@ -42,6 +42,7 @@ const HOME_LINK_COVERAGE_REPORT_PATH = path.join(ROOT, "data", "reports", "home-
 const REFERENCE_LIVE_DIR = path.join(ROOT, "data", "raw", "reference-live");
 const REFERENCE_LIVE_FALLBACK_DIR = path.join(ROOT, "data", "reference-live");
 const GNB_STATE_DIR = path.join(ROOT, "data", "debug", "gnb-state");
+const CURRENT_LIVE_HOME_DOM_PATH = path.join(ROOT, "data", "debug", "live-home-current-dom.html");
 const DEFAULT_CANVAS_WIDTH = 1460;
 const DEFAULT_COMPARE_CANVAS_HEIGHT = 2600;
 const LIVE_MEASUREMENTS = new Map();
@@ -4307,6 +4308,55 @@ function extractMobileQuickMenuSection(rawHtml) {
   return match ? match[0] : "";
 }
 
+function readCurrentLiveHomeDom() {
+  try {
+    return fs.readFileSync(CURRENT_LIVE_HOME_DOM_PATH, "utf-8");
+  } catch (_error) {
+    return "";
+  }
+}
+
+function extractCurrentLiveHomeSectionByClass(classFragment, dataArea = "") {
+  const source = readCurrentLiveHomeDom();
+  if (!source || !classFragment) return "";
+  const matcher = new RegExp(
+    `<section[^>]+class="[^"]*${escapeRegExp(classFragment)}[^"]*"[^>]*>[\\s\\S]*?<\\/section>`,
+    "g"
+  );
+  const matches = source.match(matcher) || [];
+  if (!matches.length) return "";
+  if (!dataArea) return matches[0];
+  return matches.find((entry) => entry.includes(`data-area="${dataArea}"`)) || "";
+}
+
+function markHomeLiveCustomSection(sectionHtml, slotId = "", sourceId = "") {
+  if (!sectionHtml) return "";
+  const resolution = resolveComponentSourceResolution("home", slotId, sourceId);
+  const attrs = [
+    slotId ? `data-codex-slot="${escapeHtml(slotId)}"` : "",
+    sourceId ? `data-codex-source="${escapeHtml(sourceId)}"` : "",
+    slotId ? `data-codex-component-id="home.${escapeHtml(slotId)}"` : "",
+    sourceId ? `data-codex-active-source-id="${escapeHtml(sourceId)}"` : "",
+    resolution.sourceResolution ? `data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}"` : "",
+    resolution.resolvedRenderSourceId ? `data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId)}"` : "",
+    resolution.renderMode ? `data-codex-render-mode="${escapeHtml(resolution.renderMode)}"` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return String(sectionHtml).replace(/<section\b/, `<section ${attrs}`);
+}
+
+function renderCurrentLiveHomeSection(slotId, activeSourceId, componentPatch, classFragment, dataArea = "") {
+  const sectionHtml = extractCurrentLiveHomeSectionByClass(classFragment, dataArea);
+  if (!sectionHtml) return "";
+  return applyHomeLowerSectionPatch(
+    markHomeLiveCustomSection(sectionHtml, slotId, activeSourceId),
+    slotId,
+    activeSourceId,
+    componentPatch
+  );
+}
+
 function extractMobilePromotionSection(rawHtml) {
   const match = rawHtml.match(/<section class="HomeMoBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/);
   return match ? match[0] : "";
@@ -4364,6 +4414,11 @@ function extractMobileLgBestCareSection(rawHtml) {
 
 function extractMobileBestshopGuideSection(rawHtml) {
   const match = rawHtml.match(/<section class="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__[^"]*"[\s\S]*?<\/section>/);
+  return match ? match[0] : "";
+}
+
+function extractFooterSection(rawHtml) {
+  const match = String(rawHtml || "").match(/<footer\b[\s\S]*?<\/footer>/i);
   return match ? match[0] : "";
 }
 
@@ -4497,16 +4552,28 @@ const HOME_BEST_RANKING_SAMPLE_ITEMS = [
     rankImage: "/kr/images/BRK/new/icon_ranking_view_num1.png",
     sku: "WA2525YMZF",
     price: 4473300,
-    badges: ["다품목할인", "닷컴 ONLY"],
+    badges: ["다품목할인"],
     category: "생활가전 · 워시타워",
     release: "",
   },
   {
     rank: 2,
+    name: "LG 디오스 오브제컬렉션 냉장고 Fit & Max",
+    url: "/refrigerators/m626gbb032",
+    image: "/kr/images/refrigerators/md10590836/md10590836-350x350.jpg",
+    rankImage: "/kr/images/BRK/new/icon_ranking_view_num2.png",
+    sku: "M626GBB032",
+    price: 3227100,
+    badges: ["다품목할인"],
+    category: "주방가전 · 냉장고",
+    release: "",
+  },
+  {
+    rank: 3,
     name: "LG 디오스 오브제컬렉션 식기세척기",
     url: "/dishwashers/due6bge",
     image: "/kr/images/dishwashers/md10491826/md10491826-350x350.jpg",
-    rankImage: "/kr/images/BRK/new/icon_ranking_view_num2.png",
+    rankImage: "/kr/images/BRK/new/icon_ranking_view_num3.png",
     sku: "DUE6BGE",
     price: 1925100,
     badges: ["다품목할인"],
@@ -4514,28 +4581,76 @@ const HOME_BEST_RANKING_SAMPLE_ITEMS = [
     release: "",
   },
   {
-    rank: 3,
-    name: "LG 디오스 오브제컬렉션 냉장고 Fit & Max",
-    url: "/refrigerators/m626gbb032",
-    image: "/kr/images/refrigerators/md10590836/md10590836-350x350.jpg",
-    rankImage: "/kr/images/BRK/new/icon_ranking_view_num3.png",
-    sku: "M626GBB032",
-    price: 3227100,
-    badges: ["다품목할인", "혜택가"],
+    rank: 4,
+    name: "LG 디오스 AI 오브제컬렉션 냉장고 (더블매직스페이스)",
+    url: "/refrigerators/m876gbb231",
+    image: "/kr/images/refrigerators/md10604870/md10604870-350x350.jpg",
+    rankImage: "/kr/images/BRK/new/icon_ranking_view_num4.png",
+    sku: "M876GBB231",
+    price: 3924600,
+    badges: ["다품목할인"],
     category: "주방가전 · 냉장고",
     release: "",
   },
   {
-    rank: 4,
-    name: "LG 올레드 evo AI (스탠드형)",
-    url: "/tvs/oled97g6kna-stand",
-    image: "/kr/images/tvs/md10770826/md10770826-350x350.jpg",
-    rankImage: "/kr/images/BRK/new/icon_ranking_view_num4.png",
+    rank: 5,
+    name: "LG 올레드 evo AI (벽걸이형)",
+    url: "/tvs/oled97g6kna-wall",
+    image: "/kr/images/tvs/md10770827/md10770827-350x350.jpg",
+    rankImage: "/kr/images/BRK/new/icon_ranking_view_num5.png",
     sku: "OLED97G6KNA",
     price: 39720000,
     badges: ["다품목할인"],
     category: "TV/오디오 · TV",
     release: "2026년 출시",
+  },
+];
+
+const HOME_MARKETING_AREA_ITEMS = [
+  {
+    badge: "홈스타일링",
+    title: "취향을 발견하는<br>홈스타일 콘텐츠",
+    description: "나만의 취향 탐색, 스타일 큐레이션",
+    href: "https://homestyle.lge.co.kr/collection",
+    image:
+      "https://www.lge.co.kr/kr/upload/admin/display/displayObject/1_homemain_bn_20251215_161443.png",
+    alt: "밝은 우드 톤의 미니멀한 다이닝 공간에 원형 테이블과 의자 네 개, 둥근 조명이 배치되어 있다.",
+  },
+  {
+    badge: "결합할인",
+    title: "함께 사면<br>더 커지는 혜택",
+    description: "가전+가구/조명 조합으로 최대 10%",
+    href: "https://homestyle.lge.co.kr/exhibition/detail?exhibitionId=2510000167",
+    image:
+      "https://www.lge.co.kr/kr/upload/admin/display/displayObject/2_homemain_bn_20251215_161530.png",
+    alt: "큰 창으로 자연광이 들어오는 밝은 거실에 소파와 플로어 스탠드, 우드 수납장과 식물이 배치된 아늑한 공간이다.",
+  },
+  {
+    badge: "브랜드스토리",
+    title: "프리미엄을 완성하는<br>브랜드 철학",
+    description: "LG전자가 선택한 고감도 브랜드이야기",
+    href: "https://homestyle.lge.co.kr/brand-story",
+    image:
+      "https://www.lge.co.kr/kr/upload/admin/display/displayObject/3_homemain_bn_20251215_165644.png",
+    alt: "도시 건물이 보이는 큰 창 앞에 베이지 톤 소파와 사이드 테이블, 화분이 배치된 밝고 모던한 거실이다.",
+  },
+  {
+    badge: "인테리어",
+    title: "공간을 바꾸는<br>인테리어 커뮤니티",
+    description: "예산과 평형에 맞는 시공사례 보기",
+    href: "https://homestyle.lge.co.kr/interior",
+    image:
+      "https://www.lge.co.kr/kr/upload/admin/display/displayObject/4_homemain_bn_20251215_161809.png",
+    alt: "화이트 톤의 미니멀한 주방에 싱크대와 수납장, 벽 선반과 주방 도구가 깔끔하게 정리되어 있다.",
+  },
+  {
+    badge: "Style&Tip",
+    title: "전문가의<br>홈스타일링 Tip",
+    description: "우리 집에 적용하는 전문가의 인사이트",
+    href: "https://homestyle.lge.co.kr/interior?tab=STYLE_TIP",
+    image:
+      "https://www.lge.co.kr/kr/upload/admin/display/displayObject/5_Style_Tip_20251215_161912.png",
+    alt: "화이트와 우드 톤이 어우러진 주방에 아일랜드 테이블과 펜던트 조명, 식물이 배치된 밝고 깔끔한 공간이다.",
   },
 ];
 
@@ -4691,17 +4806,23 @@ const HOME_SUMMARY_BANNER_2_ITEMS = [
   },
 ];
 
-function renderSpaceRenewalSection(data = {}) {
+function renderSpaceRenewalSection(data = {}, activeSourceId = "custom-renderer", componentPatch = {}) {
   if (!data || !Array.isArray(data.productList) || !data.productList.length) return "";
+  const resolution = resolveComponentSourceResolution("home", "space-renewal", activeSourceId);
   const products = data.productList.slice(0, 3);
+  const styles = componentPatch.styles && typeof componentPatch.styles === "object" ? componentPatch.styles : {};
+  const title = String(componentPatch.title || data.title || "");
+  const subTitle = String(componentPatch.subtitle || data.subTitle || "");
+  const titleColor = String(styles.titleColor || data.titleRgb || "#111111");
+  const subTitleColor = String(styles.subTitleColor || data.subTitleRgb || "#727780");
   const hero = toLgeAbsoluteUrl(products[0]?.additionalMobileImageUrl || "");
-  const heroAlt = products[0]?.additionalMobileImageAlt || data.title || "";
+  const heroAlt = products[0]?.additionalMobileImageAlt || title || "";
   return `
-    <section data-codex-slot="space-renewal" data-codex-source="custom-renderer" class="codex-home-space-renewal">
+    <section data-codex-slot="space-renewal" data-codex-source="custom-renderer" data-codex-component-id="home.space-renewal" data-codex-active-source-id="${escapeHtml(activeSourceId)}" data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}" data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId || activeSourceId)}" data-codex-render-mode="${escapeHtml(resolution.renderMode)}" class="codex-home-space-renewal codex-home-space-renewal--workspace-variant">
       <div class="codex-home-space-renewal-head">
         <div class="title-home_title-home__Jw_7z">
-          <h2 class="title-home_title-home_tit__tE_5M" style="color:${data.titleRgb || "#111111"}">${data.title || ""}</h2>
-          ${data.subTitle ? `<span class="title-home_title-home_sub_tit__ivkxK" style="color:${data.subTitleRgb || "#727780"}">${data.subTitle}</span>` : ""}
+          <h2 class="title-home_title-home_tit__tE_5M" style="color:${escapeHtml(titleColor)}">${escapeHtml(title)}</h2>
+          ${subTitle ? `<span class="title-home_title-home_sub_tit__ivkxK" style="color:${escapeHtml(subTitleColor)}">${escapeHtml(subTitle)}</span>` : ""}
         </div>
         ${data.moreText && data.moreTextLink ? `<a class="codex-home-space-renewal-more" href="${data.moreTextLink}">${data.moreText}</a>` : ""}
       </div>
@@ -6708,6 +6829,39 @@ function renderBestRankingSandboxSection(activeSourceId = "custom-renderer", com
     </section>`;
 }
 
+function renderHomeMarketingAreaSection() {
+  return `
+    <section data-codex-slot="marketing-area" data-codex-source="custom-renderer" class="codex-home-marketing-area HomeMoListMarketingArea_list_marketing_area__lRqzR">
+      <div class="HomeMoListMarketingArea_list_marketing_area_headline__xkOco">
+        <div class="title-home_title-home__tf4br">
+          <h2 class="title-home_title-home_tit__C6CDK">홈스타일 탐색하기</h2>
+          <span class="title-home_title-home_sub_tit__PHTeI" style="color:#000000">가전과 공간을 연결하는 새로운 기준</span>
+        </div>
+      </div>
+      <div class="HomeMoListMarketingArea_list_marketing_area_list__ea_vS">
+        <ul class="HomeMoListMarketingArea_list_marketing_area_list_inner__q_GXF">
+          ${HOME_MARKETING_AREA_ITEMS.map(
+            (item) => `
+              <li class="HomeMoListMarketingArea_list_marketing_area_item__33UOi">
+                <a href="${item.href}">
+                  <div class="HomeMoListMarketingArea_list_marketing_area_box__jtl6C">
+                    <div class="badge_badge_wrap__pETj_">
+                      <span class="badge_badge__A_1cT badge_square__nNiyc badge_black__I9EnC badge_size20__Pxksv badge_text_black__GzeBH" color="black"><span>${item.badge}</span></span>
+                    </div>
+                    <strong class="HomeMoListMarketingArea_list_marketing_area_title__8ME8z">${item.title}</strong>
+                    <p class="HomeMoListMarketingArea_list_marketing_area_description__dMjda">${item.description}</p>
+                  </div>
+                  <div class="HomeMoListMarketingArea_list_marketing_area_image__YY2gD">
+                    <img src="${item.image}" alt="${item.alt}" loading="lazy"/>
+                  </div>
+                </a>
+              </li>`
+          ).join("")}
+        </ul>
+      </div>
+    </section>`;
+}
+
 function getHomeLowerSlotRegistry(editableData = null) {
   const resolveSlotSourceId = (slotId, fallback) => getActiveSourceId(editableData || readEditableData(), "home", slotId, fallback);
   const resolveComponentPatch = (slotId, sourceId) =>
@@ -6747,167 +6901,370 @@ function getHomeLowerSlotRegistry(editableData = null) {
     },
     {
       id: "best-ranking",
-      activeSourceId: resolveSlotSourceId("best-ranking", "custom-renderer"),
+      activeSourceId: resolveSlotSourceId("best-ranking", "custom-live-current"),
       enabled: () => true,
-      render: (_data, _options, slot) => renderBestRankingSandboxSection(slot.activeSourceId, resolveComponentPatch(slot.id, slot.activeSourceId)),
+      render: (_data, _options, slot) => {
+        const effectiveSourceId = slot.activeSourceId === "custom-renderer" ? "custom-live-current" : slot.activeSourceId;
+        return (
+          renderCurrentLiveHomeSection(
+            "best-ranking",
+            effectiveSourceId,
+            resolveComponentPatch(slot.id, effectiveSourceId),
+            "HomeMoListTabstypeBestranking_list_tab_bestranking__"
+          ) ||
+          renderBestRankingSandboxSection(effectiveSourceId, resolveComponentPatch(slot.id, effectiveSourceId))
+        );
+      },
+    },
+    {
+      id: "marketing-area",
+      activeSourceId: "custom-renderer",
+      enabled: (_data, options) => !options.homeSandbox,
+      render: () => renderHomeMarketingAreaSection(),
     },
     {
       id: "subscription",
-      activeSourceId: resolveSlotSourceId("subscription", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("subscription", "custom-live-current"),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "subscription") && Boolean(data.subscriptionSection),
-      render: (data, _options, slot) =>
-        applyHomeLowerSectionPatch(
+      render: (data, _options, slot) => {
+        const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
+        const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
+        if (effectiveSourceId === "custom-live-current") {
+          return (
+            renderCurrentLiveHomeSection(
+              "subscription",
+              effectiveSourceId,
+              componentPatch,
+              "HomeMoListTabsBannertype_list_tabs_bannertype__"
+            ) ||
+            applyHomeLowerSectionPatch(
+              markHomeLowerReplay(
+                injectProductImagesIntoSection(data.subscriptionSection, data.subscriptionProducts),
+                "subscription",
+                effectiveSourceId
+              ),
+              "subscription",
+              effectiveSourceId,
+              componentPatch
+            )
+          );
+        }
+        return applyHomeLowerSectionPatch(
           markHomeLowerReplay(
             injectProductImagesIntoSection(data.subscriptionSection, data.subscriptionProducts),
             "subscription",
-            slot.activeSourceId
+            effectiveSourceId
           ),
           "subscription",
-          slot.activeSourceId,
-          resolveComponentPatch(slot.id, slot.activeSourceId)
-        ),
+          effectiveSourceId,
+          componentPatch
+        );
+      },
     },
     {
       id: "space-renewal",
-      activeSourceId: resolveSlotSourceId("space-renewal", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("space-renewal", "hybrid-home-space-renewal-v1"),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "space-renewal") &&
         Boolean(data.spaceRenewalSection) &&
         Boolean(data.spaceRenewalData),
-      render: (data, _options, slot) =>
-        applyHomeLowerSectionPatch(
-          markHomeLowerReplay(
-            injectProductImagesIntoSection(data.spaceRenewalSection, buildSpaceRenewalProducts(data.spaceRenewalData)),
-            "space-renewal",
-            slot.activeSourceId
-          ),
-          "space-renewal",
-          slot.activeSourceId,
-          resolveComponentPatch(slot.id, slot.activeSourceId)
-        ),
+      render: (data, _options, slot) => {
+        const effectiveSourceId =
+          slot.activeSourceId === "mobile-derived" ? "hybrid-home-space-renewal-v1" : slot.activeSourceId;
+        const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
+        return effectiveSourceId === "mobile-derived"
+          ? applyHomeLowerSectionPatch(
+              markHomeLowerReplay(
+                injectProductImagesIntoSection(data.spaceRenewalSection, buildSpaceRenewalProducts(data.spaceRenewalData)),
+                "space-renewal",
+                effectiveSourceId
+              ),
+              "space-renewal",
+              effectiveSourceId,
+              componentPatch
+            )
+          : renderSpaceRenewalSection(data.spaceRenewalData, effectiveSourceId, componentPatch);
+      },
     },
     {
       id: "brand-showroom",
-      activeSourceId: resolveSlotSourceId("brand-showroom", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("brand-showroom", "custom-live-current"),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "brand-showroom") && Boolean(data.brandShowroomSection),
-      render: (data, _options, slot) =>
-        slot.activeSourceId === "custom-home-brand-showroom-v1"
-          ? renderBrandShowroomCustomSection(data.brandShowroomProducts, slot.activeSourceId, resolveComponentPatch(slot.id, slot.activeSourceId))
+      render: (data, _options, slot) => {
+        const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
+        return effectiveSourceId === "custom-live-current"
+          ? (
+              renderCurrentLiveHomeSection(
+                "brand-showroom",
+                effectiveSourceId,
+                resolveComponentPatch(slot.id, effectiveSourceId),
+                "HomeMoListSquaretypeSmall_list_squaretype__"
+              ) ||
+              applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectTemplateImagesIntoSection(data.brandShowroomSection, data.brandShowroomProducts),
+                  "brand-showroom",
+                  effectiveSourceId
+                ),
+                "brand-showroom",
+                effectiveSourceId,
+                resolveComponentPatch(slot.id, effectiveSourceId)
+              )
+            )
+          : effectiveSourceId === "custom-home-brand-showroom-v1"
+          ? renderBrandShowroomCustomSection(data.brandShowroomProducts, effectiveSourceId, resolveComponentPatch(slot.id, effectiveSourceId))
           : applyHomeLowerSectionPatch(
               markHomeLowerReplay(
                 injectTemplateImagesIntoSection(data.brandShowroomSection, data.brandShowroomProducts),
                 "brand-showroom",
-                slot.activeSourceId
+                effectiveSourceId
               ),
               "brand-showroom",
-              slot.activeSourceId,
-              resolveComponentPatch(slot.id, slot.activeSourceId)
-            ),
+              effectiveSourceId,
+              resolveComponentPatch(slot.id, effectiveSourceId)
+            );
+      },
     },
     {
       id: "latest-product-news",
-      activeSourceId: resolveSlotSourceId("latest-product-news", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("latest-product-news", "custom-live-current"),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "latest-product-news") &&
         Boolean(data.latestProductNewsSection),
-      render: (data, _options, slot) =>
-        slot.activeSourceId === "custom-home-latest-product-news-v1"
-          ? renderLatestProductNewsCustomSection(data.latestProductNewsProducts, slot.activeSourceId, resolveComponentPatch(slot.id, slot.activeSourceId))
+      render: (data, _options, slot) => {
+        const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
+        return effectiveSourceId === "custom-live-current"
+          ? (
+              renderCurrentLiveHomeSection(
+                "latest-product-news",
+                effectiveSourceId,
+                resolveComponentPatch(slot.id, effectiveSourceId),
+                "HomeMoListSquaretypeBig_list_squaretype_big__"
+              ) ||
+              applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectTemplateImagesIntoSection(data.latestProductNewsSection, data.latestProductNewsProducts),
+                  "latest-product-news",
+                  effectiveSourceId
+                ),
+                "latest-product-news",
+                effectiveSourceId,
+                resolveComponentPatch(slot.id, effectiveSourceId)
+              )
+            )
+          : effectiveSourceId === "custom-home-latest-product-news-v1"
+          ? renderLatestProductNewsCustomSection(data.latestProductNewsProducts, effectiveSourceId, resolveComponentPatch(slot.id, effectiveSourceId))
           : applyHomeLowerSectionPatch(
               markHomeLowerReplay(
                 injectTemplateImagesIntoSection(data.latestProductNewsSection, data.latestProductNewsProducts),
                 "latest-product-news",
-                slot.activeSourceId
+                effectiveSourceId
               ),
               "latest-product-news",
-              slot.activeSourceId,
-              resolveComponentPatch(slot.id, slot.activeSourceId)
-            ),
+              effectiveSourceId,
+              resolveComponentPatch(slot.id, effectiveSourceId)
+            );
+      },
     },
     {
       id: "smart-life",
-      activeSourceId: resolveSlotSourceId("smart-life", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("smart-life", "custom-live-current"),
       enabled: (data, options) => (!options.homeSandbox || options.homeSandbox === "smart-life") && Boolean(data.smartLifeSection),
-      render: (data, _options, slot) =>
-        applyHomeLowerSectionPatch(
+      render: (data, _options, slot) => {
+        const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
+        const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
+        if (effectiveSourceId === "custom-live-current") {
+          return (
+            renderCurrentLiveHomeSection(
+              "smart-life",
+              effectiveSourceId,
+              componentPatch,
+              "HomeMoListVerticaltype_list_verticaltype__"
+            ) ||
+            applyHomeLowerSectionPatch(
+              markHomeLowerReplay(
+                injectTemplateImagesIntoSection(
+                  syncHomeStoryListSection(data.smartLifeSection, data.smartLifeProducts),
+                  data.smartLifeProducts
+                ),
+                "smart-life",
+                effectiveSourceId
+              ),
+              "smart-life",
+              effectiveSourceId,
+              componentPatch
+            )
+          );
+        }
+        return applyHomeLowerSectionPatch(
           markHomeLowerReplay(
             injectTemplateImagesIntoSection(
               syncHomeStoryListSection(data.smartLifeSection, data.smartLifeProducts),
               data.smartLifeProducts
             ),
             "smart-life",
-            slot.activeSourceId
+            effectiveSourceId
           ),
           "smart-life",
-          slot.activeSourceId,
-          resolveComponentPatch(slot.id, slot.activeSourceId)
-        ),
+          effectiveSourceId,
+          componentPatch
+        );
+      },
     },
     {
       id: "summary-banner-2",
-      activeSourceId: resolveSlotSourceId("summary-banner-2", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("summary-banner-2", "custom-live-current"),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "summary-banner-2") && Boolean(data.lowerPromotionSection),
-      render: (data, _options, slot) =>
-        applyHomeLowerSectionPatch(
+      render: (data, _options, slot) => {
+        const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
+        const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
+        if (effectiveSourceId === "custom-live-current") {
+          return (
+            renderCurrentLiveHomeSection(
+              "summary-banner-2",
+              effectiveSourceId,
+              componentPatch,
+              "HomeMoBannerPromotion_banner_promotion__",
+              "메인 상단 배너 영역"
+            ) ||
+            applyHomeLowerSectionPatch(
+              markHomeLowerReplay(
+                injectTemplateImagesIntoSection(data.lowerPromotionSection, data.lowerPromotionProducts),
+                "summary-banner-2",
+                effectiveSourceId
+              ),
+              "summary-banner-2",
+              effectiveSourceId,
+              componentPatch
+            )
+          );
+        }
+        return applyHomeLowerSectionPatch(
           markHomeLowerReplay(
             injectTemplateImagesIntoSection(data.lowerPromotionSection, data.lowerPromotionProducts),
             "summary-banner-2",
-            slot.activeSourceId
+            effectiveSourceId
           ),
           "summary-banner-2",
-          slot.activeSourceId,
-          resolveComponentPatch(slot.id, slot.activeSourceId)
-        ),
+          effectiveSourceId,
+          componentPatch
+        );
+      },
     },
     {
       id: "missed-benefits",
-      activeSourceId: resolveSlotSourceId("missed-benefits", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("missed-benefits", "custom-live-current"),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "missed-benefits") && Boolean(data.missedBenefitsSection),
-      render: (data, _options, slot) =>
-        applyHomeLowerSectionPatch(
+      render: (data, _options, slot) => {
+        const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
+        const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
+        if (effectiveSourceId === "custom-live-current") {
+          return (
+            renderCurrentLiveHomeSection(
+              "missed-benefits",
+              effectiveSourceId,
+              componentPatch,
+              "HomeMoListRectangletype_list_rectangle__"
+            ) ||
+            applyHomeLowerSectionPatch(
+              markHomeLowerReplay(
+                injectTemplateImagesIntoSection(data.missedBenefitsSection, data.missedBenefitsProducts),
+                "missed-benefits",
+                effectiveSourceId
+              ),
+              "missed-benefits",
+              effectiveSourceId,
+              componentPatch
+            )
+          );
+        }
+        return applyHomeLowerSectionPatch(
           markHomeLowerReplay(
             injectTemplateImagesIntoSection(data.missedBenefitsSection, data.missedBenefitsProducts),
             "missed-benefits",
-            slot.activeSourceId
+            effectiveSourceId
           ),
           "missed-benefits",
-          slot.activeSourceId,
-          resolveComponentPatch(slot.id, slot.activeSourceId)
-        ),
+          effectiveSourceId,
+          componentPatch
+        );
+      },
     },
     {
       id: "lg-best-care",
-      activeSourceId: resolveSlotSourceId("lg-best-care", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("lg-best-care", "custom-live-current"),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "lg-best-care") && Boolean(data.lgBestCareSection),
-      render: (data, _options, slot) =>
-        applyHomeLowerSectionPatch(
+      render: (data, _options, slot) => {
+        const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
+        const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
+        if (effectiveSourceId === "custom-live-current") {
+          return (
+            renderCurrentLiveHomeSection(
+              "lg-best-care",
+              effectiveSourceId,
+              componentPatch,
+              "HomeMoListVerticaltypeFill_list_verticaltype_fill__"
+            ) ||
+            applyHomeLowerSectionPatch(
+              markHomeLowerReplay(
+                injectTemplateImagesIntoSection(data.lgBestCareSection, data.lgBestCareProducts),
+                "lg-best-care",
+                effectiveSourceId
+              ),
+              "lg-best-care",
+              effectiveSourceId,
+              componentPatch
+            )
+          );
+        }
+        return applyHomeLowerSectionPatch(
           markHomeLowerReplay(
             injectTemplateImagesIntoSection(data.lgBestCareSection, data.lgBestCareProducts),
             "lg-best-care",
-            slot.activeSourceId
+            effectiveSourceId
           ),
           "lg-best-care",
-          slot.activeSourceId,
-          resolveComponentPatch(slot.id, slot.activeSourceId)
-        ),
+          effectiveSourceId,
+          componentPatch
+        );
+      },
     },
     {
       id: "bestshop-guide",
-      activeSourceId: resolveSlotSourceId("bestshop-guide", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("bestshop-guide", "custom-live-current"),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "bestshop-guide") && Boolean(data.bestshopGuideSection),
-      render: (data, _options, slot) =>
-        applyHomeLowerSectionPatch(
-          markHomeLowerReplay(data.bestshopGuideSection, "bestshop-guide", slot.activeSourceId),
+      render: (data, _options, slot) => {
+        const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
+        const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
+        if (effectiveSourceId === "custom-live-current") {
+          return (
+            renderCurrentLiveHomeSection(
+              "bestshop-guide",
+              effectiveSourceId,
+              componentPatch,
+              "HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__"
+            ) ||
+            applyHomeLowerSectionPatch(
+              markHomeLowerReplay(data.bestshopGuideSection, "bestshop-guide", effectiveSourceId),
+              "bestshop-guide",
+              effectiveSourceId,
+              componentPatch
+            )
+          );
+        }
+        return applyHomeLowerSectionPatch(
+          markHomeLowerReplay(data.bestshopGuideSection, "bestshop-guide", effectiveSourceId),
           "bestshop-guide",
-          slot.activeSourceId,
-          resolveComponentPatch(slot.id, slot.activeSourceId)
-        ),
+          effectiveSourceId,
+          componentPatch
+        );
+      },
     },
   ];
 }
@@ -6976,13 +7333,21 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
     rebuilt.match(/<section class="HomeMoListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
     "";
   const spaceRenewal =
+    rebuilt.match(/<section[^>]+data-codex-slot="space-renewal"[^>]*class="[^"]*codex-home-space-renewal[^"]*"[\s\S]*?<\/section>/)?.[0] ||
     rebuilt.match(/<section[^>]+data-codex-slot="space-renewal"[^>]*class="[^"]*HomeMoListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+    rebuilt.match(/<section class="codex-home-space-renewal[^"]*"[\s\S]*?<\/section>/)?.[0] ||
     rebuilt.match(/<section class="codex-home-lower-replay HomeMoListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
     rebuilt.match(/<section class="HomeMoListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
     "";
   const bestRanking =
-    rebuilt.match(/<section[^>]+data-codex-slot="best-ranking"[^>]*class="[^"]*codex-home-best-ranking[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+    rebuilt.match(/<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>/)?.[0] ||
     rebuilt.match(/<section class="codex-home-best-ranking"[\s\S]*?<\/section>/)?.[0] ||
+    rebuilt.match(/<section class="HomeMoListTabstypeBestranking_list_tab_bestranking__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+    "";
+  const marketingArea =
+    rebuilt.match(/<section[^>]+data-codex-slot="marketing-area"[^>]*class="[^"]*HomeMoListMarketingArea_list_marketing_area__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+    rebuilt.match(/<section class="codex-home-marketing-area[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+    rebuilt.match(/<section class="HomeMoListMarketingArea_list_marketing_area__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
     "";
   const brandShowroom =
     rebuilt.match(/<section[^>]+data-codex-slot="brand-showroom"[^>]*class="[^"]*codex-home-brand-showroom[^"]*"[\s\S]*?<\/section>/)?.[0] ||
@@ -7076,7 +7441,7 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
     );
     if (!html.includes('data-codex-slot="space-renewal"')) {
       html = html.replace(
-        /(<section[^>]+data-codex-slot="best-ranking"[^>]*class="[^"]*codex-home-best-ranking[^"]*"[\s\S]*?<\/section>)/,
+        /(<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>)/,
         `$1\n${spaceRenewal}`
       );
     }
@@ -7094,6 +7459,16 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
       /<section class="list_marketing_area HomePcListMarketingAreaSkeleton_skeleton__[^"]*"[\s\S]*?<\/section>/,
       ""
     );
+  }
+
+  if (marketingArea && bestRanking) {
+    html = html.replace(
+      /(<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>)/,
+      `$1\n${marketingArea}`
+    );
+    if (!html.includes('data-codex-slot="marketing-area"')) {
+      html = html.replace(/<\/footer>/i, `${marketingArea}\n</footer>`);
+    }
   }
 
   if (brandShowroom) {
@@ -7138,9 +7513,26 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
     );
   }
 
+  html = html.replace(
+    /(?:<div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div>\s*){2,}(?=(?:<!--\$\?--><template id="B:[^"]+"><\/template>\s*<div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div>\s*<!--\/\$-->\s*)?<section[^>]+data-codex-slot="(?:space-renewal|subscription|brand-showroom|latest-product-news|smart-life|summary-banner-2|missed-benefits|lg-best-care|bestshop-guide)")/g,
+    `<div aria-hidden="true" class="gap_gap__hz8Kt gap_gap80__0DweN"></div>\n`
+  );
+  html = html.replace(
+    /<!--\$\?--><template id="B:[^"]+"><\/template>\s*<div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div>\s*<!--\/\$-->(?=\s*<section[^>]+data-codex-slot="(?:space-renewal|subscription|brand-showroom|latest-product-news|smart-life|summary-banner-2|missed-benefits|lg-best-care|bestshop-guide)")/g,
+    ""
+  );
+  html = html.replace(
+    /<\/section>\s*<div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div>\s*<div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div>\s*<!--\$\?--><template id="B:[^"]+"><\/template><div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div><!--\/\$--><!--\$--><section([^>]+data-codex-slot="(?:space-renewal|subscription|brand-showroom|latest-product-news|smart-life|summary-banner-2|missed-benefits|lg-best-care|bestshop-guide)"[^>]*)>/g,
+    `</section><div aria-hidden="true" class="gap_gap__hz8Kt gap_gap80__0DweN"></div><!--$--><section$1>`
+  );
+  html = html.replace(
+    /(?:<div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div>\s*)+<!--\$\?--><template id="B:[^"]+"><\/template><div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div><!--\/\$--><!--\$-->(?=\s*<section data-codex-slot="space-renewal")/g,
+    `<div aria-hidden="true" class="gap_gap__hz8Kt gap_gap80__0DweN"></div>`
+  );
+
   if (options.homeSandbox === "brand-showroom" && brandShowroom && bestRanking) {
     html = html.replace(
-      /(<section[^>]+data-codex-slot="best-ranking"[^>]*class="[^"]*codex-home-best-ranking[^"]*"[\s\S]*?<\/section>)/,
+      /(<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>)/,
       `$1\n${brandShowroom}`
     );
     if (!html.includes('data-codex-slot="brand-showroom"')) {
@@ -7150,7 +7542,7 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
 
   if (options.homeSandbox === "latest-product-news" && latestProductNews && bestRanking) {
     html = html.replace(
-      /(<section[^>]+data-codex-slot="best-ranking"[^>]*class="[^"]*codex-home-best-ranking[^"]*"[\s\S]*?<\/section>)/,
+      /(<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>)/,
       `$1\n${latestProductNews}`
     );
     if (!html.includes('data-codex-slot="latest-product-news"')) {
@@ -7160,7 +7552,7 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
 
   if (options.homeSandbox === "smart-life" && smartLife && bestRanking) {
     html = html.replace(
-      /(<section[^>]+data-codex-slot="best-ranking"[^>]*class="[^"]*codex-home-best-ranking[^"]*"[\s\S]*?<\/section>)/,
+      /(<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>)/,
       `$1\n${smartLife}`
     );
     if (!html.includes('data-codex-slot="smart-life"')) {
@@ -7170,7 +7562,7 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
 
   if (options.homeSandbox === "missed-benefits" && missedBenefits && bestRanking) {
     html = html.replace(
-      /(<section[^>]+data-codex-slot="best-ranking"[^>]*class="[^"]*codex-home-best-ranking[^"]*"[\s\S]*?<\/section>)/,
+      /(<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>)/,
       `$1\n${missedBenefits}`
     );
     if (!html.includes('data-codex-slot="missed-benefits"')) {
@@ -7180,7 +7572,7 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
 
   if (options.homeSandbox === "lg-best-care" && lgBestCare && bestRanking) {
     html = html.replace(
-      /(<section[^>]+data-codex-slot="best-ranking"[^>]*class="[^"]*codex-home-best-ranking[^"]*"[\s\S]*?<\/section>)/,
+      /(<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>)/,
       `$1\n${lgBestCare}`
     );
     if (!html.includes('data-codex-slot="lg-best-care"')) {
@@ -7190,7 +7582,7 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
 
   if (options.homeSandbox === "bestshop-guide" && bestshopGuide && bestRanking) {
     html = html.replace(
-      /(<section[^>]+data-codex-slot="best-ranking"[^>]*class="[^"]*codex-home-best-ranking[^"]*"[\s\S]*?<\/section>)/,
+      /(<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>)/,
       `$1\n${bestshopGuide}`
     );
     if (!html.includes('data-codex-slot="bestshop-guide"')) {
@@ -7241,6 +7633,12 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
   html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
   if (isHome) {
     html = injectHomeReplacements(html, rawHtml, homeMobileHtml, { ...options, editableData });
+    if (viewportProfile === "pc") {
+      const desktopFooter = extractFooterSection(readHomeDesktopHtml());
+      if (desktopFooter) {
+        html = html.replace(/<footer\b[\s\S]*?<\/footer>/i, desktopFooter);
+      }
+    }
   }
   html = applyWorkspacePageVariants(html, pageId, viewportProfile, editableData);
   if (
@@ -7746,22 +8144,127 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
         color: #6b7280;
         font-size: 16px;
       }
+      :root {
+        --codex-home-lower-width: min(767px, 52.5342466vw);
+        --codex-home-lower-media-size: clamp(112px, 17.21%, 132px);
+      }
       .codex-home-lower-replay {
-        width: min(920px, calc(100vw - 160px));
+        width: var(--codex-home-lower-width);
         margin-left: auto;
         margin-right: auto;
       }
       .codex-home-lower-replay[class*="HomePcListHorizontype_list_horizontype__"],
       .codex-home-lower-replay[class*="HomePcTimedeal_timedeal__"],
       .codex-home-lower-replay[class*="HomeMoTimedeal_timedeal__"] {
-        max-width: min(920px, calc(100vw - 160px));
+        max-width: var(--codex-home-lower-width);
       }
       .codex-home-lower-replay .product-card-image_image img {
         visibility: visible !important;
       }
       .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] {
-        width: calc(100vw - 28px) !important;
-        max-width: 430px;
+        width: var(--codex-home-lower-width) !important;
+        max-width: var(--codex-home-lower-width);
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"],
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeSmall_list_squaretype__"],
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeBig_list_squaretype_big__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltype_list_verticaltype__"],
+      .codex-home-lower-replay[class*="HomeMoBannerPromotion_banner_promotion__"],
+      .codex-home-lower-replay[class*="HomeMoListRectangletype_list_rectangle__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeFill_list_verticaltype_fill__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__"] {
+        width: var(--codex-home-lower-width) !important;
+        max-width: var(--codex-home-lower-width) !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        box-sizing: border-box;
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"] [class*="HomeMoListTabsBannertype_list_tabs_bannertype_content__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltype_list_verticaltype__"] [class*="HomeMoListVerticaltype_content__"],
+      .codex-home-lower-replay[class*="HomeMoBannerPromotion_banner_promotion__"] [class*="HomeMoBannerPromotion_content__"],
+      .codex-home-lower-replay[class*="HomeMoListRectangletype_list_rectangle__"] [class*="HomeMoListRectangletype_content__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeFill_list_verticaltype_fill__"] [class*="HomeMoListVerticaltypeFill_content__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__"] [class*="HomeMoListVerticaltypeBgtype_content__"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box;
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"] [class*="HomeMoListTabsBannertype_list_tabs_bannertype_headline__"],
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeSmall_list_squaretype__"] [class*="HomeMoListSquaretypeSmall_title_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeBig_list_squaretype_big__"] [class*="HomeMoListSquaretypeBig_title_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltype_list_verticaltype__"] [class*="HomeMoListVerticaltype_title_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListRectangletype_list_rectangle__"] [class*="HomeMoListRectangletype_title_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeFill_list_verticaltype_fill__"] [class*="HomeMoListVerticaltypeFill_title_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__"] [class*="HomeMoListVerticaltypeBgtype_title_wrap__"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        box-sizing: border-box;
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"] [class*="HomeMoListTabsBannertype_list_tabs_bannertype_content__"],
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeSmall_list_squaretype__"] [class*="HomeMoListSquaretypeSmall_content__"],
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeBig_list_squaretype_big__"] [class*="HomeMoListSquaretypeBig_inner_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeBig_list_squaretype_big__"] [class*="HomeMoListSquaretypeBig_content__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltype_list_verticaltype__"] [class*="HomeMoListVerticaltype_content__"],
+      .codex-home-lower-replay[class*="HomeMoBannerPromotion_banner_promotion__"] [class*="HomeMoBannerPromotion_content__"],
+      .codex-home-lower-replay[class*="HomeMoListRectangletype_list_rectangle__"] [class*="HomeMoListRectangletype_content__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeFill_list_verticaltype_fill__"] [class*="HomeMoListVerticaltypeFill_content__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__"] [class*="HomeMoListVerticaltypeBgtype_content__"] {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"] .carousel_carousel__01_6W {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"] .swiper {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        box-sizing: border-box;
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"] .swiper-wrapper {
+        height: 36px !important;
+        box-sizing: border-box;
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"] .swiper-slide {
+        width: auto !important;
+        max-width: none !important;
+        flex: 0 0 auto !important;
+        box-sizing: border-box;
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"] [class*="HomeMoListTabsBannertype_list_tabs_bannertype_list__"] > ul,
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeSmall_list_squaretype__"] [class*="HomeMoListSquaretypeSmall_list_squaretype_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeBig_list_squaretype_big__"] [class*="HomeMoListSquaretypeBig_list_squaretype_big_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListRectangletype_list_rectangle__"] [class*="HomeMoListRectangletype_list_rectangle_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltype_list_verticaltype__"] [class*="HomeMoListVerticaltype_list_verticaltype_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeFill_list_verticaltype_fill__"] [class*="HomeMoListVerticaltypeFill_list_verticaltype_fill_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__"] [class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoBannerPromotion_banner_promotion__"] [class*="HomeMoBannerPromotion_banner_promotion_list__"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+      }
+      .codex-home-lower-replay[class*="HomeMoListTabsBannertype_list_tabs_bannertype__"] [class*="HomeMoListTabsBannertype_list_tabs_bannertype_list__"] > ul,
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeSmall_list_squaretype__"] [class*="HomeMoListSquaretypeSmall_list_squaretype_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListSquaretypeBig_list_squaretype_big__"] [class*="HomeMoListSquaretypeBig_list_squaretype_big_wrap__"],
+      .codex-home-lower-replay[class*="HomeMoListRectangletype_list_rectangle__"] [class*="HomeMoListRectangletype_list_rectangle_wrap__"] {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__"] [class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype_wrap__"] {
+        display: flex !important;
+        align-items: stretch;
+      }
+      .codex-home-lower-replay[class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__"] [class*="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype_item__"] {
+        flex: 1 1 0 !important;
+        min-width: 0 !important;
       }
       .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_list_inner__"] {
         list-style: none;
@@ -7776,7 +8279,7 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       }
       .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_item__"] > a {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 132px;
+        grid-template-columns: minmax(0, 1fr) var(--codex-home-lower-media-size);
         gap: 14px;
         align-items: center;
         text-decoration: none;
@@ -7786,14 +8289,14 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
         min-width: 0;
       }
       .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_image__"] {
-        width: 132px;
-        min-width: 132px;
+        width: var(--codex-home-lower-media-size);
+        min-width: var(--codex-home-lower-media-size);
       }
       .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_image__"] .product-card-image_image,
       .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_image__"] .image {
         display: block;
-        width: 132px;
-        height: 132px;
+        width: var(--codex-home-lower-media-size);
+        height: var(--codex-home-lower-media-size);
       }
       .codex-home-lower-replay[class*="HomeMoListBannertype_list_bannertype__"] [class*="HomeMoListBannertype_list_bannertype_image__"] img {
         display: block;
@@ -7841,16 +8344,16 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
         background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
       }
       .codex-home-lower-replay[class*="HomeMoListHorizontype_list_horizontype__"] {
-        width: min(920px, calc(100vw - 160px));
+        width: var(--codex-home-lower-width);
       }
       .codex-home-lower-replay[class*="HomeMoTimedeal_timedeal__"] {
-        width: min(920px, calc(100vw - 160px));
+        width: var(--codex-home-lower-width);
       }
       .codex-home-lower-replay[class*="HomeMoListSquaretypeSmall_list_squaretype__"] {
-        width: min(920px, calc(100vw - 160px));
+        width: var(--codex-home-lower-width);
       }
       .codex-home-lower-replay[class*="HomeMoListSquaretypeBig_list_squaretype_big__"] {
-        width: min(920px, calc(100vw - 160px));
+        width: var(--codex-home-lower-width);
       }
       .codex-home-lower-replay[class*="HomeMoTimedeal_timedeal__"] .swiper {
         overflow: hidden;
@@ -7885,9 +8388,9 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       }
       .codex-home-best-ranking {
         display: block !important;
-        width: min(780px, calc(100vw - 260px)) !important;
-        max-width: 780px;
-        margin: 56px auto 0 !important;
+        width: var(--codex-home-lower-width) !important;
+        max-width: var(--codex-home-lower-width);
+        margin: 0 auto !important;
         padding: 0 !important;
         float: none !important;
         clear: both;
@@ -8111,10 +8614,16 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       }
       .codex-home-space-renewal {
         display: block !important;
-        width: min(920px, calc(100vw - 160px)) !important;
-        max-width: 920px;
-        margin: 56px auto 0 !important;
+        width: var(--codex-home-lower-width) !important;
+        max-width: var(--codex-home-lower-width);
+        margin: -160px auto 0 !important;
         padding: 0 !important;
+      }
+      .codex-home-marketing-area {
+        display: block !important;
+        width: var(--codex-home-lower-width) !important;
+        max-width: var(--codex-home-lower-width);
+        margin: 0 auto !important;
       }
       .codex-home-space-renewal-head {
         display: flex;
@@ -8205,9 +8714,9 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       }
       .codex-home-brand-showroom {
         display: block !important;
-        width: min(920px, calc(100vw - 160px)) !important;
-        max-width: 920px;
-        margin: 56px auto 0 !important;
+        width: var(--codex-home-lower-width) !important;
+        max-width: var(--codex-home-lower-width);
+        margin: 0 auto !important;
         padding: 0 !important;
       }
       .codex-home-brand-showroom-head {
@@ -8265,9 +8774,9 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       }
       .codex-home-latest-news {
         display: block !important;
-        width: min(900px, calc(100vw - 180px)) !important;
-        max-width: 900px;
-        margin: 56px auto 0 !important;
+        width: var(--codex-home-lower-width) !important;
+        max-width: var(--codex-home-lower-width);
+        margin: 0 auto !important;
         padding: 0 !important;
       }
       .codex-home-latest-news-head {

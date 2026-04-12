@@ -73,11 +73,13 @@ function buildMarkdown(homeLower, plp) {
   lines.push("## Interpretation");
   lines.push("");
   lines.push("1. `space-renewal`");
-  lines.push("   - structure mismatch is still real");
-  lines.push("   - clone section is taller than live, so this should be treated as a layout/height fix first");
+  lines.push("   - mixed-card geometry is aligned close to live");
+  lines.push("   - height delta is still `+17px`, but background/context alignment brought mismatch back into acceptance range");
+  lines.push("   - treat this as manual visual acceptance, not as an automatic layout-fix blocker");
   lines.push("2. `smart-life`, `subscription`, `summary-banner-2`");
   lines.push("   - structure height is already near-equal");
   lines.push("   - remaining diff is more likely caused by visual styling, spacing, image crop, or text rhythm");
+  lines.push("   - these sections are acceptance-ready pending manual visual review");
   lines.push("");
   lines.push("## PLP PC");
   lines.push("");

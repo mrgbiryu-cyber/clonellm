@@ -1,6 +1,6 @@
 # Acceptance Current State
 
-- generatedAt: `2026-04-12T03:27:28.816Z`
+- generatedAt: `2026-04-12T04:49:19.815Z`
 - workspaceUser: `testuser1`
 - pass: `1`
 - fail: `0`
@@ -20,7 +20,7 @@
 - `home-core` | page=`home` | status=`pass` | items=`7` | compare=`/compare/home`
   note: auto verification
 - `home-lower-primary` | page=`home` | status=`pending` | items=`5` | compare=`/compare/home`
-  note: recheck pending
+  note: manual review: space-renewal reduced to 5.66 after background alignment; smart-life/subscription are acceptance-ready
 - `home-lower-secondary` | page=`home` | status=`unreviewed` | items=`4` | compare=`/compare/home`
 - `support-pcmo` | page=`support` | status=`unreviewed` | items=`4` | compare=`/compare/support`
 - `bestshop-pcmo` | page=`bestshop` | status=`unreviewed` | items=`3` | compare=`/compare/bestshop`

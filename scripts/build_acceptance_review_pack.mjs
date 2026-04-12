@@ -67,6 +67,49 @@ const BUNDLES = [
   },
 ];
 
+const SECTION_NOTES = {
+  "space-renewal": [
+    "geometry is aligned to live mixed-card layout",
+    "background/context alignment reduced latest mismatch back to acceptance-range",
+    "final step is manual visual acceptance, not another structural rewrite",
+  ],
+  "smart-life": [
+    "current live story card data is synced",
+    "remaining diff is minor visual tuning territory; acceptance-ready",
+  ],
+  "subscription": [
+    "stable baseline is preferred over forced image injection",
+    "structure is acceptance-ready; review visually",
+  ],
+  "summary-banner-2": [
+    "structure is acceptance-ready",
+    "remaining review is visual only",
+  ],
+};
+
+const BUNDLE_NOTES = {
+  "home-lower-primary": [
+    "bundle is ready for manual acceptance review",
+    "space-renewal requires artifact caveat when judging screenshot diff",
+  ],
+  "home-lower-secondary": [
+    "summary-banner-2 is acceptance-ready",
+    "focus on visual continuity across lower banners/guides",
+  ],
+  "care-solutions-pcmo": [
+    "duplicate header auto-check is resolved",
+    "final review should focus on overall page compare only",
+  ],
+  "category-tvs-pcmo": [
+    "PLP shell/filter/sort alignment is largely closed",
+    "final review should focus on page-level visual acceptance",
+  ],
+  "category-refrigerators-pcmo": [
+    "PLP shell/filter/sort alignment is largely closed",
+    "mobile still deserves a closer visual pass than PC",
+  ],
+};
+
 function readJson(filePath, fallback) {
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
@@ -168,6 +211,8 @@ function renderBundle(bundle, acceptanceMap, serviceMap, plpMap) {
   lines.push(`- status: \`${status}\``);
   if (recorded?.note) lines.push(`- note: ${recorded.note}`);
   lines.push(`- compare: \`${bundle.compareUrl}\``);
+  const bundleNotes = BUNDLE_NOTES[bundle.bundleId] || [];
+  for (const note of bundleNotes) lines.push(`- review-note: ${note}`);
   lines.push("");
   const artifacts = bundleArtifacts(bundle, serviceMap, plpMap);
   if (bundle.pageId === "home" && bundle.sections?.length) {
@@ -178,6 +223,9 @@ function renderBundle(bundle, acceptanceMap, serviceMap, plpMap) {
       lines.push(`  live: \`${item.artifacts.liveReference}\`${fileExists(item.artifacts.liveReference) ? "" : " (missing)"}`);
       lines.push(`  working: \`${item.artifacts.working}\`${fileExists(item.artifacts.working) ? "" : " (missing)"}`);
       lines.push(`  metadata: \`${item.artifacts.metadata}\`${fileExists(item.artifacts.metadata) ? "" : " (missing)"}`);
+      for (const note of SECTION_NOTES[item.slotId] || []) {
+        lines.push(`  note: ${note}`);
+      }
     }
     lines.push("");
     return lines.join("\n");

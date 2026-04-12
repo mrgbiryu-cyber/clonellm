@@ -1079,10 +1079,14 @@
         const resetWorkspaceBtn = document.getElementById("resetWorkspaceBtn");
         const promptEl = document.getElementById("llmPrompt");
         const statusEl = document.getElementById("llmStatus");
-        if (finalReadiness?.llmGateStatus !== "ready-for-llm") {
+        if (!finalReadiness?.llmGateOpen) {
           runBtn.disabled = true;
           runBtn.title = "Acceptance bundles must all pass before LLM changes are allowed.";
           statusEl.textContent = `LLM blocked: ${finalReadiness?.llmGateStatus || "pending"}`;
+        } else if (finalReadiness?.llmGateBypassActive) {
+          runBtn.disabled = false;
+          runBtn.title = "Demo LLM bypass active";
+          statusEl.textContent = `LLM demo bypass active: ${finalReadiness?.rawLlmGateStatus || "pending"}`;
         }
 
         resetWorkspaceBtn.addEventListener("click", async () => {

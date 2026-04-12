@@ -91,25 +91,25 @@
 1. `home-lower-primary`
    - 이유: 홈 하단 핵심 섹션 묶음이며 진행 기록도 `pending`
    - diff hotspot:
-     - `smart-life 6.41%`
-     - `subscription 4.69%`
-     - `space-renewal 4.72%`
+     - `smart-life 6.93%`
+     - `space-renewal 5.66%`
+     - `subscription 5.63%`
 2. `home-lower-secondary`
    - 이유: 홈 하단 마무리 묶음이며 `summary-banner-2`와 하단 가이드 계열 diff를 최종 확인해야 함
    - diff hotspot:
-     - `summary-banner-2 5.13%`
+     - `summary-banner-2 6.30%`
      - `bestshop-guide 5.46%`
      - `lg-best-care 4.92%`
 3. `category-refrigerators-pcmo`
    - 이유: PLP는 크게 정리됐지만 mobile이 아직 가장 큰 잔여 차이
    - diff:
-     - `pc 4.27%`
-     - `mo 4.43%`
+     - `pc 5.09%`
+     - `mo 6.70%`
 4. `category-tvs-pcmo`
    - 이유: PLP PC/MO 모두 acceptance 후보 수준까지 내려왔고 최종 판정만 남음
    - diff:
-     - `pc 4.24%`
-     - `mo 4.30%`
+     - `pc 4.66%`
+     - `mo 5.51%`
 5. `home-core`
    - 이유: 전체 home 기준 `11.89%`
 6. `care-solutions-pcmo`
@@ -140,10 +140,12 @@
    - `space-renewal`
    - `subscription`
    - 현재 구조 메모:
-     - `space-renewal` live 대비 높이 delta는 `+17px`까지 줄어든 상태
+     - `space-renewal` live 대비 높이 delta는 `+17px`
+     - item geometry는 live 수준으로 맞췄다
+     - background/context alignment 후 latest mismatch는 `5.66%`까지 내려왔다
    - 현재 기준 메모:
      - `smart-life`는 current live story card 데이터까지 맞춘 상태
-     - `subscription`, `summary-banner-2`는 강제 이미지 주입보다 안정 baseline 유지가 맞음
+     - `subscription`, `summary-banner-2`는 추가 구조 수정 없이 acceptance-ready로 보는 편이 맞다
 3. `home-lower-secondary`
    - 하단 배너/혜택/가이드 묶음의 순서, 간격, 폭
 
