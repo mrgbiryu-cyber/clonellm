@@ -4422,6 +4422,16 @@ function extractFooterSection(rawHtml) {
   return match ? match[0] : "";
 }
 
+function extractHomeDesktopHeaderSections(rawHtml) {
+  const source = String(rawHtml || "");
+  const topMatch = source.match(/<section class="CommonPcGnb_top__[^"]*"[\s\S]*?<\/section>/i);
+  const bottomMatch = source.match(/<section class="CommonPcGnb_bottom__[^"]*"[\s\S]*?<\/section>/i);
+  return {
+    top: topMatch ? topMatch[0] : "",
+    bottom: bottomMatch ? bottomMatch[0] : "",
+  };
+}
+
 function extractInlineObjectAtMarker(rawHtml, marker) {
   const source = String(rawHtml || "");
   const idx = source.indexOf(marker);
@@ -5135,6 +5145,9 @@ function applyHomeLowerSectionPatch(sectionHtml, slotId = "", activeSourceId = "
         return `<span class="${classes}"${rest} style="color:${escapeHtml(styles.subtitleColor)}">`;
       }
     );
+  }
+  if (slotId) {
+    next = rewriteSectionHrefsForClone(next, "home", "pc");
   }
   if (slotId) {
     next = next.replace(/<section([^>]*)>/, `<section$1 data-codex-patched="true">`);
@@ -6036,9 +6049,99 @@ function toCloneHref(rawHref, internalLinkMap) {
   const href = String(rawHref || "").trim();
   if (!href) return "#";
   if (href.startsWith("/clone/")) return href;
-  if (internalLinkMap[href]) return internalLinkMap[href];
-  if (href === "https://www.lge.co.kr" || href === "https://www.lge.co.kr/") return "/clone/home";
+  const normalizedHref = href.replace(/&amp;/g, "&");
+  let absolute = normalizedHref;
+  try {
+    absolute = new URL(normalizedHref, "https://www.lge.co.kr").toString();
+  } catch {
+    absolute = normalizedHref;
+  }
+  if (internalLinkMap[normalizedHref]) return internalLinkMap[normalizedHref];
+  if (internalLinkMap[absolute]) return internalLinkMap[absolute];
+  if (absolute === "https://www.lge.co.kr" || absolute === "https://www.lge.co.kr/") return "/clone/home";
   return "#";
+}
+
+function toCloneOrLiveHref(rawHref, internalLinkMap, pdpCaptureMap = {}, pageId = "home", viewportProfile = "pc") {
+  const href = String(rawHref || "").trim();
+  if (!href) return "#";
+  if (
+    href.startsWith("#") ||
+    href.startsWith("javascript:") ||
+    href.startsWith("mailto:") ||
+    href.startsWith("tel:")
+  ) {
+    return href;
+  }
+  if (href.startsWith("/clone/") || href.startsWith("/clone-product")) return href;
+  const normalizedHref = href.replace(/&amp;/g, "&");
+  let absolute = normalizedHref;
+  try {
+    absolute = new URL(normalizedHref, "https://www.lge.co.kr").toString();
+  } catch {
+    return href;
+  }
+  if (internalLinkMap[absolute]) return internalLinkMap[absolute];
+  const pdpCapture = pdpCaptureMap && typeof pdpCaptureMap === "object" ? pdpCaptureMap[absolute] : null;
+  if (pdpCapture && pdpCapture.pageId) {
+    const pathname = (() => {
+      try {
+        return new URL(absolute).pathname || absolute;
+      } catch {
+        return absolute;
+      }
+    })();
+    return (
+      `/clone-product?pageId=${encodeURIComponent(pdpCapture.pageId)}` +
+      `&viewportProfile=${encodeURIComponent(pdpCapture.viewportProfile || viewportProfile)}` +
+      `&href=${encodeURIComponent(absolute)}` +
+      `&title=${encodeURIComponent(pathname || absolute)}`
+    );
+  }
+  let hostname = "";
+  let pathname = "";
+  try {
+    const parsed = new URL(absolute);
+    hostname = parsed.hostname || "";
+    pathname = parsed.pathname || "";
+  } catch {
+    return absolute;
+  }
+  if (pathname.startsWith("/support")) return "/clone/support";
+  if (pathname.startsWith("/best-ranking")) return "/clone/home";
+  if (hostname === "bestshop.lge.co.kr" || pathname.startsWith("/bestshop")) return "/clone/bestshop";
+  if (pathname.startsWith("/care-solutions") || pathname.startsWith("/category/care-solutions")) return "/clone/care-solutions";
+  if (pathname.startsWith("/lg-best-care")) return "/clone/support";
+  if (pathname.startsWith("/lg-signature")) return "/clone/lg-signature-info";
+  if (pathname.startsWith("/objet-collection")) return "/clone/objet-collection-story";
+  if (pathname.startsWith("/category/tvs")) return "/clone/category-tvs";
+  if (pathname.startsWith("/category/refrigerators")) return "/clone/category-refrigerators";
+  if (pathname.startsWith("/story") || pathname.startsWith("/benefits") || pathname.startsWith("/livecommerce")) return absolute;
+  if (/^\/(tvs|refrigerators|kimchi-refrigerators|wash-tower|dishwashers|microwaves-and-ovens|air-purifier|air-conditioners|notebook|system-ironing)\//.test(pathname)) {
+    const inferredPageId =
+      pathname.startsWith("/refrigerators/") || pathname.startsWith("/kimchi-refrigerators/")
+        ? "category-refrigerators"
+        : "category-tvs";
+    return (
+      `/clone-product?pageId=${encodeURIComponent(inferredPageId)}` +
+      `&viewportProfile=${encodeURIComponent(viewportProfile)}` +
+      `&href=${encodeURIComponent(absolute)}` +
+      `&title=${encodeURIComponent(pathname || absolute)}`
+    );
+  }
+  if (hostname.endsWith("lge.co.kr")) return absolute;
+  return absolute;
+}
+
+function rewriteSectionHrefsForClone(sectionHtml, pageId = "home", viewportProfile = "pc") {
+  const html = String(sectionHtml || "");
+  if (!html) return "";
+  const internalLinkMap = buildInternalCloneLinkMap();
+  const pdpCaptureMap = buildPdpCapturePageMap(viewportProfile);
+  return html.replace(/href="([^"]+)"/gi, (_match, href) => {
+    const nextHref = toCloneOrLiveHref(href, internalLinkMap, pdpCaptureMap, pageId, viewportProfile);
+    return `href="${escapeHtml(nextHref)}"`;
+  });
 }
 
 function extractLegacyProductMenu(rawHtml) {
@@ -7611,7 +7714,7 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
   const internalLinkMap = buildInternalCloneLinkMap();
   const pdpCaptureMap = buildPdpCapturePageMap(viewportProfile);
   const isHome = pageId === "home";
-  const preservePageHeader = isHome || ["support", "bestshop"].includes(pageId);
+  const preservePageHeader = isHome || ["support", "bestshop", "care-solutions"].includes(pageId);
   const useCapturedHomeHeader =
     isHome &&
     isCapturedSourceActive(editableData, "home", "header-top") &&
@@ -10382,9 +10485,10 @@ function sendCloneShell(res, pageId, requestUrl = null) {
       : "pc";
   const isMobileShell = shellViewportProfile === "mo";
   const useCapturedShellHeader =
-    safePageId === "home" &&
-    isCapturedSourceActive(editableData, "home", "header-top") &&
-    isCapturedSourceActive(editableData, "home", "header-bottom");
+    safePageId === "home" ||
+    safePageId === "support" ||
+    safePageId === "bestshop" ||
+    safePageId === "care-solutions";
   const gnb = isMobileShell ? { topLinks: [], brandTabs: [], utilityLinks: [], dropdownMenus: {} } : buildShellGnbData();
   const dropdownPanelsHtml = Object.values(gnb.dropdownMenus || {})
     .map(

@@ -7,7 +7,7 @@
     <style>
       body { margin: 0; font-family: Arial, sans-serif; background: #f6f7fb; color: #141821; }
       header { padding: 16px 20px; background: #111827; color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-      main { display: grid; grid-template-columns: 320px minmax(0,1fr) 340px; gap: 16px; padding: 16px; }
+      main { display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 16px; padding: 16px; }
       .panel { background: #fff; border: 1px solid #e7e9f2; border-radius: 10px; overflow: hidden; }
       .panel h2 { margin: 0; padding: 12px 14px; font-size: 14px; border-bottom: 1px solid #eceef7; }
       .list { max-height: calc(100vh - 140px); overflow: auto; }
@@ -36,7 +36,7 @@
       .admin-notice.error { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
       .progress-track { height: 10px; border-radius: 999px; background: #e5e7eb; overflow: hidden; margin-top: 8px; }
       .progress-fill { height: 100%; background: linear-gradient(90deg, #1f4dd8 0%, #0ea5e9 100%); }
-      .toolbar-actions select, .component-card select { border: 1px solid #d9ddea; border-radius: 6px; padding: 7px 8px; background: #fff; }
+      .toolbar-actions select, .component-card select, .list-select { border: 1px solid #d9ddea; border-radius: 6px; padding: 7px 8px; background: #fff; font: inherit; }
       .history-list { padding: 12px; display: grid; gap: 8px; }
       .history-item { border: 1px solid #e9ebf5; border-radius: 8px; padding: 10px; background: #fff; }
       .history-item.acceptance-event { border-color: #bfdbfe; background: #f8fbff; }
@@ -45,11 +45,27 @@
       .component-grid { display: grid; gap: 10px; margin-top: 14px; }
       .component-card { border: 1px solid #e6e9f4; border-radius: 10px; padding: 12px; background: #fbfcff; }
       .component-card h4 { margin: 0 0 6px; font-size: 13px; }
+      .component-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+      .component-title-row h4 { margin: 0; font-size: 14px; }
+      .component-label { font-size: 11px; color: #61667a; font-weight: 700; letter-spacing: -0.02em; }
+      .component-copy { font-size: 12px; color: #374151; line-height: 1.5; margin-top: 6px; }
       .meta-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0; }
       .chip { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; background: #eef2ff; color: #3730a3; }
       .chip.warn { background: #fff7ed; color: #9a3412; }
       .chip.pass { background: #ecfdf5; color: #166534; }
       .chip.fail { background: #fef2f2; color: #991b1b; }
+      .field-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+      .field-chip { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 999px; font-size: 11px; background: #f3f4f6; color: #374151; }
+      .llm-guide { margin-top: 10px; padding: 10px; border-radius: 8px; background: #f8fafc; border: 1px solid #e5e7eb; }
+      .llm-guide strong { display: block; margin-bottom: 6px; font-size: 12px; }
+      .llm-guide .meta { line-height: 1.5; }
+      .edit-guide { margin: 12px 0; padding: 12px; border-radius: 10px; border: 1px solid #dbeafe; background: #f8fbff; }
+      .edit-guide strong { display: block; margin-bottom: 8px; font-size: 13px; }
+      .edit-guide .meta { line-height: 1.6; }
+      .fold-section { margin: 12px 0; border: 1px solid #e5e7eb; border-radius: 10px; background: #fff; overflow: hidden; }
+      .fold-section summary { list-style: none; cursor: pointer; padding: 12px 14px; font-weight: 700; font-size: 13px; }
+      .fold-section summary::-webkit-details-marker { display: none; }
+      .fold-body { padding: 0 12px 12px; }
       .gap-list { margin-top: 10px; display: grid; gap: 8px; }
       .gap-item { border: 1px solid #f1d7aa; background: #fffaf0; border-radius: 8px; padding: 8px 10px; }
       .gap-item.acceptance-pass { border-color: #b7e4c7; background: #f3fff7; }
@@ -59,15 +75,22 @@
       .gap-item.acceptance-selected-target { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18); background: #f8fbff; }
       .preview-frame { width: 100%; height: 420px; border: 1px solid #e7e9f2; border-radius: 10px; margin-top: 14px; background: #fff; }
       code { background: #f3f4f6; padding: 1px 4px; border-radius: 4px; }
+      .panel.side { grid-column: 1 / -1; }
+      .list-toolbar { padding: 10px 12px; border-bottom: 1px solid #eceef7; display: grid; gap: 8px; }
+      .list-toolbar-row { display: grid; gap: 6px; }
+      .list-toolbar-row label { font-size: 12px; color: #4b5563; font-weight: 700; }
+      .list-helper { padding: 10px 12px; border-bottom: 1px solid #eceef7; background: #f8fafc; }
+      .page-pick-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .page-pick-meta { font-size: 12px; color: #61667a; margin-top: 4px; }
       @media (max-width: 1200px) {
-        main { grid-template-columns: 320px 1fr; }
+        main { grid-template-columns: 1fr; }
         .panel.side { grid-column: 1 / -1; }
       }
     </style>
   </head>
   <body>
     <header>
-      <strong>LGE Prototype Admin</strong>
+      <strong>LGE 작업 관리자</strong>
       <div class="top-meta">
         <span id="sessionMeta">Loading session...</span>
         <button id="logoutBtn" type="button">로그아웃</button>
@@ -75,18 +98,18 @@
     </header>
     <main>
       <section class="panel">
-        <h2>Pages</h2>
+        <h2>페이지 목록</h2>
         <div id="pageListToolbar" class="list-toolbar"></div>
         <div id="pageListSummary" class="list-summary"></div>
         <div id="adminNotice" class="admin-notice" hidden></div>
         <div id="pageList" class="list"></div>
       </section>
       <section class="panel">
-        <h2>Page Detail</h2>
+        <h2>페이지 상세</h2>
         <div id="detail" class="body">Loading...</div>
       </section>
       <section class="panel side">
-        <h2>Workspace Activity</h2>
+        <h2>작업 이력</h2>
         <div id="historyPanel" class="history-list"></div>
       </section>
     </main>
@@ -119,6 +142,162 @@
           .replace(/>/g, "&gt;")
           .replace(/\"/g, "&quot;")
           .replace(/'/g, "&#39;");
+      }
+
+      const pageNameMap = {
+        home: "홈",
+        support: "고객지원",
+        bestshop: "베스트샵",
+        "care-solutions": "가전 구독",
+        "category-tvs": "TV 카테고리",
+        "category-refrigerators": "냉장고 카테고리",
+        "lg-signature-info": "LG SIGNATURE",
+        "objet-collection-story": "LG Objet Collection",
+      };
+
+      const slotNameMap = {
+        "header-top": "상단 헤더",
+        "header-bottom": "주 메뉴",
+        hero: "메인 비주얼",
+        quickmenu: "퀵메뉴",
+        timedeal: "타임딜",
+        "md-choice": "MD 추천",
+        "best-ranking": "베스트 랭킹",
+        "marketing-area": "중간 프로모션",
+        subscription: "가전 구독",
+        "space-renewal": "공간 리뉴얼",
+        "brand-showroom": "브랜드 쇼룸",
+        "latest-product-news": "신제품 소식",
+        "smart-life": "스마트 라이프",
+        "summary-banner-2": "하단 배너",
+        "missed-benefits": "혜택 모음",
+        "lg-best-care": "LG 베스트 케어",
+        "bestshop-guide": "베스트샵 안내",
+        ranking: "랭킹",
+        benefit: "혜택",
+        tabs: "탭 영역",
+        careBanner: "구독 배너",
+        shortcut: "바로가기",
+        review: "리뷰",
+        brandBanner: "브랜드 배너",
+        mainService: "주요 서비스",
+        notice: "공지",
+        tipsBanner: "팁 배너",
+        bestcare: "베스트케어",
+      };
+
+      const editableLabelMap = {
+        title: "제목",
+        subtitle: "설명/부제목",
+        headline: "메인 문구",
+        description: "설명 문구",
+        badge: "배지",
+        image: "이미지",
+        items: "목록 항목",
+        href: "링크",
+        ctaHref: "버튼 링크",
+        icon: "아이콘",
+        tabs: "탭",
+        filters: "필터",
+        sortOptions: "정렬 옵션",
+        options: "옵션",
+        selectedOption: "선택 옵션",
+        logoHref: "로고 링크",
+        utilityLinks: "유틸 메뉴",
+        mainMenus: "메인 메뉴",
+        brandTabs: "브랜드 탭",
+        slides: "슬라이드",
+        moreLink: "더보기 링크",
+        badges: "뱃지",
+        rankVisual: "랭킹 표시",
+        visibility: "노출 여부",
+        images: "이미지 목록",
+        thumbnailOrder: "썸네일 순서",
+      };
+
+      const styleLabelMap = {
+        background: "배경",
+        radius: "모서리",
+        height: "높이",
+        titleColor: "제목 색상",
+        subtitleColor: "부제목 색상",
+        spacing: "간격",
+        cardStyle: "카드 스타일",
+        titleStyle: "제목 스타일",
+        gridColumns: "그리드 수",
+        iconSize: "아이콘 크기",
+        labelStyle: "라벨 스타일",
+        cardRadius: "카드 둥글기",
+        rankPosition: "랭킹 위치",
+        badgeStyle: "배지 스타일",
+        priceStyle: "가격 스타일",
+        width: "폭",
+        gap: "간격",
+        panelStyle: "패널 스타일",
+        chipStyle: "칩 스타일",
+        selectorStyle: "선택기 스타일",
+        menuSpacing: "메뉴 간격",
+        tabSpacing: "탭 간격",
+        underlineStyle: "밑줄 스타일",
+        copyPosition: "문구 위치",
+        indicatorStyle: "인디케이터",
+        iconOrder: "아이콘 순서",
+        alignment: "정렬",
+        aspectRatio: "비율",
+        thumbnailStyle: "썸네일 스타일",
+      };
+
+      function pageLabel(pageId, title = "") {
+        return pageNameMap[pageId] || title || pageId;
+      }
+
+      function slotLabel(slotId) {
+        return slotNameMap[slotId] || slotId;
+      }
+
+      function sourceTypeLabel(value) {
+        const map = {
+          captured: "캡처 원본",
+          custom: "직접 수정본",
+          "figma-derived": "피그마 변환본",
+          "mobile-derived": "모바일 기반",
+        };
+        return map[value] || value || "기본";
+      }
+
+      function acceptanceStatusLabel(value) {
+        const map = {
+          accepted: "완료",
+          "in-progress": "작업 중",
+          "needs-review": "검수 필요",
+        };
+        return map[value] || value || "작업 중";
+      }
+
+      function advisoryFilterLabel(value) {
+        const map = {
+          all: "전체",
+          warning: "경고 이상",
+          error: "오류만",
+          "has-advisory": "주의사항 있음",
+        };
+        return map[value] || value || "전체";
+      }
+
+      function pageFilterLabel(value) {
+        const map = {
+          all: "전체",
+          pending: "작업 중",
+          fail: "검수 필요",
+          accepted: "완료",
+        };
+        return map[value] || value || "전체";
+      }
+
+      function renderLabelChips(values, labelMap) {
+        const items = Array.isArray(values) ? values : [];
+        if (!items.length) return `<span class="meta">없음</span>`;
+        return `<div class="field-list">${items.map((item) => `<span class="field-chip">${escapeHtml(labelMap[item] || item)}</span>`).join("")}</div>`;
       }
 
       async function fetchJson(url, options) {
@@ -354,196 +533,101 @@
 
       function renderList() {
         const pageAcceptanceMap = new Map((finalReadinessMeta?.pages || []).map((item) => [item.pageId, item]));
-        const overallTotal = Number(finalReadinessMeta?.acceptance?.total || 0);
-        const overallPass = Number(finalReadinessMeta?.acceptance?.pass || 0);
-        const nextPageId = finalReadinessMeta?.nextActionablePageId || findNextActionablePageId("");
-        const completionRate = overallTotal > 0 ? Math.round((overallPass / overallTotal) * 100) : 0;
-        const counts = runtimePageSummary?.counts || {};
-        const advisorySummary = {
-          total: Number(finalReadinessMeta?.pageAdvisoryCount || 0),
-          warningPages: Number(finalReadinessMeta?.warningPageCount || 0),
-          errorPages: Number(finalReadinessMeta?.errorPageCount || 0),
-        };
+        const visiblePages = getVisiblePages();
+        const totalPages = Number(pages.length || 0);
+        const visibleCount = Number(visiblePages.length || 0);
+        const acceptedCount = pages.filter((page) => (pageAcceptanceMap.get(page.id)?.acceptanceStatus || "in-progress") === "accepted").length;
+        const selectedPage = pages.find((page) => page.id === selectedId) || visiblePages[0] || pages[0] || null;
         const filters = [
-          { id: "all", label: "All" },
-          { id: "pending", label: "Pending" },
-          { id: "fail", label: "Fail" },
-          { id: "accepted", label: "Accepted" },
+          { id: "all", label: "전체" },
+          { id: "pending", label: "작업 중" },
+          { id: "fail", label: "검수 필요" },
+          { id: "accepted", label: "완료" },
         ];
         const advisoryFilters = [
-          { id: "all", label: "All Advisories" },
-          { id: "warning", label: "Warning+" },
-          { id: "error", label: "Error" },
-          { id: "has-advisory", label: "Has Advisory" },
+          { id: "all", label: "전체" },
+          { id: "warning", label: "경고 이상" },
+          { id: "error", label: "오류만" },
+          { id: "has-advisory", label: "주의사항 있음" },
         ];
         pageListToolbarEl.innerHTML = `
-          <div class="actions" style="margin-top:0;">
-            ${filters.map((filter) => `
-              <button class="list-filter-btn ${pageFilter === filter.id ? "active" : ""}" type="button" data-filter="${escapeHtml(filter.id)}">${escapeHtml(filter.label)}</button>
-            `).join("")}
+          <div class="list-toolbar-row">
+            <label for="pageStatusFilter">페이지 상태</label>
+            <select id="pageStatusFilter" class="list-select">
+              ${filters.map((filter) => `<option value="${escapeHtml(filter.id)}" ${pageFilter === filter.id ? "selected" : ""}>${escapeHtml(filter.label)}</option>`).join("")}
+            </select>
           </div>
-          <div class="actions" style="margin-top:0;">
-            ${advisoryFilters.map((filter) => `
-              <button class="list-filter-btn ${advisoryFilter === filter.id ? "active" : ""}" type="button" data-advisory-filter="${escapeHtml(filter.id)}">${escapeHtml(filter.label)}</button>
-            `).join("")}
+          <div class="list-toolbar-row">
+            <label for="pageAdvisoryFilter">주의사항</label>
+            <select id="pageAdvisoryFilter" class="list-select">
+              ${advisoryFilters.map((filter) => `<option value="${escapeHtml(filter.id)}" ${advisoryFilter === filter.id ? "selected" : ""}>${escapeHtml(filter.label)}</option>`).join("")}
+            </select>
+          </div>
+          <div class="list-toolbar-row">
+            <label for="pageQuickSelect">수정할 페이지 선택</label>
+            <div class="page-pick-row">
+              <select id="pageQuickSelect" class="list-select">
+                ${visiblePages.map((page) => `<option value="${escapeHtml(page.id)}" ${page.id === selectedId ? "selected" : ""}>${escapeHtml(pageLabel(page.id, page.title))}</option>`).join("")}
+              </select>
+            </div>
+            <div class="page-pick-meta">선택한 페이지는 오른쪽 상세 화면에서 바로 수정할 수 있습니다.</div>
           </div>
         `;
-        pageListToolbarEl.querySelectorAll("[data-filter]").forEach((button) => {
-          button.addEventListener("click", () => {
-            pageFilter = button.getAttribute("data-filter") || "all";
-            const visiblePages = getVisiblePages();
-            if (!visiblePages.find((page) => page.id === selectedId)) {
-              selectedId = visiblePages[0]?.id || pages[0]?.id || "";
-              selectedBundleId = "";
-            }
-            syncAdminStateUrl("push");
-            renderList();
-            renderDetail();
-          });
+        pageListToolbarEl.querySelector("#pageStatusFilter")?.addEventListener("change", async (event) => {
+          pageFilter = event.target.value || "all";
+          const nextVisiblePages = getVisiblePages();
+          if (!nextVisiblePages.find((page) => page.id === selectedId)) {
+            selectedId = nextVisiblePages[0]?.id || pages[0]?.id || "";
+            selectedBundleId = "";
+          }
+          syncAdminStateUrl("push");
+          renderList();
+          await renderDetail();
         });
-        pageListToolbarEl.querySelectorAll("[data-advisory-filter]").forEach((button) => {
-          button.addEventListener("click", () => {
-            advisoryFilter = button.getAttribute("data-advisory-filter") || "all";
-            const visiblePages = getVisiblePages();
-            if (!visiblePages.find((page) => page.id === selectedId)) {
-              selectedId = visiblePages[0]?.id || pages[0]?.id || "";
-              selectedBundleId = "";
-            }
-            syncAdminStateUrl("push");
-            renderList();
-            renderDetail();
-          });
+        pageListToolbarEl.querySelector("#pageAdvisoryFilter")?.addEventListener("change", async (event) => {
+          advisoryFilter = event.target.value || "all";
+          const nextVisiblePages = getVisiblePages();
+          if (!nextVisiblePages.find((page) => page.id === selectedId)) {
+            selectedId = nextVisiblePages[0]?.id || pages[0]?.id || "";
+            selectedBundleId = "";
+          }
+          syncAdminStateUrl("push");
+          renderList();
+          await renderDetail();
+        });
+        pageListToolbarEl.querySelector("#pageQuickSelect")?.addEventListener("change", async (event) => {
+          selectedId = event.target.value || "";
+          selectedBundleId = "";
+          syncAdminStateUrl("push");
+          renderList();
+          await renderDetail();
         });
         pageListSummaryEl.innerHTML = `
-          <div class="meta">runtime pages: ${escapeHtml(runtimePageSummary?.totalRuntimePages || 0)} | core ${escapeHtml(counts.corePages || 0)} | info ${escapeHtml(counts.infoPages || 0)} | plp ${escapeHtml(counts.plpPages || 0)} | pdp route ${escapeHtml(counts.pdpRoutes || 0)}</div>
-          <div class="meta">overall acceptance: ${escapeHtml(finalReadinessMeta?.acceptance?.pass || 0)} / ${escapeHtml(finalReadinessMeta?.acceptance?.total || 0)} pass | llm gate: ${escapeHtml(finalReadinessMeta?.llmGateStatus || "pending")}</div>
-          <div class="meta">fallback components: ${escapeHtml(finalReadinessMeta?.fallbackComponentCount || 0)} | advisories: ${escapeHtml(finalReadinessMeta?.advisoryComponentCount || 0)}</div>
-          <div class="meta">page advisories: ${escapeHtml(advisorySummary.total)} | warning pages: ${escapeHtml(advisorySummary.warningPages)} | error pages: ${escapeHtml(advisorySummary.errorPages)}</div>
-          <div class="meta">next actionable page: ${escapeHtml(nextPageId || "none")}</div>
-          ${finalReadinessMeta?.nextAcceptanceTarget ? `<div class="meta">next acceptance target: <code>${escapeHtml(finalReadinessMeta.nextAcceptanceTarget.bundleId)}</code> (${escapeHtml(finalReadinessMeta.nextAcceptanceTarget.title)}) | advisory ${escapeHtml(finalReadinessMeta.nextAcceptanceTarget.bundleContext?.pageAdvisoryCount || 0)} (${escapeHtml(finalReadinessMeta.nextAcceptanceTarget.bundleContext?.pageAdvisorySeverity || "none")}) | risk ${escapeHtml(finalReadinessMeta.nextAcceptanceTarget.bundleContext?.riskScore || 0)}</div>` : `<div class="meta">next acceptance target: none</div>`}
-          ${finalReadinessMeta?.acceptanceQueuePreview?.length ? `<div class="meta">queue preview</div><div class="gap-list">${finalReadinessMeta.acceptanceQueuePreview.map((item) => `<div class="gap-item"><strong>${escapeHtml(item.bundleId)}</strong><div class="meta">${escapeHtml(item.pageId)} | ${escapeHtml(item.status)} | risk ${escapeHtml(item.bundleContext?.riskScore || 0)} | adv ${escapeHtml(item.bundleContext?.pageAdvisoryCount || 0)}</div><div class="actions"><button type="button" class="btn secondary jump-summary-page-btn" data-jump-page-id="${escapeHtml(item.pageId)}">Go To Page</button><button type="button" class="btn secondary copy-summary-page-btn" data-copy-page-id="${escapeHtml(item.pageId)}">Copy Page Link</button><button type="button" class="btn secondary jump-summary-bundle-btn" data-jump-page-id="${escapeHtml(item.pageId)}" data-jump-bundle-id="${escapeHtml(item.bundleId)}">Go To Bundle</button><button type="button" class="btn secondary copy-summary-bundle-btn" data-copy-page-id="${escapeHtml(item.pageId)}" data-copy-bundle-id="${escapeHtml(item.bundleId)}">Copy Bundle Link</button>${pageReviewMap.get(item.pageId)?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReviewMap.get(item.pageId).compareUrl)}" target="_blank">Open Page Compare</a>` : ``}${item.review?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(item.review.compareUrl)}" target="_blank">Open Bundle Compare</a>` : ``}</div></div>`).join("")}</div>` : ``}
-          <div class="actions">
-            ${nextPageId ? `<button type="button" class="btn secondary" id="jumpNextPageBtn">Go To Next Page</button>` : ``}
-            ${nextPageId ? `<button type="button" class="btn secondary" id="copyNextPageBtn">Copy Next Page Link</button>` : ``}
-            ${nextPageId && pageReviewMap.get(nextPageId)?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReviewMap.get(nextPageId).compareUrl)}" target="_blank">Open Next Page Compare</a>` : ``}
-            ${finalReadinessMeta?.nextAcceptanceTarget ? `<button type="button" class="btn secondary" id="jumpNextBundleBtn">Go To Next Bundle</button>` : ``}
-            ${finalReadinessMeta?.nextAcceptanceTarget ? `<button type="button" class="btn secondary" id="copyNextBundleBtn">Copy Next Bundle Link</button>` : ``}
-            <button type="button" class="btn secondary" id="copyAdminStateBtn">Copy Current Link</button>
-            ${selectedBundleId ? `<button type="button" class="btn secondary" id="clearBundleTargetBtn">Clear Bundle Target</button>` : ``}
-            ${finalReadinessMeta?.nextAcceptanceTarget?.review?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(finalReadinessMeta.nextAcceptanceTarget.review.compareUrl)}" target="_blank">Open Next Target Bundle Compare</a>` : ``}
+          <div class="list-helper">
+            <div class="meta">수정할 페이지를 하나 고르면 오른쪽 상세 화면에서 바로 편집할 수 있습니다.</div>
+            <div class="meta">현재 ${escapeHtml(visibleCount)} / ${escapeHtml(totalPages)}페이지 표시 · 검수 완료 ${escapeHtml(acceptedCount)}페이지</div>
+            <div class="meta">현재 선택: ${escapeHtml(selectedPage ? pageLabel(selectedPage.id, selectedPage.title) : "없음")} · 상태 필터 ${escapeHtml(pageFilterLabel(pageFilter))} · 주의사항 필터 ${escapeHtml(advisoryFilterLabel(advisoryFilter))}</div>
           </div>
-          <div class="progress-track"><div class="progress-fill" style="width:${completionRate}%;"></div></div>
         `;
-        document.getElementById("jumpNextPageBtn")?.addEventListener("click", async () => {
-          if (!nextPageId) return;
-          selectedId = nextPageId;
-          selectedBundleId = "";
-          syncAdminStateUrl("push");
-          renderList();
-          await renderDetail();
-        });
-        document.getElementById("copyNextPageBtn")?.addEventListener("click", async () => {
-          if (!nextPageId) return;
-          try {
-            await copyAdminLinkFor(nextPageId, "");
-            showAdminNotice(`Page link copied: ${nextPageId}`);
-          } catch (error) {
-            console.error(error);
-            showAdminNotice("Copy failed", "error");
-          }
-        });
-        document.getElementById("jumpNextBundleBtn")?.addEventListener("click", async () => {
-          const target = finalReadinessMeta?.nextAcceptanceTarget || null;
-          if (!target?.pageId || !target?.bundleId) return;
-          await navigateToBundle(target.pageId, target.bundleId);
-        });
-        document.getElementById("copyNextBundleBtn")?.addEventListener("click", async () => {
-          const target = finalReadinessMeta?.nextAcceptanceTarget || null;
-          if (!target?.pageId || !target?.bundleId) return;
-          try {
-            await copyAdminLinkFor(target.pageId, target.bundleId);
-            showAdminNotice(`Bundle link copied: ${target.bundleId}`);
-          } catch (error) {
-            console.error(error);
-            showAdminNotice("Copy failed", "error");
-          }
-        });
-        document.getElementById("copyAdminStateBtn")?.addEventListener("click", async () => {
-          try {
-            await copyCurrentAdminLink();
-            showAdminNotice("Current admin link copied");
-          } catch (error) {
-            console.error(error);
-            showAdminNotice("Copy failed", "error");
-          }
-        });
-        document.getElementById("clearBundleTargetBtn")?.addEventListener("click", async () => {
-          selectedBundleId = "";
-          syncAdminStateUrl("push");
-          renderList();
-          await renderDetail();
-          showAdminNotice("Bundle target cleared");
-        });
-        pageListSummaryEl.querySelectorAll(".jump-summary-bundle-btn").forEach((button) => {
-          button.addEventListener("click", async () => {
-            const targetPageId = button.getAttribute("data-jump-page-id") || "";
-            const targetBundleId = button.getAttribute("data-jump-bundle-id") || "";
-            await navigateToBundle(targetPageId, targetBundleId);
-          });
-        });
-        pageListSummaryEl.querySelectorAll(".jump-summary-page-btn").forEach((button) => {
-          button.addEventListener("click", async () => {
-            const targetPageId = button.getAttribute("data-jump-page-id") || "";
-            await navigateToBundle(targetPageId, "");
-          });
-        });
-        pageListSummaryEl.querySelectorAll(".copy-summary-page-btn").forEach((button) => {
-          button.addEventListener("click", async () => {
-            const targetPageId = button.getAttribute("data-copy-page-id") || "";
-            try {
-              await copyAdminLinkFor(targetPageId, "");
-              showAdminNotice(`Page link copied: ${targetPageId}`);
-            } catch (error) {
-              console.error(error);
-              showAdminNotice("Copy failed", "error");
-            }
-          });
-        });
-        pageListSummaryEl.querySelectorAll(".copy-summary-bundle-btn").forEach((button) => {
-          button.addEventListener("click", async () => {
-            const targetPageId = button.getAttribute("data-copy-page-id") || "";
-            const targetBundleId = button.getAttribute("data-copy-bundle-id") || "";
-            try {
-              await copyAdminLinkFor(targetPageId, targetBundleId);
-              showAdminNotice(`Bundle link copied: ${targetBundleId}`);
-            } catch (error) {
-              console.error(error);
-              showAdminNotice("Copy failed", "error");
-            }
-          });
-        });
-        pageListEl.innerHTML = getVisiblePages().map((p) => {
+        pageListEl.innerHTML = visiblePages.map((p) => {
           const pageState = pageAcceptanceMap.get(p.id) || {};
+          const advisoryMeta = getPageAdvisoryMeta(p.id);
           const pageReview = pageReviewMap.get(p.id) || null;
           return `
           <div class="row ${p.id === selectedId ? "active" : ""}" data-id="${escapeHtml(p.id)}" role="button" tabindex="0" aria-pressed="${p.id === selectedId ? "true" : "false"}">
-            ${escapeHtml(p.title || p.id)}
-            <div class="meta">${escapeHtml(p.pageGroup)} | ${escapeHtml(p.id)}</div>
-            <div class="meta">acceptance: ${escapeHtml(pageState.acceptanceStatus || "pending")} | pass ${escapeHtml(pageState.acceptanceCounts?.pass || 0)} / ${escapeHtml(pageState.acceptanceCounts?.total || 0)}</div>
-            <div class="meta">fallback ${escapeHtml(pageState.fallbackComponentCount || 0)} | advisories ${escapeHtml(pageState.advisoryComponentCount || 0)} | risk ${escapeHtml(pageState.maxRiskScore || 0)}</div>
-            <div class="meta">page advisory ${escapeHtml(pageState.pageAdvisoryCount ?? getPageAdvisoryMeta(p.id).count)} | severity ${escapeHtml(pageState.highestAdvisorySeverity || getPageAdvisoryMeta(p.id).highestSeverity)}</div>
-            ${pageState.nextBundleId ? `<div class="meta">next bundle ${escapeHtml(pageState.nextBundleId)} | ${escapeHtml(pageState.nextBundleStatus || "pending")} | risk ${escapeHtml(pageState.nextBundleRiskScore || 0)}</div>` : `<div class="meta">next bundle none</div>`}
+            <strong>${escapeHtml(pageLabel(p.id, p.title || p.id))}</strong>
+            <div class="meta">${escapeHtml(p.pageGroup)} · ${escapeHtml(p.id)}</div>
+            <div class="meta">상태 ${escapeHtml(acceptanceStatusLabel(pageState.acceptanceStatus || "in-progress"))} · 주의사항 ${escapeHtml(pageState.pageAdvisoryCount ?? advisoryMeta.count)}건 · 위험도 ${escapeHtml(pageState.maxRiskScore || 0)}</div>
             <div class="actions">
-              <button type="button" class="btn secondary jump-page-btn" data-jump-page-id="${escapeHtml(p.id)}">Go To Page</button>
-              <button type="button" class="btn secondary copy-page-link-btn" data-copy-page-id="${escapeHtml(p.id)}">Copy Page Link</button>
-              ${pageState.nextBundleId ? `<button type="button" class="btn secondary jump-page-btn" data-jump-page-id="${escapeHtml(p.id)}" data-jump-bundle-id="${escapeHtml(pageState.nextBundleId)}">Go To Next Bundle</button>` : ``}
-              ${pageState.nextBundleId ? `<button type="button" class="btn secondary copy-bundle-link-btn" data-copy-page-id="${escapeHtml(p.id)}" data-copy-bundle-id="${escapeHtml(pageState.nextBundleId)}">Copy Next Bundle Link</button>` : ``}
-              ${pageReview?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReview.compareUrl)}" target="_blank">Open Page Compare</a>` : ``}
-              ${pageState.nextBundleCompareUrl ? `<a class="btn secondary" href="${escapeHtml(pageState.nextBundleCompareUrl)}" target="_blank">Open Next Bundle Compare</a>` : ``}
+              <button type="button" class="btn secondary select-page-btn" data-select-page-id="${escapeHtml(p.id)}">${p.id === selectedId ? "선택됨" : "선택"}</button>
+              ${pageReview?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReview.compareUrl)}" target="_blank">비교 보기</a>` : ``}
             </div>
           </div>
         `;
         }).join("");
+        if (!visiblePages.length) {
+          pageListEl.innerHTML = `<div class="empty">조건에 맞는 페이지가 없습니다. 필터를 바꿔보세요.</div>`;
+        }
         pageListEl.querySelectorAll(".row").forEach((el) => {
           el.addEventListener("click", async () => {
             selectedId = el.dataset.id;
@@ -562,39 +646,14 @@
             await renderDetail();
           });
         });
-        pageListEl.querySelectorAll(".jump-page-btn").forEach((button) => {
+        pageListEl.querySelectorAll(".select-page-btn").forEach((button) => {
           button.addEventListener("click", async (event) => {
             event.stopPropagation();
-            const targetPageId = button.getAttribute("data-jump-page-id") || "";
-            const targetBundleId = button.getAttribute("data-jump-bundle-id") || "";
-            await navigateToBundle(targetPageId, targetBundleId);
-          });
-        });
-        pageListEl.querySelectorAll(".copy-page-link-btn").forEach((button) => {
-          button.addEventListener("click", async (event) => {
-            event.stopPropagation();
-            const targetPageId = button.getAttribute("data-copy-page-id") || "";
-            try {
-              await copyAdminLinkFor(targetPageId, "");
-              showAdminNotice(`Page link copied: ${targetPageId}`);
-            } catch (error) {
-              console.error(error);
-              showAdminNotice("Copy failed", "error");
-            }
-          });
-        });
-        pageListEl.querySelectorAll(".copy-bundle-link-btn").forEach((button) => {
-          button.addEventListener("click", async (event) => {
-            event.stopPropagation();
-            const targetPageId = button.getAttribute("data-copy-page-id") || "";
-            const targetBundleId = button.getAttribute("data-copy-bundle-id") || "";
-            try {
-              await copyAdminLinkFor(targetPageId, targetBundleId);
-              showAdminNotice(`Bundle link copied: ${targetBundleId}`);
-            } catch (error) {
-              console.error(error);
-              showAdminNotice("Copy failed", "error");
-            }
+            selectedId = button.getAttribute("data-select-page-id") || "";
+            selectedBundleId = "";
+            syncAdminStateUrl("push");
+            renderList();
+            await renderDetail();
           });
         });
       }
@@ -957,122 +1016,141 @@
 
         detailEl.innerHTML = `
           <div><strong>${escapeHtml(page.title || page.id)}</strong></div>
-          <div class="meta">${escapeHtml(page.pageGroup)} | sections: ${page.sections.length}</div>
-          <div class="meta">workspace updated: ${escapeHtml(workspaceMeta?.updatedAt || "n/a")} | llm usage: ${escapeHtml(workspaceMeta?.llmUsageCount || 0)}</div>
-          <div class="meta">pre-LLM: ${escapeHtml(gaps.overallStatus)} | component gaps: ${escapeHtml(gaps.componentGapCount || 0)} | fallback components: ${escapeHtml(gaps.fallbackComponentCount || 0)}</div>
-          <div class="meta">final readiness: ${escapeHtml(finalReadiness?.overallStatus || "pending")} | llm gate: ${escapeHtml(finalReadiness?.llmGateStatus || "pending")} | visual batch: ${escapeHtml(finalReadiness?.visualBatchStatus || "pending")} | bundles: ${escapeHtml(finalReadiness?.acceptanceBundleCount || 0)} | acceptance: ${escapeHtml(finalReadiness?.acceptance?.pass || 0)}/${escapeHtml(finalReadiness?.acceptance?.total || 0)} pass | fallback: ${escapeHtml(finalReadiness?.fallbackComponentCount || 0)}</div>
-          ${selectedBundleId ? `<div class="meta">current bundle target: <code>${escapeHtml(selectedBundleId)}</code></div>` : ``}
+          <div class="meta">${escapeHtml(pageLabel(page.id, page.title))} | 섹션 ${page.sections.length}개</div>
+          <div class="meta">최근 작업: ${escapeHtml(workspaceMeta?.updatedAt || "n/a")} | AI 사용 ${escapeHtml(workspaceMeta?.llmUsageCount || 0)}회</div>
+          ${selectedBundleId ? `<div class="meta">현재 선택된 번들: <code>${escapeHtml(selectedBundleId)}</code></div>` : ``}
           <div class="toolbar-actions">
-            <button id="resetWorkspaceBtn" type="button">Reset Workspace</button>
+            <button id="resetWorkspaceBtn" type="button">이 페이지 수정 초기화</button>
           </div>
           <div class="actions">
-            <a class="btn" href="/p/${encodeURIComponent(page.id)}" target="_blank">Open /p/${escapeHtml(page.id)}</a>
-            <a class="btn" href="/clone/${encodeURIComponent(page.id)}" target="_blank">Open /clone/${escapeHtml(page.id)}</a>
-            <button type="button" class="btn secondary" id="copyDetailStateBtn">Copy Page Link</button>
-            ${pageReviewMap.get(page.id)?.compareUrl ? `<a class="btn secondary" id="openDetailPageCompareBtn" href="${escapeHtml(pageReviewMap.get(page.id).compareUrl)}" target="_blank">Open Page Compare</a>` : ``}
-            ${selectedBundleId ? `<button type="button" class="btn secondary" id="copySelectedBundleBtn">Copy Selected Bundle Link</button>` : ``}
-            ${selectedBundleId ? `<button type="button" class="btn secondary" id="focusSelectedBundleBtn">Focus Selected Bundle</button>` : ``}
-            ${selectedBundleId ? `<button type="button" class="btn secondary" id="clearDetailBundleTargetBtn">Clear Bundle Target</button>` : ``}
-            ${selectedBundleDefinition?.review?.compareUrl ? `<a class="btn secondary" id="openSelectedBundleCompareBtn" href="${escapeHtml(selectedBundleDefinition.review.compareUrl)}" target="_blank">Open Selected Bundle Compare</a>` : ``}
+            <a class="btn" href="/clone/${encodeURIComponent(page.id)}" target="_blank">변경 화면 새 탭으로 보기</a>
+            <button type="button" class="btn secondary" id="copyDetailStateBtn">현재 설정 링크 복사</button>
+            ${pageReviewMap.get(page.id)?.compareUrl ? `<a class="btn secondary" id="openDetailPageCompareBtn" href="${escapeHtml(pageReviewMap.get(page.id).compareUrl)}" target="_blank">기준 화면과 비교</a>` : ``}
           </div>
-          <div class="section">
-            <div><strong>Runtime Page Scope</strong></div>
-            ${runtimeScopeHtml}
+          <div class="edit-guide">
+            <strong>작업 순서</strong>
+            <div class="meta">1. 아래 미리보기에서 현재 페이지를 본다.</div>
+            <div class="meta">2. AI 요청 또는 직접 수정으로 바꾸고 싶은 부분만 손본다.</div>
+            <div class="meta">3. 필요할 때만 아래 접힌 영역에서 비교/기술 정보를 확인한다.</div>
           </div>
-          <div class="section">
-            <div><strong>Page Advisories</strong></div>
-            ${advisoryHtml}
-          </div>
-          <div class="section">
-            <div><strong>Pre-LLM Gaps</strong></div>
-            ${gaps.globalGaps?.length ? gaps.globalGaps.map((gap) => `<div class="meta">${escapeHtml(gap)}</div>`).join("") : `<div class="meta">No global gaps.</div>`}
-            ${gaps.fallbackComponents?.length ? `<div class="meta">Fallback components</div><div class="gap-list">${gaps.fallbackComponents.map((item) => `<div class="gap-item"><strong>${escapeHtml(item.componentId)}</strong><div class="meta">${escapeHtml(item.sourceResolution)} | ${escapeHtml(item.activeSourceId || "")} -> ${escapeHtml(item.resolvedRenderSourceId || "")}</div>${item.detail ? `<div class="meta">${escapeHtml(item.detail)}</div>` : ``}</div>`).join("")}</div>` : ``}
-            ${gapHtml}
-          </div>
-          ${page.id === "home" ? `<div class="section"><div><strong>Home Link Coverage</strong></div>${homeLinkCoverageHtml}</div>` : ``}
-          <div class="section">
-            <div><strong>Visual Batch</strong></div>
-            ${visualBatch ? `
-              <div class="meta">status: ${escapeHtml(visualBatch.overallStatus || "unknown")}</div>
-              <div class="meta">generatedAt: ${escapeHtml(visualBatch.generatedAt || "n/a")}</div>
-              <div class="meta">homeLower sections: ${escapeHtml(visualBatch.artifacts?.homeLower?.sectionCount || 0)}</div>
-              <div class="meta">service captures: ${escapeHtml(visualBatch.artifacts?.servicePages?.captureCount || 0)} | errors: ${escapeHtml(visualBatch.artifacts?.servicePages?.errorCount || 0)}</div>
-              <div class="meta">plp captures: ${escapeHtml(visualBatch.artifacts?.plp?.captureCount || 0)} | errors: ${escapeHtml(visualBatch.artifacts?.plp?.errorCount || 0)}</div>
-            ` : `<div class="meta">visual batch summary pending</div>`}
-            ${reviewHtml}
-          </div>
-          <div class="section">
-            <div><strong>Final Acceptance Bundles</strong></div>
-            <div class="meta">page acceptance: ${escapeHtml(acceptanceResults?.overallStatus || "pending")} | pass ${escapeHtml(currentPageAcceptance?.pass || 0)} / ${escapeHtml(currentPageAcceptance?.total || 0)} | fail ${escapeHtml(currentPageAcceptance?.fail || 0)} | pending ${escapeHtml(currentPageAcceptance?.pending || 0)}</div>
-            ${acceptanceResults?.nextPendingBundle ? `<div class="meta">next pending bundle: <code>${escapeHtml(acceptanceResults.nextPendingBundle.bundleId)}</code> (${escapeHtml(acceptanceResults.nextPendingBundle.title)})</div><div class="actions"><button type="button" class="btn secondary" id="jumpNextPendingPageBtn">Go To Page</button><button type="button" class="btn secondary" id="copyNextPendingPageBtn">Copy Page Link</button><button type="button" class="btn secondary" id="focusNextPendingBtn">Focus Next Pending</button><button type="button" class="btn secondary" id="copyNextPendingBtn">Copy Next Pending Link</button>${pageReviewMap.get(page.id)?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReviewMap.get(page.id).compareUrl)}" target="_blank">Open Page Compare</a>` : ``}${acceptanceResults.nextPendingBundle.review?.compareUrl ? `<a class="btn" href="${escapeHtml(acceptanceResults.nextPendingBundle.review.compareUrl)}" target="_blank">Open Next Pending Bundle Compare</a>` : ``}</div>` : `<div class="meta">next pending bundle: none</div>`}
-            ${acceptanceQueue?.queue?.length ? `<div class="meta" style="margin-top:10px;">Acceptance queue</div><div class="gap-list">${acceptanceQueue.queue.slice(0, 5).map((item, index) => `<div class="gap-item acceptance-${escapeHtml(item.status)}"><strong>${index + 1}. ${escapeHtml(item.title)}</strong><div class="meta">${escapeHtml(item.pageId)} | ${escapeHtml(item.bundleId)} | ${escapeHtml(item.status)}</div><div class="meta">risk ${escapeHtml(item.bundleContext?.riskScore || 0)} | priority ${escapeHtml(item.bundleContext?.reviewPriority || "normal")} | advisory ${escapeHtml(item.bundleContext?.pageAdvisoryCount || 0)} (${escapeHtml(item.bundleContext?.pageAdvisorySeverity || "none")})</div>${item.bundleContext?.pageAdvisories?.length ? `<div class="meta">page advisories: ${escapeHtml(item.bundleContext.pageAdvisories.map((advisory) => `${advisory.severity}:${advisory.title || advisory.id}`).join(", "))}</div>` : ``}<div class="actions"><button type="button" class="btn secondary jump-page-btn" data-jump-page-id="${escapeHtml(item.pageId)}">Go To Page</button><button type="button" class="btn secondary copy-page-link-btn" data-copy-page-id="${escapeHtml(item.pageId)}">Copy Page Link</button><button type="button" class="btn secondary jump-acceptance-target-btn" data-jump-page-id="${escapeHtml(item.pageId)}" data-jump-bundle-id="${escapeHtml(item.bundleId)}">Go To Bundle</button><button type="button" class="btn secondary copy-bundle-link-btn" data-copy-page-id="${escapeHtml(item.pageId)}" data-copy-bundle-id="${escapeHtml(item.bundleId)}">Copy Bundle Link</button>${pageReviewMap.get(item.pageId)?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReviewMap.get(item.pageId).compareUrl)}" target="_blank">Open Page Compare</a>` : ``}${item.review?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(item.review.compareUrl)}" target="_blank">Open Bundle Compare</a>` : ``}</div></div>`).join("")}</div>` : ``}
-            ${currentFailedBundles.length ? `<div class="meta" style="margin-top:10px;">Current page failed bundles</div><div class="gap-list">${currentFailedBundles.map((bundle) => `<div class="gap-item acceptance-fail"><strong>${escapeHtml(bundle.title)}</strong><div class="meta">bundleId: ${escapeHtml(bundle.bundleId)}</div><div class="meta">risk ${escapeHtml(bundle.bundleContext?.riskScore || 0)} | priority ${escapeHtml(bundle.bundleContext?.reviewPriority || "normal")} | advisory ${escapeHtml(bundle.bundleContext?.pageAdvisoryCount || 0)} (${escapeHtml(bundle.bundleContext?.pageAdvisorySeverity || "none")})</div>${bundle.bundleContext?.pageAdvisories?.length ? `<div class="meta">page advisories: ${escapeHtml(bundle.bundleContext.pageAdvisories.map((advisory) => `${advisory.severity}:${advisory.title || advisory.id}`).join(", "))}</div>` : ``}<div class="meta">${escapeHtml(bundle.note || "no note")}</div><div class="actions"><button type="button" class="btn secondary jump-page-btn" data-jump-page-id="${escapeHtml(bundle.pageId)}">Go To Page</button><button type="button" class="btn secondary copy-page-link-btn" data-copy-page-id="${escapeHtml(bundle.pageId)}">Copy Page Link</button><button type="button" class="btn secondary jump-page-btn" data-jump-page-id="${escapeHtml(bundle.pageId)}" data-jump-bundle-id="${escapeHtml(bundle.bundleId)}">Go To Bundle</button><button type="button" class="btn secondary copy-bundle-link-btn" data-copy-page-id="${escapeHtml(bundle.pageId)}" data-copy-bundle-id="${escapeHtml(bundle.bundleId)}">Copy Bundle Link</button>${pageReviewMap.get(bundle.pageId)?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReviewMap.get(bundle.pageId).compareUrl)}" target="_blank">Open Page Compare</a>` : ``}${bundleDefinitionMap.get(bundle.bundleId)?.review?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(bundleDefinitionMap.get(bundle.bundleId).review.compareUrl)}" target="_blank">Open Bundle Compare</a>` : ``}</div></div>`).join("")}</div>` : ``}
-            <div class="meta" style="margin-top:10px;">Page acceptance summary</div>
-            ${acceptanceSummaryHtml}
-            <div class="meta">Recommended order</div>
-            ${allBundlesHtml}
-            <div class="meta" style="margin-top:10px;">Current page bundles</div>
-            ${bundleHtml}
-          </div>
+          <iframe class="preview-frame" src="/clone/${encodeURIComponent(page.id)}" title="clone preview"></iframe>
           <div class="llm">
-            <div><strong>LLM Change Request</strong></div>
-            <div class="meta">OpenRouter API key is read from environment variables.</div>
-            <textarea id="llmPrompt" placeholder="예: 홈 페이지에서 CTA Banner를 숨기고 Featured Products를 두 번째로 올려줘"></textarea>
-            <button class="run" id="runLlm">Apply with OpenRouter</button>
-            <div class="status" id="llmStatus">Idle</div>
+            <div><strong>AI 수정 요청</strong></div>
+            <div class="meta">지금 보고 있는 페이지를 기준으로, 바꾸고 싶은 내용을 자연어로 입력하면 된다.</div>
+            <div class="llm-guide">
+              <strong>예시</strong>
+              <div class="meta">홈 메인 비주얼 제목을 "새로운 봄 혜택"으로 바꿔줘</div>
+              <div class="meta">홈 공간 리뉴얼 섹션 제목을 "우리집 새단장"으로 바꿔줘</div>
+              <div class="meta">홈 히어로를 피그마 소스로 바꿔줘</div>
+            </div>
+            <textarea id="llmPrompt" placeholder="예: 홈 메인 비주얼 설명 문구를 '지금만 가능한 특별 혜택'으로 바꿔줘"></textarea>
+            <button class="run" id="runLlm">AI로 적용</button>
+            <div class="status" id="llmStatus">대기 중</div>
           </div>
           <div class="section">
-            <div><strong>Workspace Components</strong></div>
+            <div><strong>수정 가능한 컴포넌트</strong></div>
             <div class="component-grid">
               ${(inventory.components || []).map((component) => {
                 const editable = editabilityMap.get(component.componentId) || {};
                 const slot = slotMap.get(component.slotId) || { sources: [] };
                 const gap = gapMap.get(component.componentId) || null;
                 const patchSchema = editable.patchSchema || { rootKeys: [], styleKeys: [] };
+                const editableProps = editable.editableProps || [];
+                const editableStyles = editable.editableStyles || [];
                 return `
                   <div class="component-card" data-component-id="${escapeHtml(component.componentId)}" data-slot-id="${escapeHtml(component.slotId)}" data-page-id="${escapeHtml(page.id)}">
-                    <h4>${escapeHtml(component.componentId)}</h4>
+                    <div class="component-title-row">
+                      <h4>${escapeHtml(slotLabel(component.slotId))}</h4>
+                      <span class="component-label">${escapeHtml(component.componentId)}</span>
+                    </div>
                     <div class="meta-row">
-                      <span class="chip ${component.hasPatch ? "warn" : "pass"}">patch: ${component.hasPatch ? "yes" : "no"}</span>
+                      <span class="chip ${component.hasPatch ? "warn" : "pass"}">${component.hasPatch ? "수정 있음" : "기본 상태"}</span>
                       <span class="chip">${escapeHtml(component.kind || "unknown")}</span>
                       <span class="chip">${escapeHtml(component.containerMode || "n/a")}</span>
                       <span class="chip ${gap ? "warn" : "pass"}">${escapeHtml(gap ? gap.status : "pass")}</span>
                     </div>
-                    <div class="meta">slot: ${escapeHtml(component.slotId)} | source: <code>${escapeHtml(component.activeSourceId || "")}</code></div>
-                    <div class="meta">render: <code>${escapeHtml(component.resolvedRenderSourceId || component.activeSourceId || "")}</code> | resolution: <span class="chip ${component.sourceResolution === "direct" ? "pass" : "warn"}">${escapeHtml(component.sourceResolution || "unknown")}</span></div>
-                    ${component.sourceResolutionDetail ? `<div class="meta">resolution detail: ${escapeHtml(component.sourceResolutionDetail)}</div>` : ""}
-                    ${Array.isArray(component.advisories) && component.advisories.length ? `<div class="meta">advisories: ${escapeHtml(component.advisories.map((item) => item.id).join(", "))}</div>` : ""}
-                    <div class="meta">editable: ${escapeHtml((editable.editableProps || []).join(", ") || "none")} | styles: ${escapeHtml((editable.editableStyles || []).join(", ") || "none")}</div>
-                    <div class="meta">patch schema: root[${escapeHtml(patchSchema.rootKeys.join(", ") || "-")}] style[${escapeHtml(patchSchema.styleKeys.join(", ") || "-")}]</div>
+                    <div class="component-copy">현재 소스: <code>${escapeHtml(component.activeSourceId || "")}</code> / 렌더 기준: <code>${escapeHtml(component.resolvedRenderSourceId || component.activeSourceId || "")}</code></div>
+                    ${component.sourceResolutionDetail ? `<div class="meta">소스 해석: ${escapeHtml(component.sourceResolutionDetail)}</div>` : ""}
+                    <div class="meta">수정 가능한 내용</div>
+                    ${renderLabelChips(editableProps, editableLabelMap)}
+                    <div class="meta" style="margin-top:8px;">조절 가능한 스타일</div>
+                    ${renderLabelChips(editableStyles, styleLabelMap)}
+                    ${(patchSchema.rootKeys || []).length || (patchSchema.styleKeys || []).length ? `<div class="meta" style="margin-top:8px;">패치 키: root[${escapeHtml((patchSchema.rootKeys || []).join(", ") || "-")}] / style[${escapeHtml((patchSchema.styleKeys || []).join(", ") || "-")}]</div>` : ``}
+                    ${Array.isArray(component.advisories) && component.advisories.length ? `<div class="meta">주의사항: ${escapeHtml(component.advisories.map((item) => item.id).join(", "))}</div>` : ``}
                     <div class="component-actions">
                       <select class="source-select">
                         ${(slot.sources || []).map((source) => `
                           <option value="${escapeHtml(source.sourceId)}" ${source.sourceId === component.activeSourceId ? "selected" : ""}>
-                            ${escapeHtml(source.sourceId)} (${escapeHtml(source.sourceType || source.status || "")})
+                            ${escapeHtml(source.sourceId)} (${escapeHtml(sourceTypeLabel(source.sourceType || source.status || ""))})
                           </option>
                         `).join("")}
                       </select>
-                      <button type="button" class="btn apply-source-btn">Apply Source</button>
-                      <button type="button" class="btn secondary load-patch-btn">Load Patch</button>
+                      <button type="button" class="btn apply-source-btn">이 소스로 바꾸기</button>
+                      <button type="button" class="btn secondary load-patch-btn">저장된 수정 불러오기</button>
                     </div>
-                    <textarea class="inline-textarea patch-json" placeholder='{"title":"...", "styles":{"background":"#fff"}}'></textarea>
+                    <textarea class="inline-textarea patch-json" placeholder='예: {"title":"새 제목","subtitle":"보조 설명","styles":{"background":"#fff"}}'></textarea>
                     <div class="component-actions">
-                      <button type="button" class="btn apply-patch-btn">Apply Patch</button>
+                      <button type="button" class="btn apply-patch-btn">직접 수정 저장</button>
                     </div>
-                    <div class="component-status">Idle</div>
+                    <div class="component-status">대기 중</div>
                   </div>
                 `;
               }).join("")}
             </div>
           </div>
-          <iframe class="preview-frame" src="/clone/${encodeURIComponent(page.id)}" title="clone preview"></iframe>
-          ${page.sections.map((s) => `
-            <div class="section">
-              <div><strong>${escapeHtml(s.name)}</strong></div>
-              <div class="meta">component: ${escapeHtml(s.componentType)}</div>
-              <div class="meta">visible: ${escapeHtml(s.visible)} | order: ${escapeHtml(s.order)}</div>
+          <details class="fold-section">
+            <summary>비교 자료 / 운영 정보</summary>
+            <div class="fold-body">
+              <div class="section">
+                <div><strong>검수 상태</strong></div>
+                <div class="meta">page acceptance: ${escapeHtml(acceptanceResults?.overallStatus || "pending")} | pass ${escapeHtml(currentPageAcceptance?.pass || 0)} / ${escapeHtml(currentPageAcceptance?.total || 0)} | fail ${escapeHtml(currentPageAcceptance?.fail || 0)} | pending ${escapeHtml(currentPageAcceptance?.pending || 0)}</div>
+                ${acceptanceResults?.nextPendingBundle ? `<div class="meta">next pending bundle: <code>${escapeHtml(acceptanceResults.nextPendingBundle.bundleId)}</code> (${escapeHtml(acceptanceResults.nextPendingBundle.title)})</div>` : `<div class="meta">next pending bundle: none</div>`}
+                ${currentFailedBundles.length ? `<div class="meta" style="margin-top:10px;">Current page failed bundles</div><div class="gap-list">${currentFailedBundles.map((bundle) => `<div class="gap-item acceptance-fail"><strong>${escapeHtml(bundle.title)}</strong><div class="meta">bundleId: ${escapeHtml(bundle.bundleId)}</div><div class="meta">${escapeHtml(bundle.note || "no note")}</div></div>`).join("")}</div>` : ``}
+              </div>
+              <div class="section">
+                <div><strong>비교 자료</strong></div>
+                ${reviewHtml}
+              </div>
+              ${page.id === "home" ? `<div class="section"><div><strong>홈 링크 현황</strong></div>${homeLinkCoverageHtml}</div>` : ``}
+              <div class="section">
+                <div><strong>운영 번들</strong></div>
+                <div class="meta">Recommended order</div>
+                ${allBundlesHtml}
+                <div class="meta" style="margin-top:10px;">Current page bundles</div>
+                ${bundleHtml}
+              </div>
             </div>
-          `).join("")}
+          </details>
+          <details class="fold-section">
+            <summary>기술 정보</summary>
+            <div class="fold-body">
+              <div class="section">
+                <div><strong>런타임 범위</strong></div>
+                ${runtimeScopeHtml}
+              </div>
+              <div class="section">
+                <div><strong>페이지 주의사항</strong></div>
+                ${advisoryHtml}
+              </div>
+              <div class="section">
+                <div><strong>Pre-LLM 상태</strong></div>
+                <div class="meta">pre-LLM: ${escapeHtml(gaps.overallStatus)} | component gaps: ${escapeHtml(gaps.componentGapCount || 0)} | fallback components: ${escapeHtml(gaps.fallbackComponentCount || 0)}</div>
+                ${gaps.globalGaps?.length ? gaps.globalGaps.map((gap) => `<div class="meta">${escapeHtml(gap)}</div>`).join("") : `<div class="meta">No global gaps.</div>`}
+                ${gaps.fallbackComponents?.length ? `<div class="meta">Fallback components</div><div class="gap-list">${gaps.fallbackComponents.map((item) => `<div class="gap-item"><strong>${escapeHtml(item.componentId)}</strong><div class="meta">${escapeHtml(item.sourceResolution)} | ${escapeHtml(item.activeSourceId || "")} -> ${escapeHtml(item.resolvedRenderSourceId || "")}</div>${item.detail ? `<div class="meta">${escapeHtml(item.detail)}</div>` : ``}</div>`).join("")}</div>` : ``}
+                ${gapHtml}
+              </div>
+              <div class="section">
+                <div><strong>배치 상태</strong></div>
+                ${visualBatch ? `
+                  <div class="meta">status: ${escapeHtml(visualBatch.overallStatus || "unknown")}</div>
+                  <div class="meta">generatedAt: ${escapeHtml(visualBatch.generatedAt || "n/a")}</div>
+                  <div class="meta">homeLower sections: ${escapeHtml(visualBatch.artifacts?.homeLower?.sectionCount || 0)}</div>
+                  <div class="meta">service captures: ${escapeHtml(visualBatch.artifacts?.servicePages?.captureCount || 0)} | errors: ${escapeHtml(visualBatch.artifacts?.servicePages?.errorCount || 0)}</div>
+                  <div class="meta">plp captures: ${escapeHtml(visualBatch.artifacts?.plp?.captureCount || 0)} | errors: ${escapeHtml(visualBatch.artifacts?.plp?.errorCount || 0)}</div>
+                ` : `<div class="meta">visual batch summary pending</div>`}
+              </div>
+            </div>
+          </details>
         `;
 
         const runBtn = document.getElementById("runLlm");
@@ -1082,31 +1160,31 @@
         if (!finalReadiness?.llmGateOpen) {
           runBtn.disabled = true;
           runBtn.title = "Acceptance bundles must all pass before LLM changes are allowed.";
-          statusEl.textContent = `LLM blocked: ${finalReadiness?.llmGateStatus || "pending"}`;
+          statusEl.textContent = `AI 수정 잠금: ${finalReadiness?.llmGateStatus || "pending"}`;
         } else if (finalReadiness?.llmGateBypassActive) {
           runBtn.disabled = false;
           runBtn.title = "Demo LLM bypass active";
-          statusEl.textContent = `LLM demo bypass active: ${finalReadiness?.rawLlmGateStatus || "pending"}`;
+          statusEl.textContent = `데모 AI 우회 활성화: ${finalReadiness?.rawLlmGateStatus || "pending"}`;
         }
 
         resetWorkspaceBtn.addEventListener("click", async () => {
-          statusEl.textContent = "Resetting workspace...";
+          statusEl.textContent = "작업본 초기화 중...";
           try {
             await fetchJson("/api/workspace/reset", { method: "POST" });
             await refreshData();
-            statusEl.textContent = "Workspace reset to shared default";
+            statusEl.textContent = "공용 기본값으로 초기화됨";
           } catch (error) {
-            statusEl.textContent = "Reset failed: " + String(error);
+            statusEl.textContent = "초기화 실패: " + String(error);
           }
         });
 
         runBtn.addEventListener("click", async () => {
           const prompt = (promptEl.value || "").trim();
           if (!prompt) {
-            statusEl.textContent = "Prompt is required";
+            statusEl.textContent = "요청 문구를 입력해야 한다";
             return;
           }
-          statusEl.textContent = "Applying...";
+          statusEl.textContent = "AI 적용 중...";
           try {
             const response = await fetch("/api/llm/change", {
               method: "POST",
@@ -1115,13 +1193,13 @@
             });
             const payload = await response.json();
             if (!response.ok) {
-              statusEl.textContent = `Failed: ${payload.detail || payload.error}`;
+              statusEl.textContent = `실패: ${payload.detail || payload.error}`;
               return;
             }
-            statusEl.textContent = payload.summary || "Applied";
+            statusEl.textContent = payload.summary || "적용 완료";
             await refreshData();
           } catch (error) {
-            statusEl.textContent = "Failed: " + String(error);
+            statusEl.textContent = "실패: " + String(error);
           }
         });
 
@@ -1134,28 +1212,28 @@
           const componentStatusEl = card.querySelector(".component-status");
 
           card.querySelector(".apply-source-btn")?.addEventListener("click", async () => {
-            componentStatusEl.textContent = "Applying source...";
+            componentStatusEl.textContent = "소스 적용 중...";
             try {
               await fetchJson("/api/workspace/slot-source", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ pageId, slotId, sourceId: sourceSelect.value }),
               });
-              componentStatusEl.textContent = `Applied source: ${sourceSelect.value}`;
+              componentStatusEl.textContent = `소스 적용 완료: ${sourceSelect.value}`;
               await renderDetail();
             } catch (error) {
-              componentStatusEl.textContent = "Source failed: " + String(error);
+              componentStatusEl.textContent = "소스 적용 실패: " + String(error);
             }
           });
 
           card.querySelector(".load-patch-btn")?.addEventListener("click", async () => {
-            componentStatusEl.textContent = "Loading patch...";
+            componentStatusEl.textContent = "저장된 수정 불러오는 중...";
             try {
               const payload = await fetchJson(`/api/workspace/component-patches?pageId=${encodeURIComponent(pageId)}&componentId=${encodeURIComponent(componentId)}&sourceId=${encodeURIComponent(sourceSelect.value)}`);
               patchEl.value = payload.patch ? JSON.stringify(payload.patch, null, 2) : "";
-              componentStatusEl.textContent = payload.patch ? "Patch loaded" : "No patch saved";
+              componentStatusEl.textContent = payload.patch ? "저장된 수정 불러옴" : "저장된 수정 없음";
             } catch (error) {
-              componentStatusEl.textContent = "Load failed: " + String(error);
+              componentStatusEl.textContent = "불러오기 실패: " + String(error);
             }
           });
 
@@ -1164,10 +1242,10 @@
             try {
               patch = patchEl.value.trim() ? JSON.parse(patchEl.value) : {};
             } catch (error) {
-              componentStatusEl.textContent = "Patch JSON invalid";
+              componentStatusEl.textContent = "수정 JSON 형식이 올바르지 않음";
               return;
             }
-            componentStatusEl.textContent = "Applying patch...";
+            componentStatusEl.textContent = "수정 저장 중...";
             try {
               const payload = await fetchJson("/api/workspace/component-patch", {
                 method: "POST",
@@ -1175,10 +1253,10 @@
                 body: JSON.stringify({ pageId, componentId, sourceId: sourceSelect.value, patch }),
               });
               patchEl.value = JSON.stringify(payload.patch || {}, null, 2);
-              componentStatusEl.textContent = "Patch applied";
+              componentStatusEl.textContent = "수정 저장 완료";
               await renderDetail();
             } catch (error) {
-              componentStatusEl.textContent = "Patch failed: " + String(error);
+              componentStatusEl.textContent = "수정 저장 실패: " + String(error);
             }
           });
         });
