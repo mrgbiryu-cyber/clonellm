@@ -2234,3 +2234,23 @@
 - 의미:
   - acceptance screenshot diff에서 실제 clone 화면과 무관한 overlay 오염을 줄였다.
   - PLP diff는 여전히 높지만, 이제 오버레이가 기본 원인은 아니다.
+
+### 2026-04-12 029
+
+- `capture:plp` 기본 동작을 working capture로 정정
+- 원인:
+  1. `scripts/capture_plp_representatives.mjs`는 `--source`가 없으면 `reference`로 떨어짐
+  2. 기존 `npm run capture:plp`는 실제 clone working artifact를 갱신하지 못했음
+- 변경:
+  1. `package.json`
+     - `capture:plp` -> `node scripts/capture_plp_representatives.mjs --source working`
+     - `capture:plp:reference` 추가
+- 재검증:
+  1. working metadata `capturedAt`가 `2026-04-12T01:40:23.609Z`로 갱신됨
+  2. PLP diff는 working recapture 후에도 큰 폭으로 유지
+     - `category-tvs:pc 30.37%`
+     - `category-refrigerators:pc 21.54%`
+     - `category-refrigerators:mo 20.19%`
+- 의미:
+  - 이제 PLP compare는 stale artifact가 아니라 현재 clone working 기준으로 읽는다.
+  - 남은 큰 diff는 capture 도구 문제가 아니라 실제 shell/banner/filter/sort/style mismatch로 봐야 한다.

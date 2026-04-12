@@ -37,11 +37,11 @@
 ## PLP PC
 
 - `category-tvs:pc`
-  - mismatch: `30.41%`
+  - mismatch: `30.37%`
   - representative count: `3`
   - representative rects/text match: `true`
 - `category-refrigerators:pc`
-  - mismatch: `21.56%`
+  - mismatch: `21.54%`
   - representative count: `3`
   - representative rects/text match: `true`
 

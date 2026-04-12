@@ -7235,8 +7235,8 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
     <style>
       html, body { min-height: 100%; visibility: visible !important; opacity: 1 !important; }
       body { background: #fff; visibility: visible !important; opacity: 1 !important; }
-      [style*="visibility:hidden"] { visibility: visible !important; }
-      [style*="opacity:0"] { opacity: 1 !important; }
+      img[style*="visibility:hidden"][src]:not([src=""]) { visibility: visible !important; }
+      img[style*="opacity:0"][src]:not([src=""]) { opacity: 1 !important; }
       [hidden][data-codex-force-visible] { display: initial !important; }
       .skip_nav,
       .skip-nav {
@@ -7771,6 +7771,25 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
         width: 100%;
         height: 100%;
         object-fit: cover;
+      }
+      .codex-home-lower-replay[class*="HomeMoListVerticaltype_list_verticaltype__"] [class*="HomeMoListVerticaltype_image__"] {
+        overflow: hidden;
+        border-radius: 20px;
+        background: #f3f4f6;
+      }
+      .codex-home-lower-replay[class*="HomeMoListVerticaltype_list_verticaltype__"] [class*="HomeMoListVerticaltype_image__"] .codex-home-template-image {
+        border-radius: inherit;
+        object-position: center center;
+      }
+      .codex-home-lower-replay[class*="HomeMoBannerPromotion_banner_promotion__"] [class*="HomeMoBannerPromotion_banner_image_wrap__"] {
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        overflow: hidden;
+      }
+      .codex-home-lower-replay[class*="HomeMoBannerPromotion_banner_promotion__"] [class*="HomeMoBannerPromotion_banner_image_wrap__"] .codex-home-template-image {
+        object-fit: contain;
+        object-position: center bottom;
       }
       .codex-home-lower-replay .codex-home-template-fallback {
         display: block;
@@ -9467,8 +9486,8 @@ function rewriteReferenceHtml(rawHtml, pageId) {
     `<style>
       html, body { min-height: 100%; visibility: visible !important; opacity: 1 !important; }
       body { background: #fff; visibility: visible !important; opacity: 1 !important; }
-      [style*="visibility:hidden"] { visibility: visible !important; }
-      [style*="opacity:0"] { opacity: 1 !important; }
+      img[style*="visibility:hidden"][src]:not([src=""]) { visibility: visible !important; }
+      img[style*="opacity:0"][src]:not([src=""]) { opacity: 1 !important; }
       ${isHome ? buildHomeHeroRuntimeCss() : ""}
     </style></head>`
   );
@@ -9658,14 +9677,13 @@ function rewriteProductCapturedHtml(rawHtml) {
   html = html.replace(/\b(href|src|poster)=("|')\/(?!\/)/gi, `$1=$2https://www.lge.co.kr/`);
   html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
   html = html.replace(/visibility\s*:\s*hidden/gi, "visibility:visible");
-  html = html.replace(/opacity\s*:\s*0(?!\.\d)/gi, "opacity:1");
   html = html.replace(
     /<\/head>/i,
     `<style>
       html, body { min-height: 100%; visibility: visible !important; opacity: 1 !important; }
       body { background: #fff; visibility: visible !important; opacity: 1 !important; }
-      [style*="visibility:hidden"] { visibility: visible !important; }
-      [style*="opacity:0"] { opacity: 1 !important; }
+      img[style*="visibility:hidden"][src]:not([src=""]) { visibility: visible !important; }
+      img[style*="opacity:0"][src]:not([src=""]) { opacity: 1 !important; }
     </style></head>`
   );
   return html;
