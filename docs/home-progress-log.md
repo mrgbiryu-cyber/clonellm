@@ -2275,3 +2275,13 @@
 - 의미:
   - hidden override 축소는 안전성 보정으로는 필요했지만, 현재 acceptance hotspot의 주원인은 아니다.
   - 남은 큰 diff는 여전히 실제 shell/banner/filter/sort/style mismatch로 봐야 한다.
+
+## 2026-04-12 031
+- PLP working capture split by viewport profile: `pc -> /clone?view=pc`, `mo -> /clone-content?viewportProfile=mo`.
+- `sendCloneShell()` now honors `view` / `viewportProfile` when deciding shell header visibility and iframe viewport forwarding.
+- PLP working diff after recapture:
+  - `category-tvs:pc 4.24%`
+  - `category-refrigerators:pc 4.27%`
+  - `category-tvs:mo 4.30%`
+  - `category-refrigerators:mo 16.28%`
+- Remaining PLP hotspot is `category-refrigerators:mo`, currently driven by top app banner visibility/state delta.

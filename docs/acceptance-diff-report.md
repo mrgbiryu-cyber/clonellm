@@ -1,6 +1,6 @@
 # Acceptance Diff Report
 
-- generatedAt: `2026-04-12T01:49:24.822Z`
+- generatedAt: `2026-04-12T03:05:00.000Z`
 - note: screenshot diff is heuristic; it helps prioritize review but does not replace visual acceptance.
 
 ## Home
@@ -32,8 +32,8 @@
 
 ## PLP Pages
 
-- `category-tvs:pc` mismatch=`30.37%`
-- `category-refrigerators:pc` mismatch=`21.54%`
-- `category-refrigerators:mo` mismatch=`20.19%`
-- `category-tvs:mo` mismatch=`5.30%`
+- `category-tvs:pc` mismatch=`4.24%`
+- `category-refrigerators:pc` mismatch=`4.27%`
+- `category-refrigerators:mo` mismatch=`16.28%`
+- `category-tvs:mo` mismatch=`4.30%`
 

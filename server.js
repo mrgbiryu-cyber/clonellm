@@ -7202,8 +7202,6 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
   html = html.replace(/<link[^>]+rel=("|')manifest\1[^>]*>/gi, "");
   html = html.replace(/\b(href|src|poster)=("|')\/(?!\/)/gi, `$1=$2https://www.lge.co.kr/`);
   html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
-  html = html.replace(/visibility\s*:\s*hidden/gi, "visibility:visible");
-  html = html.replace(/opacity\s*:\s*0(?!\.\d)/gi, "opacity:1");
   if (isHome) {
     html = injectHomeReplacements(html, rawHtml, homeMobileHtml, { ...options, editableData });
   }
@@ -9465,8 +9463,6 @@ function rewriteReferenceHtml(rawHtml, pageId) {
   html = html.replace(/<link[^>]+rel=("|')manifest\1[^>]*>/gi, "");
   html = html.replace(/\b(href|src|poster)=("|')\/(?!\/)/gi, `$1=$2https://www.lge.co.kr/`);
   html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
-  html = html.replace(/visibility\s*:\s*hidden/gi, "visibility:visible");
-  html = html.replace(/opacity\s*:\s*0(?!\.\d)/gi, "opacity:1");
   html = html.replace(/\shidden(?=[\s>])/gi, "");
   if (isHome) {
     html = injectHomeReplacements(html, rawHtml, homeMobileHtml);
@@ -9676,7 +9672,6 @@ function rewriteProductCapturedHtml(rawHtml) {
   html = html.replace(/<link[^>]+rel=("|')manifest\1[^>]*>/gi, "");
   html = html.replace(/\b(href|src|poster)=("|')\/(?!\/)/gi, `$1=$2https://www.lge.co.kr/`);
   html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
-  html = html.replace(/visibility\s*:\s*hidden/gi, "visibility:visible");
   html = html.replace(
     /<\/head>/i,
     `<style>
@@ -9816,11 +9811,23 @@ function sendCloneShell(res, pageId, requestUrl = null) {
   const safePageId = String(pageId || "home");
   const homeSandbox = String(requestUrl?.searchParams?.get("homeSandbox") || "").trim();
   const homeVariant = String(requestUrl?.searchParams?.get("homeVariant") || "").trim();
+  const requestedView = String(
+    requestUrl?.searchParams?.get("view") ||
+    requestUrl?.searchParams?.get("viewportProfile") ||
+    ""
+  )
+    .trim()
+    .toLowerCase();
   const homeSandboxQuery = homeSandbox ? `&homeSandbox=${encodeURIComponent(homeSandbox)}` : "";
   const homeVariantQuery = homeVariant ? `&homeVariant=${encodeURIComponent(homeVariant)}` : "";
   const editableData = readEditableData();
   const baseline = resolveBaselineInfo(safePageId);
-  const isMobileShell = baseline.mode === "mobile";
+  const shellViewportProfile = requestedView === "mo" || requestedView === "pc"
+    ? requestedView
+    : baseline.mode === "mobile"
+      ? "mo"
+      : "pc";
+  const isMobileShell = shellViewportProfile === "mo";
   const useCapturedShellHeader =
     safePageId === "home" &&
     isCapturedSourceActive(editableData, "home", "header-top") &&
@@ -10256,7 +10263,7 @@ function sendCloneShell(res, pageId, requestUrl = null) {
         id="clone-frame"
         class="clone-frame"
         title="Captured clone"
-        src="/clone-content/${encodeURIComponent(safePageId)}?v=${Date.now()}${homeSandboxQuery}${homeVariantQuery}"
+        src="/clone-content/${encodeURIComponent(safePageId)}?viewportProfile=${encodeURIComponent(shellViewportProfile)}&v=${Date.now()}${homeSandboxQuery}${homeVariantQuery}"
       ></iframe>
     </div>
     <script>

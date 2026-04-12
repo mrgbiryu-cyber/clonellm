@@ -250,18 +250,28 @@ async function settlePlpPage(client) {
   await sleep(5000);
   await client.send("Runtime.evaluate", {
     expression: `(() => {
+      const frame = document.getElementById('clone-frame');
+      const rootDoc = frame?.contentDocument || document;
+      const rootWin = frame?.contentWindow || window;
       const hidden = ['.chatbot','.floating','.sticky-banner','.layer-popup','.toast','[class*="chat"]','[class*="Chat"]','[class*="toast"]'];
       hidden.forEach((selector) => {
-        document.querySelectorAll(selector).forEach((node) => {
+        rootDoc.querySelectorAll(selector).forEach((node) => {
           node.style.visibility = 'hidden';
           node.style.opacity = '0';
           node.style.pointerEvents = 'none';
         });
       });
-      window.scrollTo(0, 0);
+      rootDoc.querySelectorAll('.swiper').forEach((node) => {
+        const instance = node.swiper;
+        if (!instance) return;
+        try { instance.autoplay?.stop?.(); } catch {}
+        try { instance.slideTo?.(0, 0, false); } catch {}
+      });
+      try { rootWin.scrollTo(0, 0); } catch {}
+      try { window.scrollTo(0, 0); } catch {}
       return {
-        title: document.title || '',
-        scrollHeight: Math.round(document.documentElement?.scrollHeight || document.body?.scrollHeight || 0)
+        title: rootDoc.title || document.title || '',
+        scrollHeight: Math.round(rootDoc.documentElement?.scrollHeight || rootDoc.body?.scrollHeight || 0)
       };
     })()`,
     returnByValue: true,
@@ -300,7 +310,9 @@ async function captureVariant(session, target, sourceType, baseUrl) {
   const htmlPath = path.join(dir, `${sourceType}.html`);
   const metadataPath = path.join(dir, `${sourceType}.metadata.json`);
   const targetUrl = sourceType === "working"
-    ? `${baseUrl}/clone-content/${encodeURIComponent(target.pageId)}?viewportProfile=${encodeURIComponent(target.viewportProfile)}`
+    ? target.viewportProfile === "pc"
+      ? `${baseUrl}/clone/${encodeURIComponent(target.pageId)}?view=${encodeURIComponent(target.viewportProfile)}`
+      : `${baseUrl}/clone-content/${encodeURIComponent(target.pageId)}?viewportProfile=${encodeURIComponent(target.viewportProfile)}`
     : target.sourceUrl;
 
   const client = session.client;
