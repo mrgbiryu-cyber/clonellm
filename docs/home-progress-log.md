@@ -2254,3 +2254,24 @@
 - 의미:
   - 이제 PLP compare는 stale artifact가 아니라 현재 clone working 기준으로 읽는다.
   - 남은 큰 diff는 capture 도구 문제가 아니라 실제 shell/banner/filter/sort/style mismatch로 봐야 한다.
+
+### 2026-04-12 030
+
+- clone-content 전역 hidden override를 이미지 태그로 축소
+- 변경:
+  1. `[style*="visibility:hidden"]`, `[style*="opacity:0"]` 전역 해제 제거
+  2. 실제 이미지 태그에만 visible/opacity 보정 적용
+- 목적:
+  1. focus guard, hidden panel, runtime-only hidden node가 강제로 노출되는 부작용 제거
+- 재검증:
+  1. PLP working recapture 후에도 diff는 큰 폭 유지
+     - `category-tvs:pc 30.37%`
+     - `category-refrigerators:pc 21.54%`
+     - `category-refrigerators:mo 20.19%`
+  2. home lower recapture 결과도 큰 개선 없음
+     - `smart-life 11.64%`
+     - `subscription 7.78%`
+     - `summary-banner-2 7.32%`
+- 의미:
+  - hidden override 축소는 안전성 보정으로는 필요했지만, 현재 acceptance hotspot의 주원인은 아니다.
+  - 남은 큰 diff는 여전히 실제 shell/banner/filter/sort/style mismatch로 봐야 한다.

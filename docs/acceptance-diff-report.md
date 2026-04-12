@@ -1,6 +1,6 @@
 # Acceptance Diff Report
 
-- generatedAt: `2026-04-12T01:46:21.731Z`
+- generatedAt: `2026-04-12T01:49:24.822Z`
 - note: screenshot diff is heuristic; it helps prioritize review but does not replace visual acceptance.
 
 ## Home
@@ -12,7 +12,7 @@
 ## Home Lower
 
 - `smart-life` mismatch=`11.64%`
-- `subscription` mismatch=`7.71%`
+- `subscription` mismatch=`7.78%`
 - `summary-banner-2` mismatch=`7.32%`
 - `space-renewal` mismatch=`6.43%`
 - `bestshop-guide` mismatch=`5.46%`

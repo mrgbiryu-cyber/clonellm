@@ -15,7 +15,7 @@
   - clone height: `559`
   - height delta: `1`
 - `subscription`
-  - mismatch: `7.71%`
+  - mismatch: `7.78%`
   - live height: `768`
   - clone height: `769`
   - height delta: `1`
