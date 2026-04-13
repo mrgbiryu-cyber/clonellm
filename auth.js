@@ -236,6 +236,40 @@ function normalizePinnedViewsByPage(value) {
   return next;
 }
 
+function normalizePageIdentityLines(value) {
+  return toPlainArray(value)
+    .map((item) => String(item || "").trim())
+    .filter(Boolean)
+    .slice(0, 20);
+}
+
+function normalizePageIdentityOverride(entry, { pageId = "" } = {}) {
+  const normalizedPageId = String(entry?.pageId || pageId || "").trim();
+  return {
+    pageId: normalizedPageId,
+    role: String(entry?.role || "").trim(),
+    purpose: String(entry?.purpose || "").trim(),
+    designIntent: String(entry?.designIntent || "").trim(),
+    mustPreserve: normalizePageIdentityLines(entry?.mustPreserve),
+    shouldAvoid: normalizePageIdentityLines(entry?.shouldAvoid),
+    visualGuardrails: normalizePageIdentityLines(entry?.visualGuardrails),
+    createdAt: String(entry?.createdAt || nowIso()),
+    updatedAt: String(entry?.updatedAt || entry?.createdAt || nowIso()),
+  };
+}
+
+function normalizePageIdentityOverrides(value) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  return Object.fromEntries(
+    Object.entries(source)
+      .map(([pageId, entry]) => {
+        const normalized = normalizePageIdentityOverride(entry, { pageId });
+        return normalized.pageId ? [normalized.pageId, normalized] : null;
+      })
+      .filter(Boolean)
+  );
+}
+
 function normalizeWorkspaceRecord(workspace, { userId = "" } = {}) {
   const normalizedUserId = String(workspace?.userId || userId || "").trim();
   const normalized = {
@@ -249,6 +283,7 @@ function normalizeWorkspaceRecord(workspace, { userId = "" } = {}) {
     draftBuilds: toPlainArray(workspace?.draftBuilds).map(normalizeDraftBuild).slice(0, 200),
     savedVersions: toPlainArray(workspace?.savedVersions).map(normalizeSavedVersion).slice(0, 200),
     pinnedViewsByPage: normalizePinnedViewsByPage(workspace?.pinnedViewsByPage),
+    pageIdentityOverrides: normalizePageIdentityOverrides(workspace?.pageIdentityOverrides),
   };
   return normalized;
 }
@@ -281,6 +316,7 @@ function initializeWorkspace(userId) {
     draftBuilds: [],
     savedVersions: [],
     pinnedViewsByPage: {},
+    pageIdentityOverrides: {},
   });
   payload.workspaces.push(workspace);
   writeWorkspaces(payload);
@@ -520,6 +556,45 @@ function getPinnedView(userId, pageId) {
   };
 }
 
+function getPageIdentityOverride(userId, pageId) {
+  const workspace = getWorkspace(userId);
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return null;
+  const entry = workspace.pageIdentityOverrides?.[normalizedPageId] || null;
+  return entry ? normalizePageIdentityOverride(entry, { pageId: normalizedPageId }) : null;
+}
+
+function savePageIdentityOverride(userId, pageId, input = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) throw new Error("page_id_required");
+  const normalizedInput = normalizePageIdentityOverride({ ...input, pageId: normalizedPageId }, { pageId: normalizedPageId });
+  const { workspace, result } = updateWorkspaceMeta(
+    userId,
+    (draft) => {
+      draft.pageIdentityOverrides = normalizePageIdentityOverrides(draft.pageIdentityOverrides);
+      const existing = draft.pageIdentityOverrides[normalizedPageId] || null;
+      const nextEntry = normalizePageIdentityOverride(
+        {
+          ...(existing || {}),
+          ...normalizedInput,
+          pageId: normalizedPageId,
+          createdAt: existing?.createdAt || normalizedInput.createdAt || nowIso(),
+          updatedAt: nowIso(),
+        },
+        { pageId: normalizedPageId }
+      );
+      draft.pageIdentityOverrides[normalizedPageId] = nextEntry;
+      return nextEntry;
+    },
+    {
+      logType: "workspace_page_identity_saved",
+      logDetail: { pageId: normalizedPageId },
+      historySummary: `page_identity:${normalizedPageId}`,
+    }
+  );
+  return result || workspace.pageIdentityOverrides?.[normalizedPageId] || null;
+}
+
 function registerUser({ loginId, password, displayName }) {
   const normalizedLoginId = normalizeLoginId(loginId);
   if (!normalizedLoginId) throw new Error("login_id_required");
@@ -596,4 +671,6 @@ module.exports = {
   saveSavedVersion,
   pinSavedVersion,
   getPinnedView,
+  getPageIdentityOverride,
+  savePageIdentityOverride,
 };

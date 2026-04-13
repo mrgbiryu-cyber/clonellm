@@ -115,8 +115,20 @@
       .planner-component-item strong { display: block; font-size: 12px; color: #111827; }
       .planner-component-item .meta { margin-top: 2px; }
       .planner-loading-box { margin-top: 10px; padding: 12px; border: 1px solid #dbeafe; border-radius: 10px; background: #f8fbff; }
+      .planner-loading-message { margin-top: 6px; font-size: 13px; color: #1d4ed8; }
       .planner-loading-fill { width: 38%; animation: planner-loading 1.2s ease-in-out infinite; }
       .planner-draft-form[hidden], .planner-target-box[hidden], .planner-loading-box[hidden] { display: none !important; }
+      .modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.52); display: flex; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; z-index: 60; }
+      .modal-backdrop[hidden] { display: none !important; }
+      .modal-panel { width: min(880px, 100%); max-height: calc(100vh - 40px); overflow: auto; background: #fff; border-radius: 14px; border: 1px solid #dbe1ef; box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22); }
+      .modal-header { padding: 16px 18px 10px; border-bottom: 1px solid #eceef7; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+      .modal-title { margin: 0; font-size: 16px; }
+      .modal-body { padding: 16px 18px 18px; }
+      .modal-close { border: 0; background: #f3f4f6; color: #111827; width: 36px; height: 36px; border-radius: 999px; cursor: pointer; font-size: 18px; line-height: 1; }
+      .modal-meta { color: #61667a; font-size: 12px; line-height: 1.6; }
+      .identity-grid { display: grid; gap: 12px; margin-top: 12px; }
+      .identity-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .identity-status { margin-top: 10px; font-size: 12px; color: #586075; }
       @keyframes planner-loading {
         0% { transform: translateX(-100%); }
         100% { transform: translateX(300%); }
@@ -130,6 +142,7 @@
         .detail-actions .toolbar-actions, .detail-actions .actions { justify-content: flex-start; }
         .planner-grid.two { grid-template-columns: 1fr; }
         .planner-component-list { grid-template-columns: 1fr; }
+        .identity-grid.two { grid-template-columns: 1fr; }
       }
     </style>
   </head>
@@ -161,6 +174,56 @@
         <div id="detail" class="body">Loading...</div>
       </section>
     </main>
+    <div id="pageIdentityModal" class="modal-backdrop" hidden>
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="pageIdentityModalTitle">
+        <div class="modal-header">
+          <div>
+            <h3 id="pageIdentityModalTitle" class="modal-title">페이지 정체성 편집</h3>
+            <div id="pageIdentityModalMeta" class="modal-meta">페이지별 역할과 유지해야 할 인상을 저장합니다.</div>
+          </div>
+          <button id="closePageIdentityModalBtn" type="button" class="modal-close" aria-label="닫기">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="identity-grid two">
+            <div class="planner-field">
+              <label for="identityRole">페이지 역할</label>
+              <input id="identityRole" type="text" placeholder="예: 브랜드 홈이자 전체 서비스 진입 허브" />
+            </div>
+            <div class="planner-field">
+              <label for="identityDesignIntent">디자인 의도</label>
+              <input id="identityDesignIntent" type="text" placeholder="예: 신뢰감과 탐색 리듬을 함께 유지" />
+            </div>
+          </div>
+          <div class="identity-grid">
+            <div class="planner-field">
+              <label for="identityPurpose">페이지 목적</label>
+              <textarea id="identityPurpose" placeholder="이 페이지가 원래 어떤 목적을 가지는지 구체적으로 작성"></textarea>
+            </div>
+          </div>
+          <div class="identity-grid two">
+            <div class="planner-field">
+              <label for="identityMustPreserve">반드시 유지할 것</label>
+              <textarea id="identityMustPreserve" placeholder="한 줄에 하나씩"></textarea>
+            </div>
+            <div class="planner-field">
+              <label for="identityShouldAvoid">피해야 할 것</label>
+              <textarea id="identityShouldAvoid" placeholder="한 줄에 하나씩"></textarea>
+            </div>
+          </div>
+          <div class="identity-grid">
+            <div class="planner-field">
+              <label for="identityGuardrails">시각 가드레일</label>
+              <textarea id="identityGuardrails" placeholder="한 줄에 하나씩"></textarea>
+            </div>
+          </div>
+          <div class="actions">
+            <button id="savePageIdentityBtn" type="button" class="btn">저장</button>
+            <button id="cancelPageIdentityBtn" type="button" class="btn secondary">닫기</button>
+          </div>
+          <div id="pageIdentityStatus" class="identity-status">대기 중</div>
+        </div>
+      </div>
+    </div>
     <script>
       const pageListEl = document.getElementById("pageList");
       const pageListToolbarEl = document.getElementById("pageListToolbar");
@@ -170,6 +233,12 @@
       const sessionMetaEl = document.getElementById("sessionMeta");
       const logoutBtn = document.getElementById("logoutBtn");
       const historyPanelEl = document.getElementById("historyPanel");
+      const pageIdentityModalEl = document.getElementById("pageIdentityModal");
+      const pageIdentityModalMetaEl = document.getElementById("pageIdentityModalMeta");
+      const closePageIdentityModalBtn = document.getElementById("closePageIdentityModalBtn");
+      const cancelPageIdentityBtn = document.getElementById("cancelPageIdentityBtn");
+      const savePageIdentityBtn = document.getElementById("savePageIdentityBtn");
+      const pageIdentityStatusEl = document.getElementById("pageIdentityStatus");
       let pages = [];
       let selectedId = "";
       let pendingSelectedId = "";
@@ -183,6 +252,7 @@
       let pageAdvisories = {};
       let pageReviewMap = new Map();
       let refreshGeneration = 0;
+      let activePageIdentityPageId = "";
       const plannerUiStateByPage = new Map();
       const builderUiStateByPage = new Map();
       const adminTargetCatalog = [
@@ -550,9 +620,50 @@
         return payload;
       }
 
+      function closePageIdentityModal() {
+        activePageIdentityPageId = "";
+        if (pageIdentityModalEl) pageIdentityModalEl.hidden = true;
+        if (pageIdentityStatusEl) pageIdentityStatusEl.textContent = "대기 중";
+      }
+
+      function fillPageIdentityForm(payload = {}) {
+        const effective = payload?.effectiveIdentity || {};
+        document.getElementById("identityRole").value = effective.role || "";
+        document.getElementById("identityPurpose").value = effective.purpose || "";
+        document.getElementById("identityDesignIntent").value = effective.designIntent || "";
+        document.getElementById("identityMustPreserve").value = linesToText(effective.mustPreserve || []);
+        document.getElementById("identityShouldAvoid").value = linesToText(effective.shouldAvoid || []);
+        document.getElementById("identityGuardrails").value = linesToText(effective.visualGuardrails || []);
+      }
+
+      async function openPageIdentityModal(page) {
+        const pageId = getTargetWorkspacePageId(page);
+        if (!pageId) return;
+        activePageIdentityPageId = pageId;
+        if (pageIdentityModalMetaEl) {
+          pageIdentityModalMetaEl.textContent = `${pageLabel(pageId, page?.title || "")}의 원래 역할, 유지해야 할 인상, 피해야 할 방향을 저장합니다.`;
+        }
+        if (pageIdentityStatusEl) pageIdentityStatusEl.textContent = "페이지 정체성 정보를 불러오는 중...";
+        if (pageIdentityModalEl) pageIdentityModalEl.hidden = false;
+        try {
+          const payload = await fetchJson(`/api/workspace/page-identity?pageId=${encodeURIComponent(pageId)}`);
+          if (activePageIdentityPageId !== pageId) return;
+          fillPageIdentityForm(payload);
+          if (pageIdentityStatusEl) {
+            pageIdentityStatusEl.textContent = payload.override?.updatedAt
+              ? `마지막 저장: ${payload.override.updatedAt}`
+              : "기본 정체성 기준으로 표시 중";
+          }
+        } catch (error) {
+          if (pageIdentityStatusEl) pageIdentityStatusEl.textContent = `불러오기 실패: ${describeRequestError(error)}`;
+        }
+      }
+
       let noticeTimer = null;
       let plannerProgressTimer = null;
       let builderProgressTimer = null;
+      let plannerProgressPoller = null;
+      let builderProgressPoller = null;
       function showAdminNotice(message, type = "info") {
         if (!adminNoticeEl) return;
         adminNoticeEl.textContent = String(message || "");
@@ -575,11 +686,19 @@
         if (kind === "builder" && builderProgressTimer) {
           window.clearInterval(builderProgressTimer);
           builderProgressTimer = null;
+        }
+        if (kind === "builder" && builderProgressPoller) {
+          window.clearInterval(builderProgressPoller);
+          builderProgressPoller = null;
           return;
         }
         if (kind !== "builder" && plannerProgressTimer) {
           window.clearInterval(plannerProgressTimer);
           plannerProgressTimer = null;
+        }
+        if (kind !== "builder" && plannerProgressPoller) {
+          window.clearInterval(plannerProgressPoller);
+          plannerProgressPoller = null;
         }
       }
 
@@ -598,6 +717,33 @@
         } else {
           plannerProgressTimer = timerId;
         }
+      }
+
+      function formatProgressStatus(item, fallbackText = "생성중입니다.") {
+        const percent = Number(item?.percent || 0);
+        const message = String(item?.message || "").trim() || fallbackText;
+        if (percent > 0 && percent < 100) return `${message} (${percent}%)`;
+        if (percent >= 100 && message) return message;
+        return fallbackText;
+      }
+
+      function startProgressPolling(kind, workspacePageId, statusEl, fallbackText) {
+        if (!workspacePageId || !statusEl) return;
+        stopProgressMessages(kind);
+        const poll = async () => {
+          try {
+            const payload = await fetchJson(`/api/workspace/llm-progress?pageId=${encodeURIComponent(workspacePageId)}&kind=${encodeURIComponent(kind)}`);
+            const item = payload?.item || null;
+            statusEl.textContent = formatProgressStatus(item, fallbackText);
+            if (item?.status === "completed" || item?.status === "failed") {
+              stopProgressMessages(kind);
+            }
+          } catch (_) {}
+        };
+        poll();
+        const timerId = window.setInterval(poll, 900);
+        if (kind === "builder") builderProgressPoller = timerId;
+        else plannerProgressPoller = timerId;
       }
 
       function readAdminStateFromUrl() {
@@ -1322,7 +1468,10 @@
               ${selectedBundleId ? `<div class="meta">현재 선택된 번들: <code>${escapeHtml(selectedBundleId)}</code></div>` : ``}
             </div>
             <div class="detail-actions">
-              <div class="toolbar-actions"><button id="resetWorkspaceBtn" type="button">이 페이지 수정 초기화</button></div>
+              <div class="toolbar-actions">
+                <button id="editPageIdentityBtn" type="button">페이지 정체성 편집</button>
+                <button id="resetWorkspaceBtn" type="button">이 페이지 수정 초기화</button>
+              </div>
             </div>
           </div>
           <div class="edit-guide">
@@ -1429,11 +1578,11 @@
             <div class="actions">
               <button class="run" id="runPlanner">기획안 생성</button>
             </div>
-            <div class="planner-status" id="plannerStatus">대기 중</div>
             <div id="plannerDraftRegion" class="planner-subsection" ${plannerDraftVisible ? "" : "hidden"}>
               <div id="plannerLoadingBox" class="planner-loading-box" ${plannerLoading ? "" : "hidden"}>
                 <div><strong>기획안 작성중</strong></div>
                 <div class="meta">페이지 구조와 레퍼런스를 읽고 기획 초안을 정리하고 있습니다.</div>
+                <div class="planner-loading-message" id="plannerStatus">기획안 생성중입니다.</div>
                 <div class="progress-track"><div class="progress-fill planner-loading-fill"></div></div>
               </div>
               <div id="plannerDraftForm" class="planner-draft-form" ${plannerLoading ? "hidden" : ""}>
@@ -1552,10 +1701,10 @@
               <button class="run" id="runBuilder" ${latestPlan ? "" : "disabled"}>2. 디자인 생성 실행</button>
               <button type="button" class="btn secondary" id="saveVersionBtn" ${latestDraftBuild ? "" : "disabled"}>4. 저장 버전 확정</button>
             </div>
-            <div class="planner-status" id="builderStatus">${latestPlan ? "기획안 저장 후 디자인 생성 가능" : "기획안 필요"}</div>
             <div id="builderLoadingBox" class="planner-loading-box" ${builderLoading ? "" : "hidden"}>
               <div><strong>디자인 생성중</strong></div>
               <div class="meta">승인된 기획안을 기준으로 실제 draft 변경안을 만들고 있습니다.</div>
+              <div class="planner-loading-message" id="builderStatus">${latestPlan ? "디자인 생성중입니다." : "기획안 필요"}</div>
               <div class="progress-track"><div class="progress-fill planner-loading-fill"></div></div>
             </div>
 
@@ -1747,6 +1896,7 @@
         const builderLoadingBoxEl = document.getElementById("builderLoadingBox");
         const runBtn = document.getElementById("runLlm");
         const resetWorkspaceBtn = document.getElementById("resetWorkspaceBtn");
+        const editPageIdentityBtn = document.getElementById("editPageIdentityBtn");
         const promptEl = document.getElementById("llmPrompt");
         const legacyStatusEl = document.getElementById("llmStatus");
         if (runBtn && legacyStatusEl) {
@@ -1754,7 +1904,7 @@
           runBtn.title = "";
           legacyStatusEl.textContent = "대기 중";
         }
-        if (plannerStatusEl) plannerStatusEl.textContent = "대기 중";
+        if (plannerStatusEl) plannerStatusEl.textContent = "기획안 생성중입니다.";
 
         const collectPlanTargetSelection = () => {
           const componentOnly = Boolean(document.getElementById("planComponentOnly")?.checked);
@@ -1794,13 +1944,8 @@
           if (plannerDraftRegionEl) plannerDraftRegionEl.hidden = false;
           if (plannerLoadingBoxEl) plannerLoadingBoxEl.hidden = false;
           if (plannerDraftFormEl) plannerDraftFormEl.hidden = true;
-          startProgressMessages("planner", plannerStatusEl, [
-            statusText || "기획안 생성 중입니다.",
-            "기획안 생성 중입니다. 요청 내용을 해석하고 있습니다.",
-            "기획안 생성 중입니다. 명칭과 요구사항을 정리하고 있습니다.",
-            "기획안 생성 중입니다. 기획 방향과 디자인 방향을 구조화하고 있습니다.",
-            "잠시만 기다려주십시오. 정리본을 마무리하고 있습니다.",
-          ]);
+          if (plannerStatusEl) plannerStatusEl.textContent = statusText || "기획안 생성중입니다.";
+          startProgressPolling("planner", workspacePageId, plannerStatusEl, statusText || "기획안 생성중입니다.");
         };
 
         const showPlannerDraftState = () => {
@@ -1902,13 +2047,8 @@
             return;
           }
           showBuilderLoadingState();
-          startProgressMessages("builder", builderStatusEl, [
-            "디자인 생성 중입니다.",
-            "디자인 생성 중입니다. 승인된 기획안을 빌더 입력으로 변환하고 있습니다.",
-            "디자인 생성 중입니다. 적용 가능한 컴포넌트와 변경 범위를 검토하고 있습니다.",
-            "디자인 생성 중입니다. 실제 변경 operation을 구성하고 있습니다.",
-            "잠시만 기다려주십시오. 생성 결과를 정리하고 있습니다.",
-          ]);
+          if (builderStatusEl) builderStatusEl.textContent = "디자인 생성중입니다.";
+          startProgressPolling("builder", workspacePageId, builderStatusEl, "디자인 생성중입니다.");
           try {
             const payload = await fetchJson("/api/llm/build", {
               method: "POST",
@@ -1931,7 +2071,7 @@
             await rerenderDetailWithFocus({ selector: "#builderResultSection", behavior: "smooth", block: "start" });
           } catch (error) {
             showBuilderIdleState();
-            if (builderStatusEl) builderStatusEl.textContent = "디자인 생성 실패: " + String(error);
+            if (builderStatusEl) builderStatusEl.textContent = "디자인 생성 실패: " + describeRequestError(error);
           }
         };
 
@@ -1955,6 +2095,10 @@
             }
           });
         }
+
+        editPageIdentityBtn?.addEventListener("click", async () => {
+          await openPageIdentityModal(page);
+        });
 
         plannerRunBtn?.addEventListener("click", async () => {
           const planModeEl = document.getElementById("planMode");
@@ -2387,6 +2531,43 @@
           detailEl.appendChild(marker);
         }
       }
+
+      closePageIdentityModalBtn?.addEventListener("click", closePageIdentityModal);
+      cancelPageIdentityBtn?.addEventListener("click", closePageIdentityModal);
+      pageIdentityModalEl?.addEventListener("click", (event) => {
+        if (event.target === pageIdentityModalEl) closePageIdentityModal();
+      });
+      savePageIdentityBtn?.addEventListener("click", async () => {
+        const pageId = activePageIdentityPageId;
+        if (!pageId) return;
+        if (pageIdentityStatusEl) pageIdentityStatusEl.textContent = "저장 중...";
+        try {
+          await fetchJson("/api/workspace/page-identity", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pageId,
+              role: document.getElementById("identityRole").value || "",
+              purpose: document.getElementById("identityPurpose").value || "",
+              designIntent: document.getElementById("identityDesignIntent").value || "",
+              mustPreserve: textToLines(document.getElementById("identityMustPreserve").value || ""),
+              shouldAvoid: textToLines(document.getElementById("identityShouldAvoid").value || ""),
+              visualGuardrails: textToLines(document.getElementById("identityGuardrails").value || ""),
+            }),
+          });
+          if (pageIdentityStatusEl) pageIdentityStatusEl.textContent = "저장 완료";
+          showAdminNotice("페이지 정체성 저장 완료");
+          await refreshData();
+          closePageIdentityModal();
+        } catch (error) {
+          if (pageIdentityStatusEl) pageIdentityStatusEl.textContent = `저장 실패: ${describeRequestError(error)}`;
+        }
+      });
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && pageIdentityModalEl && !pageIdentityModalEl.hidden) {
+          closePageIdentityModal();
+        }
+      });
 
       logoutBtn.addEventListener("click", async () => {
         await fetch("/api/auth/logout", { method: "POST" });

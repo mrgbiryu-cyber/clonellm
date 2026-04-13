@@ -39,6 +39,8 @@ const {
   saveSavedVersion,
   pinSavedVersion,
   getPinnedView,
+  getPageIdentityOverride,
+  savePageIdentityOverride,
 } = require("./auth");
 
 const HOST = "0.0.0.0";
@@ -73,6 +75,52 @@ const WORKING_COMPONENT_INVENTORY_CACHE = new Map();
 const WORKING_EDITABILITY_CACHE = new Map();
 const PRE_LLM_GAP_CACHE = new Map();
 const ACCEPTANCE_RESULTS_CACHE = new Map();
+const LLM_PROGRESS_CACHE = new Map();
+
+function buildLlmProgressKey(userId, pageId, kind) {
+  return [String(userId || "").trim(), String(pageId || "").trim(), String(kind || "").trim()].join("::");
+}
+
+function setLlmProgress(userId, pageId, kind, payload = {}) {
+  const key = buildLlmProgressKey(userId, pageId, kind);
+  if (!userId || !pageId || !kind) return;
+  const previous = LLM_PROGRESS_CACHE.get(key) || {};
+  LLM_PROGRESS_CACHE.set(key, {
+    userId,
+    pageId,
+    kind,
+    status: String(payload.status || previous.status || "running"),
+    stage: String(payload.stage || previous.stage || "").trim(),
+    message: String(payload.message || previous.message || "").trim(),
+    percent: Math.max(0, Math.min(100, Number(payload.percent || 0))),
+    startedAt: previous.startedAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    detail: payload.detail && typeof payload.detail === "object" ? payload.detail : previous.detail || null,
+  });
+}
+
+function getLlmProgress(userId, pageId, kind) {
+  const key = buildLlmProgressKey(userId, pageId, kind);
+  return LLM_PROGRESS_CACHE.get(key) || null;
+}
+
+function clearCompletedLlmProgress(userId, pageId, kind, delayMs = 120000) {
+  const key = buildLlmProgressKey(userId, pageId, kind);
+  setTimeout(() => {
+    const current = LLM_PROGRESS_CACHE.get(key);
+    if (!current) return;
+    if (current.status === "completed" || current.status === "failed") {
+      LLM_PROGRESS_CACHE.delete(key);
+    }
+  }, delayMs);
+}
+
+function isRenderableBuilderSlot(pageId, slotId) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  if (!normalizedPageId || !normalizedSlotId) return false;
+  return true;
+}
 
 function readCachedValue(cache, key, compute, ttlMs = PAGE_COMPUTE_CACHE_TTL_MS) {
   const now = Date.now();
@@ -246,6 +294,8 @@ function buildWorkspaceMetaSummary(workspace) {
     savedVersionCount: Array.isArray(workspace.savedVersions) ? workspace.savedVersions.length : 0,
     pinnedViewPageCount: workspace.pinnedViewsByPage ? Object.keys(workspace.pinnedViewsByPage).length : 0,
     pinnedViewsByPage: workspace.pinnedViewsByPage || {},
+    pageIdentityOverrideCount: workspace.pageIdentityOverrides ? Object.keys(workspace.pageIdentityOverrides).length : 0,
+    pageIdentityOverrides: workspace.pageIdentityOverrides || {},
   };
 }
 
@@ -316,7 +366,10 @@ function readBody(req) {
     req.on("data", (chunk) => {
       body += chunk;
     });
-    req.on("end", () => resolve(body));
+    req.on("end", () => {
+      req.__lastParsedBody = body;
+      resolve(body);
+    });
     req.on("error", reject);
   });
 }
@@ -3435,9 +3488,17 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
       if (slotId === "header-top") {
         base.editableProps = ["logoHref", "utilityLinks", "visibility"];
         base.editableStyles = ["spacing", "iconOrder", "alignment"];
+        base.patchSchema = {
+          rootKeys: ["title", "subtitle", "logoHref", "utilityLinks", "visibility"],
+          styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+        };
       } else if (slotId === "header-bottom") {
         base.editableProps = ["mainMenus", "brandTabs", "visibility"];
         base.editableStyles = ["menuSpacing", "tabSpacing", "underlineStyle"];
+        base.patchSchema = {
+          rootKeys: ["title", "subtitle", "mainMenus", "brandTabs", "visibility"],
+          styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+        };
       } else if (slotId === "hero") {
         base.editableProps = ["slides", "headline", "description", "badge", "image", "ctaHref"];
         base.editableStyles = ["height", "copyPosition", "indicatorStyle"];
@@ -3466,6 +3527,10 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
       } else if (slotId === "quickmenu") {
         base.editableProps = ["items", "title", "icon", "href"];
         base.editableStyles = ["gridColumns", "iconSize", "labelStyle"];
+        base.patchSchema = {
+          rootKeys: ["title", "subtitle", "items", "visibility"],
+          styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+        };
       } else if (slotId === "best-ranking") {
         base.editableProps = ["tabs", "items", "badges", "rankVisual", "moreLink"];
         base.editableStyles = ["cardRadius", "rankPosition", "badgeStyle", "priceStyle"];
@@ -3590,6 +3655,21 @@ function getGenericPatchSchema(pageId, slotId) {
   if (!normalizedPageId || !normalizedSlotId) return empty;
 
   if (normalizedPageId === "home") {
+    const homeSlotSchemas = {
+      "header-top": {
+        rootKeys: ["title", "subtitle", "logoHref", "utilityLinks", "visibility"],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      "header-bottom": {
+        rootKeys: ["title", "subtitle", "mainMenus", "brandTabs", "visibility"],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      quickmenu: {
+        rootKeys: ["title", "subtitle", "items", "visibility"],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+    };
+    if (homeSlotSchemas[normalizedSlotId]) return homeSlotSchemas[normalizedSlotId];
     return {
       rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
       styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
@@ -3624,7 +3704,15 @@ function getGenericPatchSchema(pageId, slotId) {
         rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
         styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
+      shortcut: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
       review: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      brandBanner: {
         rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
         styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
@@ -3660,7 +3748,31 @@ function getGenericPatchSchema(pageId, slotId) {
 
   if (normalizedPageId.startsWith("category-") || isPdpCasePageId(normalizedPageId)) {
     const slotSchemas = {
+      filter: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      sort: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      productGrid: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      firstRow: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      firstProduct: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
       banner: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      gallery: {
         rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
         styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
@@ -4227,6 +4339,9 @@ function buildLlmEditableList(pageId, options = {}) {
         slotId: component.slotId,
         kind: inventoryItem.kind || component.kind || "section",
         activeSourceId: inventoryItem.activeSourceId || component.activeSourceId || null,
+        containerMode: inventoryItem.containerMode || null,
+        layout: inventoryItem.layout || null,
+        mediaSpec: buildComponentMediaSpec(pageId, component.slotId, inventoryItem),
         editableProps: component.editableProps || [],
         editableStyles: component.editableStyles || [],
         patchSchema: component.patchSchema || { rootKeys: [], styleKeys: [] },
@@ -4265,16 +4380,179 @@ function mergeReferenceSlotMatches(referenceAnalyses = []) {
   );
 }
 
-function buildPlannerPageContext(pageId, viewportProfile, editableData) {
+function mergePageIdentityBrief(baseBrief, overrideBrief = {}) {
+  const base = baseBrief && typeof baseBrief === "object" ? baseBrief : {};
+  const override = overrideBrief && typeof overrideBrief === "object" ? overrideBrief : {};
+  const mergeLines = (key) => {
+    const next = Array.isArray(override[key]) ? override[key].map((item) => String(item || "").trim()).filter(Boolean) : [];
+    if (next.length) return next;
+    return Array.isArray(base[key]) ? base[key] : [];
+  };
+  return {
+    role: String(override.role || base.role || "").trim(),
+    purpose: String(override.purpose || base.purpose || "").trim(),
+    designIntent: String(override.designIntent || base.designIntent || "").trim(),
+    mustPreserve: mergeLines("mustPreserve"),
+    shouldAvoid: mergeLines("shouldAvoid"),
+    visualGuardrails: mergeLines("visualGuardrails"),
+  };
+}
+
+function buildPlannerPageContext(pageId, viewportProfile, editableData, options = {}) {
   const normalizedPageId = String(pageId || "").trim();
   const page = findPage(editableData || {}, normalizedPageId);
   const pdpContext = resolvePdpRuntimeContext(normalizedPageId);
+  const identity = mergePageIdentityBrief(buildPageIdentityBrief(normalizedPageId, {
+    pageTitle: pdpContext?.title || page?.title || normalizedPageId,
+    pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
+  }), options.pageIdentityOverride || {});
   return {
     workspacePageId: normalizedPageId,
     runtimePageId: pdpContext?.runtimePageId || normalizedPageId,
     pageLabel: pdpContext?.title || page?.title || normalizedPageId,
     pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
     viewportProfile: String(viewportProfile || "pc").trim() || "pc",
+    pageIdentity: identity,
+  };
+}
+
+function buildPageIdentityBrief(pageId, options = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const pageTitle = String(options.pageTitle || normalizedPageId || "페이지").trim();
+  const pageGroup = String(options.pageGroup || "").trim();
+  const briefs = {
+    home: {
+      role: "브랜드 홈이자 전체 서비스 진입 허브",
+      purpose: "LG전자 브랜드 인상, 주요 혜택, 탐색 출발점을 한 화면 안에서 설득력 있게 전달해야 하는 메인 허브 페이지입니다.",
+      designIntent: "한두 구간만 과격하게 튀는 화면이 아니라, 상단 진입부부터 주요 커머스/브랜드/신뢰 구간까지 일관된 브랜드 온도와 정보 위계를 유지해야 합니다.",
+      mustPreserve: [
+        "LG전자 공식 메인으로서의 신뢰감",
+        "브랜드 홈다운 정돈된 톤",
+        "혜택과 탐색의 균형",
+      ],
+      shouldAvoid: [
+        "일부 슬롯만 뜬금없이 다크 테마로 분리되는 과한 대비",
+        "할인몰처럼 보이는 과잉 프로모션 톤",
+        "상단과 하단이 서로 다른 사이트처럼 보이는 파편화된 스타일",
+      ],
+      visualGuardrails: [
+        "강한 대비를 쓰더라도 페이지 전체 컨셉 안에서만 사용한다.",
+        "배경색 변화는 섹션 목적 구분을 위해 제한적으로 사용한다.",
+        "단일 슬롯 과장보다 페이지 전체 리듬을 우선한다.",
+      ],
+    },
+    support: {
+      role: "고객지원 허브",
+      purpose: "문제 해결, 서비스 안내, 자가 해결 경로를 빠르게 찾게 하는 신뢰 중심 지원 페이지입니다.",
+      designIntent: "프로모션 감도보다 명확한 안내성과 안심감을 우선해야 하며, 복잡한 장식보다 서비스 신뢰가 먼저 읽혀야 합니다.",
+      mustPreserve: ["명확한 정보 탐색", "고객지원 톤", "문제 해결 중심 구조"],
+      shouldAvoid: ["과도한 캠페인 톤", "브랜드 쇼케이스형 과장 연출", "강한 다크 블록 남발"],
+      visualGuardrails: ["정보 탐색성이 최우선", "안정적인 톤 유지", "CTA는 해결 경로를 분명히 하는 수준으로만 강조"],
+    },
+    bestshop: {
+      role: "오프라인 매장 체험/상담 전환 허브",
+      purpose: "오프라인 방문의 이유와 예약/체험 동선을 분명하게 설득해야 하는 매장 전환 페이지입니다.",
+      designIntent: "매장 경험과 상담 가치가 보이도록 신뢰감과 체험 가치를 강조하되, 지나치게 온라인 커머스처럼 보이면 안 됩니다.",
+      mustPreserve: ["방문 동선 명확성", "오프라인 체험 가치", "상담 신뢰감"],
+      shouldAvoid: ["일반 프로모션 랜딩처럼 보이는 과장", "브랜드 메인보다 더 화려한 톤", "정보보다 비주얼만 앞서는 구성"],
+      visualGuardrails: ["방문 행동 유도는 분명하게", "서비스형 신뢰 톤 유지", "전환 이유가 카피와 구조에서 바로 읽혀야 함"],
+    },
+    "care-solutions": {
+      role: "구독/케어 솔루션 소개 및 전환 페이지",
+      purpose: "구독 가치와 유지관리 혜택을 이해시키고 행동으로 이어지게 하는 설명형 페이지입니다.",
+      designIntent: "구독의 실용성과 안심감을 전달해야 하므로, 과한 명품형 톤보다 이해하기 쉬운 가치 구조와 혜택 정리가 중요합니다.",
+      mustPreserve: ["이해 가능한 혜택 설명", "안심감", "서비스 지속 가치"],
+      shouldAvoid: ["제품 쇼케이스형 과장", "한 구간만 극단적으로 튀는 색/명암", "설명보다 분위기만 앞서는 구성"],
+      visualGuardrails: ["가치 제안이 먼저", "서비스 설명이 흐려지지 않도록 대비 사용", "정보형 리듬 유지"],
+    },
+    "category-tvs": {
+      role: "TV 카테고리 상품 탐색 페이지",
+      purpose: "여러 상품을 비교 탐색하게 하는 카테고리 페이지로, 탐색 효율과 비교 용이성이 핵심입니다.",
+      designIntent: "프로모션 연출은 보조적이어야 하며, 필터/정렬/카드 스캔이 흐려지지 않는 선에서만 톤 조정이 가능해야 합니다.",
+      mustPreserve: ["상품 비교 흐름", "카드 가독성", "탐색 효율"],
+      shouldAvoid: ["상세페이지처럼 감성 연출 중심으로 가는 것", "카드보다 배경이 더 강한 디자인", "강한 다크 블록으로 스캔 방해"],
+      visualGuardrails: ["탐색 UI 우선", "상품 카드 인지 방해 금지", "프로모션은 보조적"],
+    },
+    "category-refrigerators": {
+      role: "냉장고 카테고리 상품 탐색 페이지",
+      purpose: "냉장고 제품군을 비교하고 선택 기준을 빠르게 읽게 하는 카테고리 페이지입니다.",
+      designIntent: "탐색성과 비교 기준 정리가 먼저이며, 브랜딩 연출은 상품 탐색을 해치지 않는 범위에서만 허용됩니다.",
+      mustPreserve: ["비교 기준 가독성", "탐색 흐름", "제품 카드 정보 위계"],
+      shouldAvoid: ["과한 무드 연출", "일부 구간만 과도하게 어두운 테마", "필터/정렬보다 배경이 강한 상태"],
+      visualGuardrails: ["상품 탐색을 가리는 장식 금지", "정보 우선 위계 유지", "브랜딩보다 비교 효율 우선"],
+    },
+  };
+  if (briefs[normalizedPageId]) return briefs[normalizedPageId];
+  if (isPdpCasePageId(normalizedPageId) || pageGroup === "product-detail") {
+    return {
+      role: "상품 상세 페이지",
+      purpose: `${pageTitle}의 가치, 사양, 가격, 구매 판단 근거를 명확하게 전달해야 하는 상세 페이지입니다.`,
+      designIntent: "브랜드 인상보다 구매 판단과 신뢰가 우선이며, 요약/가격/구매 유도 영역의 명료함이 가장 중요합니다.",
+      mustPreserve: ["구매 판단 정보", "가격/옵션 신뢰감", "상세 정보 위계"],
+      shouldAvoid: ["감성 랜딩처럼 과장된 연출", "구매 정보보다 비주얼이 앞서는 상태", "강한 테마 전환으로 신뢰가 흔들리는 표현"],
+      visualGuardrails: ["요약/가격/CTA 명확성 우선", "사실 정보 보호", "신뢰 중심 톤 유지"],
+    };
+  }
+  return {
+    role: "서비스 페이지",
+    purpose: `${pageTitle}의 핵심 목적과 행동 유도를 분명하게 전달해야 하는 페이지입니다.`,
+    designIntent: "과한 스타일 실험보다 페이지 목적과 정보 위계를 먼저 명확하게 보여줘야 합니다.",
+    mustPreserve: ["페이지 목적 명확성", "핵심 사용자 흐름"],
+    shouldAvoid: ["뜬금없는 테마 전환", "페이지 목적과 무관한 장식", "일관성 없는 섹션별 스타일"],
+    visualGuardrails: ["전체 페이지 컨셉 일관성 유지", "행동 유도와 정보 위계 우선"],
+  };
+}
+
+function buildBuilderAuditReport(pageId, options = {}) {
+  const editableData = options.editableData || {};
+  const pageContext = buildPlannerPageContext(pageId, options.viewportProfile || "pc", editableData, {
+    pageIdentityOverride: options.pageIdentityOverride,
+  });
+  const editableList = buildLlmEditableList(pageId, { editableData });
+  const slotRegistry = findSlotRegistry(editableData, pageId) || { pageId, slots: [] };
+  const slotMap = new Map((slotRegistry.slots || []).map((slot) => [String(slot.slotId || "").trim(), slot]));
+  const components = (editableList.components || []).map((component) => {
+    const slotId = String(component.slotId || "").trim();
+    const patchSchema = component.patchSchema || { rootKeys: [], styleKeys: [] };
+    const slot = slotMap.get(slotId) || null;
+    const activeSourceId = String(component.activeSourceId || slot?.activeSourceId || "").trim();
+    const resolution = resolveComponentSourceResolution(pageId, slotId, activeSourceId, editableData || {});
+    const renderable = isRenderableBuilderSlot(pageId, slotId);
+    const rootKeys = Array.isArray(patchSchema.rootKeys) ? patchSchema.rootKeys : [];
+    const styleKeys = Array.isArray(patchSchema.styleKeys) ? patchSchema.styleKeys : [];
+    const issues = [];
+    if (!slot) issues.push("slot_registry_missing");
+    if (!activeSourceId) issues.push("active_source_missing");
+    if (!rootKeys.length && !styleKeys.length) issues.push("patch_schema_empty");
+    if (!renderable) issues.push("renderer_fidelity_low");
+    if (resolution?.renderMode === "fallback") issues.push("render_fallback_active");
+    return {
+      componentId: component.componentId,
+      slotId,
+      activeSourceId,
+      resolvedRenderSourceId: resolution?.resolvedRenderSourceId || null,
+      renderMode: resolution?.renderMode || null,
+      sourceResolution: resolution?.sourceResolution || null,
+      renderable,
+      rootKeyCount: rootKeys.length,
+      styleKeyCount: styleKeys.length,
+      allowedRootKeys: rootKeys,
+      allowedStyleKeys: styleKeys,
+      issues,
+    };
+  });
+  const summary = {
+    pageId,
+    pageLabel: pageContext.pageLabel,
+    renderableComponentCount: components.filter((item) => item.renderable).length,
+    nonRenderableComponentCount: components.filter((item) => !item.renderable).length,
+    fallbackRenderCount: components.filter((item) => item.renderMode === "fallback").length,
+    emptyPatchSchemaCount: components.filter((item) => item.rootKeyCount + item.styleKeyCount === 0).length,
+  };
+  return {
+    pageContext,
+    summary,
+    components,
   };
 }
 
@@ -4292,6 +4570,83 @@ function normalizeDesignChangeLevel(value, fallback = "medium") {
   const normalized = String(value || fallback).trim().toLowerCase();
   if (normalized === "low" || normalized === "medium" || normalized === "high") return normalized;
   return fallback;
+}
+
+function buildComponentMediaSpec(pageId, slotId, inventoryItem = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  const spec = {
+    slotId: normalizedSlotId,
+    containerMode: inventoryItem.containerMode || null,
+    layout: inventoryItem.layout || null,
+    imageHandling: [],
+  };
+  if (normalizedPageId === "home") {
+    const homeSpecs = {
+      hero: {
+        aspectRatio: "hero visual varies by live source; copy and image must still feel balanced across wide desktop",
+        fit: "cover",
+        notes: [
+          "hero는 이미지가 카피보다 과하게 작아 보이면 안 된다",
+          "다크 블록은 전체 페이지 컨셉과 연결될 때만 사용한다",
+        ],
+      },
+      quickmenu: {
+        aspectRatio: "icon tile / small visual",
+        fit: "contain",
+        notes: [
+          "quickmenu 이미지는 아이콘성 시각 요소라서 카드 대비 과도하게 작아 보이면 안 된다",
+          "아이콘형 이미지는 항목 크기 대비 60~75% 체감 크기를 유지한다",
+        ],
+      },
+      timedeal: {
+        aspectRatio: "product square",
+        fit: "contain",
+        notes: ["상품 이미지는 카드 내 정중앙에 안정적으로 보여야 한다"],
+      },
+      "brand-showroom": {
+        aspectRatio: "square",
+        fit: "cover",
+        notes: ["감성형 이미지는 박스를 충분히 채워야 한다"],
+      },
+      "latest-product-news": {
+        aspectRatio: "1.28:1",
+        fit: "contain",
+        notes: ["기사형 카드 이미지는 너무 작게 남지 않도록 프레임 활용이 필요하다"],
+      },
+      "space-renewal": {
+        aspectRatio: "hero 920:503, cards 1:1",
+        fit: "hero cover / card contain",
+        notes: ["영역별 이미지 규격이 다르므로 hero와 카드 이미지를 같은 기준으로 다루면 안 된다"],
+      },
+      "summary-banner-2": {
+        aspectRatio: "banner landscape",
+        fit: "contain",
+        notes: ["배너 이미지는 텍스트보다 너무 축소돼 보이면 안 된다"],
+      },
+    };
+    return { ...spec, ...(homeSpecs[normalizedSlotId] || {}) };
+  }
+  if (normalizedPageId.startsWith("category-") && normalizedSlotId === "banner") {
+    return {
+      ...spec,
+      aspectRatio: "wide banner",
+      fit: "cover",
+      notes: ["카테고리 배너는 탐색 UI보다 강해지지 않는 범위에서만 사용"],
+    };
+  }
+  if (isPdpCasePageId(normalizedPageId) && normalizedSlotId === "gallery") {
+    return {
+      ...spec,
+      aspectRatio: "product gallery",
+      fit: "contain",
+      notes: [
+        "제품컷은 프레임 안에서 안정적으로 보여야 하며 과도한 crop을 피한다",
+        "썸네일과 메인 이미지의 비율 체감이 크게 어긋나면 안 된다",
+      ],
+    };
+  }
+  return spec;
 }
 
 function buildPlannerPageSummary(pageId, editableData, options = {}) {
@@ -4329,6 +4684,13 @@ function buildBuilderDesignGuidance(pageId, editableComponents = [], options = {
   const normalizedPageId = String(pageId || "").trim();
   const targetScope = String(options.targetScope || "page").trim() || "page";
   const designChangeLevel = normalizeDesignChangeLevel(options.designChangeLevel, "medium");
+  const pageIdentity = mergePageIdentityBrief(
+    buildPageIdentityBrief(normalizedPageId, {
+      pageTitle: options.pageTitle || normalizedPageId,
+      pageGroup: options.pageGroup || "",
+    }),
+    options.pageIdentityOverride || {}
+  );
   const slotIds = Array.from(
     new Set((editableComponents || []).map((item) => String(item?.slotId || "").trim()).filter(Boolean))
   );
@@ -4396,6 +4758,7 @@ function buildBuilderDesignGuidance(pageId, editableComponents = [], options = {
   };
   return {
     pageType,
+    pageIdentity,
     targetScope,
     designChangeLevel,
     designChangeProfile: changeProfiles[designChangeLevel] || changeProfiles.medium,
@@ -4406,6 +4769,7 @@ function buildBuilderDesignGuidance(pageId, editableComponents = [], options = {
       "고객 프리뷰용 시안이므로 브랜드 디자인 우선으로 설득력 있는 방향성을 만든다.",
       "지원된 slot/source/patch 범위 안에서만 변경하되, 변화율이 허용하는 탐색 폭은 적극 활용한다.",
       "사실 정보와 실제 상품 데이터는 왜곡하지 않는다.",
+      "현재 페이지의 원래 역할과 정체성을 해치지 않는다.",
     ],
     changeLevelGuidance: Object.fromEntries(
       Object.entries(changeProfiles).map(([key, value]) => [key, value.guidance])
@@ -4414,6 +4778,9 @@ function buildBuilderDesignGuidance(pageId, editableComponents = [], options = {
 }
 
 function buildBuilderSystemContext(pageId, editableData, options = {}) {
+  const pageContext = buildPlannerPageContext(pageId, options.viewportProfile || "pc", editableData, {
+    pageIdentityOverride: options.pageIdentityOverride,
+  });
   const slotRegistry = findSlotRegistry(editableData || {}, pageId) || { pageId, slots: [] };
   const editableComponentsPayload = buildLlmEditableList(pageId, { editableData });
   const targetScope = String(options.targetScope || "page").trim() || "page";
@@ -4426,7 +4793,10 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
     targetScope === "components" && targetComponentSet.size
       ? (editableComponentsPayload.components || []).filter((item) => targetComponentSet.has(String(item.componentId || "").trim()))
       : (editableComponentsPayload.components || []);
-  const allowedSlotIds = new Set(editableComponents.map((item) => String(item.slotId || "").trim()).filter(Boolean));
+  const renderableEditableComponents = editableComponents.filter((item) =>
+    isRenderableBuilderSlot(pageId, String(item?.slotId || "").trim())
+  );
+  const allowedSlotIds = new Set(renderableEditableComponents.map((item) => String(item.slotId || "").trim()).filter(Boolean));
   const currentPatches = listComponentPatches(editableData || {}, pageId)
     .filter((item) => {
       if (targetScope !== "components" || !targetComponentSet.size) return true;
@@ -4439,7 +4809,7 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
     patch: item.patch && typeof item.patch === "object" ? item.patch : {},
   }));
   const patchSchemaMap = Object.fromEntries(
-    editableComponents.map((item) => [item.componentId, item.patchSchema || { rootKeys: [], styleKeys: [] }])
+    renderableEditableComponents.map((item) => [item.componentId, item.patchSchema || { rootKeys: [], styleKeys: [] }])
   );
   return {
     slotRegistry: {
@@ -4449,21 +4819,20 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
           ? (slotRegistry.slots || []).filter((item) => allowedSlotIds.has(String(item.slotId || "").trim()))
           : (slotRegistry.slots || []),
     },
-    editableComponents,
+    editableComponents: renderableEditableComponents,
     patchSchemaMap,
     currentPatches,
     targeting: {
       scope: targetScope,
       componentIds: targetComponents,
+      excludedComponentIds: editableComponents
+        .filter((item) => !isRenderableBuilderSlot(pageId, String(item?.slotId || "").trim()))
+        .map((item) => String(item.componentId || "").trim())
+        .filter(Boolean),
     },
     designToolContext: {
       designChangeLevel,
       availableTools: [
-        {
-          id: "slot_source_switch",
-          category: "editing",
-          whenToUse: "기존 캡처/커스텀/피그마 파생 소스 중 시안 방향에 더 맞는 소스로 바꿀 때",
-        },
         {
           id: "component_patch",
           category: "editing",
@@ -4487,16 +4856,17 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
       ],
       workflowOrder: [
         "approved_plan_review",
-        "slot_source_switch",
         "component_patch",
         "preview_render",
         "version_save",
         "view_pin",
       ],
       patchStrategy: [
-        "브랜드 인상을 살리는 방향이라면 변화율이 허용하는 범위에서 source switch와 component patch를 적극 사용할 수 있다.",
+        "현재 활성 소스를 유지한 채 component patch 중심으로 시안을 구성한다.",
         "허용된 rootKeys/styleKeys 밖의 필드는 만들지 않는다.",
         "targetScope가 components이면 해당 범위 바깥 slot은 건드리지 않는다.",
+        "slot별 렌더 구조에 맞는 root patch를 우선 사용하고, 서술한 변화는 반드시 실제 operation으로 연결한다.",
+        "editableComponents에 포함된 mediaSpec과 layout을 보고 이미지 비율, fill 방식, 아이콘 크기 판단을 맞춘다.",
       ],
       designSurfaces: [
         {
@@ -4512,10 +4882,6 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
           whenToUse: "hero, summary, gallery, sticky 등 핵심 슬롯의 인상을 조절할 때",
         },
         {
-          id: "source_choice",
-          whenToUse: "같은 슬롯 안에서 더 적합한 캡처/커스텀 소스를 선택할 때",
-        },
-        {
           id: "local_style_patch",
           whenToUse: "허용된 style patch로 분위기와 밀도를 미세 조정할 때",
         },
@@ -4529,6 +4895,9 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
       visualPrinciples: buildBuilderDesignGuidance(pageId, editableComponents, {
         targetScope,
         designChangeLevel,
+        pageTitle: pageContext.pageLabel,
+        pageGroup: pageContext.pageGroup,
+        pageIdentityOverride: options.pageIdentityOverride,
       }),
     },
   };
@@ -4552,6 +4921,7 @@ function buildBuilderInputPayload({
   editableData,
   pageId,
   viewportProfile,
+  pageIdentityOverride,
   approvedPlan,
   intensity,
   versionLabelHint,
@@ -4559,7 +4929,7 @@ function buildBuilderInputPayload({
   targetScope,
   targetComponents,
 }) {
-  const pageContext = buildPlannerPageContext(pageId, viewportProfile, editableData);
+  const pageContext = buildPlannerPageContext(pageId, viewportProfile, editableData, { pageIdentityOverride });
   const normalizedDesignChangeLevel = normalizeDesignChangeLevel(
     designChangeLevel || approvedPlan?.designChangeLevel,
     "medium"
@@ -4568,6 +4938,8 @@ function buildBuilderInputPayload({
     pageContext,
     approvedPlan,
     systemContext: buildBuilderSystemContext(pageId, editableData, {
+      viewportProfile,
+      pageIdentityOverride,
       designChangeLevel: normalizedDesignChangeLevel,
       targetScope,
       targetComponents,
@@ -4588,6 +4960,7 @@ async function buildPlannerInputPayload({
   editableData,
   pageId,
   viewportProfile,
+  pageIdentityOverride,
   mode,
   requestText,
   keyMessage,
@@ -4599,7 +4972,7 @@ async function buildPlannerInputPayload({
   targetScope,
   targetComponents,
 }) {
-  const pageContext = buildPlannerPageContext(pageId, viewportProfile, editableData);
+  const pageContext = buildPlannerPageContext(pageId, viewportProfile, editableData, { pageIdentityOverride });
   const normalizedTargetScope = String(targetScope || "page").trim() || "page";
   const normalizedDesignChangeLevel = normalizeDesignChangeLevel(designChangeLevel, "medium");
   const normalizedTargetComponents = safeArray(targetComponents || [], 50)
@@ -6130,6 +6503,156 @@ function replaceFirstTextMatch(blockHtml, patterns, value) {
     if (!pattern.test(next)) continue;
     next = next.replace(pattern, (match) => match.replace(/>[\s\S]*?</, `>${target}<`));
     return next;
+  }
+  return next;
+}
+
+function replaceSequentialTextMatches(blockHtml, pattern, values = []) {
+  const queue = Array.isArray(values)
+    ? values.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  if (!queue.length) return String(blockHtml || "");
+  let index = 0;
+  return String(blockHtml || "").replace(pattern, (match) => {
+    const nextValue = queue[index];
+    if (!nextValue) return match;
+    index += 1;
+    return match.replace(/>[\s\S]*?</, `>${escapeHtml(nextValue)}<`);
+  });
+}
+
+function replaceSequentialAnchorHrefs(blockHtml, pattern, items = []) {
+  const queue = Array.isArray(items) ? items : [];
+  let index = 0;
+  return String(blockHtml || "").replace(pattern, (match) => {
+    const item = queue[index];
+    index += 1;
+    if (!item?.href) return match;
+    return match.replace(/href="[^"]*"/, `href="${escapeHtml(String(item.href || ""))}"`);
+  });
+}
+
+function applyHomeHeaderTopPatch(sectionHtml, activeSourceId = "", componentPatch = {}) {
+  if (!sectionHtml) return "";
+  const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  let next = String(sectionHtml);
+  next = next.replace(/<section([^>]*)>/, (match) => {
+    const cleaned = match.replace(/\sstyle="[^"]*"/, "");
+    const inlineStyle = buildSectionPatchStyleText(styles, { hidden: patch.visibility === false });
+    return cleaned.replace(/>$/, `${inlineStyle ? ` style="${escapeHtml(inlineStyle)}"` : ""} data-codex-patched="true">`);
+  });
+  if (patch.logoHref) {
+    next = replaceFirstMatch(
+      next,
+      /<a\b[^>]*aria-label="LG전자"[^>]*href="[^"]*"[^>]*>/i,
+      (match) => match[0].replace(/href="[^"]*"/, `href="${escapeHtml(String(patch.logoHref || ""))}"`)
+    );
+  }
+  if (patch.title || patch.subtitle) {
+    const titleStyle = buildTextPatchStyleText(styles, "title");
+    const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+    const introHtml = `
+      <div class="codex-home-header-top-intro" style="display:flex;flex-direction:column;gap:4px;min-width:0;flex:1;align-items:flex-start;justify-content:center;padding:0 24px 0 28px;">
+        ${patch.title ? `<strong style="display:block;font:700 15px/1.35 Arial,sans-serif;color:#111827;letter-spacing:-0.02em;${titleStyle ? escapeHtml(`;${titleStyle}`) : ""}">${escapeHtml(patch.title)}</strong>` : ""}
+        ${patch.subtitle ? `<span style="display:block;font:500 12px/1.45 Arial,sans-serif;color:#4b5563;letter-spacing:-0.01em;${subtitleStyle ? escapeHtml(`;${subtitleStyle}`) : ""}">${escapeHtml(patch.subtitle)}</span>` : ""}
+      </div>`;
+    if (next.includes("codex-home-header-top-intro")) {
+      next = next.replace(/<div class="codex-home-header-top-intro"[\s\S]*?<\/div>/, introHtml);
+    } else {
+      next = next.replace(/(<h1 class="CommonPcGnb_logo___kjxo">[\s\S]*?<\/h1>)/, `$1${introHtml}`);
+    }
+  }
+  if (Array.isArray(patch.utilityLinks) && patch.utilityLinks.length) {
+    next = replaceSequentialTextMatches(
+      next,
+      /<a\b[^>]*class="link_company"[^>]*>[\s\S]*?<\/a>|<div class="business"><a\b[^>]*>[\s\S]*?<\/a>/g,
+      patch.utilityLinks
+    );
+  }
+  return next;
+}
+
+function applyHomeHeaderBottomPatch(sectionHtml, activeSourceId = "", componentPatch = {}) {
+  if (!sectionHtml) return "";
+  const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  let next = String(sectionHtml);
+  next = next.replace(/<section([^>]*)>/, (match) => {
+    const cleaned = match.replace(/\sstyle="[^"]*"/, "");
+    const inlineStyle = buildSectionPatchStyleText(styles, { hidden: patch.visibility === false });
+    return cleaned.replace(/>$/, `${inlineStyle ? ` style="${escapeHtml(inlineStyle)}"` : ""} data-codex-patched="true">`);
+  });
+  if (patch.title || patch.subtitle) {
+    const titleStyle = buildTextPatchStyleText(styles, "title");
+    const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+    const introHtml = `
+      <div class="codex-home-header-bottom-intro" style="display:flex;align-items:flex-start;gap:10px;padding:12px 0 10px 2px;flex-wrap:wrap;">
+        ${patch.title ? `<strong style="display:block;font:700 14px/1.35 Arial,sans-serif;color:#111827;letter-spacing:-0.02em;${titleStyle ? escapeHtml(`;${titleStyle}`) : ""}">${escapeHtml(patch.title)}</strong>` : ""}
+        ${patch.subtitle ? `<span style="display:block;font:500 12px/1.45 Arial,sans-serif;color:#6b7280;letter-spacing:-0.01em;${subtitleStyle ? escapeHtml(`;${subtitleStyle}`) : ""}">${escapeHtml(patch.subtitle)}</span>` : ""}
+      </div>`;
+    if (next.includes("codex-home-header-bottom-intro")) {
+      next = next.replace(/<div class="codex-home-header-bottom-intro"[\s\S]*?<\/div>/, introHtml);
+    } else {
+      next = next.replace(/(<div class="CommonPcGnb_nav__Ri977">)/, `${introHtml}$1`);
+    }
+  }
+  if (Array.isArray(patch.mainMenus) && patch.mainMenus.length) {
+    next = replaceSequentialTextMatches(
+      next,
+      /<a\b[^>]*class="CommonPcGnb_item__[^"]*"[^>]*>[\s\S]*?<\/a>/g,
+      patch.mainMenus
+    );
+  }
+  return next;
+}
+
+function applyHomeQuickmenuPatch(sectionHtml, activeSourceId = "", componentPatch = {}) {
+  if (!sectionHtml) return "";
+  const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  let next = String(sectionHtml);
+  next = next.replace(/<section([^>]*)>/, (match) => {
+    const cleaned = match.replace(/\sstyle="[^"]*"/, "");
+    const inlineStyle = buildSectionPatchStyleText(styles, { hidden: patch.visibility === false });
+    return cleaned.replace(/>$/, `${inlineStyle ? ` style="${escapeHtml(inlineStyle)}"` : ""} data-codex-patched="true">`);
+  });
+  if (patch.title || patch.subtitle) {
+    const titleStyle = buildTextPatchStyleText(styles, "title");
+    const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+    const headHtml = `
+      <div class="codex-home-quickmenu-head" style="max-width:1460px;margin:0 auto;padding:8px 24px 16px;">
+        ${patch.title ? `<strong style="display:block;font:700 24px/1.28 Arial,sans-serif;color:#111827;letter-spacing:-0.03em;${titleStyle ? escapeHtml(`;${titleStyle}`) : ""}">${escapeHtml(patch.title)}</strong>` : ""}
+        ${patch.subtitle ? `<span style="display:block;margin-top:6px;font:500 14px/1.5 Arial,sans-serif;color:#6b7280;letter-spacing:-0.01em;${subtitleStyle ? escapeHtml(`;${subtitleStyle}`) : ""}">${escapeHtml(patch.subtitle)}</span>` : ""}
+      </div>`;
+    if (next.includes("codex-home-quickmenu-head")) {
+      next = next.replace(/<div class="codex-home-quickmenu-head"[\s\S]*?<\/div>/, headHtml);
+    } else {
+      next = next.replace(/(<div class="carousel_carousel__2JX9H">|<div class="codex-home-shell codex-home-shell--narrow">)/, `${headHtml}$1`);
+    }
+  }
+  if (Array.isArray(patch.items) && patch.items.length) {
+    const items = patch.items;
+    next = replaceSequentialTextMatches(
+      next,
+      /<strong class="HomePcQuickmenu_quickmenu_title__[^"]*"[^>]*>[\s\S]*?<\/strong>|<strong>[\s\S]*?<\/strong>/g,
+      items.map((item) => item?.title || "")
+    );
+    next = replaceSequentialAnchorHrefs(
+      next,
+      /<a\b[^>]*href="[^"]*"[^>]*>/g,
+      items
+    );
+    let imageIndex = 0;
+    next = next.replace(/<img\b([^>]*?)alt="([^"]*)"([^>]*?)src="([^"]+)"([^>]*)>/g, (match, before, alt, middle, src, after) => {
+      const item = items[imageIndex];
+      if (!item) return match;
+      imageIndex += 1;
+      const nextSrc = String(item.image || item.imageSrc || src || "").trim();
+      const nextAlt = String(item.alt || item.title || alt || "").trim();
+      let rewritten = `<img${before}alt="${escapeHtml(nextAlt)}"${middle}src="${escapeHtml(nextSrc || src)}"${after}>`;
+      return rewritten;
+    });
   }
   return next;
 }
@@ -8412,12 +8935,23 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
   const rebuilt = renderHomeEnhancements(rawHtml, mobileHtml, options);
   if (!rebuilt) return html;
 
+  const headerTopSourceId = getActiveSourceId(options.editableData || {}, "home", "header-top", "captured-home-header-top");
+  const headerTopPatch = findComponentPatch(options.editableData || {}, "home", "home.header-top", headerTopSourceId)?.patch || {};
+  const headerBottomSourceId = getActiveSourceId(options.editableData || {}, "home", "header-bottom", "captured-home-header-bottom");
+  const headerBottomPatch = findComponentPatch(options.editableData || {}, "home", "home.header-bottom", headerBottomSourceId)?.patch || {};
   const heroSourceId = getActiveSourceId(options.editableData || {}, "home", "hero", "captured-home-hero");
   const heroPatch = findComponentPatch(options.editableData || {}, "home", "home.hero", heroSourceId)?.patch || {};
+  const quickmenuSourceId = getActiveSourceId(options.editableData || {}, "home", "quickmenu", "captured-home-quickmenu");
+  const quickmenuPatch = findComponentPatch(options.editableData || {}, "home", "home.quickmenu", quickmenuSourceId)?.patch || {};
   const hero = mobileHtml ? applyHomeHeroPatch(extractMobileHeroSection(mobileHtml), heroSourceId, heroPatch) : "";
   const quickMenu =
-    rebuilt.match(/<section class="HomeMoQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-section codex-home-quickmenu">[\s\S]*?<\/section>/)?.[0] ||
+    applyHomeQuickmenuPatch(
+      rebuilt.match(/<section class="HomeMoQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+      rebuilt.match(/<section class="codex-home-section codex-home-quickmenu">[\s\S]*?<\/section>/)?.[0] ||
+      "",
+      quickmenuSourceId,
+      quickmenuPatch
+    ) ||
     "";
   const promotion =
     rebuilt.match(/<section class="HomeMoBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
@@ -8495,6 +9029,15 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
       () => hero
     );
   }
+
+  html = html.replace(
+    /<section class="CommonPcGnb_top__[^"]*"[\s\S]*?<\/section>/,
+    (match) => applyHomeHeaderTopPatch(match, headerTopSourceId, headerTopPatch)
+  );
+  html = html.replace(
+    /<section class="CommonPcGnb_bottom__[^"]*"[\s\S]*?<\/section>/,
+    (match) => applyHomeHeaderBottomPatch(match, headerBottomSourceId, headerBottomPatch)
+  );
 
   if (quickMenu) {
     html = html.replace(
@@ -13292,6 +13835,39 @@ function route(req, res) {
       items: listRequirementPlans(user.userId, { pageId, limit }),
     });
   }
+  if (pathname === "/api/workspace/page-identity") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    if (req.method === "GET") {
+      const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+      if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+      const editableData = readWorkspaceData(user.userId);
+      const page = findPage(editableData, pageId);
+      const pdpContext = resolvePdpRuntimeContext(pageId);
+      const defaultIdentity = buildPageIdentityBrief(pageId, {
+        pageTitle: pdpContext?.title || page?.title || pageId,
+        pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
+      });
+      const override = getPageIdentityOverride(user.userId, pageId);
+      return sendJson(res, 200, {
+        pageId,
+        defaultIdentity,
+        override,
+        effectiveIdentity: mergePageIdentityBrief(defaultIdentity, override || {}),
+      });
+    }
+    if (req.method === "POST") {
+      return readBody(req)
+        .then((body) => {
+          const payload = body ? JSON.parse(body) : {};
+          const pageId = String(payload.pageId || "").trim();
+          if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+          const item = savePageIdentityOverride(user.userId, pageId, payload);
+          return sendJson(res, 200, { ok: true, item });
+        })
+        .catch((error) => sendJson(res, 500, { error: "workspace_page_identity_failed", detail: String(error) }));
+    }
+  }
   if (pathname === "/api/workspace/plan" && req.method === "POST") {
     return readBody(req)
       .then((body) => {
@@ -13552,6 +14128,37 @@ function route(req, res) {
     const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildLlmReadinessReport(pageId, { editableData: data }));
   }
+  if (pathname === "/api/workspace/builder-audit") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "pc";
+    const data = readWorkspaceData(user.userId);
+    const pageIdentityOverride = getPageIdentityOverride(user.userId, pageId);
+    return sendJson(res, 200, buildBuilderAuditReport(pageId, { editableData: data, viewportProfile, pageIdentityOverride }));
+  }
+  if (pathname === "/api/workspace/llm-progress") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = requestUrl.searchParams.get("pageId") || "";
+    const kind = requestUrl.searchParams.get("kind") || "planner";
+    const item = getLlmProgress(user.userId, pageId, kind);
+    return sendJson(res, 200, {
+      ok: true,
+      item: item || {
+        userId: user.userId,
+        pageId,
+        kind,
+        status: "idle",
+        stage: "",
+        message: "",
+        percent: 0,
+        startedAt: null,
+        updatedAt: null,
+        detail: null,
+      },
+    });
+  }
   if (pathname === "/api/workspace/pre-llm-gaps") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
@@ -13709,19 +14316,36 @@ function route(req, res) {
         if (!pageId) {
           return sendJson(res, 400, { error: "page_id_required" });
         }
+        setLlmProgress(user.userId, pageId, "planner", {
+          status: "running",
+          stage: "validate",
+          message: "기획안 생성 요청을 확인하고 있습니다.",
+          percent: 8,
+        });
         if (!requestText && referenceUrls.length === 0) {
           return sendJson(res, 400, { error: "request_text_or_reference_required" });
         }
         const data = readWorkspaceData(user.userId);
+        const pageIdentityOverride = getPageIdentityOverride(user.userId, pageId);
         const page = findPage(data, pageId);
         if (!page) {
           return sendJson(res, 404, { error: "page_not_found", pageId });
         }
+        setLlmProgress(user.userId, pageId, "planner", {
+          status: "running",
+          stage: "prepare_input",
+          message: referenceUrls.length
+            ? "페이지 구조와 레퍼런스 정보를 수집하고 있습니다."
+            : "페이지 구조와 편집 범위를 정리하고 있습니다.",
+          percent: referenceUrls.length ? 20 : 28,
+          detail: { referenceCount: referenceUrls.length },
+        });
         const plannerInput = await buildPlannerInputPayload({
           user,
           editableData: data,
           pageId,
           viewportProfile,
+          pageIdentityOverride,
           mode,
           requestText,
           keyMessage,
@@ -13733,7 +14357,19 @@ function route(req, res) {
           targetScope,
           targetComponents,
         });
+        setLlmProgress(user.userId, pageId, "planner", {
+          status: "running",
+          stage: "model_generation",
+          message: "기획 방향과 디자인 방향을 생성하고 있습니다.",
+          percent: 62,
+        });
         const plannerResult = await handleLlmPlan(plannerInput);
+        setLlmProgress(user.userId, pageId, "planner", {
+          status: "running",
+          stage: "save_result",
+          message: "생성된 기획안을 저장하고 화면에 반영할 준비를 하고 있습니다.",
+          percent: 88,
+        });
         const savedPlan = saveRequirementPlan(user.userId, {
           pageId,
           viewportProfile,
@@ -13765,6 +14401,14 @@ function route(req, res) {
         console.log(
           `[planner] success user=${user.userId} page=${pageId} planId=${savedPlan?.id || "n/a"} summaryLength=${String(plannerResult.summary || "").length}`
         );
+        setLlmProgress(user.userId, pageId, "planner", {
+          status: "completed",
+          stage: "completed",
+          message: "기획안 생성이 완료되었습니다.",
+          percent: 100,
+          detail: { planId: savedPlan?.id || null },
+        });
+        clearCompletedLlmProgress(user.userId, pageId, "planner");
         return sendJson(res, 200, {
           summary: plannerResult.summary || "요구사항 정리 완료",
           planId: savedPlan?.id || null,
@@ -13777,6 +14421,21 @@ function route(req, res) {
       })
       .catch((error) => {
         console.error(`[planner] failed ${String(error)}`);
+        try {
+          const user = getUserFromRequest(req);
+          const payload = req.__lastParsedBody ? JSON.parse(req.__lastParsedBody) : {};
+          const pageId = String(payload.pageId || "").trim();
+          if (user && pageId) {
+            setLlmProgress(user.userId, pageId, "planner", {
+              status: "failed",
+              stage: "failed",
+              message: "기획안 생성 중 오류가 발생했습니다.",
+              percent: 100,
+              detail: { error: String(error) },
+            });
+            clearCompletedLlmProgress(user.userId, pageId, "planner");
+          }
+        } catch {}
         return sendJson(res, 500, {
           error: "llm_plan_failed",
           detail: String(error),
@@ -13795,7 +14454,14 @@ function route(req, res) {
         const intensity = String(payload.intensity || "balanced").trim() || "balanced";
         const versionLabelHint = String(payload.versionLabelHint || "").trim();
         if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        setLlmProgress(user.userId, pageId, "builder", {
+          status: "running",
+          stage: "validate",
+          message: "디자인 생성 요청과 승인된 기획안을 확인하고 있습니다.",
+          percent: 10,
+        });
         const data = readWorkspaceData(user.userId);
+        const pageIdentityOverride = getPageIdentityOverride(user.userId, pageId);
         const page = findPage(data, pageId);
         if (!page) return sendJson(res, 404, { error: "page_not_found", pageId });
         const savedPlans = listRequirementPlans(user.userId, { pageId, limit: 200 });
@@ -13820,10 +14486,17 @@ function route(req, res) {
         if (!approvedPlan) {
           return sendJson(res, 400, { error: "approved_plan_required" });
         }
+        setLlmProgress(user.userId, pageId, "builder", {
+          status: "running",
+          stage: "prepare_input",
+          message: "실제 반영 가능한 슬롯과 patch 범위를 정리하고 있습니다.",
+          percent: 28,
+        });
         const builderInput = buildBuilderInputPayload({
           editableData: data,
           pageId,
           viewportProfile,
+          pageIdentityOverride,
           approvedPlan,
           intensity,
           versionLabelHint,
@@ -13831,7 +14504,20 @@ function route(req, res) {
           targetScope,
           targetComponents,
         });
+        setLlmProgress(user.userId, pageId, "builder", {
+          status: "running",
+          stage: "model_generation",
+          message: "실행 가능한 디자인 operation을 생성하고 있습니다.",
+          percent: 64,
+          detail: { editableComponentCount: Array.isArray(builderInput?.systemContext?.editableComponents) ? builderInput.systemContext.editableComponents.length : 0 },
+        });
         const buildResult = await handleLlmBuildOnData(builderInput, data);
+        setLlmProgress(user.userId, pageId, "builder", {
+          status: "running",
+          stage: "save_result",
+          message: "생성된 draft를 저장하고 미리보기 반영을 준비하고 있습니다.",
+          percent: 90,
+        });
         const nextData = buildResult.data || data;
         saveDataForUser(user, nextData, buildResult.summary || `llm_build:${pageId}`);
         const changedComponentIds = Array.from(
@@ -13871,6 +14557,17 @@ function route(req, res) {
           planId: matchedPlan?.id || planId || null,
           intensity,
         });
+        setLlmProgress(user.userId, pageId, "builder", {
+          status: "completed",
+          stage: "completed",
+          message: "디자인 생성과 draft 반영이 완료되었습니다.",
+          percent: 100,
+          detail: {
+            draftBuildId: saved?.id || null,
+            operationCount: Array.isArray(buildResult.buildResult?.operations) ? buildResult.buildResult.operations.length : 0,
+          },
+        });
+        clearCompletedLlmProgress(user.userId, pageId, "builder");
         return sendJson(res, 200, {
           summary: buildResult.summary || "시안 생성 완료",
           draftBuildId: saved?.id || null,
@@ -13878,6 +14575,21 @@ function route(req, res) {
         });
       })
       .catch((error) => {
+        try {
+          const user = getUserFromRequest(req);
+          const payload = req.__lastParsedBody ? JSON.parse(req.__lastParsedBody) : {};
+          const pageId = String(payload.pageId || "").trim();
+          if (user && pageId) {
+            setLlmProgress(user.userId, pageId, "builder", {
+              status: "failed",
+              stage: "failed",
+              message: "디자인 생성 중 오류가 발생했습니다.",
+              percent: 100,
+              detail: { error: String(error) },
+            });
+            clearCompletedLlmProgress(user.userId, pageId, "builder");
+          }
+        } catch {}
         return sendJson(res, 500, {
           error: "llm_build_failed",
           detail: String(error),
