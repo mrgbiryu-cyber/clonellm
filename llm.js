@@ -13,6 +13,119 @@ const WORKSPACE_DEFAULT_PAGE_IDS = [
   "category-refrigerators",
 ];
 
+const WORKSPACE_DEFAULT_PAGE_META = {
+  home: {
+    url: "https://www.lge.co.kr/home",
+    title: "LGE.COM | LG전자",
+    pageGroup: "home",
+  },
+  support: {
+    url: "https://www.lge.co.kr/support",
+    title: "고객지원 | LG전자",
+    pageGroup: "support",
+  },
+  bestshop: {
+    url: "https://www.lge.co.kr/bestshop",
+    title: "베스트샵 | LG전자",
+    pageGroup: "bestshop",
+  },
+  "care-solutions": {
+    url: "https://www.lge.co.kr/care-solutions",
+    title: "가전 구독 | LG전자",
+    pageGroup: "care-solution",
+  },
+  "category-tvs": {
+    url: "https://www.lge.co.kr/category/tvs",
+    title: "TV | LG전자 | 공식몰 LGE.COM",
+    pageGroup: "category",
+  },
+  "category-refrigerators": {
+    url: "https://www.lge.co.kr/category/refrigerators",
+    title: "냉장고 | LG전자 | 공식몰 LGE.COM",
+    pageGroup: "category",
+  },
+};
+
+const DEFAULT_SECTION_NAME_MAP = {
+  "header-top": "상단 헤더",
+  "header-bottom": "주 메뉴",
+  hero: "메인 비주얼",
+  quickmenu: "퀵메뉴",
+  timedeal: "타임딜",
+  "md-choice": "MD 추천",
+  "best-ranking": "베스트 랭킹",
+  "space-renewal": "공간 리뉴얼",
+  subscription: "가전 구독",
+  "brand-showroom": "브랜드 쇼룸",
+  "latest-product-news": "신제품 소식",
+  "smart-life": "스마트 라이프",
+  "summary-banner-2": "하단 배너",
+  "missed-benefits": "혜택 모음",
+  "lg-best-care": "LG 베스트 케어",
+  "bestshop-guide": "베스트샵 안내",
+  mainService: "주요 서비스",
+  notice: "공지",
+  tipsBanner: "팁 배너",
+  bestcare: "베스트케어",
+  shortcut: "바로가기",
+  review: "리뷰",
+  brandBanner: "브랜드 배너",
+  ranking: "랭킹",
+  benefit: "혜택",
+  tabs: "탭",
+  careBanner: "구독 배너",
+  banner: "상단 배너",
+  filter: "필터",
+  sort: "정렬",
+  productGrid: "상품 그리드",
+  firstRow: "첫 번째 상품열",
+  firstProduct: "대표 상품",
+  gallery: "상품 갤러리",
+  option: "옵션",
+  qna: "문의",
+};
+
+function readRawPageMetaMap() {
+  const rawPagesDir = path.join(ROOT, "data", "raw", "pages");
+  const metaByPageId = {};
+  try {
+    const fileNames = fs.readdirSync(rawPagesDir).filter((fileName) => fileName.endsWith(".json"));
+    for (const fileName of fileNames) {
+      try {
+        const item = JSON.parse(fs.readFileSync(path.join(rawPagesDir, fileName), "utf-8"));
+        const pageId = rawPageIdFromUrl(item?.url || "");
+        if (!pageId || metaByPageId[pageId]) continue;
+        metaByPageId[pageId] = {
+          url: item.url,
+          title: item.title,
+          pageGroup: item.pageGroup,
+        };
+      } catch {
+        // ignore malformed raw page records
+      }
+    }
+  } catch {
+    // raw page capture is optional in some environments
+  }
+  return metaByPageId;
+}
+
+function rawPageIdFromUrl(url) {
+  const normalized = String(url || "").trim();
+  if (!normalized) return "";
+  if (normalized === "https://www.lge.co.kr/home") return "home";
+  if (normalized === "https://www.lge.co.kr/support") return "support";
+  if (normalized === "https://www.lge.co.kr/bestshop") return "bestshop";
+  if (normalized === "https://www.lge.co.kr/care-solutions") return "care-solutions";
+  if (normalized === "https://www.lge.co.kr/category/tvs") return "category-tvs";
+  if (normalized === "https://www.lge.co.kr/category/refrigerators") return "category-refrigerators";
+  return "";
+}
+
+function defaultSectionName(slotId) {
+  return DEFAULT_SECTION_NAME_MAP[String(slotId || "").trim()] || String(slotId || "").trim() || "섹션";
+}
+
 function buildDefaultSourceSet(prefix) {
   return [
     { sourceId: `captured-${prefix}`, sourceType: "captured", renderer: "iframe", status: "active" },
@@ -254,6 +367,55 @@ function buildDefaultSlotRegistry(pageId) {
   return null;
 }
 
+function buildDefaultPageEntry(pageId, rawPageMetaMap = {}) {
+  const fallbackMeta = WORKSPACE_DEFAULT_PAGE_META[pageId] || {
+    url: `/clone/${pageId}`,
+    title: pageId,
+    pageGroup: "other",
+  };
+  const rawMeta = rawPageMetaMap[pageId] || {};
+  const pageMeta = {
+    ...fallbackMeta,
+    ...Object.fromEntries(
+      Object.entries(rawMeta).filter(([, value]) => typeof value === "string" && value.trim())
+    ),
+  };
+  const slotRegistry = buildDefaultSlotRegistry(pageId);
+  const sections = pageId === "home"
+    ? [
+        { name: "Header", componentType: "global-header" },
+        { name: "Hero Banner", componentType: "hero-banner" },
+        { name: "Promotion Carousel", componentType: "promo-carousel" },
+        { name: "Featured Products", componentType: "product-card-grid" },
+        { name: "CTA Banner", componentType: "cta-banner" },
+        { name: "Footer", componentType: "global-footer" },
+      ]
+    : (slotRegistry?.slots || []).map((slot) => ({
+        name: defaultSectionName(slot.slotId),
+        componentType: slot.componentType || "section",
+        slotId: slot.slotId,
+      }));
+
+  return {
+    id: pageId,
+    title: pageMeta.title || pageId,
+    pageGroup: pageMeta.pageGroup || "other",
+    url: pageMeta.url || `/clone/${pageId}`,
+    sections: sections.map((section, index) => ({
+      id: `${pageId}-section-${index + 1}`,
+      name: section.name,
+      componentType: section.componentType,
+      visible: true,
+      order: index + 1,
+      props: {
+        pageTitle: pageMeta.title || pageId,
+        sourceUrl: pageMeta.url || `/clone/${pageId}`,
+        ...(section.slotId ? { slotId: section.slotId } : {}),
+      },
+    })),
+  };
+}
+
 function normalizeSlotRegistry(existingRegistry, defaultRegistry) {
   const current = existingRegistry || {};
   const currentSlots = Array.isArray(current.slots) ? current.slots : [];
@@ -287,9 +449,18 @@ function normalizeSlotRegistry(existingRegistry, defaultRegistry) {
 
 function normalizeEditableData(data) {
   const next = JSON.parse(JSON.stringify(data || {}));
+  next.pages = Array.isArray(next.pages) ? next.pages : [];
   next.slotRegistries = Array.isArray(next.slotRegistries) ? next.slotRegistries : [];
   next.componentPatches = Array.isArray(next.componentPatches) ? next.componentPatches : [];
   next.acceptanceResults = Array.isArray(next.acceptanceResults) ? next.acceptanceResults : [];
+  const rawPageMetaMap = readRawPageMetaMap();
+  const existingPageIds = new Set(
+    next.pages.map((page) => String(page?.id || "").trim()).filter(Boolean)
+  );
+  for (const pageId of WORKSPACE_DEFAULT_PAGE_IDS) {
+    if (existingPageIds.has(pageId)) continue;
+    next.pages.push(buildDefaultPageEntry(pageId, rawPageMetaMap));
+  }
   for (const pageId of WORKSPACE_DEFAULT_PAGE_IDS) {
     const defaultRegistry = buildDefaultSlotRegistry(pageId);
     if (!defaultRegistry) continue;

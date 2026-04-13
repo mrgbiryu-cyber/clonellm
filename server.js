@@ -6394,18 +6394,20 @@ function buildRuntimePageSummary(data) {
   ];
   const existingPageIds = new Set((data.pages || []).map((page) => String(page.id || "").trim()).filter(Boolean));
   const corePages = corePageIds.filter((pageId) => existingPageIds.has(pageId));
+  const infoPages = infoPageIds.filter((pageId) => existingPageIds.has(pageId));
+  const plpPages = plpPageIds.filter((pageId) => existingPageIds.has(pageId));
   const routeCatalog = [
     ...corePages.map((pageId) => ({
       type: "core-page",
       id: pageId,
       route: `/clone/${pageId}`,
     })),
-    ...infoPageIds.map((pageId) => ({
+    ...infoPages.map((pageId) => ({
       type: "info-page",
       id: pageId,
       route: `/clone/${pageId}`,
     })),
-    ...plpPageIds.map((pageId) => ({
+    ...plpPages.map((pageId) => ({
       type: "plp-page",
       id: pageId,
       route: `/clone/${pageId}`,
@@ -6416,11 +6418,12 @@ function buildRuntimePageSummary(data) {
       route: "/clone-product",
     },
   ];
+  const uniqueRuntimePageCount = new Set([...corePages, ...infoPages, ...plpPages]).size;
   return {
-    totalRuntimePages: corePages.length + infoPageIds.length + 1,
+    totalRuntimePages: uniqueRuntimePageCount + 1,
     corePages,
-    infoPages: infoPageIds,
-    plpPages: plpPageIds,
+    infoPages,
+    plpPages,
     pdpRoutes: ["/clone-product"],
     routeCatalog,
     counts: {

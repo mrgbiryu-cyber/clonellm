@@ -10,7 +10,7 @@
       main { display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 16px; padding: 16px; }
       .panel { background: #fff; border: 1px solid #e7e9f2; border-radius: 10px; overflow: hidden; }
       .panel h2 { margin: 0; padding: 12px 14px; font-size: 14px; border-bottom: 1px solid #eceef7; }
-      .list { max-height: calc(100vh - 140px); overflow: auto; }
+      .list { max-height: 52vh; overflow: auto; }
       .row { display: block; width: 100%; text-align: left; border: 0; background: #fff; padding: 10px 12px; border-bottom: 1px solid #f1f2f8; cursor: pointer; }
       .row:hover { background: #f7f8ff; }
       .row.active { background: #eef2ff; font-weight: 700; }
@@ -75,7 +75,9 @@
       .gap-item.acceptance-selected-target { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18); background: #f8fbff; }
       .preview-frame { width: 100%; height: 420px; border: 1px solid #e7e9f2; border-radius: 10px; margin-top: 14px; background: #fff; }
       code { background: #f3f4f6; padding: 1px 4px; border-radius: 4px; }
-      .panel.side { grid-column: 1 / -1; }
+      .panel-subtitle { margin: 0; padding: 12px 14px; font-size: 13px; border-top: 1px solid #eceef7; border-bottom: 1px solid #eceef7; background: #fbfcff; }
+      .history-panel-inline { border-top: 1px solid #eceef7; background: #f8fafc; }
+      .history-panel-inline .history-list { max-height: 36vh; overflow: auto; }
       .list-toolbar { padding: 10px 12px; border-bottom: 1px solid #eceef7; display: grid; gap: 8px; }
       .list-toolbar-row { display: grid; gap: 6px; }
       .list-toolbar-row label { font-size: 12px; color: #4b5563; font-weight: 700; }
@@ -84,7 +86,8 @@
       .page-pick-meta { font-size: 12px; color: #61667a; margin-top: 4px; }
       @media (max-width: 1200px) {
         main { grid-template-columns: 1fr; }
-        .panel.side { grid-column: 1 / -1; }
+        .list { max-height: none; }
+        .history-panel-inline .history-list { max-height: none; }
       }
     </style>
   </head>
@@ -103,14 +106,14 @@
         <div id="pageListSummary" class="list-summary"></div>
         <div id="adminNotice" class="admin-notice" hidden></div>
         <div id="pageList" class="list"></div>
+        <h3 class="panel-subtitle">작업 이력</h3>
+        <div class="history-panel-inline">
+          <div id="historyPanel" class="history-list"></div>
+        </div>
       </section>
       <section class="panel">
         <h2>페이지 상세</h2>
         <div id="detail" class="body">Loading...</div>
-      </section>
-      <section class="panel side">
-        <h2>작업 이력</h2>
-        <div id="historyPanel" class="history-list"></div>
       </section>
     </main>
     <script>
@@ -552,18 +555,6 @@
         ];
         pageListToolbarEl.innerHTML = `
           <div class="list-toolbar-row">
-            <label for="pageStatusFilter">페이지 상태</label>
-            <select id="pageStatusFilter" class="list-select">
-              ${filters.map((filter) => `<option value="${escapeHtml(filter.id)}" ${pageFilter === filter.id ? "selected" : ""}>${escapeHtml(filter.label)}</option>`).join("")}
-            </select>
-          </div>
-          <div class="list-toolbar-row">
-            <label for="pageAdvisoryFilter">주의사항</label>
-            <select id="pageAdvisoryFilter" class="list-select">
-              ${advisoryFilters.map((filter) => `<option value="${escapeHtml(filter.id)}" ${advisoryFilter === filter.id ? "selected" : ""}>${escapeHtml(filter.label)}</option>`).join("")}
-            </select>
-          </div>
-          <div class="list-toolbar-row">
             <label for="pageQuickSelect">수정할 페이지 선택</label>
             <div class="page-pick-row">
               <select id="pageQuickSelect" class="list-select">
@@ -571,6 +562,18 @@
               </select>
             </div>
             <div class="page-pick-meta">선택한 페이지는 오른쪽 상세 화면에서 바로 수정할 수 있습니다.</div>
+          </div>
+          <div class="list-toolbar-row">
+            <label for="pageStatusFilter">페이지 상태</label>
+            <select id="pageStatusFilter" class="list-select">
+              ${filters.map((filter) => `<option value="${escapeHtml(filter.id)}" ${pageFilter === filter.id ? "selected" : ""}>${escapeHtml(filter.label)}</option>`).join("")}
+            </select>
+          </div>
+          <div class="list-toolbar-row">
+            <label for="pageAdvisoryFilter">주의 사항</label>
+            <select id="pageAdvisoryFilter" class="list-select">
+              ${advisoryFilters.map((filter) => `<option value="${escapeHtml(filter.id)}" ${advisoryFilter === filter.id ? "selected" : ""}>${escapeHtml(filter.label)}</option>`).join("")}
+            </select>
           </div>
         `;
         pageListToolbarEl.querySelector("#pageStatusFilter")?.addEventListener("change", async (event) => {
@@ -619,7 +622,7 @@
             <div class="meta">${escapeHtml(p.pageGroup)} · ${escapeHtml(p.id)}</div>
             <div class="meta">상태 ${escapeHtml(acceptanceStatusLabel(pageState.acceptanceStatus || "in-progress"))} · 주의사항 ${escapeHtml(pageState.pageAdvisoryCount ?? advisoryMeta.count)}건 · 위험도 ${escapeHtml(pageState.maxRiskScore || 0)}</div>
             <div class="actions">
-              <button type="button" class="btn secondary select-page-btn" data-select-page-id="${escapeHtml(p.id)}">${p.id === selectedId ? "선택됨" : "선택"}</button>
+              <button type="button" class="btn secondary select-page-btn" data-select-page-id="${escapeHtml(p.id)}">선택하기</button>
               ${pageReview?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReview.compareUrl)}" target="_blank">비교 보기</a>` : ``}
             </div>
           </div>
