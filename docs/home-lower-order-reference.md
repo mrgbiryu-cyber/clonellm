@@ -2,6 +2,11 @@
 
 > 먼저 읽을 기준 문서:
 > `docs/project-purpose-reference.md`
+>
+> 문서 상태:
+> 이 문서는 홈 하단 순서와 raw 매핑을 위한 참조 문서다.
+> 여기의 `TBD`는 현재 기본값이 아니라, 당시 섹션 source 판단이 미확정이었음을 뜻하는 기록용 표현이다.
+> 현재 구현 판단에는 `docs/home-progress-log.md`, `docs/decision-history.md`, `docs/document-placeholder-audit-2026-04-13.md`를 함께 본다.
 
 이 문서는 `quickmenu` 아래 `footer` 전까지의 홈 하단 섹션 순서를
 
@@ -133,7 +138,7 @@
 3. 다만 구현은 섹션마다 다를 수 있다
    - `mobile-derived`
    - `custom-renderer`
-   - `TBD`
+   - `per-section verification required`
 
 즉:
 
@@ -172,7 +177,7 @@
 |---|---|---|
 | `order-check` | 현재 섹션이 live reference 순서에서 맞는 위치에 있는지 | `best-ranking 뒤`처럼 임시 anchor로 가다 순서가 흔들린 적이 있음 |
 | `anchor-check` | 삽입 anchor가 실제 앞/뒤 섹션 기준으로 맞는지 | raw skeleton anchor와 live 순서가 엇갈린 적이 있음 |
-| `source-check` | `mobile-derived / custom-renderer / TBD` 판정이 맞는지 | `pc raw`와 `mo raw`가 섞여 계속 흔들렸음 |
+| `source-check` | `mobile-derived / custom-renderer / per-section verification required` 판정이 맞는지 | `pc raw`와 `mo raw`가 섞여 계속 흔들렸음 |
 | `slot-check` | `data-codex-slot`, `data-codex-source`가 정확히 붙는지 | 나중에 LLM이 slot/source 기준으로 수정해야 함 |
 | `single-instance-check` | 섹션이 중복 삽입되지 않았는지 | sandbox/main 전환 때 같은 섹션이 두 번 나온 적이 있음 |
 | `footer-leak-check` | footer 아래 hidden chunk/S:* 조각이 새어나오지 않는지 | 홈 하단에서 실제로 크게 실패했던 항목 |

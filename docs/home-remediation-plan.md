@@ -1,15 +1,19 @@
 # Home Remediation Plan
 
+> 문서 상태:
+> 이 문서는 `home` 복구/정렬 작업의 기준 계획 문서다.
+> 다만 일부 표현은 당시 remediation 단계의 용어를 유지하고 있으므로, 현재 제품 구조와 역할 분리는 `docs/decision-history.md`, `docs/admin-preview-workbench-structure.md`, `docs/llm-planner-builder-schema.md`를 함께 본다.
+
 ## 목적
 - `home`을 LLM 이전 최우선 기준 페이지로 다시 닫는다.
 - `home`의 문제를 `구조`, `스타일`, `인터랙션`으로 분리해서 관리한다.
 - `workbench -> clone 수정 -> replay` 루프를 홈에서 먼저 안정화한다.
 - 임시 overlay나 ad hoc CSS가 아니라 재사용 가능한 규칙으로 홈을 정리한다.
 
-## 현재 판단
+## 판단 요약
 `home`은 backend foundation 관점에서는 많이 올라와 있지만, visual acceptance 관점에서는 아직 미완료다.
 
-현재 상태를 요약하면:
+요약하면:
 1. baseline/source/slot 구조는 존재한다.
 2. captured-first 방향은 유지되고 있다.
 3. 하지만 실제 화면은 다음 문제가 섞여 있다.
@@ -137,9 +141,9 @@
 - `group checks`
 - `focus area metadata`
 
-## Current Artifacts
+## Artifact Snapshot
 
-현재 바로 확인 가능한 산출물은 아래와 같다.
+바로 확인 가능한 산출물은 아래와 같다.
 
 ### URLs
 - `http://localhost:3000/clone/home`
@@ -180,7 +184,7 @@
 - `utility-icons`
 - `corp-links`
 
-### 현재 문제
+### 주요 문제
 1. 로고 크기/베이스라인이 reference와 다르다.
 2. 우측 아이콘 간격과 정렬이 다르다.
 3. `회사소개 / 사업자몰`의 폰트, 간격, 높이가 다르다.
@@ -224,7 +228,7 @@
 - `homestyle-chip`
 - `promo-side`
 
-### 현재 문제
+### 주요 문제
 1. 1depth 메뉴의 높이, 간격, 타이포가 다르다.
 2. `홈스타일`이 원래 구조 안이 아니라 임시 방식으로 흔들렸었다.
 3. 우측 보조 영역(브랜드/프로모션) 디자인과 위치가 다르다.
@@ -274,7 +278,7 @@
 - `depth3-columns`
 - `right-promo`
 
-### 현재 문제
+### 주요 문제
 1. open-state는 backend 기준 많이 맞췄지만 visual fidelity가 낮다.
 2. `with-depth2`와 `simple-panel` 타입 차이가 아직 충분히 닫히지 않았다.
 3. 우측 이미지/배너 영역이 reference와 다르다.
@@ -328,7 +332,7 @@
 - `hero-copy`
 - `hero-indicator`
 
-### 현재 문제
+### 주요 문제
 1. hero 크기/높이가 reference와 다르다.
 2. 현재는 raw swiper를 정적으로 고정한 상태라서 layout은 일부 맞지만 interaction이 없다.
 3. 우측 하단 indicator가 layout 차이에 영향을 줄 가능성이 있다.
@@ -376,7 +380,7 @@
 - `summary-banner`
 - `indicator`
 
-### 현재 문제
+### 주요 문제
 1. 아이콘 크기와 카드 외곽선이 reference와 다르다.
 2. quickmenu 카드 이미지/썸네일 비율이 다르다.
 3. summary banner 폭과 비율이 다르다.
@@ -423,7 +427,7 @@
 - `timedeal`
 - `first-lower-slider`
 
-### 현재 문제
+### 주요 문제
 1. 슬라이드가 제대로 동작하지 않아 개별 이미지 폭이 다르다.
 2. 타임딜은 구조 일부는 들어왔지만 디자인이 아직 다르다.
 3. 첫 하단 블록들의 rhythm과 spacing이 reference와 다르다.
@@ -462,7 +466,7 @@
 - `section-order`
 - `section-rhythm`
 
-### 현재 문제
+### 주요 문제
 1. reference와 블록 구조 자체가 다른 섹션이 남아 있다.
 2. section order / spacing / rhythm이 다르다.
 3. 일부는 아직 placeholder replacement 단계에서 막 벗어난 상태다.

@@ -10,7 +10,7 @@
       main { display: grid; grid-template-columns: 320px minmax(0,1fr); gap: 16px; padding: 16px; }
       .panel { background: #fff; border: 1px solid #e7e9f2; border-radius: 10px; overflow: hidden; }
       .panel h2 { margin: 0; padding: 12px 14px; font-size: 14px; border-bottom: 1px solid #eceef7; }
-      .list { max-height: 52vh; overflow: auto; }
+      .list { overflow: auto; }
       .row { display: block; width: 100%; text-align: left; border: 0; background: #fff; padding: 10px 12px; border-bottom: 1px solid #f1f2f8; cursor: pointer; }
       .row:hover { background: #f7f8ff; }
       .row.active { background: #eef2ff; font-weight: 700; }
@@ -22,6 +22,7 @@
       button.btn.secondary, a.btn.secondary { background: #475569; }
       .llm { margin-top: 14px; padding-top: 14px; border-top: 1px solid #eceef7; }
       textarea { width: 100%; min-height: 100px; box-sizing: border-box; border: 1px solid #dfe3f0; border-radius: 8px; padding: 10px; font: inherit; resize: vertical; }
+      input[type="text"] { width: 100%; box-sizing: border-box; border: 1px solid #dfe3f0; border-radius: 8px; padding: 10px; font: inherit; }
       textarea.inline-textarea { min-height: 92px; margin-top: 8px; }
       button.run { margin-top: 8px; border: 0; background: #c60c30; color: #fff; padding: 9px 12px; border-radius: 7px; cursor: pointer; font-weight: 700; }
       .status, .component-status { margin-top: 8px; font-size: 12px; color: #586075; }
@@ -84,16 +85,60 @@
       .list-helper { padding: 10px 12px; border-bottom: 1px solid #eceef7; background: #f8fafc; }
       .page-pick-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
       .page-pick-meta { font-size: 12px; color: #61667a; margin-top: 4px; }
-      @media (max-width: 1200px) {
+      .build-badge { display: inline-flex; align-items: center; margin-left: 8px; padding: 3px 8px; border-radius: 999px; background: #dbeafe; color: #1d4ed8; font-size: 11px; font-weight: 700; }
+      .detail-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+      .detail-heading { min-width: 0; }
+      .detail-heading strong { display: block; font-size: 18px; }
+      .detail-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+      .detail-actions .toolbar-actions, .detail-actions .actions { margin-top: 0; justify-content: flex-end; }
+      .planner-grid { display: grid; gap: 10px; margin-top: 10px; }
+      .planner-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .planner-field label { display: block; font-size: 12px; color: #4b5563; font-weight: 700; margin-bottom: 6px; }
+      .planner-field.compact textarea { min-height: 72px; }
+      .planner-field.wide { grid-column: 1 / -1; }
+      .planner-field.wide textarea { min-height: 132px; }
+      .planner-subsection { margin-top: 14px; padding-top: 14px; border-top: 1px solid #eceef7; }
+      .planner-card-grid { display: grid; gap: 10px; margin-top: 10px; }
+      .planner-card { border: 1px solid #e6e9f4; border-radius: 10px; padding: 12px; background: #fbfcff; }
+      .planner-card strong { display: block; margin-bottom: 6px; font-size: 13px; }
+      .planner-ref-list { display: grid; gap: 8px; margin-top: 10px; }
+      .planner-ref-item { border: 1px solid #e6e9f4; border-radius: 8px; padding: 10px; background: #fff; }
+      .planner-status { margin-top: 10px; font-size: 12px; color: #586075; }
+      .planner-inline-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+      .planner-scope-toggle { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+      .checkbox-chip { display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid #d9ddea; border-radius: 999px; background: #fff; font-size: 12px; font-weight: 700; color: #1f2937; }
+      .checkbox-chip input { margin: 0; }
+      .planner-target-box { margin-top: 10px; padding: 12px; border: 1px solid #e6e9f4; border-radius: 10px; background: #fbfcff; }
+      .planner-component-list { display: grid; gap: 8px; margin-top: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .planner-component-item { display: flex; align-items: flex-start; gap: 8px; padding: 10px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; }
+      .planner-component-item input { margin-top: 2px; }
+      .planner-component-item strong { display: block; font-size: 12px; color: #111827; }
+      .planner-component-item .meta { margin-top: 2px; }
+      .planner-loading-box { margin-top: 10px; padding: 12px; border: 1px solid #dbeafe; border-radius: 10px; background: #f8fbff; }
+      .planner-loading-fill { width: 38%; animation: planner-loading 1.2s ease-in-out infinite; }
+      .planner-draft-form[hidden], .planner-target-box[hidden], .planner-loading-box[hidden] { display: none !important; }
+      @keyframes planner-loading {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(300%); }
+      }
+      @media (max-width: 900px) {
         main { grid-template-columns: 1fr; }
         .list { max-height: none; }
         .history-panel-inline .history-list { max-height: none; }
+        .detail-header { flex-direction: column; }
+        .detail-actions { width: 100%; align-items: stretch; }
+        .detail-actions .toolbar-actions, .detail-actions .actions { justify-content: flex-start; }
+        .planner-grid.two { grid-template-columns: 1fr; }
+        .planner-component-list { grid-template-columns: 1fr; }
       }
     </style>
   </head>
   <body>
     <header>
-      <strong>LGE 작업 관리자</strong>
+      <div>
+        <strong>LGE 작업 관리자</strong>
+        <span class="build-badge">admin-v2026-04-13b</span>
+      </div>
       <div class="top-meta">
         <span id="sessionMeta">Loading session...</span>
         <button id="logoutBtn" type="button">로그아웃</button>
@@ -127,16 +172,73 @@
       const historyPanelEl = document.getElementById("historyPanel");
       let pages = [];
       let selectedId = "";
+      let pendingSelectedId = "";
       let selectedBundleId = "";
+      let acceptanceBundles = null;
       let workspaceMeta = null;
       let recentActivity = [];
       let finalReadinessMeta = null;
-      let pageFilter = "all";
       let activityFilter = "all";
-      let advisoryFilter = "all";
       let runtimePageSummary = null;
       let pageAdvisories = {};
       let pageReviewMap = new Map();
+      let refreshGeneration = 0;
+      const plannerUiStateByPage = new Map();
+      const adminTargetCatalog = [
+        { id: "home", workspacePageId: "home", targetKind: "home", displayTitle: "홈 - 메인", order: 1 },
+        { id: "category-tvs", workspacePageId: "category-tvs", targetKind: "plp", displayTitle: "PLP - TV 카테고리", order: 2 },
+        { id: "category-refrigerators", workspacePageId: "category-refrigerators", targetKind: "plp", displayTitle: "PLP - 냉장고 카테고리", order: 3 },
+        {
+          id: "pdp-tv-general",
+          workspacePageId: "pdp-tv-general",
+          runtimePageId: "category-tvs",
+          targetKind: "pdp",
+          displayTitle: "PDP - TV 일반형",
+          order: 4,
+          href: "https://www.lge.co.kr/tvs/32lq635bkna-stand",
+          cloneTitle: "/tvs/32lq635bkna-stand",
+        },
+        {
+          id: "pdp-tv-premium",
+          workspacePageId: "pdp-tv-premium",
+          runtimePageId: "category-tvs",
+          targetKind: "pdp",
+          displayTitle: "PDP - TV 프리미엄형",
+          order: 5,
+          href: "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+          cloneTitle: "/tvs/oled97g5kna-stand",
+        },
+        {
+          id: "pdp-refrigerator-general",
+          workspacePageId: "pdp-refrigerator-general",
+          runtimePageId: "category-refrigerators",
+          targetKind: "pdp",
+          displayTitle: "PDP - 냉장고 일반형",
+          order: 6,
+          href: "https://www.lge.co.kr/refrigerators/t873mee111",
+          cloneTitle: "/refrigerators/t873mee111",
+        },
+        {
+          id: "pdp-refrigerator-knockon",
+          workspacePageId: "pdp-refrigerator-knockon",
+          runtimePageId: "category-refrigerators",
+          targetKind: "pdp",
+          displayTitle: "PDP - 냉장고 노크온형",
+          order: 7,
+          href: "https://www.lge.co.kr/refrigerators/t875mee412",
+          cloneTitle: "/refrigerators/t875mee412",
+        },
+        {
+          id: "pdp-refrigerator-glass",
+          workspacePageId: "pdp-refrigerator-glass",
+          runtimePageId: "category-refrigerators",
+          targetKind: "pdp",
+          displayTitle: "PDP - 냉장고 글라스형",
+          order: 8,
+          href: "https://www.lge.co.kr/refrigerators/h875gbb111",
+          cloneTitle: "/refrigerators/h875gbb111",
+        },
+      ];
 
       function escapeHtml(value) {
         return String(value ?? "")
@@ -148,12 +250,17 @@
       }
 
       const pageNameMap = {
-        home: "홈",
+        home: "홈 - 메인",
         support: "고객지원",
         bestshop: "베스트샵",
         "care-solutions": "가전 구독",
-        "category-tvs": "TV 카테고리",
-        "category-refrigerators": "냉장고 카테고리",
+        "category-tvs": "PLP - TV 카테고리",
+        "category-refrigerators": "PLP - 냉장고 카테고리",
+        "pdp-tv-general": "PDP - TV 일반형",
+        "pdp-tv-premium": "PDP - TV 프리미엄형",
+        "pdp-refrigerator-general": "PDP - 냉장고 일반형",
+        "pdp-refrigerator-knockon": "PDP - 냉장고 노크온형",
+        "pdp-refrigerator-glass": "PDP - 냉장고 글라스형",
         "lg-signature-info": "LG SIGNATURE",
         "objet-collection-story": "LG Objet Collection",
       };
@@ -181,7 +288,13 @@
         tabs: "탭 영역",
         careBanner: "구독 배너",
         shortcut: "바로가기",
+        gallery: "상품 갤러리",
+        summary: "상품 요약",
+        price: "가격 정보",
+        option: "옵션",
+        sticky: "고정 구매 영역",
         review: "리뷰",
+        qna: "문의",
         brandBanner: "브랜드 배너",
         mainService: "주요 서비스",
         notice: "공지",
@@ -250,8 +363,64 @@
         thumbnailStyle: "썸네일 스타일",
       };
 
+      const pdpSlotIds = new Set(["gallery", "summary", "price", "option", "sticky", "review", "qna"]);
+
       function pageLabel(pageId, title = "") {
         return pageNameMap[pageId] || title || pageId;
+      }
+
+      function getTargetWorkspacePageId(page) {
+        return page?.workspacePageId || page?.id || "";
+      }
+
+      function getTargetRuntimePageId(page) {
+        return page?.runtimePageId || page?.workspacePageId || page?.id || "";
+      }
+
+      function getTargetKindLabel(page) {
+        const map = {
+          home: "홈",
+          plp: "PLP",
+          pdp: "PDP",
+        };
+        return map[page?.targetKind] || page?.pageGroup || "page";
+      }
+
+      function buildPreviewTargetUrl(page) {
+        if (!page) return "#";
+        if (page.targetKind === "pdp") {
+          const params = new URLSearchParams();
+          params.set("pageId", getTargetWorkspacePageId(page));
+          if (page.href) params.set("href", page.href);
+          if (page.cloneTitle) params.set("title", page.cloneTitle);
+          return `/clone-product?${params.toString()}`;
+        }
+        return `/clone/${encodeURIComponent(getTargetWorkspacePageId(page))}`;
+      }
+
+      function buildPreviewTargets(rawPages = []) {
+        const pageMap = new Map((rawPages || []).map((page) => [page.id, page]));
+        const targets = [];
+        for (const spec of adminTargetCatalog) {
+          const basePage = pageMap.get(spec.workspacePageId);
+          if (!basePage) continue;
+          targets.push({
+            ...basePage,
+            id: spec.id,
+            workspacePageId: spec.workspacePageId,
+            runtimePageId: spec.runtimePageId || spec.workspacePageId,
+            targetKind: spec.targetKind,
+            title: spec.displayTitle,
+            displayTitle: spec.displayTitle,
+            href: spec.href || "",
+            cloneTitle: spec.cloneTitle || "",
+            previewUrl: buildPreviewTargetUrl({ ...basePage, ...spec }),
+            pageGroup: spec.targetKind === "pdp" ? "product-detail" : basePage.pageGroup,
+            order: spec.order,
+            editingSupported: true,
+          });
+        }
+        return targets.sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
       }
 
       function slotLabel(slotId) {
@@ -277,30 +446,49 @@
         return map[value] || value || "작업 중";
       }
 
-      function advisoryFilterLabel(value) {
-        const map = {
-          all: "전체",
-          warning: "경고 이상",
-          error: "오류만",
-          "has-advisory": "주의사항 있음",
-        };
-        return map[value] || value || "전체";
-      }
-
-      function pageFilterLabel(value) {
-        const map = {
-          all: "전체",
-          pending: "작업 중",
-          fail: "검수 필요",
-          accepted: "완료",
-        };
-        return map[value] || value || "전체";
-      }
-
       function renderLabelChips(values, labelMap) {
         const items = Array.isArray(values) ? values : [];
         if (!items.length) return `<span class="meta">없음</span>`;
         return `<div class="field-list">${items.map((item) => `<span class="field-chip">${escapeHtml(labelMap[item] || item)}</span>`).join("")}</div>`;
+      }
+
+      function linesToText(values) {
+        return Array.isArray(values) ? values.map((item) => String(item || "").trim()).filter(Boolean).join("\n") : "";
+      }
+
+      function textToLines(value) {
+        return String(value || "")
+          .split(/\r?\n/)
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+
+      function priorityToText(items) {
+        return (Array.isArray(items) ? items : [])
+          .map((item) => {
+            const target = String(item?.target || "").trim();
+            const reason = String(item?.reason || "").trim();
+            if (!target) return "";
+            return reason ? `${target} | ${reason}` : target;
+          })
+          .filter(Boolean)
+          .join("\n");
+      }
+
+      function textToPriority(value) {
+        return textToLines(value).map((line, index) => {
+          const [target, ...rest] = line.split("|");
+          return {
+            rank: index + 1,
+            target: String(target || "").trim(),
+            reason: rest.join("|").trim(),
+          };
+        }).filter((item) => item.target);
+      }
+
+      function formatPlanUpdatedAt(value) {
+        if (!value) return "n/a";
+        return String(value);
       }
 
       async function fetchJson(url, options) {
@@ -333,20 +521,22 @@
 
       function readAdminStateFromUrl() {
         const params = new URLSearchParams(window.location.search);
-        selectedId = params.get("pageId") || selectedId || "";
-        selectedBundleId = params.get("bundleId") || "";
-        pageFilter = params.get("pageFilter") || pageFilter || "all";
-        activityFilter = params.get("activityFilter") || activityFilter || "all";
-        advisoryFilter = params.get("advisoryFilter") || advisoryFilter || "all";
+        const pageIdFromUrl = params.get("pageId") || "";
+        selectedId = "";
+        pendingSelectedId = pageIdFromUrl || pendingSelectedId || "";
+        selectedBundleId = "";
+        activityFilter = params.get("activityFilter") || "all";
+      }
+
+      function renderDetailIdleState() {
+        detailEl.innerHTML = "왼쪽에서 페이지를 고른 뒤 선택하기를 눌러주세요.";
       }
 
       function syncAdminStateUrl(mode = "replace") {
         const params = new URLSearchParams();
         if (selectedId) params.set("pageId", selectedId);
         if (selectedBundleId) params.set("bundleId", selectedBundleId);
-        if (pageFilter && pageFilter !== "all") params.set("pageFilter", pageFilter);
         if (activityFilter && activityFilter !== "all") params.set("activityFilter", activityFilter);
-        if (advisoryFilter && advisoryFilter !== "all") params.set("advisoryFilter", advisoryFilter);
         const nextUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
         if (mode === "push") {
           window.history.pushState({}, "", nextUrl);
@@ -358,7 +548,11 @@
       function renderHistoryPanel() {
         const historyItems = Array.isArray(workspaceMeta?.workHistory) ? workspaceMeta.workHistory : [];
         const activityItems = Array.isArray(recentActivity) ? recentActivity : [];
-        const bundleDefinitionMap = new Map((acceptanceBundles?.bundles || []).map((bundle) => [bundle.bundleId, bundle]));
+        const safeAcceptanceBundles =
+          typeof acceptanceBundles !== "undefined" && acceptanceBundles && Array.isArray(acceptanceBundles.bundles)
+            ? acceptanceBundles.bundles
+            : [];
+        const bundleDefinitionMap = new Map(safeAcceptanceBundles.map((bundle) => [bundle.bundleId, bundle]));
         const visibleActivityItems = activityFilter === "acceptance"
           ? activityItems.filter((item) => item.type === "acceptance_result_saved")
           : activityItems;
@@ -460,7 +654,8 @@
       }
 
       function getPageAdvisoryMeta(pageId) {
-        const items = Array.isArray(pageAdvisories?.[pageId]) ? pageAdvisories[pageId] : [];
+        const runtimePageId = pages.find((page) => page.id === pageId)?.workspacePageId || pageId;
+        const items = Array.isArray(pageAdvisories?.[runtimePageId]) ? pageAdvisories[runtimePageId] : [];
         const severityRank = { error: 3, warning: 2, info: 1 };
         const highestSeverity = items.reduce((current, item) => {
           const nextSeverity = String(item?.severity || "info");
@@ -486,13 +681,28 @@
         return nextMap;
       }
 
+      async function hydrateDeferredAdminMeta(generation) {
+        const [finalReadinessResult, visualManifestResult] = await Promise.allSettled([
+          fetchJson("/api/workspace/final-readiness"),
+          fetchJson("/api/visual-review-manifest"),
+        ]);
+        if (generation !== refreshGeneration) return;
+        if (finalReadinessResult.status === "fulfilled") {
+          finalReadinessMeta = finalReadinessResult.value || null;
+        }
+        if (visualManifestResult.status === "fulfilled") {
+          pageReviewMap = buildPageReviewMap(visualManifestResult.value || null);
+        }
+        renderList();
+        renderHistoryPanel();
+      }
+
       async function refreshData(options = {}) {
-        const [session, data, activity, finalReadiness, visualManifest] = await Promise.all([
+        const generation = ++refreshGeneration;
+        const [session, data, activity] = await Promise.all([
           fetchJson("/api/auth/session"),
           fetchJson("/api/data"),
           fetchJson("/api/activity?limit=20"),
-          fetchJson("/api/workspace/final-readiness"),
-          fetchJson("/api/visual-review-manifest"),
         ]);
         if (!session?.authenticated) {
           location.href = "/login";
@@ -501,180 +711,100 @@
         sessionMetaEl.textContent = `${session.user?.displayName || session.user?.loginId} · ${data.workspaceSource || "shared-default"}`;
         workspaceMeta = data.workspaceMeta || null;
         recentActivity = activity.items || [];
-        finalReadinessMeta = finalReadiness || null;
         runtimePageSummary = data.runtimePageSummary || null;
         pageAdvisories = data.pageAdvisories || {};
-        pageReviewMap = buildPageReviewMap(visualManifest || null);
-        const acceptanceOrder = { "needs-review": 0, "in-progress": 1, "accepted": 2 };
-        const pageAcceptanceMap = new Map((finalReadinessMeta?.pages || []).map((item) => [item.pageId, item]));
+        finalReadinessMeta = null;
+        pageReviewMap = new Map();
+        acceptanceBundles = null;
         pages = (data.pages || []).slice().sort((a, b) => {
-          const aa = pageAcceptanceMap.get(a.id) || {};
-          const bb = pageAcceptanceMap.get(b.id) || {};
-          const ar = acceptanceOrder[aa.acceptanceStatus || "in-progress"] ?? 9;
-          const br = acceptanceOrder[bb.acceptanceStatus || "in-progress"] ?? 9;
-          if (ar !== br) return ar - br;
-          const riskDiff = Number(bb.maxRiskScore || 0) - Number(aa.maxRiskScore || 0);
-          if (riskDiff !== 0) return riskDiff;
-          const fallbackDiff = Number(bb.fallbackComponentCount || 0) - Number(aa.fallbackComponentCount || 0);
-          if (fallbackDiff !== 0) return fallbackDiff;
-          const ap = Number(aa.acceptanceCounts?.pending || 0);
-          const bp = Number(bb.acceptanceCounts?.pending || 0);
-          if (ap !== bp) return bp - ap;
           return String(a.title || a.id).localeCompare(String(b.title || b.id), "ko");
         });
-        if (!pages.find((page) => page.id === selectedId)) {
-          selectedId = pages[0] ? pages[0].id : "";
+        pages = buildPreviewTargets(data.pages || []);
+        if (selectedId && !pages.find((page) => page.id === selectedId)) {
+          selectedId = "";
           selectedBundleId = "";
+        }
+        if (!pages.find((page) => page.id === pendingSelectedId)) {
+          pendingSelectedId = selectedId || pages[0]?.id || "";
         }
         syncAdminStateUrl();
         renderList();
         if (!options.skipDetail) {
-          await renderDetail();
+          if (options.forceDetail === true) {
+            await renderDetail();
+          } else {
+            renderDetailIdleState();
+          }
         }
         renderHistoryPanel();
+        hydrateDeferredAdminMeta(generation).catch((error) => {
+          console.error("failed to hydrate admin meta", error);
+        });
       }
 
       function renderList() {
         const pageAcceptanceMap = new Map((finalReadinessMeta?.pages || []).map((item) => [item.pageId, item]));
         const visiblePages = getVisiblePages();
-        const totalPages = Number(pages.length || 0);
-        const visibleCount = Number(visiblePages.length || 0);
-        const acceptedCount = pages.filter((page) => (pageAcceptanceMap.get(page.id)?.acceptanceStatus || "in-progress") === "accepted").length;
-        const selectedPage = pages.find((page) => page.id === selectedId) || visiblePages[0] || pages[0] || null;
-        const filters = [
-          { id: "all", label: "전체" },
-          { id: "pending", label: "작업 중" },
-          { id: "fail", label: "검수 필요" },
-          { id: "accepted", label: "완료" },
-        ];
-        const advisoryFilters = [
-          { id: "all", label: "전체" },
-          { id: "warning", label: "경고 이상" },
-          { id: "error", label: "오류만" },
-          { id: "has-advisory", label: "주의사항 있음" },
-        ];
+        const appliedPage = pages.find((page) => page.id === selectedId) || null;
+        const pendingPage =
+          visiblePages.find((page) => page.id === pendingSelectedId) ||
+          pages.find((page) => page.id === pendingSelectedId) ||
+          visiblePages[0] ||
+          pages[0] ||
+          null;
         pageListToolbarEl.innerHTML = `
           <div class="list-toolbar-row">
             <label for="pageQuickSelect">수정할 페이지 선택</label>
             <div class="page-pick-row">
               <select id="pageQuickSelect" class="list-select">
-                ${visiblePages.map((page) => `<option value="${escapeHtml(page.id)}" ${page.id === selectedId ? "selected" : ""}>${escapeHtml(pageLabel(page.id, page.title))}</option>`).join("")}
+                ${visiblePages.map((page) => `<option value="${escapeHtml(page.id)}" ${page.id === pendingSelectedId ? "selected" : ""}>${escapeHtml(pageLabel(page.id, page.title))}</option>`).join("")}
               </select>
             </div>
-            <div class="page-pick-meta">선택한 페이지는 오른쪽 상세 화면에서 바로 수정할 수 있습니다.</div>
-          </div>
-          <div class="list-toolbar-row">
-            <label for="pageStatusFilter">페이지 상태</label>
-            <select id="pageStatusFilter" class="list-select">
-              ${filters.map((filter) => `<option value="${escapeHtml(filter.id)}" ${pageFilter === filter.id ? "selected" : ""}>${escapeHtml(filter.label)}</option>`).join("")}
-            </select>
-          </div>
-          <div class="list-toolbar-row">
-            <label for="pageAdvisoryFilter">주의 사항</label>
-            <select id="pageAdvisoryFilter" class="list-select">
-              ${advisoryFilters.map((filter) => `<option value="${escapeHtml(filter.id)}" ${advisoryFilter === filter.id ? "selected" : ""}>${escapeHtml(filter.label)}</option>`).join("")}
-            </select>
+            <div class="page-pick-meta">페이지를 고른 뒤 아래 선택하기를 눌러야 오른쪽 상세 화면에 반영됩니다.</div>
           </div>
         `;
-        pageListToolbarEl.querySelector("#pageStatusFilter")?.addEventListener("change", async (event) => {
-          pageFilter = event.target.value || "all";
-          const nextVisiblePages = getVisiblePages();
-          if (!nextVisiblePages.find((page) => page.id === selectedId)) {
-            selectedId = nextVisiblePages[0]?.id || pages[0]?.id || "";
-            selectedBundleId = "";
-          }
-          syncAdminStateUrl("push");
+        pageListToolbarEl.querySelector("#pageQuickSelect")?.addEventListener("change", (event) => {
+          pendingSelectedId = event.target.value || "";
           renderList();
-          await renderDetail();
         });
-        pageListToolbarEl.querySelector("#pageAdvisoryFilter")?.addEventListener("change", async (event) => {
-          advisoryFilter = event.target.value || "all";
-          const nextVisiblePages = getVisiblePages();
-          if (!nextVisiblePages.find((page) => page.id === selectedId)) {
-            selectedId = nextVisiblePages[0]?.id || pages[0]?.id || "";
-            selectedBundleId = "";
-          }
-          syncAdminStateUrl("push");
-          renderList();
-          await renderDetail();
-        });
-        pageListToolbarEl.querySelector("#pageQuickSelect")?.addEventListener("change", async (event) => {
-          selectedId = event.target.value || "";
+        pageListSummaryEl.innerHTML = `
+          <div class="list-helper">
+            <div class="meta">선택 후보: ${escapeHtml(pendingPage ? pageLabel(pendingPage.id, pendingPage.title) : "없음")} · 현재 로딩: ${escapeHtml(appliedPage ? pageLabel(appliedPage.id, appliedPage.title) : "없음")}</div>
+            <div class="meta">현재 목록은 홈 + 대표 PLP + 대표 PDP 케이스 기준입니다.</div>
+          </div>
+        `;
+        if (!visiblePages.length || !pendingPage) {
+          pageListEl.innerHTML = `<div class="empty">조건에 맞는 페이지가 없습니다. 필터를 바꿔보세요.</div>`;
+          return;
+        }
+        const runtimePageId = getTargetWorkspacePageId(pendingPage);
+        const pageState = pageAcceptanceMap.get(runtimePageId) || {};
+        const advisoryMeta = getPageAdvisoryMeta(pendingPage.id);
+        const pageReview = pendingPage.targetKind === "pdp" ? null : pageReviewMap.get(runtimePageId) || null;
+        pageListEl.innerHTML = `
+          <div class="row ${pendingPage.id === selectedId ? "active" : ""}" aria-pressed="${pendingPage.id === selectedId ? "true" : "false"}">
+            <strong>${escapeHtml(pageLabel(pendingPage.id, pendingPage.title || pendingPage.id))}</strong>
+            <div class="meta">${escapeHtml(getTargetKindLabel(pendingPage))} · ${escapeHtml(runtimePageId)}${pendingPage.targetKind === "pdp" && pendingPage.cloneTitle ? ` · ${escapeHtml(pendingPage.cloneTitle)}` : ""}</div>
+            <div class="meta">${pendingPage.targetKind === "pdp" ? "대표 PDP 케이스 · 현재는 시안 미리보기 우선" : `상태 ${escapeHtml(acceptanceStatusLabel(pageState.acceptanceStatus || "in-progress"))} · 주의사항 ${escapeHtml(pageState.pageAdvisoryCount ?? advisoryMeta.count)}건 · 위험도 ${escapeHtml(pageState.maxRiskScore || 0)}`}</div>
+            <div class="meta">${pendingPage.id === selectedId ? "현재 상세에 로딩된 페이지입니다." : "아직 상세 화면에는 반영되지 않았습니다."}</div>
+            <div class="actions">
+              <button type="button" class="btn secondary apply-selected-page-btn" data-select-page-id="${escapeHtml(pendingPage.id)}">선택하기</button>
+              ${pageReview?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReview.compareUrl)}" target="_blank">비교 보기</a>` : ``}
+            </div>
+          </div>
+        `;
+        pageListEl.querySelector(".apply-selected-page-btn")?.addEventListener("click", async () => {
+          selectedId = pendingPage.id;
+          pendingSelectedId = pendingPage.id;
           selectedBundleId = "";
           syncAdminStateUrl("push");
           renderList();
           await renderDetail();
         });
-        pageListSummaryEl.innerHTML = `
-          <div class="list-helper">
-            <div class="meta">수정할 페이지를 하나 고르면 오른쪽 상세 화면에서 바로 편집할 수 있습니다.</div>
-            <div class="meta">현재 ${escapeHtml(visibleCount)} / ${escapeHtml(totalPages)}페이지 표시 · 검수 완료 ${escapeHtml(acceptedCount)}페이지</div>
-            <div class="meta">현재 선택: ${escapeHtml(selectedPage ? pageLabel(selectedPage.id, selectedPage.title) : "없음")} · 상태 필터 ${escapeHtml(pageFilterLabel(pageFilter))} · 주의사항 필터 ${escapeHtml(advisoryFilterLabel(advisoryFilter))}</div>
-          </div>
-        `;
-        pageListEl.innerHTML = visiblePages.map((p) => {
-          const pageState = pageAcceptanceMap.get(p.id) || {};
-          const advisoryMeta = getPageAdvisoryMeta(p.id);
-          const pageReview = pageReviewMap.get(p.id) || null;
-          return `
-          <div class="row ${p.id === selectedId ? "active" : ""}" data-id="${escapeHtml(p.id)}" role="button" tabindex="0" aria-pressed="${p.id === selectedId ? "true" : "false"}">
-            <strong>${escapeHtml(pageLabel(p.id, p.title || p.id))}</strong>
-            <div class="meta">${escapeHtml(p.pageGroup)} · ${escapeHtml(p.id)}</div>
-            <div class="meta">상태 ${escapeHtml(acceptanceStatusLabel(pageState.acceptanceStatus || "in-progress"))} · 주의사항 ${escapeHtml(pageState.pageAdvisoryCount ?? advisoryMeta.count)}건 · 위험도 ${escapeHtml(pageState.maxRiskScore || 0)}</div>
-            <div class="actions">
-              <button type="button" class="btn secondary select-page-btn" data-select-page-id="${escapeHtml(p.id)}">선택하기</button>
-              ${pageReview?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReview.compareUrl)}" target="_blank">비교 보기</a>` : ``}
-            </div>
-          </div>
-        `;
-        }).join("");
-        if (!visiblePages.length) {
-          pageListEl.innerHTML = `<div class="empty">조건에 맞는 페이지가 없습니다. 필터를 바꿔보세요.</div>`;
-        }
-        pageListEl.querySelectorAll(".row").forEach((el) => {
-          el.addEventListener("click", async () => {
-            selectedId = el.dataset.id;
-            selectedBundleId = "";
-            syncAdminStateUrl("push");
-            renderList();
-            await renderDetail();
-          });
-          el.addEventListener("keydown", async (event) => {
-            if (event.key !== "Enter" && event.key !== " ") return;
-            event.preventDefault();
-            selectedId = el.dataset.id;
-            selectedBundleId = "";
-            syncAdminStateUrl("push");
-            renderList();
-            await renderDetail();
-          });
-        });
-        pageListEl.querySelectorAll(".select-page-btn").forEach((button) => {
-          button.addEventListener("click", async (event) => {
-            event.stopPropagation();
-            selectedId = button.getAttribute("data-select-page-id") || "";
-            selectedBundleId = "";
-            syncAdminStateUrl("push");
-            renderList();
-            await renderDetail();
-          });
-        });
       }
 
       function getVisiblePages() {
-        const pageAcceptanceMap = new Map((finalReadinessMeta?.pages || []).map((item) => [item.pageId, item]));
-        return pages.filter((page) => {
-          const acceptance = pageAcceptanceMap.get(page.id) || {};
-          const status = acceptance.acceptanceStatus || "in-progress";
-          const advisory = getPageAdvisoryMeta(page.id);
-          if (pageFilter === "accepted" && status !== "accepted") return false;
-          if (pageFilter === "fail" && status !== "needs-review") return false;
-          if (pageFilter === "pending" && status !== "in-progress") return false;
-          if (advisoryFilter === "warning" && !["warning", "error"].includes(advisory.highestSeverity)) return false;
-          if (advisoryFilter === "error" && advisory.highestSeverity !== "error") return false;
-          if (advisoryFilter === "has-advisory" && Number(advisory.count || 0) <= 0) return false;
-          return true;
-        });
+        return pages.slice();
       }
 
       function focusNextPendingBundle(bundleId) {
@@ -713,6 +843,7 @@
       async function navigateToBundle(pageId, bundleId) {
         if (!pageId) return;
         selectedId = pageId;
+        pendingSelectedId = pageId;
         selectedBundleId = bundleId || "";
         syncAdminStateUrl("push");
         renderList();
@@ -730,9 +861,7 @@
         } else {
           url.searchParams.delete("bundleId");
         }
-        url.searchParams.set("pageFilter", pageFilter || "all");
         url.searchParams.set("activityFilter", activityFilter || "all");
-        url.searchParams.set("advisoryFilter", advisoryFilter || "all");
         return url.toString();
       }
 
@@ -786,6 +915,7 @@
         const currentPageState = (finalReadinessMeta?.pages || []).find((item) => item.pageId === currentPageId);
         if (status === "pass" && currentPageState?.acceptanceStatus === "accepted") {
           selectedId = findNextActionablePageId(currentPageId) || selectedId;
+          pendingSelectedId = selectedId;
           selectedBundleId = "";
         }
         syncAdminStateUrl();
@@ -809,52 +939,127 @@
       async function renderDetail() {
         const page = pages.find((p) => p.id === selectedId);
         if (!page) {
-          detailEl.innerHTML = "No page selected";
+          renderDetailIdleState();
           return;
         }
+        const workspacePageId = getTargetWorkspacePageId(page);
+        const runtimePageId = getTargetRuntimePageId(page);
         const currentPageId = page.id;
+        const previewUrl = page.previewUrl || buildPreviewTargetUrl(page);
+        const isPdpTarget = page.targetKind === "pdp";
         detailEl.innerHTML = "Loading page detail...";
         let inventory = { components: [] };
         let editability = { components: [] };
         let slotRegistry = { slots: [] };
         let gaps = { overallStatus: "warning", componentGaps: [], globalGaps: [], componentGapCount: 0 };
         let visualBatch = null;
-        let visualManifest = null;
-        let acceptanceBundles = null;
         let acceptanceResults = null;
-        let acceptanceQueue = null;
-        let finalReadiness = null;
+        let planList = { items: [] };
+        let draftBuildList = { items: [] };
+        let versionList = { items: [] };
+        let pinnedView = { item: null };
         try {
-          const results = await Promise.allSettled([
-            fetchJson(`/api/workspace/component-inventory?pageId=${encodeURIComponent(page.id)}`),
-            fetchJson(`/api/workspace/component-editability?pageId=${encodeURIComponent(page.id)}`),
-            fetchJson(`/api/workspace/slot-registry?pageId=${encodeURIComponent(page.id)}`),
-            fetchJson(`/api/workspace/pre-llm-gaps?pageId=${encodeURIComponent(page.id)}`),
+          const requests = [
+            fetchJson(`/api/workspace/component-inventory?pageId=${encodeURIComponent(workspacePageId)}`),
+            fetchJson(`/api/workspace/component-editability?pageId=${encodeURIComponent(workspacePageId)}`),
+            fetchJson(`/api/workspace/slot-registry?pageId=${encodeURIComponent(workspacePageId)}`),
+            fetchJson(`/api/workspace/pre-llm-gaps?pageId=${encodeURIComponent(workspacePageId)}`),
             fetchJson(`/api/visual-batch-summary`),
-            fetchJson(`/api/visual-review-manifest`),
-            fetchJson(`/api/final-acceptance-bundles`),
-            fetchJson(`/api/workspace/acceptance-results?pageId=${encodeURIComponent(page.id)}`),
-            fetchJson(`/api/workspace/acceptance-queue?pageId=${encodeURIComponent(page.id)}`),
-            fetchJson(`/api/workspace/final-readiness`),
-          ]);
+            fetchJson(`/api/workspace/plans?pageId=${encodeURIComponent(workspacePageId)}&limit=10`),
+            fetchJson(`/api/workspace/draft-builds?pageId=${encodeURIComponent(workspacePageId)}&limit=10`),
+            fetchJson(`/api/workspace/versions?pageId=${encodeURIComponent(workspacePageId)}&limit=10`),
+            fetchJson(`/api/workspace/view-pin?pageId=${encodeURIComponent(workspacePageId)}`),
+            ...(isPdpTarget ? [] : [
+              fetchJson(`/api/final-acceptance-bundles`),
+              fetchJson(`/api/workspace/acceptance-results?pageId=${encodeURIComponent(workspacePageId)}`),
+            ]),
+          ];
+          const results = await Promise.allSettled(requests);
           if (results[0].status === "fulfilled") inventory = results[0].value;
           if (results[1].status === "fulfilled") editability = results[1].value;
           if (results[2].status === "fulfilled") slotRegistry = results[2].value;
           if (results[3].status === "fulfilled") gaps = results[3].value;
           if (results[4].status === "fulfilled") visualBatch = results[4].value;
-          if (results[5].status === "fulfilled") visualManifest = results[5].value;
-          if (results[6].status === "fulfilled") acceptanceBundles = results[6].value;
-          if (results[7].status === "fulfilled") acceptanceResults = results[7].value;
-          if (results[8].status === "fulfilled") acceptanceQueue = results[8].value;
-          if (results[9].status === "fulfilled") finalReadiness = results[9].value;
+          if (results[5].status === "fulfilled") planList = results[5].value;
+          if (results[6].status === "fulfilled") draftBuildList = results[6].value;
+          if (results[7].status === "fulfilled") versionList = results[7].value;
+          if (results[8].status === "fulfilled") pinnedView = results[8].value;
+          if (!isPdpTarget) {
+            if (results[9].status === "fulfilled") acceptanceBundles = results[9].value;
+            if (results[10].status === "fulfilled") acceptanceResults = results[10].value;
+          } else {
+            acceptanceBundles = null;
+            acceptanceResults = null;
+          }
         } catch (error) {
           detailEl.innerHTML = `Failed to load page detail: ${escapeHtml(String(error))}`;
           return;
         }
 
+        if (isPdpTarget) {
+          inventory = {
+            ...inventory,
+            components: (inventory.components || []).filter((component) => pdpSlotIds.has(String(component.slotId || "").trim())),
+          };
+          editability = {
+            ...editability,
+            components: (editability.components || []).filter((component) => pdpSlotIds.has(String(component.slotId || "").trim())),
+          };
+          slotRegistry = {
+            ...slotRegistry,
+            slots: (slotRegistry.slots || []).filter((slot) => pdpSlotIds.has(String(slot.slotId || "").trim())),
+          };
+          const filteredComponentGaps = (gaps.componentGaps || []).filter((item) => pdpSlotIds.has(String(item.slotId || "").trim()));
+          const filteredFallbackComponents = (gaps.fallbackComponents || []).filter((item) => pdpSlotIds.has(String(item.slotId || "").trim()));
+          gaps = {
+            ...gaps,
+            componentGaps: filteredComponentGaps,
+            fallbackComponents: filteredFallbackComponents,
+            componentGapCount: filteredComponentGaps.length,
+            fallbackComponentCount: filteredFallbackComponents.length,
+          };
+        }
+
         const editabilityMap = new Map((editability.components || []).map((item) => [item.componentId, item]));
         const slotMap = new Map((slotRegistry.slots || []).map((item) => [item.slotId, item]));
         const gapMap = new Map((gaps.componentGaps || []).map((item) => [item.componentId, item]));
+        const plans = Array.isArray(planList?.items) ? planList.items : [];
+        const draftBuilds = Array.isArray(draftBuildList?.items) ? draftBuildList.items : [];
+        const versions = Array.isArray(versionList?.items) ? versionList.items : [];
+        const pinnedViewItem = pinnedView?.item || null;
+        const latestPlan = plans[0] || null;
+        const latestDraftBuild = draftBuilds[0] || null;
+        const latestRequirementPlan = latestPlan?.output?.requirementPlan || null;
+        const latestToolContext = latestPlan?.output?.toolContext || {};
+        const latestPlanInput = latestPlan?.input || {};
+        const latestPlanUserInput = latestPlanInput?.userInput || {};
+        const plannerUiState = plannerUiStateByPage.get(workspacePageId) || { draftVisible: false, loading: false };
+        const plannerDraftVisible = Boolean(plannerUiState.draftVisible);
+        const plannerLoading = Boolean(plannerUiState.loading);
+        const selectedTargetScope = latestPlanUserInput?.targetScope === "components" ? "components" : "page";
+        const selectedTargetComponents = Array.isArray(latestPlanUserInput?.targetComponents) ? latestPlanUserInput.targetComponents : [];
+        const plannerComponentTargets = Array.from(
+          new Map(
+            (inventory.components || [])
+              .filter((component) => {
+                const componentPageId = String(component.pageId || workspacePageId).trim();
+                return componentPageId === workspacePageId;
+              })
+              .map((component) => [
+                String(component.componentId || "").trim(),
+                {
+                  componentId: String(component.componentId || "").trim(),
+                  slotId: String(component.slotId || "").trim(),
+                  title: slotLabel(component.slotId),
+                  kind: String(component.kind || "component").trim(),
+                },
+              ])
+          ).values()
+        ).sort(
+          (a, b) =>
+            String(a.title || "").localeCompare(String(b.title || ""), "ko") ||
+            String(a.componentId || "").localeCompare(String(b.componentId || ""), "ko")
+        );
         const gapHtml = gaps.componentGaps?.length
           ? `<div class="gap-list">${gaps.componentGaps.map((gap) => `
               <div class="gap-item">
@@ -882,19 +1087,14 @@
               ${(gaps.linkCoverage.targets || []).length ? `<div class="gap-list">${gaps.linkCoverage.targets.map((item) => `<div class="gap-item"><strong>${escapeHtml(item.linkType)}</strong><div class="meta">${escapeHtml(item.slotId || "")}</div><div class="meta">${escapeHtml(item.href)}</div><div class="meta">${escapeHtml(item.originHref || "")}</div></div>`).join("")}</div>` : ``}
             `
             : `<div class="meta">home link coverage only</div>`;
-        const advisoryItems = Array.isArray(pageAdvisories?.[page.id]) ? pageAdvisories[page.id] : [];
+        const advisoryItems = Array.isArray(pageAdvisories?.[workspacePageId]) ? pageAdvisories[workspacePageId] : [];
         const advisoryHtml = advisoryItems.length
           ? `<div class="gap-list">${advisoryItems.map((item) => `<div class="gap-item"><strong>${escapeHtml(item.title || item.id)}</strong><div class="meta">${escapeHtml(item.severity || "info")}</div><div class="meta">${escapeHtml(item.detail || "")}</div></div>`).join("")}</div>`
           : `<div class="meta">No page advisories.</div>`;
 
         let reviewHtml = `<div class="meta">review manifest pending</div>`;
-        if (visualManifest) {
-          let review = null;
-          if (page.id === "home") review = visualManifest.home || null;
-          else review =
-            (visualManifest.servicePages || []).find((item) => item.pageId === page.id) ||
-            (visualManifest.plpPages || []).find((item) => item.pageId === page.id) ||
-            null;
+        {
+          const review = isPdpTarget ? null : pageReviewMap.get(workspacePageId) || null;
           if (review) {
             const links = [];
             if (review.compareUrl) {
@@ -914,9 +1114,11 @@
               links.push(`<button type="button" class="btn secondary review-copy-btn" data-copy-text="${escapeHtml(review.compareImage)}" data-copy-label="Compare image link">Copy Compare Image Link</button>`);
             }
             reviewHtml = links.length ? `<div class="actions">${links.join("")}</div>` : `<div class="meta">No direct review links for this page.</div>`;
+          } else if (isPdpTarget) {
+            reviewHtml = `<div class="meta">대표 PDP 케이스는 현재 별도 compare 링크 대신 미리보기 중심으로 확인합니다.</div>`;
           }
         }
-        const bundleList = (acceptanceBundles?.bundles || []).filter((bundle) => bundle.pageId === page.id);
+        const bundleList = (acceptanceBundles?.bundles || []).filter((bundle) => bundle.pageId === workspacePageId);
         const bundleDefinitionMap = new Map((acceptanceBundles?.bundles || []).map((bundle) => [bundle.bundleId, bundle]));
         const selectedBundleDefinition = selectedBundleId ? bundleDefinitionMap.get(selectedBundleId) || null : null;
         const allBundlesHtml = (acceptanceBundles?.bundles || []).length
@@ -936,8 +1138,8 @@
             `).join("")}</div>`
           : `<div class="meta">No acceptance bundles available.</div>`;
         const acceptanceMap = new Map((acceptanceResults?.items || []).map((item) => [item.bundleId, item]));
-        const currentPageAcceptance = (acceptanceResults?.pageSummaries || []).find((item) => item.pageId === page.id) || null;
-        const currentFailedBundles = (acceptanceResults?.items || []).filter((item) => item.pageId === page.id && item.status === "fail");
+        const currentPageAcceptance = (acceptanceResults?.pageSummaries || []).find((item) => item.pageId === workspacePageId) || null;
+        const currentFailedBundles = (acceptanceResults?.items || []).filter((item) => item.pageId === workspacePageId && item.status === "fail");
         const pageNextBundleMap = new Map();
         for (const item of (acceptanceResults?.items || [])) {
           if (item.status !== "pending" && item.status !== "fail") continue;
@@ -1018,40 +1220,314 @@
           : `<div class="meta">No acceptance bundle for this page.</div>`;
 
         detailEl.innerHTML = `
-          <div><strong>${escapeHtml(page.title || page.id)}</strong></div>
-          <div class="meta">${escapeHtml(pageLabel(page.id, page.title))} | 섹션 ${page.sections.length}개</div>
-          <div class="meta">최근 작업: ${escapeHtml(workspaceMeta?.updatedAt || "n/a")} | AI 사용 ${escapeHtml(workspaceMeta?.llmUsageCount || 0)}회</div>
-          ${selectedBundleId ? `<div class="meta">현재 선택된 번들: <code>${escapeHtml(selectedBundleId)}</code></div>` : ``}
-          <div class="toolbar-actions">
-            <button id="resetWorkspaceBtn" type="button">이 페이지 수정 초기화</button>
-          </div>
-          <div class="actions">
-            <a class="btn" href="/clone/${encodeURIComponent(page.id)}" target="_blank">변경 화면 새 탭으로 보기</a>
-            <button type="button" class="btn secondary" id="copyDetailStateBtn">현재 설정 링크 복사</button>
-            ${pageReviewMap.get(page.id)?.compareUrl ? `<a class="btn secondary" id="openDetailPageCompareBtn" href="${escapeHtml(pageReviewMap.get(page.id).compareUrl)}" target="_blank">기준 화면과 비교</a>` : ``}
+          <div class="detail-header">
+            <div class="detail-heading">
+              <strong>${escapeHtml(page.title || page.id)}</strong>
+              <div class="meta">${escapeHtml(pageLabel(page.id, page.title))} | ${escapeHtml(getTargetKindLabel(page))} | 작업 pageId ${escapeHtml(workspacePageId)}${isPdpTarget ? ` | 캡처 기준 ${escapeHtml(runtimePageId)}` : ``}${page.cloneTitle ? ` | ${escapeHtml(page.cloneTitle)}` : ``}</div>
+              <div class="meta">${isPdpTarget ? "대표 PDP 케이스이며, 이 케이스에만 독립 저장됩니다." : `섹션 ${escapeHtml(page.sections.length)}개`}</div>
+              <div class="meta">최근 작업: ${escapeHtml(workspaceMeta?.updatedAt || "n/a")} | AI 사용 ${escapeHtml(workspaceMeta?.llmUsageCount || 0)}회</div>
+              ${selectedBundleId ? `<div class="meta">현재 선택된 번들: <code>${escapeHtml(selectedBundleId)}</code></div>` : ``}
+            </div>
+            <div class="detail-actions">
+              <div class="toolbar-actions"><button id="resetWorkspaceBtn" type="button">이 페이지 수정 초기화</button></div>
+            </div>
           </div>
           <div class="edit-guide">
             <strong>작업 순서</strong>
-            <div class="meta">1. 아래 미리보기에서 현재 페이지를 본다.</div>
-            <div class="meta">2. AI 요청 또는 직접 수정으로 바꾸고 싶은 부분만 손본다.</div>
-            <div class="meta">3. 필요할 때만 아래 접힌 영역에서 비교/기술 정보를 확인한다.</div>
+            <div class="meta">1. 현재 페이지와 레퍼런스를 확인한 뒤 요구사항을 정리한다.</div>
+            <div class="meta">2. 정리본을 검토하고 수정 가능한 문서 형태로 다듬는다.</div>
+            <div class="meta">${isPdpTarget ? "3. 이후 Builder 단계에서 현재 대표 PDP 케이스에만 독립 시안을 생성한다." : "3. 이후 Builder 단계에서 이 페이지 기준 시안을 생성한다."}</div>
           </div>
-          <iframe class="preview-frame" src="/clone/${encodeURIComponent(page.id)}" title="clone preview"></iframe>
-          <div class="llm">
-            <div><strong>AI 수정 요청</strong></div>
-            <div class="meta">지금 보고 있는 페이지를 기준으로, 바꾸고 싶은 내용을 자연어로 입력하면 된다.</div>
-            <div class="llm-guide">
-              <strong>예시</strong>
-              <div class="meta">홈 메인 비주얼 제목을 "새로운 봄 혜택"으로 바꿔줘</div>
-              <div class="meta">홈 공간 리뉴얼 섹션 제목을 "우리집 새단장"으로 바꿔줘</div>
-              <div class="meta">홈 히어로를 피그마 소스로 바꿔줘</div>
+          <iframe class="preview-frame" src="${escapeHtml(previewUrl)}" title="clone preview"></iframe>
+          <div class="section">
+            <div><strong>요구사항 정리</strong></div>
+            <div class="meta">${isPdpTarget ? "현재 케이스 기준으로 기획/디자인 요구사항을 먼저 정리합니다. 결과는 Builder가 받아 실제 시안 생성에 사용합니다." : "직접 수정 전에 요구사항을 먼저 구조화합니다. 결과는 Builder 단계의 기준 문서가 됩니다."}</div>
+            <div class="planner-inline-meta">
+              <span class="chip">${escapeHtml(`저장된 정리본 ${plans.length}개`)}</span>
+              <span class="chip ${latestPlan ? "pass" : "warn"}">${latestPlan ? `최근 정리 ${escapeHtml(formatPlanUpdatedAt(latestPlan.updatedAt))}` : "아직 정리본 없음"}</span>
+              <span class="chip">${escapeHtml(`작업 pageId ${workspacePageId}`)}</span>
             </div>
-            <textarea id="llmPrompt" placeholder="예: 홈 메인 비주얼 설명 문구를 '지금만 가능한 특별 혜택'으로 바꿔줘"></textarea>
-            <button class="run" id="runLlm">AI로 적용</button>
-            <div class="status" id="llmStatus">대기 중</div>
+            <div class="planner-grid two">
+              <div class="planner-field">
+                <label for="planMode">입력 방식</label>
+                <select id="planMode" class="list-select">
+                  ${[
+                    { id: "hybrid", label: "직접 작성 + 레퍼런스" },
+                    { id: "direct", label: "직접 작성" },
+                    { id: "reference", label: "레퍼런스 사이트 입력" },
+                  ].map((item) => `<option value="${item.id}" ${(latestPlanInput?.mode || "hybrid") === item.id ? "selected" : ""}>${item.label}</option>`).join("")}
+                </select>
+              </div>
+              <div class="planner-field">
+                <label>적용 범위</label>
+                <div class="planner-scope-toggle">
+                  <label class="checkbox-chip" for="planComponentOnly">
+                    <input id="planComponentOnly" type="checkbox" ${selectedTargetScope === "components" ? "checked" : ""} />
+                    선택한 컴포넌트만 진행
+                  </label>
+                  <span class="meta">체크 해제 시 페이지 전체를 대상으로 기획안을 만듭니다.</span>
+                </div>
+              </div>
+            </div>
+            <div class="planner-grid two">
+              <div class="planner-field">
+                <label for="planDesignChangeLevel">디자인 변화율</label>
+                <select id="planDesignChangeLevel" class="list-select">
+                  ${[
+                    { id: "low", label: "하 · 현재 화면을 거의 유지" },
+                    { id: "medium", label: "중 · 구조를 유지하며 체감 개선" },
+                    { id: "high", label: "상 · 브랜드를 벗어나지 않는 선에서 변화 확대" },
+                  ].map((item) => `<option value="${item.id}" ${((latestPlanUserInput?.designChangeLevel || latestRequirementPlan?.designChangeLevel || "medium") === item.id) ? "selected" : ""}>${item.label}</option>`).join("")}
+                </select>
+              </div>
+              <div class="planner-field">
+                <label>변화율 가이드</label>
+                <div class="meta">하: 카피/톤 중심, 중: 섹션 인상과 위계 조정, 상: 브랜드를 유지한 채 시각 체감까지 크게 반영합니다.</div>
+              </div>
+            </div>
+            <div id="plannerTargetBox" class="planner-target-box" ${selectedTargetScope === "components" ? "" : "hidden"}>
+              <div class="meta">${plannerComponentTargets.length ? "Planner와 Builder가 아래 선택 컴포넌트만 기준으로 작업합니다." : "선택 가능한 컴포넌트가 없습니다. 페이지 전체로 진행해 주세요."}</div>
+              ${plannerComponentTargets.length ? `
+                <div class="planner-component-list">
+                  ${plannerComponentTargets.map((component) => `
+                    <label class="planner-component-item" for="planTargetComponent-${escapeHtml(component.componentId)}">
+                      <input
+                        id="planTargetComponent-${escapeHtml(component.componentId)}"
+                        type="checkbox"
+                        name="planTargetComponent"
+                        value="${escapeHtml(component.componentId)}"
+                        ${selectedTargetComponents.includes(component.componentId) ? "checked" : ""}
+                      />
+                      <span>
+                        <strong>${escapeHtml(component.title)}</strong>
+                        <div class="meta">${escapeHtml(component.componentId)} · ${escapeHtml(component.kind)}</div>
+                      </span>
+                    </label>
+                  `).join("")}
+                </div>
+              ` : ``}
+            </div>
+            <div class="planner-grid two" id="plannerInputGrid">
+              <div class="planner-field compact" data-plan-field="reference">
+                <label for="planReferenceUrls">레퍼런스 URL</label>
+                <textarea id="planReferenceUrls" placeholder="한 줄에 하나씩 입력">${escapeHtml(linesToText(latestPlanUserInput?.referenceUrls || []))}</textarea>
+              </div>
+              <div class="planner-field" data-plan-field="preferred">
+                <label for="planPreferredDirection">원하는 방향</label>
+                <input id="planPreferredDirection" type="text" value="${escapeHtml(latestPlanUserInput?.preferredDirection || "")}" placeholder="예: 정제된 다크톤, 감도 높은 비주얼" />
+              </div>
+              <div class="planner-field" data-plan-field="tone">
+                <label for="planToneAndMood">톤앤매너</label>
+                <input id="planToneAndMood" type="text" value="${escapeHtml(latestPlanUserInput?.toneAndMood || "")}" placeholder="예: 정제된 프리미엄, 밝고 가벼운 캠페인형" />
+              </div>
+              <div class="planner-field" data-plan-field="key">
+                <label for="planKeyMessage">핵심 메시지</label>
+                <input id="planKeyMessage" type="text" value="${escapeHtml(latestPlanUserInput?.keyMessage || "")}" placeholder="예: 초프리미엄, 몰입감, 공간 조화" />
+              </div>
+              <div class="planner-field" data-plan-field="avoid">
+                <label for="planAvoidDirection">피하고 싶은 방향</label>
+                <input id="planAvoidDirection" type="text" value="${escapeHtml(latestPlanUserInput?.avoidDirection || "")}" placeholder="예: 할인몰 느낌, 과한 프로모션" />
+              </div>
+              <div class="planner-field wide" data-plan-field="request">
+                <label for="planRequestText">고객요구사항</label>
+                <textarea id="planRequestText" placeholder="예: 프리미엄 톤을 강화하고 혜택 메시지는 줄여줘">${escapeHtml(latestPlanUserInput?.requestText || "")}</textarea>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="run" id="runPlanner">기획안 생성</button>
+            </div>
+            <div class="planner-status" id="plannerStatus">대기 중</div>
+            <div id="plannerDraftRegion" class="planner-subsection" ${plannerDraftVisible ? "" : "hidden"}>
+              <div id="plannerLoadingBox" class="planner-loading-box" ${plannerLoading ? "" : "hidden"}>
+                <div><strong>기획안 작성중</strong></div>
+                <div class="meta">페이지 구조와 레퍼런스를 읽고 기획 초안을 정리하고 있습니다.</div>
+                <div class="progress-track"><div class="progress-fill planner-loading-fill"></div></div>
+              </div>
+              <div id="plannerDraftForm" class="planner-draft-form" ${plannerLoading ? "hidden" : ""}>
+                <div><strong>기획 초안</strong></div>
+                <div class="meta">${latestPlan ? `현재 편집 중인 planId ${escapeHtml(latestPlan.id)}` : "기획안 생성 버튼을 누르면 편집 가능한 초안이 여기에 생성됩니다."}</div>
+                ${latestPlan ? `
+                  <div class="planner-grid">
+                    <div class="planner-field">
+                      <label for="planTitle">기획안 제목</label>
+                      <input id="planTitle" type="text" value="${escapeHtml(latestRequirementPlan?.title || "")}" placeholder="예: PDP - TV 프리미엄형 초프리미엄 시안" />
+                    </div>
+                    <div class="planner-field">
+                      <label for="planRequestSummary">요구사항 요약</label>
+                      <textarea id="planRequestSummary" placeholder="한 줄에 하나씩">${escapeHtml(linesToText(latestRequirementPlan?.requestSummary || []))}</textarea>
+                    </div>
+                    <div class="planner-field">
+                      <label for="planPlanningDirection">기획 방향</label>
+                      <textarea id="planPlanningDirection" placeholder="한 줄에 하나씩">${escapeHtml(linesToText(latestRequirementPlan?.planningDirection || []))}</textarea>
+                    </div>
+                    <div class="planner-field">
+                      <label for="planDesignDirection">디자인 방향</label>
+                      <textarea id="planDesignDirection" placeholder="한 줄에 하나씩">${escapeHtml(linesToText(latestRequirementPlan?.designDirection || []))}</textarea>
+                    </div>
+                  </div>
+                  <div class="planner-grid two">
+                    <div class="planner-field">
+                      <label for="planPriority">우선순위</label>
+                      <textarea id="planPriority" placeholder="slotId | reason">${escapeHtml(priorityToText(latestRequirementPlan?.priority || []))}</textarea>
+                    </div>
+                    <div class="planner-field">
+                      <label for="planGuardrails">가드레일</label>
+                      <textarea id="planGuardrails" placeholder="한 줄에 하나씩">${escapeHtml(linesToText(latestRequirementPlan?.guardrails || []))}</textarea>
+                    </div>
+                  </div>
+                  <div class="planner-grid two">
+                    <div class="planner-field">
+                      <label for="planBuilderObjective">Builder 목표</label>
+                      <input id="planBuilderObjective" type="text" value="${escapeHtml(latestRequirementPlan?.builderBrief?.objective || "")}" placeholder="예: 프리미엄 브랜드 감도 강화" />
+                    </div>
+                    <div class="planner-field">
+                      <label for="planBuilderFocusSlots">Builder 집중 slot</label>
+                      <input id="planBuilderFocusSlots" type="text" value="${escapeHtml((latestRequirementPlan?.builderBrief?.suggestedFocusSlots || []).join(", "))}" placeholder="예: gallery, summary, price" />
+                    </div>
+                  </div>
+                  <div class="planner-grid two">
+                    <div class="planner-field">
+                      <label for="planBuilderMustKeep">유지해야 할 것</label>
+                      <textarea id="planBuilderMustKeep" placeholder="한 줄에 하나씩">${escapeHtml(linesToText(latestRequirementPlan?.builderBrief?.mustKeep || []))}</textarea>
+                    </div>
+                    <div class="planner-field">
+                      <label for="planBuilderMustChange">반드시 바꿔야 할 것</label>
+                      <textarea id="planBuilderMustChange" placeholder="한 줄에 하나씩">${escapeHtml(linesToText(latestRequirementPlan?.builderBrief?.mustChange || []))}</textarea>
+                    </div>
+                  </div>
+                ` : `<div class="meta" style="margin-top:10px;">아직 생성된 기획 초안이 없습니다.</div>`}
+                <div class="actions">
+                  <button type="button" class="btn" id="savePlanBtn" ${latestPlan ? "" : "disabled"}>정리본 저장</button>
+                  <button type="button" class="btn secondary" id="runBuilderFromPlanBtn" ${latestPlan ? "" : "disabled"}>디자인 생성</button>
+                </div>
+                <div class="planner-status" id="planSaveStatus">${latestPlan ? "편집 가능" : "기획안 생성 후 편집 및 저장 가능"}</div>
+              </div>
+            </div>
+
+            <div class="planner-subsection">
+              <div><strong>레퍼런스 분석 결과</strong></div>
+              <div class="planner-card-grid">
+                <div class="planner-card">
+                  <strong>Slot 매칭 요약</strong>
+                  ${(latestToolContext?.referenceSummary?.mergedSlotMatches || []).length
+                    ? `<div class="field-list">${latestToolContext.referenceSummary.mergedSlotMatches.map((item) => `<span class="field-chip">${escapeHtml(item.slotId)} · ${escapeHtml(item.confidence)} · ${escapeHtml(item.score)}</span>`).join("")}</div>`
+                    : `<div class="meta">아직 매칭된 reference slot이 없습니다.</div>`}
+                </div>
+                <div class="planner-card">
+                  <strong>Guardrail</strong>
+                  ${linesToText(latestToolContext?.guardrailBundle?.rules || []).split("\n").filter(Boolean).length
+                    ? linesToText(latestToolContext?.guardrailBundle?.rules || []).split("\n").filter(Boolean).map((line) => `<div class="meta">${escapeHtml(line)}</div>`).join("")
+                    : `<div class="meta">가드레일 정보 없음</div>`}
+                  ${(latestToolContext?.guardrailBundle?.warnings || []).length
+                    ? `<div class="meta" style="margin-top:8px; color:#9a3412;">${escapeHtml((latestToolContext.guardrailBundle.warnings || []).join(" | "))}</div>`
+                    : ``}
+                </div>
+              </div>
+              <div class="planner-ref-list">
+                ${(latestToolContext?.referenceSummary?.analyses || []).length
+                  ? latestToolContext.referenceSummary.analyses.map((item) => `
+                      <div class="planner-ref-item">
+                        <strong>${escapeHtml(item.requestedUrl || item.finalUrl || "reference")}</strong>
+                        <div class="meta">status: ${escapeHtml(item.status || "unknown")} | capturedAt: ${escapeHtml(item.capturedAt || "n/a")}</div>
+                        ${item.artifact?.htmlPath ? `<div class="meta">html artifact: <code>${escapeHtml(item.artifact.htmlPath)}</code></div>` : ``}
+                        ${(item.takeaways || []).length ? item.takeaways.map((takeaway) => `<div class="meta">${escapeHtml(takeaway)}</div>`).join("") : `<div class="meta">추출 takeaway 없음</div>`}
+                      </div>
+                    `).join("")
+                  : `<div class="meta">아직 분석된 레퍼런스가 없습니다.</div>`}
+              </div>
+            </div>
+          </div>
+          <div class="section">
+            <div><strong>생성 결과 / 버전 관리</strong></div>
+            <div class="meta">${latestPlan ? "기획 초안을 기준으로 디자인 생성 결과를 확인하고, 저장 버전과 현재 View를 관리합니다." : "먼저 위에서 요구사항 정리본을 만든 뒤 디자인 생성까지 진행해야 합니다."}</div>
+            <div class="planner-inline-meta">
+              <span class="chip ${latestDraftBuild ? "pass" : "warn"}">${latestDraftBuild ? `최근 draft ${escapeHtml(formatPlanUpdatedAt(latestDraftBuild.updatedAt || latestDraftBuild.createdAt))}` : "draft build 없음"}</span>
+              <span class="chip ${pinnedViewItem?.versionId ? "pass" : "warn"}">${pinnedViewItem?.versionId ? `현재 View ${escapeHtml(pinnedViewItem.version?.versionLabel || pinnedViewItem.versionId)}` : "현재 View 미고정"}</span>
+              <span class="chip">${escapeHtml(`디자인 변화율 ${({
+                low: "하",
+                medium: "중",
+                high: "상",
+              }[latestRequirementPlan?.designChangeLevel || latestPlanUserInput?.designChangeLevel || "medium"] || "중")}`)}</span>
+            </div>
+            <div class="planner-grid">
+              <div class="planner-field">
+                <label for="builderVersionLabelHint">버전명 힌트</label>
+                <input id="builderVersionLabelHint" type="text" value="${escapeHtml(latestDraftBuild?.proposedVersionLabel || "")}" placeholder="예: premium-dark-v1" />
+              </div>
+            </div>
+            <div class="actions">
+              <button class="run" id="runBuilder" ${latestPlan ? "" : "disabled"}>디자인 생성 실행</button>
+              <button type="button" class="btn secondary" id="saveVersionBtn" ${latestDraftBuild ? "" : "disabled"}>새 버전 저장</button>
+            </div>
+            <div class="planner-status" id="builderStatus">${latestPlan ? "정리본 기준으로 시안 생성 가능" : "정리본 필요"}</div>
+
+            <div class="planner-subsection">
+              <div><strong>적용 결과</strong></div>
+              <div class="meta">${latestDraftBuild ? "최근 생성된 draft 결과를 확인하고 미리보기/비교 액션을 사용할 수 있습니다." : "디자인 생성 실행 후 생성 결과와 미리보기 액션이 여기에 표시됩니다."}</div>
+              <div class="actions">
+                <a class="btn" href="${escapeHtml(previewUrl)}" target="_blank">변경 화면 새 탭으로 보기</a>
+                <button type="button" class="btn secondary" id="copyDetailStateBtn">현재 설정 링크 복사</button>
+                ${!isPdpTarget && pageReviewMap.get(workspacePageId)?.compareUrl ? `<a class="btn secondary" id="openDetailPageCompareBtn" href="${escapeHtml(pageReviewMap.get(workspacePageId).compareUrl)}" target="_blank">기준 화면과 비교</a>` : ``}
+              </div>
+              ${latestDraftBuild ? `
+                <div class="planner-card-grid">
+                  <div class="planner-card">
+                    <strong>${escapeHtml(latestDraftBuild.proposedVersionLabel || latestDraftBuild.id)}</strong>
+                    <div class="meta">planId: ${escapeHtml(latestDraftBuild.planId || "n/a")} | updatedAt: ${escapeHtml(formatPlanUpdatedAt(latestDraftBuild.updatedAt || latestDraftBuild.createdAt))}</div>
+                    <div class="meta">summary: ${escapeHtml(latestDraftBuild.summary || "n/a")}</div>
+                    <div class="meta">changed components: ${escapeHtml((latestDraftBuild.snapshotData?.changedComponentIds || []).join(", ") || "none")}</div>
+                    ${(latestDraftBuild.report?.whatChanged || []).length ? latestDraftBuild.report.whatChanged.map((line) => `<div class="meta">${escapeHtml(line)}</div>`).join("") : `<div class="meta">변경 요약 없음</div>`}
+                  </div>
+                  <div class="planner-card">
+                    <strong>Draft Operations</strong>
+                    ${(latestDraftBuild.operations || []).length
+                      ? latestDraftBuild.operations.map((item) => `<div class="meta"><code>${escapeHtml(item.action || "op")}</code> · ${escapeHtml(item.slotId || item.sectionId || "-")} · ${escapeHtml(item.field || item.sourceId || "-")}</div>`).join("")
+                      : `<div class="meta">생성된 operation이 없습니다.</div>`}
+                  </div>
+                </div>
+              ` : `<div class="meta">아직 생성된 draft build가 없습니다.</div>`}
+            </div>
+
+            <div class="planner-subsection">
+              <div><strong>저장 버전 / 현재 View</strong></div>
+              <div class="meta">생성 결과를 저장 버전으로 남기고, 그중 하나를 clone에 노출할 현재 View로 고정합니다.</div>
+              <div class="planner-ref-list">
+                ${versions.length ? versions.map((item) => `
+                  <div class="planner-ref-item">
+                    <strong>${escapeHtml(item.versionLabel || item.id)}</strong>
+                    <div class="meta">createdAt: ${escapeHtml(formatPlanUpdatedAt(item.createdAt))} | buildId: ${escapeHtml(item.buildId || "n/a")}</div>
+                    <div class="meta">${escapeHtml(item.summary || "요약 없음")}</div>
+                    <div class="actions">
+                      <button type="button" class="btn secondary pin-version-btn" data-version-id="${escapeHtml(item.id)}">현재 View로 고정</button>
+                      ${pinnedViewItem?.versionId === item.id ? `<span class="chip pass">현재 View</span>` : ``}
+                    </div>
+                  </div>
+                `).join("") : `<div class="meta">저장된 버전이 없습니다.</div>`}
+              </div>
+              <div class="planner-status" id="versionStatus">${pinnedViewItem?.versionId ? `현재 View: ${pinnedViewItem.version?.versionLabel || pinnedViewItem.versionId}` : "현재 View 미고정"}</div>
+            </div>
+          </div>
+          <details class="fold-section">
+            <summary>직접 AI 적용 (임시)</summary>
+            <div class="fold-body">
+              <div class="llm" style="margin-top:0; padding-top:0; border-top:0;">
+                <div><strong>Legacy 직접 적용</strong></div>
+                <div class="meta">Planner/Builder 분리 전까지 유지하는 임시 경로입니다. 가능하면 위 요구사항 정리 단계를 먼저 사용하세요.</div>
+                <div class="llm-guide">
+                  <strong>예시</strong>
+                  <div class="meta">홈 메인 비주얼 제목을 "새로운 봄 혜택"으로 바꿔줘</div>
+                  <div class="meta">홈 공간 리뉴얼 섹션 제목을 "우리집 새단장"으로 바꿔줘</div>
+                  <div class="meta">홈 히어로를 피그마 소스로 바꿔줘</div>
+                </div>
+                <textarea id="llmPrompt" placeholder="예: 홈 메인 비주얼 설명 문구를 '지금만 가능한 특별 혜택'으로 바꿔줘"></textarea>
+                <button class="run" id="runLlm">AI로 바로 적용</button>
+                <div class="status" id="llmStatus">대기 중</div>
+              </div>
+            </div>
           </div>
           <div class="section">
             <div><strong>수정 가능한 컴포넌트</strong></div>
+            ${isPdpTarget ? `<div class="meta" style="margin-top:8px;">현재 대표 케이스에 보이는 PDP 슬롯만 노출합니다. 변경은 현재 케이스에만 저장됩니다.</div>` : ``}
             <div class="component-grid">
               ${(inventory.components || []).map((component) => {
                 const editable = editabilityMap.get(component.componentId) || {};
@@ -1061,7 +1537,7 @@
                 const editableProps = editable.editableProps || [];
                 const editableStyles = editable.editableStyles || [];
                 return `
-                  <div class="component-card" data-component-id="${escapeHtml(component.componentId)}" data-slot-id="${escapeHtml(component.slotId)}" data-page-id="${escapeHtml(page.id)}">
+                  <div class="component-card" data-component-id="${escapeHtml(component.componentId)}" data-slot-id="${escapeHtml(component.slotId)}" data-page-id="${escapeHtml(component.pageId || workspacePageId)}">
                     <div class="component-title-row">
                       <h4>${escapeHtml(slotLabel(component.slotId))}</h4>
                       <span class="component-label">${escapeHtml(component.componentId)}</span>
@@ -1104,24 +1580,24 @@
           <details class="fold-section">
             <summary>비교 자료 / 운영 정보</summary>
             <div class="fold-body">
-              <div class="section">
+              ${isPdpTarget ? `` : `<div class="section">
                 <div><strong>검수 상태</strong></div>
                 <div class="meta">page acceptance: ${escapeHtml(acceptanceResults?.overallStatus || "pending")} | pass ${escapeHtml(currentPageAcceptance?.pass || 0)} / ${escapeHtml(currentPageAcceptance?.total || 0)} | fail ${escapeHtml(currentPageAcceptance?.fail || 0)} | pending ${escapeHtml(currentPageAcceptance?.pending || 0)}</div>
                 ${acceptanceResults?.nextPendingBundle ? `<div class="meta">next pending bundle: <code>${escapeHtml(acceptanceResults.nextPendingBundle.bundleId)}</code> (${escapeHtml(acceptanceResults.nextPendingBundle.title)})</div>` : `<div class="meta">next pending bundle: none</div>`}
                 ${currentFailedBundles.length ? `<div class="meta" style="margin-top:10px;">Current page failed bundles</div><div class="gap-list">${currentFailedBundles.map((bundle) => `<div class="gap-item acceptance-fail"><strong>${escapeHtml(bundle.title)}</strong><div class="meta">bundleId: ${escapeHtml(bundle.bundleId)}</div><div class="meta">${escapeHtml(bundle.note || "no note")}</div></div>`).join("")}</div>` : ``}
-              </div>
+              </div>`}
               <div class="section">
                 <div><strong>비교 자료</strong></div>
                 ${reviewHtml}
               </div>
-              ${page.id === "home" ? `<div class="section"><div><strong>홈 링크 현황</strong></div>${homeLinkCoverageHtml}</div>` : ``}
-              <div class="section">
+              ${workspacePageId === "home" ? `<div class="section"><div><strong>홈 링크 현황</strong></div>${homeLinkCoverageHtml}</div>` : ``}
+              ${isPdpTarget ? `` : `<div class="section">
                 <div><strong>운영 번들</strong></div>
                 <div class="meta">Recommended order</div>
                 ${allBundlesHtml}
                 <div class="meta" style="margin-top:10px;">Current page bundles</div>
                 ${bundleHtml}
-              </div>
+              </div>`}
             </div>
           </details>
           <details class="fold-section">
@@ -1135,13 +1611,13 @@
                 <div><strong>페이지 주의사항</strong></div>
                 ${advisoryHtml}
               </div>
-              <div class="section">
+              ${isPdpTarget ? `<div class="section"><div><strong>PDP 연결 상태</strong></div><div class="meta">대표 PDP는 /clone-product 기반으로 보이지만, 수정 내용은 현재 케이스 pageId에 독립 저장됩니다.</div><div class="meta">캡처/selector 기준만 ${escapeHtml(runtimePageId)}를 재사용합니다.</div></div>` : `<div class="section">
                 <div><strong>Pre-LLM 상태</strong></div>
                 <div class="meta">pre-LLM: ${escapeHtml(gaps.overallStatus)} | component gaps: ${escapeHtml(gaps.componentGapCount || 0)} | fallback components: ${escapeHtml(gaps.fallbackComponentCount || 0)}</div>
                 ${gaps.globalGaps?.length ? gaps.globalGaps.map((gap) => `<div class="meta">${escapeHtml(gap)}</div>`).join("") : `<div class="meta">No global gaps.</div>`}
                 ${gaps.fallbackComponents?.length ? `<div class="meta">Fallback components</div><div class="gap-list">${gaps.fallbackComponents.map((item) => `<div class="gap-item"><strong>${escapeHtml(item.componentId)}</strong><div class="meta">${escapeHtml(item.sourceResolution)} | ${escapeHtml(item.activeSourceId || "")} -> ${escapeHtml(item.resolvedRenderSourceId || "")}</div>${item.detail ? `<div class="meta">${escapeHtml(item.detail)}</div>` : ``}</div>`).join("")}</div>` : ``}
                 ${gapHtml}
-              </div>
+              </div>`}
               <div class="section">
                 <div><strong>배치 상태</strong></div>
                 ${visualBatch ? `
@@ -1156,53 +1632,360 @@
           </details>
         `;
 
+        const plannerRunBtn = document.getElementById("runPlanner");
+        const plannerStatusEl = document.getElementById("plannerStatus");
+        const savePlanBtn = document.getElementById("savePlanBtn");
+        const planSaveStatusEl = document.getElementById("planSaveStatus");
+        const runBuilderFromPlanBtn = document.getElementById("runBuilderFromPlanBtn");
+        const plannerDraftRegionEl = document.getElementById("plannerDraftRegion");
+        const plannerLoadingBoxEl = document.getElementById("plannerLoadingBox");
+        const plannerDraftFormEl = document.getElementById("plannerDraftForm");
         const runBtn = document.getElementById("runLlm");
         const resetWorkspaceBtn = document.getElementById("resetWorkspaceBtn");
         const promptEl = document.getElementById("llmPrompt");
-        const statusEl = document.getElementById("llmStatus");
-        if (!finalReadiness?.llmGateOpen) {
-          runBtn.disabled = true;
-          runBtn.title = "Acceptance bundles must all pass before LLM changes are allowed.";
-          statusEl.textContent = `AI 수정 잠금: ${finalReadiness?.llmGateStatus || "pending"}`;
-        } else if (finalReadiness?.llmGateBypassActive) {
+        const legacyStatusEl = document.getElementById("llmStatus");
+        if (runBtn && legacyStatusEl) {
           runBtn.disabled = false;
-          runBtn.title = "Demo LLM bypass active";
-          statusEl.textContent = `데모 AI 우회 활성화: ${finalReadiness?.rawLlmGateStatus || "pending"}`;
+          runBtn.title = "";
+          legacyStatusEl.textContent = "대기 중";
+        }
+        if (plannerStatusEl) plannerStatusEl.textContent = "대기 중";
+
+        const collectPlanTargetSelection = () => {
+          const componentOnly = Boolean(document.getElementById("planComponentOnly")?.checked);
+          const targetComponents = Array.from(detailEl.querySelectorAll('input[name="planTargetComponent"]:checked'))
+            .map((input) => String(input.value || "").trim())
+            .filter(Boolean);
+          return {
+            targetScope: componentOnly ? "components" : "page",
+            targetComponents,
+          };
+        };
+
+        const updatePlannerTargetUi = () => {
+          const componentOnly = Boolean(document.getElementById("planComponentOnly")?.checked);
+          const plannerTargetBoxEl = document.getElementById("plannerTargetBox");
+          if (plannerTargetBoxEl) plannerTargetBoxEl.hidden = !componentOnly;
+        };
+
+        const updatePlanModeUi = () => {
+          const planMode = document.getElementById("planMode")?.value || "hybrid";
+          const fieldConfig = {
+            hybrid: ["reference", "preferred", "tone", "key", "avoid", "request"],
+            direct: ["key", "avoid", "request"],
+            reference: ["preferred", "avoid", "reference"],
+          };
+          const visibleFields = fieldConfig[planMode] || fieldConfig.hybrid;
+          detailEl.querySelectorAll("[data-plan-field]").forEach((fieldEl) => {
+            const fieldId = fieldEl.getAttribute("data-plan-field") || "";
+            const order = visibleFields.indexOf(fieldId);
+            fieldEl.hidden = order < 0;
+            fieldEl.style.order = order >= 0 ? String(order + 1) : "";
+          });
+        };
+
+        const showPlannerLoadingState = (statusText) => {
+          plannerUiStateByPage.set(workspacePageId, { draftVisible: true, loading: true });
+          if (plannerDraftRegionEl) plannerDraftRegionEl.hidden = false;
+          if (plannerLoadingBoxEl) plannerLoadingBoxEl.hidden = false;
+          if (plannerDraftFormEl) plannerDraftFormEl.hidden = true;
+          if (plannerStatusEl) plannerStatusEl.textContent = statusText || "기획안 생성 중...";
+        };
+
+        const showPlannerDraftState = () => {
+          plannerUiStateByPage.set(workspacePageId, { draftVisible: true, loading: false });
+          if (plannerDraftRegionEl) plannerDraftRegionEl.hidden = false;
+          if (plannerLoadingBoxEl) plannerLoadingBoxEl.hidden = true;
+          if (plannerDraftFormEl) plannerDraftFormEl.hidden = false;
+        };
+
+        const collectCurrentRequirementPlan = () => ({
+          title: (document.getElementById("planTitle")?.value || "").trim(),
+          designChangeLevel: document.getElementById("planDesignChangeLevel")?.value || latestRequirementPlan?.designChangeLevel || "medium",
+          requestSummary: textToLines(document.getElementById("planRequestSummary")?.value || ""),
+          planningDirection: textToLines(document.getElementById("planPlanningDirection")?.value || ""),
+          designDirection: textToLines(document.getElementById("planDesignDirection")?.value || ""),
+          priority: textToPriority(document.getElementById("planPriority")?.value || ""),
+          guardrails: textToLines(document.getElementById("planGuardrails")?.value || ""),
+          referenceNotes: latestRequirementPlan?.referenceNotes || [],
+          builderBrief: {
+            objective: (document.getElementById("planBuilderObjective")?.value || "").trim(),
+            mustKeep: textToLines(document.getElementById("planBuilderMustKeep")?.value || ""),
+            mustChange: textToLines(document.getElementById("planBuilderMustChange")?.value || ""),
+            suggestedFocusSlots: (document.getElementById("planBuilderFocusSlots")?.value || "")
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean),
+          },
+        });
+
+        const persistCurrentPlanDraft = async () => {
+          if (!latestPlan) {
+            throw new Error("저장할 정리본이 없습니다.");
+          }
+          const requirementPlan = collectCurrentRequirementPlan();
+          const currentDesignChangeLevel = document.getElementById("planDesignChangeLevel")?.value || requirementPlan.designChangeLevel || "medium";
+          if (!requirementPlan.title) {
+            throw new Error("기획안 제목은 필요합니다.");
+          }
+          const item = await fetchJson("/api/workspace/plan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: latestPlan.id,
+              pageId: workspacePageId,
+              viewportProfile: latestPlan.viewportProfile || "pc",
+              mode: latestPlan.mode || "hybrid",
+              status: latestPlan.status || "draft",
+              title: requirementPlan.title,
+              summary: requirementPlan.title,
+              input: {
+                ...(latestPlan.input || {}),
+                userInput: {
+                  ...((latestPlan.input && latestPlan.input.userInput) || {}),
+                  designChangeLevel: currentDesignChangeLevel,
+                },
+              },
+              output: {
+                requirementPlan,
+                toolContext: latestToolContext || {},
+              },
+            }),
+          });
+          return { item, requirementPlan };
+        };
+
+        const runBuilderWorkflow = async () => {
+          if (!latestPlan) {
+            if (builderStatusEl) builderStatusEl.textContent = "기획 초안이 필요합니다.";
+            return;
+          }
+          const { targetScope, targetComponents } = collectPlanTargetSelection();
+          if (targetScope === "components" && !targetComponents.length) {
+            if (builderStatusEl) builderStatusEl.textContent = "컴포넌트 범위를 선택했다면 최소 1개는 체크해야 합니다.";
+            return;
+          }
+          const versionLabelHint = (document.getElementById("builderVersionLabelHint")?.value || "").trim();
+          const approvedPlan = latestRequirementPlan ? collectCurrentRequirementPlan() : null;
+          const designChangeLevel = document.getElementById("planDesignChangeLevel")?.value || approvedPlan?.designChangeLevel || latestPlanUserInput?.designChangeLevel || "medium";
+          const intensityMap = {
+            low: "conservative",
+            medium: "balanced",
+            high: "bold",
+          };
+          const intensity = intensityMap[designChangeLevel] || "balanced";
+          if (!approvedPlan) {
+            if (builderStatusEl) builderStatusEl.textContent = "기획 초안이 필요합니다.";
+            return;
+          }
+          if (builderStatusEl) builderStatusEl.textContent = "디자인 생성 중...";
+          try {
+            const payload = await fetchJson("/api/llm/build", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                pageId: workspacePageId,
+                viewportProfile: "pc",
+                planId: latestPlan.id,
+                approvedPlan,
+                intensity,
+                versionLabelHint,
+                designChangeLevel,
+                targetScope,
+                targetComponents,
+              }),
+            });
+            if (builderStatusEl) builderStatusEl.textContent = payload.summary || "디자인 생성 완료";
+            showAdminNotice("디자인 생성 완료");
+            await renderDetail();
+          } catch (error) {
+            if (builderStatusEl) builderStatusEl.textContent = "디자인 생성 실패: " + String(error);
+          }
+        };
+
+        document.getElementById("planMode")?.addEventListener("change", updatePlanModeUi);
+        document.getElementById("planComponentOnly")?.addEventListener("change", updatePlannerTargetUi);
+        updatePlanModeUi();
+        updatePlannerTargetUi();
+
+        if (resetWorkspaceBtn) {
+          resetWorkspaceBtn.addEventListener("click", async () => {
+            if (plannerStatusEl) plannerStatusEl.textContent = "작업본 초기화 중...";
+            if (legacyStatusEl) legacyStatusEl.textContent = "작업본 초기화 중...";
+            try {
+              await fetchJson("/api/workspace/reset", { method: "POST" });
+              await refreshData();
+              if (plannerStatusEl) plannerStatusEl.textContent = "공용 기본값으로 초기화됨";
+              if (legacyStatusEl) legacyStatusEl.textContent = "공용 기본값으로 초기화됨";
+            } catch (error) {
+              if (plannerStatusEl) plannerStatusEl.textContent = "초기화 실패: " + String(error);
+              if (legacyStatusEl) legacyStatusEl.textContent = "초기화 실패: " + String(error);
+            }
+          });
         }
 
-        resetWorkspaceBtn.addEventListener("click", async () => {
-          statusEl.textContent = "작업본 초기화 중...";
+        plannerRunBtn?.addEventListener("click", async () => {
+          const planModeEl = document.getElementById("planMode");
+          const planRequestTextEl = document.getElementById("planRequestText");
+          const planKeyMessageEl = document.getElementById("planKeyMessage");
+          const planPreferredDirectionEl = document.getElementById("planPreferredDirection");
+          const planAvoidDirectionEl = document.getElementById("planAvoidDirection");
+          const planToneAndMoodEl = document.getElementById("planToneAndMood");
+          const planReferenceUrlsEl = document.getElementById("planReferenceUrls");
+          const { targetScope, targetComponents } = collectPlanTargetSelection();
+          const mode = planModeEl?.value || "hybrid";
+          const rawRequestText = (planRequestTextEl?.value || "").trim();
+          const rawKeyMessage = (planKeyMessageEl?.value || "").trim();
+          const rawPreferredDirection = (planPreferredDirectionEl?.value || "").trim();
+          const rawAvoidDirection = (planAvoidDirectionEl?.value || "").trim();
+          const rawToneAndMood = (planToneAndMoodEl?.value || "").trim();
+          const rawReferenceUrls = textToLines(planReferenceUrlsEl?.value || "");
+          const designChangeLevel = document.getElementById("planDesignChangeLevel")?.value || "medium";
+          const requestText = mode === "reference" ? "" : rawRequestText;
+          const keyMessage = mode === "reference" ? "" : rawKeyMessage;
+          const preferredDirection = mode === "direct" ? "" : rawPreferredDirection;
+          const avoidDirection = rawAvoidDirection;
+          const toneAndMood = mode === "hybrid" ? rawToneAndMood : "";
+          const referenceUrls = mode === "direct" ? [] : rawReferenceUrls;
+          if (targetScope === "components" && !targetComponents.length) {
+            if (plannerStatusEl) plannerStatusEl.textContent = "선택한 컴포넌트만 진행하려면 최소 1개는 체크해야 합니다.";
+            return;
+          }
+          if (!requestText && !referenceUrls.length) {
+            if (plannerStatusEl) plannerStatusEl.textContent = "고객 요청 또는 레퍼런스 URL 중 하나는 필요합니다.";
+            return;
+          }
+          showPlannerLoadingState("기획안 생성 중...");
           try {
-            await fetchJson("/api/workspace/reset", { method: "POST" });
-            await refreshData();
-            statusEl.textContent = "공용 기본값으로 초기화됨";
+            const payload = await fetchJson("/api/llm/plan", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                pageId: workspacePageId,
+                viewportProfile: "pc",
+                mode,
+                requestText,
+                keyMessage,
+                preferredDirection,
+                avoidDirection,
+                toneAndMood,
+                referenceUrls,
+                designChangeLevel,
+                targetScope,
+                targetComponents,
+              }),
+            });
+            plannerUiStateByPage.set(workspacePageId, { draftVisible: true, loading: false });
+            if (plannerStatusEl) plannerStatusEl.textContent = payload.summary || "기획안 생성 완료";
+            showAdminNotice("기획안 생성 완료");
+            await renderDetail();
           } catch (error) {
-            statusEl.textContent = "초기화 실패: " + String(error);
+            showPlannerDraftState();
+            if (plannerStatusEl) plannerStatusEl.textContent = "기획안 생성 실패: " + String(error);
           }
         });
 
-        runBtn.addEventListener("click", async () => {
-          const prompt = (promptEl.value || "").trim();
-          if (!prompt) {
-            statusEl.textContent = "요청 문구를 입력해야 한다";
+        savePlanBtn?.addEventListener("click", async () => {
+          if (planSaveStatusEl) planSaveStatusEl.textContent = "정리본 저장 중...";
+          try {
+            await persistCurrentPlanDraft();
+            if (planSaveStatusEl) planSaveStatusEl.textContent = "정리본 저장 완료";
+            showAdminNotice("정리본 저장 완료");
+            await renderDetail();
+          } catch (error) {
+            if (planSaveStatusEl) planSaveStatusEl.textContent = "정리본 저장 실패: " + String(error);
+          }
+        });
+
+        runBuilderFromPlanBtn?.addEventListener("click", async () => {
+          await runBuilderWorkflow();
+        });
+
+        const runBuilderBtn = document.getElementById("runBuilder");
+        const builderStatusEl = document.getElementById("builderStatus");
+        const saveVersionBtn = document.getElementById("saveVersionBtn");
+        const versionStatusEl = document.getElementById("versionStatus");
+
+        runBuilderBtn?.addEventListener("click", async () => {
+          await runBuilderWorkflow();
+        });
+
+        saveVersionBtn?.addEventListener("click", async () => {
+          if (!latestDraftBuild) {
+            if (versionStatusEl) versionStatusEl.textContent = "저장할 draft build가 없습니다.";
             return;
           }
-          statusEl.textContent = "AI 적용 중...";
+          if (versionStatusEl) versionStatusEl.textContent = "버전 저장 중...";
+          try {
+            const item = await fetchJson("/api/workspace/version-save", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                pageId: workspacePageId,
+                viewportProfile: latestDraftBuild.viewportProfile || "pc",
+                planId: latestDraftBuild.planId || latestPlan?.id || "",
+                buildId: latestDraftBuild.id,
+                versionLabel: latestDraftBuild.proposedVersionLabel || `${workspacePageId}-draft-v1`,
+                summary: latestDraftBuild.summary || "",
+                snapshotData: latestDraftBuild.snapshotData || {},
+              }),
+            });
+            if (versionStatusEl) versionStatusEl.textContent = `버전 저장 완료: ${item.item?.versionLabel || item.item?.id || "saved"}`;
+            showAdminNotice("새 버전 저장 완료");
+            await renderDetail();
+          } catch (error) {
+            if (versionStatusEl) versionStatusEl.textContent = "버전 저장 실패: " + String(error);
+          }
+        });
+
+        detailEl.querySelectorAll(".pin-version-btn").forEach((button) => {
+          button.addEventListener("click", async () => {
+            const versionId = button.getAttribute("data-version-id") || "";
+            if (!versionId) return;
+            if (versionStatusEl) versionStatusEl.textContent = "현재 View 고정 중...";
+            try {
+              await fetchJson("/api/workspace/view-pin", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  pageId: workspacePageId,
+                  versionId,
+                }),
+              });
+              if (versionStatusEl) versionStatusEl.textContent = `현재 View 고정 완료: ${versionId}`;
+              showAdminNotice("현재 View 고정 완료");
+              await renderDetail();
+            } catch (error) {
+              if (versionStatusEl) versionStatusEl.textContent = "현재 View 고정 실패: " + String(error);
+            }
+          });
+        });
+
+        runBtn?.addEventListener("click", async () => {
+          const prompt = (promptEl.value || "").trim();
+          if (!prompt) {
+            legacyStatusEl.textContent = "요청 문구를 입력해야 한다";
+            return;
+          }
+          const contextualPrompt = isPdpTarget
+            ? `현재 작업 대상은 ${pageLabel(page.id, page.title)}이며, 실제 적용 pageId는 ${workspacePageId} 입니다. 이 요청은 현재 대표 PDP 케이스에만 독립 저장해야 합니다. 캡처 기준 페이지는 ${runtimePageId} 이며 PDP 관련 슬롯(gallery, summary, price, option, sticky, review, qna)을 우선 고려하세요. 사용자 요청: ${prompt}`
+            : `현재 작업 대상 pageId는 ${workspacePageId} 입니다. 사용자 요청: ${prompt}`;
+          legacyStatusEl.textContent = "AI 적용 중...";
           try {
             const response = await fetch("/api/llm/change", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ prompt }),
+              body: JSON.stringify({ prompt: contextualPrompt }),
             });
             const payload = await response.json();
             if (!response.ok) {
-              statusEl.textContent = `실패: ${payload.detail || payload.error}`;
+              legacyStatusEl.textContent = `실패: ${payload.detail || payload.error}`;
               return;
             }
-            statusEl.textContent = payload.summary || "적용 완료";
+            legacyStatusEl.textContent = payload.summary || "적용 완료";
             await refreshData();
           } catch (error) {
-            statusEl.textContent = "실패: " + String(error);
+            legacyStatusEl.textContent = "실패: " + String(error);
           }
         });
 

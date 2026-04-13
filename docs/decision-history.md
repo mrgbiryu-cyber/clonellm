@@ -198,3 +198,164 @@ Confirmed:
 Reference document:
 - `docs/home-remediation-plan.md`
 
+## 2026-04-13
+
+### 12. Admin is a preview workbench, not a maintenance console
+
+User clarified that the `admin` experience should not be framed as a homepage maintenance tool.
+
+Confirmed:
+1. primary goal is to preview how well planning and design ideas fit the page
+2. the result is a client-facing preview draft, not a final production design tool
+3. the main flow is:
+   - page selection
+   - requirement planning
+   - AI preview generation
+   - version save
+   - View pinning
+   - history recall
+
+Confirmed screen structure:
+1. left rail = selection / page status / version history
+2. right workspace = planning / generation / result / support info
+
+### 13. Anti-AI design rules and tool phases
+
+User confirmed that design quality is a core concern and that the system must avoid obviously AI-looking outputs.
+
+Confirmed:
+1. `designChangeLevel` and `anti-AI rules` are separate controls
+2. change level controls how much the screen changes
+3. anti-AI rules control how the result must not drift from brand/system baseline
+4. external concept tools do not replace the internal Builder
+
+Confirmed anti-AI direction:
+1. preserve current page baseline first
+2. do not invent new visual languages freely
+3. keep page-type-specific priorities:
+   - home = first impression / curation continuity
+   - plp = scanability / comparison flow
+   - pdp = trust / clarity / product fact preservation
+
+Confirmed tool phases:
+1. phase 1 internal Builder tools:
+   - Style Dictionary
+   - Open Props
+   - Motion
+2. phase 2 extended tools:
+   - GSAP
+   - Konva
+   - Google Stitch
+   - Figma Make
+   - Relume Style Guide Builder
+
+Reference document:
+- `docs/design-tooling-strategy.md`
+
+### 14. Brand-first Builder and change profiles
+
+User clarified that this system should not be optimized around reducing model freedom too aggressively.
+
+Confirmed:
+1. Builder should be `brand-first`, not `restriction-first`
+2. the main control lever is `designChangeLevel`
+3. `designChangeLevel` should be interpreted as a richer internal change profile, not just a simple label
+4. anti-AI rules remain as minimum brand safety lines, not as broad suppression rules
+
+Confirmed change-profile direction:
+1. control levers include:
+   - layout shift
+   - copy shift
+   - source swap aggressiveness
+   - motion level
+   - emphasis strength
+2. high change level is allowed to explore assertively as long as brand baseline is preserved
+
+Reference document:
+- `docs/design-tooling-strategy.md`
+3. editable-component information is support-only and should live in collapsed accordions by default
+
+Confirmed version model:
+1. working versions can be saved many times
+2. one saved version can be pinned as the current `View`
+3. clone pages should expose only the pinned `View` version, not the latest temporary draft
+
+Reference document:
+- `docs/admin-preview-workbench-structure.md`
+
+### 15. Planner toolchain is first-wave scope, not later polish
+
+Confirmed:
+1. the Planner toolchain should not be treated as a later optional enhancement
+2. the following are first-wave required scope:
+   - `Reference URL Fetch`
+   - `Browser Render`
+   - `Reference Capture`
+   - `Structure Extractor`
+   - `Reference Summarizer`
+   - `Slot Matcher`
+   - `Guardrail Checker`
+3. external search is useful, but it is secondary to direct reference URL analysis
+4. the implementation order should therefore prioritize:
+   - workspace storage expansion
+   - Planner toolchain
+   - Planner API / UI
+   - Builder toolchain
+   - Builder API / UI
+
+Reference document:
+- `docs/llm-planner-builder-schema.md`
+- `docs/llm-planner-builder-schema.md`
+
+### 13. PLP/PDP preview target catalog
+
+Confirmed for admin preview targeting:
+1. top-level preview targets must explicitly include:
+   - `home`
+   - `PLP`
+   - `PDP`
+2. PLP first-wave targets are:
+   - `category-tvs`
+   - `category-refrigerators`
+3. PDP should not be exposed to users as a raw shared route only
+4. PDP must be shown as human-readable representative cases mapped to `/clone-product`
+
+Confirmed first-wave representative PDP cases:
+1. `PDP - TV 일반형`
+2. `PDP - TV 프리미엄형`
+3. `PDP - 냉장고 일반형`
+4. `PDP - 냉장고 노크온형`
+5. `PDP - 냉장고 글라스형`
+
+Confirmed exclusion:
+1. `vc23ga` should not be used as a first-wave representative TV PDP case because it behaves more like an accessory/product-adjacent outlier than a main TV preview case.
+
+Reference document:
+- `docs/admin-plp-pdp-target-catalog.md`
+
+### 14. Split LLM responsibilities into Planner and Builder
+
+Confirmed:
+1. requirement interpretation and version generation should not be treated as one undifferentiated LLM task
+2. the system should separate:
+   - `Planner LLM`
+   - `Builder LLM`
+3. `Planner LLM` is responsible for:
+   - requirement interpretation
+   - reference digestion
+   - planning / design direction summary
+   - editable planning draft output
+4. `Builder LLM` is responsible for:
+   - using approved planning output as input
+   - applying system tools / slot rules
+   - producing saveable preview versions
+5. Builder should execute against the approved requirement summary, not re-interpret raw user input as its primary source
+
+Implementation follow-up:
+1. define Planner output schema
+2. define Builder input/output schema
+3. add explicit handoff from Planner result review to Builder execution
+4. connect both artifacts to version history
+
+Reference document:
+- `docs/admin-preview-workbench-structure.md`

@@ -11,6 +11,11 @@ const WORKSPACE_DEFAULT_PAGE_IDS = [
   "care-solutions",
   "category-tvs",
   "category-refrigerators",
+  "pdp-tv-general",
+  "pdp-tv-premium",
+  "pdp-refrigerator-general",
+  "pdp-refrigerator-knockon",
+  "pdp-refrigerator-glass",
 ];
 
 const WORKSPACE_DEFAULT_PAGE_META = {
@@ -43,6 +48,31 @@ const WORKSPACE_DEFAULT_PAGE_META = {
     url: "https://www.lge.co.kr/category/refrigerators",
     title: "냉장고 | LG전자 | 공식몰 LGE.COM",
     pageGroup: "category",
+  },
+  "pdp-tv-general": {
+    url: "https://www.lge.co.kr/tvs/32lq635bkna-stand",
+    title: "PDP - TV 일반형",
+    pageGroup: "product-detail",
+  },
+  "pdp-tv-premium": {
+    url: "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+    title: "PDP - TV 프리미엄형",
+    pageGroup: "product-detail",
+  },
+  "pdp-refrigerator-general": {
+    url: "https://www.lge.co.kr/refrigerators/t873mee111",
+    title: "PDP - 냉장고 일반형",
+    pageGroup: "product-detail",
+  },
+  "pdp-refrigerator-knockon": {
+    url: "https://www.lge.co.kr/refrigerators/t875mee412",
+    title: "PDP - 냉장고 노크온형",
+    pageGroup: "product-detail",
+  },
+  "pdp-refrigerator-glass": {
+    url: "https://www.lge.co.kr/refrigerators/h875gbb111",
+    title: "PDP - 냉장고 글라스형",
+    pageGroup: "product-detail",
   },
 };
 
@@ -81,7 +111,11 @@ const DEFAULT_SECTION_NAME_MAP = {
   firstRow: "첫 번째 상품열",
   firstProduct: "대표 상품",
   gallery: "상품 갤러리",
+  summary: "상품 요약",
+  price: "가격 정보",
   option: "옵션",
+  sticky: "고정 구매 영역",
+  review: "리뷰",
   qna: "문의",
 };
 
@@ -349,7 +383,27 @@ function buildDefaultCategorySlotRegistry(pageId) {
     ["firstRow", "product-list"],
     ["firstProduct", "product-card"],
     ["gallery", "gallery"],
+    ["summary", "content"],
+    ["price", "content"],
     ["option", "controls"],
+    ["sticky", "controls"],
+    ["review", "content"],
+    ["qna", "content"],
+  ].map(([slotId, componentType]) => buildDefaultSlotEntry(pageId, slotId, componentType));
+  return { pageId, slots };
+}
+
+function isPdpCasePageId(pageId) {
+  return String(pageId || "").trim().startsWith("pdp-");
+}
+
+function buildDefaultPdpSlotRegistry(pageId) {
+  const slots = [
+    ["gallery", "gallery"],
+    ["summary", "content"],
+    ["price", "content"],
+    ["option", "controls"],
+    ["sticky", "controls"],
     ["review", "content"],
     ["qna", "content"],
   ].map(([slotId, componentType]) => buildDefaultSlotEntry(pageId, slotId, componentType));
@@ -360,6 +414,9 @@ function buildDefaultSlotRegistry(pageId) {
   if (pageId === "home") return buildDefaultHomeSlotRegistry();
   if (["support", "bestshop", "care-solutions"].includes(pageId)) {
     return buildDefaultServiceSlotRegistry(pageId);
+  }
+  if (isPdpCasePageId(pageId)) {
+    return buildDefaultPdpSlotRegistry(pageId);
   }
   if (String(pageId || "").startsWith("category-")) {
     return buildDefaultCategorySlotRegistry(pageId);
@@ -940,6 +997,471 @@ async function callOpenRouter(requestText, data) {
   return JSON.parse(content);
 }
 
+function resolveOpenRouterModel(...envKeys) {
+  for (const key of envKeys.flat()) {
+    const value = String(process.env[key] || "").trim();
+    if (value) return value;
+  }
+  return process.env.OPENROUTER_MODEL || "openai/gpt-4.1-mini";
+}
+
+async function callOpenRouterJson({ model, messages, temperature = 0.1, demoFallback = null }) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) {
+    if (typeof demoFallback === "function") return demoFallback();
+    throw new Error("OPENROUTER_API_KEY is not set");
+  }
+
+  const siteUrl = process.env.OPENROUTER_SITE_URL || "http://localhost:3000";
+  const siteName = process.env.OPENROUTER_SITE_NAME || "lge-site-analysis";
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": siteUrl,
+      "X-Title": siteName,
+    },
+    body: JSON.stringify({
+      model: model || resolveOpenRouterModel("OPENROUTER_MODEL"),
+      temperature,
+      response_format: { type: "json_object" },
+      messages,
+    }),
+  });
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error(`OpenRouter request failed: ${response.status} ${text}`);
+  }
+  const payload = await response.json();
+  const content = payload?.choices?.[0]?.message?.content;
+  if (!content) {
+    throw new Error("OpenRouter returned empty content");
+  }
+  return JSON.parse(content);
+}
+
+function toStringArray(value, fallback = []) {
+  if (!Array.isArray(value)) return [...fallback];
+  return value.map((item) => String(item || "").trim()).filter(Boolean);
+}
+
+function normalizePlannerPriority(value, fallbackTargets = []) {
+  const allowedTargets = new Set(toStringArray(fallbackTargets));
+  const items = Array.isArray(value) ? value : [];
+  const normalized = items
+    .map((item, index) => ({
+      rank: Number(item?.rank || index + 1) || index + 1,
+      target: String(item?.target || "").trim(),
+      reason: String(item?.reason || "").trim(),
+    }))
+    .filter((item) => item.target && (!allowedTargets.size || allowedTargets.has(item.target)));
+  if (normalized.length) {
+    return normalized.sort((a, b) => a.rank - b.rank).slice(0, 6);
+  }
+  return fallbackTargets.slice(0, 4).map((target, index) => ({
+    rank: index + 1,
+    target,
+    reason: "현재 편집 가능 슬롯 기준 우선순위",
+  }));
+}
+
+function normalizePlannerReferenceNotes(value, fallback = []) {
+  const items = Array.isArray(value) ? value : [];
+  const normalized = items
+    .map((item) => ({
+      url: String(item?.url || "").trim(),
+      takeaways: toStringArray(item?.takeaways),
+    }))
+    .filter((item) => item.url || item.takeaways.length);
+  return normalized.length ? normalized.slice(0, 5) : fallback.slice(0, 5);
+}
+
+function normalizeDesignChangeLevel(value, fallback = "medium") {
+  const normalized = String(value || fallback).trim().toLowerCase();
+  if (normalized === "low" || normalized === "medium" || normalized === "high") return normalized;
+  return fallback;
+}
+
+function buildPlannerSystemPrompt() {
+  return [
+    "You are the Planner LLM for an admin preview workbench.",
+    "Persona: a senior digital strategist who organizes client requirements into a preview-ready plan before any build step starts.",
+    "This product is for customer-facing preview proposals, not for full production delivery or generic site maintenance.",
+    "Your responsibilities are: interpret the request, read reference intent, define planning direction, define visual direction, set priorities, and hand a clear builder brief to the next model.",
+    "Your non-responsibilities are: writing patch operations, choosing unsupported tools, saving versions, or performing implementation commands.",
+    "Respect the provided target scope. If the planner input is limited to selected components, concentrate only on those slots/components and do not expand the plan to unrelated areas.",
+    "Treat reference URLs as inspiration and signal extraction only. Never ask to copy layouts or text verbatim.",
+    "The user input includes designChangeLevel. Interpret it as the desired exploration width for visual change while still prioritizing the brand design baseline.",
+    "Preserve facts about products, prices, and specs.",
+    "Return JSON only.",
+    "Required top-level keys: summary, requirementPlan.",
+    "Required requirementPlan keys: title, designChangeLevel, requestSummary, planningDirection, designDirection, priority, guardrails, referenceNotes, builderBrief.",
+    "builderBrief must include objective, mustKeep, mustChange, suggestedFocusSlots.",
+    "Make the plan concise but explicit enough that a human can edit it and the Builder can execute it safely.",
+  ].join(" ");
+}
+
+function buildPlannerUserPrompt(plannerInput) {
+  return [
+    "Use the following structured planner input.",
+    "Create a concise but detailed requirement plan that a human can edit before build.",
+    "Do not mention slots or components outside the provided editable scope unless you are explicitly warning that they must remain unchanged.",
+    JSON.stringify(plannerInput, null, 2),
+  ].join("\n\n");
+}
+
+function buildDemoPlannerResult(plannerInput = {}) {
+  const pageLabel = String(plannerInput?.pageContext?.pageLabel || plannerInput?.pageContext?.workspacePageId || "페이지").trim();
+  const requestText = String(plannerInput?.userInput?.requestText || "").trim();
+  const keyMessage = String(plannerInput?.userInput?.keyMessage || "").trim();
+  const preferredDirection = String(plannerInput?.userInput?.preferredDirection || "").trim();
+  const avoidDirection = String(plannerInput?.userInput?.avoidDirection || "").trim();
+  const designChangeLevel = normalizeDesignChangeLevel(plannerInput?.userInput?.designChangeLevel, "medium");
+  const editableSlots = toStringArray(plannerInput?.pageSummary?.editableSlots);
+  const focusSlots = editableSlots.slice(0, 4);
+  const referenceNotes = ((plannerInput?.referenceSummary?.analyses || []) || [])
+    .filter((item) => item?.requestedUrl)
+    .map((item) => ({
+      url: String(item.requestedUrl || item.finalUrl || "").trim(),
+      takeaways: toStringArray(item?.takeaways),
+    }))
+    .slice(0, 5);
+  return {
+    summary: `${pageLabel} 요구사항 정리 완료`,
+    requirementPlan: {
+      title: `${pageLabel} 시안 기획안`,
+      designChangeLevel,
+      requestSummary: toStringArray(
+        [
+          requestText || `${pageLabel} 방향 정리`,
+          keyMessage ? `핵심 메시지: ${keyMessage}` : "",
+        ].filter(Boolean),
+        [`${pageLabel} 요구사항을 정리한다.`]
+      ),
+      planningDirection: toStringArray(
+        [
+          focusSlots[0] ? `${focusSlots[0]} 영역을 우선적으로 재정리한다.` : "",
+          focusSlots[1] ? `${focusSlots[1]} 영역을 보조 시안 포인트로 사용한다.` : "",
+        ].filter(Boolean),
+        ["현재 편집 가능한 슬롯 중심으로 시안 범위를 제한한다."]
+      ),
+      designDirection: toStringArray(
+        [
+          preferredDirection ? preferredDirection : "",
+          avoidDirection ? `${avoidDirection} 방향은 피한다.` : "",
+        ].filter(Boolean),
+        ["과도한 구현보다 고객 프리뷰용 방향 제시에 집중한다."]
+      ),
+      priority: normalizePlannerPriority([], focusSlots),
+      guardrails: toStringArray(
+        plannerInput?.guardrailBundle?.rules,
+        ["사실 기반 가격/스펙/상품 정보는 임의 변경 금지"]
+      ),
+      referenceNotes,
+      builderBrief: {
+        objective: keyMessage || requestText || `${pageLabel} 방향 정리`,
+        mustKeep: ["지원되는 슬롯 구조", "핵심 사용자 흐름"],
+        mustChange: focusSlots.length ? focusSlots.map((slotId) => `${slotId} 영역 톤 조정`) : ["핵심 카피 톤 재정리"],
+        suggestedFocusSlots: focusSlots,
+      },
+    },
+  };
+}
+
+function normalizePlannerResult(result, plannerInput = {}) {
+  const source = result && typeof result === "object" ? result : {};
+  const pageLabel = String(plannerInput?.pageContext?.pageLabel || plannerInput?.pageContext?.workspacePageId || "페이지").trim();
+  const editableSlots = toStringArray(plannerInput?.pageSummary?.editableSlots);
+  const editableSlotSet = new Set(editableSlots);
+  const fallbackRefNotes = ((plannerInput?.referenceSummary?.analyses || []) || [])
+    .filter((item) => item?.requestedUrl)
+    .map((item) => ({
+      url: String(item.requestedUrl || item.finalUrl || "").trim(),
+      takeaways: toStringArray(item?.takeaways),
+    }))
+    .slice(0, 5);
+  const requirementPlan = source.requirementPlan && typeof source.requirementPlan === "object" ? source.requirementPlan : {};
+  const builderBrief = requirementPlan.builderBrief && typeof requirementPlan.builderBrief === "object" ? requirementPlan.builderBrief : {};
+  return {
+    summary: String(source.summary || `${pageLabel} 요구사항 정리 완료`).trim(),
+    requirementPlan: {
+      title: String(requirementPlan.title || `${pageLabel} 시안 기획안`).trim(),
+      designChangeLevel: normalizeDesignChangeLevel(
+        requirementPlan.designChangeLevel,
+        plannerInput?.userInput?.designChangeLevel || "medium"
+      ),
+      requestSummary: toStringArray(requirementPlan.requestSummary, [`${pageLabel} 요구사항 정리`]),
+      planningDirection: toStringArray(requirementPlan.planningDirection, ["편집 가능한 슬롯 범위 안에서 방향을 정리한다."]),
+      designDirection: toStringArray(requirementPlan.designDirection, ["고객 프리뷰용 비주얼 방향을 제안한다."]),
+      priority: normalizePlannerPriority(requirementPlan.priority, editableSlots),
+      guardrails: toStringArray(
+        requirementPlan.guardrails,
+        toStringArray(plannerInput?.guardrailBundle?.rules, ["사실 기반 가격/스펙/상품 정보는 임의 변경 금지"])
+      ),
+      referenceNotes: normalizePlannerReferenceNotes(requirementPlan.referenceNotes, fallbackRefNotes),
+      builderBrief: {
+        objective: String(builderBrief.objective || source.summary || `${pageLabel} 방향 정리`).trim(),
+        mustKeep: toStringArray(builderBrief.mustKeep, ["지원되는 슬롯 구조", "핵심 사용자 흐름"]),
+        mustChange: toStringArray(builderBrief.mustChange, editableSlots.slice(0, 3).map((slotId) => `${slotId} 영역 조정`)),
+        suggestedFocusSlots: toStringArray(builderBrief.suggestedFocusSlots, editableSlots.slice(0, 4))
+          .filter((slotId) => !editableSlotSet.size || editableSlotSet.has(slotId))
+          .slice(0, 4),
+      },
+    },
+  };
+}
+
+async function handleLlmPlan(plannerInput) {
+  const result = await callOpenRouterJson({
+    model: resolveOpenRouterModel("PLANNER_MODEL", "OPENROUTER_MODEL"),
+    temperature: 0.2,
+    demoFallback: () => buildDemoPlannerResult(plannerInput),
+    messages: [
+      { role: "system", content: buildPlannerSystemPrompt() },
+      { role: "user", content: buildPlannerUserPrompt(plannerInput) },
+    ],
+  });
+  return normalizePlannerResult(result, plannerInput);
+}
+
+function buildBuilderSystemPrompt() {
+  return [
+    "You are the Builder LLM for an admin preview workbench.",
+    "Persona: a brand-first preview designer-builder who turns an approved requirement plan into a persuasive page draft inside an existing slot/component system.",
+    "This product is for customer-facing preview proposals, not full production redesigns.",
+    "Your responsibilities are: map the approved plan onto the allowed slot structure, choose the best available editing tool for the intended visual change, generate supported operations, and report what changed and why.",
+    "Your non-responsibilities are: reinterpreting the raw customer request, inventing unsupported slots, rewriting product facts, or performing arbitrary full-page generation outside the system context.",
+    "Use only allowed slots and supported operation formats.",
+    "Respect the provided target scope. If the system context is limited to selected components, do not create operations for anything outside that scope.",
+    "Prioritize brand design first. Do not flatten the result into overly conservative output if the approved designChangeLevel calls for stronger visual exploration.",
+    "Respect the approved designChangeLevel and its profile. Low means light refinement, medium means controlled but noticeable improvement, high means strong visual exploration inside the brand/system baseline.",
+    "Prefer high-signal supported changes over arbitrary generation. Source switching and component patches may be used assertively when they fit the approved change profile.",
+    "Prefer update_component_patch when you need to change multiple supported root/style fields together on one slot.",
+    "Preserve facts about products, prices, and specs.",
+    "Return JSON only.",
+    "Required top-level keys: summary, buildResult.",
+    "Required buildResult keys: proposedVersionLabel, changedTargets, operations, report.",
+  ].join(" ");
+}
+
+function buildBuilderUserPrompt(builderInput) {
+  return [
+    "Use the following approved plan and system context to produce a preview build draft.",
+    "Use the brand baseline as the design anchor, and use the approved change profile to decide how far the visual direction should move.",
+    "Use the provided designToolContext as the only allowed tool surface and follow its workflow order, patch strategy, and change profile.",
+    "If the approved plan is valid but no safe operation is possible, return an empty operations array and explain why in the report.",
+    JSON.stringify(builderInput, null, 2),
+  ].join("\n\n");
+}
+
+function normalizeVersionLabel(value, fallback = "draft-v1") {
+  const next = String(value || fallback)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return next || fallback;
+}
+
+function buildDemoBuilderResult(builderInput = {}) {
+  const pageId = String(builderInput?.pageContext?.workspacePageId || "").trim();
+  const pageLabel = String(builderInput?.pageContext?.pageLabel || pageId || "page").trim();
+  const approvedPlan = builderInput?.approvedPlan || {};
+  const designChangeLevel = normalizeDesignChangeLevel(
+    builderInput?.generationOptions?.designChangeLevel || approvedPlan?.designChangeLevel,
+    "medium"
+  );
+  const editableComponents = Array.isArray(builderInput?.systemContext?.editableComponents)
+    ? builderInput.systemContext.editableComponents
+    : [];
+  const preferredSlots = [
+    ...toStringArray(approvedPlan?.builderBrief?.suggestedFocusSlots),
+    ...((Array.isArray(approvedPlan?.priority) ? approvedPlan.priority : []).map((item) => String(item?.target || "").trim()).filter(Boolean)),
+  ];
+  const normalizedSlots = Array.from(new Set(preferredSlots)).filter(Boolean);
+  const operations = [];
+  const changedTargets = [];
+
+  const pushTextOp = (slotId, field, value) => {
+    const editable = editableComponents.find((item) => String(item?.slotId || "").trim() === slotId);
+    if (!editable || !String(value || "").trim()) return false;
+    const patchSchema = editable.patchSchema || { rootKeys: [], styleKeys: [] };
+    const normalizedField = field === "headline" ? "title" : field;
+    if (!Array.isArray(patchSchema.rootKeys) || !patchSchema.rootKeys.includes(normalizedField)) return false;
+    operations.push({
+      action: "update_slot_text",
+      pageId,
+      slotId,
+      field: normalizedField,
+      value: String(value).trim(),
+    });
+    changedTargets.push({
+      slotId,
+      componentId: editable.componentId,
+      changeType: "component_patch",
+    });
+    return true;
+  };
+
+  const pushPatchOp = (slotId, patchInput = {}) => {
+    const editable = editableComponents.find((item) => String(item?.slotId || "").trim() === slotId);
+    if (!editable) return false;
+    const patchSchema = editable.patchSchema || { rootKeys: [], styleKeys: [] };
+    const rootKeys = new Set(Array.isArray(patchSchema.rootKeys) ? patchSchema.rootKeys : []);
+    const styleKeys = new Set(Array.isArray(patchSchema.styleKeys) ? patchSchema.styleKeys : []);
+    const sourcePatch = patchInput && typeof patchInput === "object" ? patchInput : {};
+    const nextPatch = {};
+    for (const [key, value] of Object.entries(sourcePatch)) {
+      if (key === "styles" && value && typeof value === "object") {
+        const nextStyles = Object.fromEntries(
+          Object.entries(value).filter(([styleKey, styleValue]) => styleKeys.has(styleKey) && String(styleValue ?? "").trim() !== "")
+        );
+        if (Object.keys(nextStyles).length) nextPatch.styles = nextStyles;
+        continue;
+      }
+      if (!rootKeys.has(key)) continue;
+      if (typeof value === "undefined" || value === null || String(value).trim() === "") continue;
+      nextPatch[key] = value;
+    }
+    if (!Object.keys(nextPatch).length) return false;
+    operations.push({
+      action: "update_component_patch",
+      pageId,
+      slotId,
+      patch: nextPatch,
+    });
+    changedTargets.push({
+      slotId,
+      componentId: editable.componentId,
+      changeType: "component_patch",
+    });
+    return true;
+  };
+
+  const objective = String(approvedPlan?.builderBrief?.objective || "").trim();
+  const designLead = toStringArray(approvedPlan?.designDirection)[0] || "";
+  const requestLead = toStringArray(approvedPlan?.requestSummary)[0] || "";
+  const slotLimit = designChangeLevel === "low" ? 1 : designChangeLevel === "high" ? 4 : 2;
+
+  for (const slotId of normalizedSlots.slice(0, slotLimit)) {
+    if (slotId === "summary" || slotId === "hero" || slotId === "banner") {
+      pushTextOp(slotId, "title", objective || requestLead || `${pageLabel} 방향 강화`);
+      pushTextOp(slotId, "subtitle", designLead || "고객 프리뷰용 방향 제안");
+      continue;
+    }
+    if (slotId === "price" || slotId === "sticky") {
+      pushTextOp(slotId, "title", objective || "핵심 메시지 정리");
+      continue;
+    }
+    if (slotId === "review" || slotId === "qna") {
+      pushTextOp(slotId, "title", requestLead || `${slotId} 섹션 톤 정리`);
+      continue;
+    }
+    const stylePatch = {};
+    if (designChangeLevel === "high") {
+      stylePatch.titleWeight = "700";
+      stylePatch.titleSize = "28";
+      stylePatch.subtitleSize = "16";
+    } else if (designChangeLevel === "medium") {
+      stylePatch.titleWeight = "600";
+      stylePatch.titleSize = "24";
+      stylePatch.subtitleSize = "15";
+    }
+    pushPatchOp(slotId, {
+      title: objective || requestLead || `${slotId} 방향 정리`,
+      subtitle: designLead || "",
+      description: requestLead || "",
+      badge: approvedPlan?.requestSummary?.[0] || "",
+      ctaLabel: "자세히 보기",
+      moreLabel: "더보기",
+      styles: stylePatch,
+    });
+  }
+
+  const uniqueTargets = [];
+  const targetSeen = new Set();
+  for (const item of changedTargets) {
+    const key = `${item.slotId}:${item.componentId}:${item.changeType}`;
+    if (targetSeen.has(key)) continue;
+    targetSeen.add(key);
+    uniqueTargets.push(item);
+  }
+  const versionLabelHint = String(builderInput?.generationOptions?.versionLabelHint || "").trim();
+  const labelCore = normalizeVersionLabel(versionLabelHint || objective || pageId || "draft-v1");
+  return {
+    summary: `${pageLabel} 시안 생성 완료`,
+    buildResult: {
+      proposedVersionLabel: `${pageId || "page"}_${labelCore}`,
+      changedTargets: uniqueTargets.slice(0, 8),
+      operations: operations.slice(0, 12),
+      report: {
+        whatChanged: uniqueTargets.slice(0, 4).map((item) => `${item.slotId} 영역 시안 조정`),
+        whyChanged: [
+          `승인된 Planner 정리본과 designChangeLevel=${designChangeLevel} 기준으로 집중 slot만 반영`,
+        ],
+        assumptions: [
+          "가격/스펙 같은 사실 데이터는 유지",
+        ],
+        guardrailCheck: toStringArray(approvedPlan?.guardrails).map((rule) => ({
+          rule,
+          status: "pass",
+        })),
+      },
+    },
+  };
+}
+
+function normalizeBuilderResult(result, builderInput = {}) {
+  const source = result && typeof result === "object" ? result : {};
+  const buildResult = source.buildResult && typeof source.buildResult === "object" ? source.buildResult : {};
+  const pageId = String(builderInput?.pageContext?.workspacePageId || "").trim();
+  const pageLabel = String(builderInput?.pageContext?.pageLabel || pageId || "page").trim();
+  const operations = Array.isArray(buildResult.operations) ? buildResult.operations.filter((item) => item && typeof item === "object") : [];
+  const changedTargets = Array.isArray(buildResult.changedTargets) ? buildResult.changedTargets.filter((item) => item && typeof item === "object") : [];
+  const report = buildResult.report && typeof buildResult.report === "object" ? buildResult.report : {};
+  return {
+    summary: String(source.summary || `${pageLabel} 시안 생성 완료`).trim(),
+    buildResult: {
+      proposedVersionLabel: String(buildResult.proposedVersionLabel || `${pageId || "page"}_draft-v1`).trim(),
+      changedTargets: changedTargets.map((item) => ({
+        slotId: String(item.slotId || "").trim(),
+        componentId: String(item.componentId || "").trim(),
+        changeType: String(item.changeType || "component_patch").trim(),
+      })).filter((item) => item.slotId || item.componentId),
+      operations,
+      report: {
+        whatChanged: toStringArray(report.whatChanged),
+        whyChanged: toStringArray(report.whyChanged),
+        assumptions: toStringArray(report.assumptions),
+        guardrailCheck: Array.isArray(report.guardrailCheck) ? report.guardrailCheck : [],
+      },
+    },
+  };
+}
+
+async function handleLlmBuildOnData(builderInput, currentData) {
+  const result = await callOpenRouterJson({
+    model: resolveOpenRouterModel("BUILDER_MODEL", "OPENROUTER_MODEL"),
+    temperature: 0.15,
+    demoFallback: () => buildDemoBuilderResult(builderInput),
+    messages: [
+      { role: "system", content: buildBuilderSystemPrompt() },
+      { role: "user", content: buildBuilderUserPrompt(builderInput) },
+    ],
+  });
+  const normalizedResult = normalizeBuilderResult(result, builderInput);
+  const current = normalizeEditableData(currentData || {});
+  const next = applyOperations(current, normalizedResult.buildResult.operations || []);
+  return {
+    summary: normalizedResult.summary,
+    buildResult: normalizedResult.buildResult,
+    operations: normalizedResult.buildResult.operations || [],
+    data: next,
+  };
+}
+
 function applyOperations(data, operations) {
   let next = JSON.parse(JSON.stringify(data));
 
@@ -997,6 +1519,14 @@ function applyOperations(data, operations) {
               : null;
       if (!patchField) continue;
       next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, { [patchField]: op.value });
+      continue;
+    }
+
+    if (op.action === "update_component_patch") {
+      const slot = findSlotConfig(next, op.pageId, op.slotId);
+      if (!slot || !op.patch || typeof op.patch !== "object") continue;
+      const sourceId = String(slot.activeSourceId || "").trim();
+      next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, op.patch);
       continue;
     }
 
@@ -1066,6 +1596,8 @@ async function handleLlmChangeOnData(requestText, currentData) {
 module.exports = {
   handleLlmChange,
   handleLlmChangeOnData,
+  handleLlmPlan,
+  handleLlmBuildOnData,
   normalizeEditableData,
   readEditableData,
   writeEditableData,

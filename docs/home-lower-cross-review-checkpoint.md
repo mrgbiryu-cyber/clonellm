@@ -1,5 +1,9 @@
 # Home Lower Cross Review Checkpoint
 
+> 문서 상태:
+> 이 문서는 홈 하단 섹션 검토 과정의 크로스 리뷰 체크포인트 문서다.
+> 아래 판단과 수치, `현재` 표현은 작성 시점 기준일 수 있으므로, 최신 구현 기준은 `docs/decision-history.md`와 최신 acceptance 문서를 우선한다.
+
 이 문서는 홈 하단 섹션 진행 방식이 정상 흐름인지, 아니면 별도 점검 지점인지 판단하기 위한 크로스 리뷰 기준 문서다.
 
 대상:
@@ -9,9 +13,9 @@
 3. `summary-banner-2`
 4. `space-renewal`
 
-## 1. 질문의 핵심
+## 1. 당시 질문의 핵심
 
-현재 의문은 이거다.
+당시 의문은 이거다.
 
 1. 위쪽 섹션들은 비교적 빨리 맞춰졌는데
 2. 하단 섹션들은 수정 과정이 오래 걸리고 있으며
@@ -74,11 +78,11 @@
 
 즉 하단이 오래 걸린 이유는 단순 구현 난이도보다, reference baseline을 믿을 수 있게 만드는 작업이 먼저 필요했기 때문이다.
 
-## 5. 현재 판단: 정상 진행 vs 점검 필요
+## 5. 당시 판단: 정상 진행 vs 점검 필요
 
 ### 5.1 정상 진행으로 볼 수 있는 부분
 
-아래 항목은 현재 흐름이 정상이다.
+아래 항목은 당시 흐름 기준으로 정상으로 판단했다.
 
 1. `smart-life`
    - current live story data까지 sync했다
@@ -93,7 +97,7 @@
 
 즉 이 셋은 “느리지만 정상적인 하단 튜닝 흐름” 안에 있다.
 
-### 5.2 점검 필요로 봐야 하는 부분
+### 5.2 별도 점검이 필요하다고 본 부분
 
 `space-renewal`은 별도로 봐야 한다.
 
@@ -109,21 +113,21 @@
 즉 `space-renewal`은 “진행이 느린 것”이라기보다,
 이제는 `별도 체크포인트`로 분리해야 하는 상태다.
 
-## 6. space-renewal 현재 상태
+## 6. space-renewal 당시 상태
 
-현재 수치:
+당시 수치:
 
 1. `space-renewal`은 item geometry 기준으로는 live와 거의 맞췄다
 2. 다만 최신 screenshot diff는 `89.77%`까지 튈 수 있다
 3. 이 값은 실제 layout 붕괴보다는 live reference artifact 불안정의 영향이 크다
 
-이미 된 것:
+당시 기준으로 이미 된 것:
 
 1. raw mobile replay 기반 구조 보정
 2. `list_inner` 폭, item 폭, first card hero layout, 2/3번째 compact row layout까지 live geometry에 맞춤
 3. 카드 개수와 카드별 높이도 live와 동일하게 맞춤
 
-하지만 현재 남아 있는 핵심은 layout보다 capture/reference 축이다.
+하지만 당시 남아 있던 핵심은 layout보다 capture/reference 축이었다.
 
 1. `space-renewal` live mobile reference는 이미지 DOM이 `visibility:hidden`, `naturalWidth=0`인 placeholder 상태로 잡힌다
 2. clone은 실제 product image를 정상 렌더한다
@@ -133,7 +137,7 @@
 즉 `space-renewal`은 이제 “계속 CSS를 더 만져야 하는가”보다
 “현재 diff가 실제 시각 품질을 얼마나 제대로 반영하느냐”를 먼저 따져야 하는 단계다.
 
-## 7. 현재 하단 diff 스냅샷
+## 7. 당시 하단 diff 스냅샷
 
 1. `smart-life 6.41%`
 2. `subscription 4.69%`

@@ -42,7 +42,7 @@
       const gridEl = document.getElementById("grid");
       const heroEl = document.getElementById("hero");
       const startBtn = document.getElementById("startBtn");
-      fetch("/api/data")
+      fetch("/api/data?includeCoverage=1")
         .then((r) => r.json())
         .then((data) => {
           const pages = data.pages || [];

@@ -2,6 +2,11 @@
 
 Schema version: `v3`
 
+> 문서 상태:
+> 이 문서는 slot snapshot 스키마 설계 문서다.
+> 아래 JSON의 빈 배열은 실제 런타임 기본값이라기보다 스키마 shape 설명용 예시다.
+> 구현 시에는 최신 registry/slot 규칙과 함께 해석해야 한다.
+
 ## 목적
 - DOM만 읽어서 복원하지 않고, 화면 구조를 `slot` 단위로 고정한다.
 - `reference`와 `working`을 같은 기준으로 비교한다.
@@ -25,6 +30,10 @@ Schema version: `v3`
 - 동일한 slot에 대해 PC/MO source set을 누적할 수 있어야 한다.
 
 ## 최상위 모델
+
+예시 주의:
+1. 아래 JSON은 스키마 shape 설명용 샘플이다.
+2. `zones`, `slots`, `states`, `groups`, `rules`, `validation`의 빈 배열은 production에서 비어 있어야 한다는 뜻이 아니다.
 ```json
 {
   "schemaVersion": "v3",

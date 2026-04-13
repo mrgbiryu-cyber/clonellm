@@ -3,7 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
 const crypto = require("crypto");
-const { handleLlmChange, handleLlmChangeOnData, readEditableData, writeEditableData } = require("./llm");
+const { handleLlmChange, handleLlmChangeOnData, handleLlmPlan, handleLlmBuildOnData, normalizeEditableData, readEditableData, writeEditableData } = require("./llm");
+const { analyzeReferenceUrls, buildGuardrailBundle } = require("./planner-tools");
 const {
   getUserFromRequest,
   registerUser,
@@ -17,6 +18,14 @@ const {
   logEvent,
   readUserActivity,
   sanitizeUser,
+  listRequirementPlans,
+  saveRequirementPlan,
+  listDraftBuilds,
+  saveDraftBuild,
+  listSavedVersions,
+  saveSavedVersion,
+  pinSavedVersion,
+  getPinnedView,
 } = require("./auth");
 
 const HOST = "0.0.0.0";
@@ -46,6 +55,37 @@ const CURRENT_LIVE_HOME_DOM_PATH = path.join(ROOT, "data", "debug", "live-home-c
 const DEFAULT_CANVAS_WIDTH = 1460;
 const DEFAULT_COMPARE_CANVAS_HEIGHT = 2600;
 const LIVE_MEASUREMENTS = new Map();
+const PAGE_COMPUTE_CACHE_TTL_MS = 15000;
+const WORKING_COMPONENT_INVENTORY_CACHE = new Map();
+const WORKING_EDITABILITY_CACHE = new Map();
+const PRE_LLM_GAP_CACHE = new Map();
+const ACCEPTANCE_RESULTS_CACHE = new Map();
+
+function readCachedValue(cache, key, compute, ttlMs = PAGE_COMPUTE_CACHE_TTL_MS) {
+  const now = Date.now();
+  const cached = cache.get(key);
+  if (cached && now - cached.at <= ttlMs) {
+    return cached.value;
+  }
+  const value = compute();
+  cache.set(key, { at: now, value });
+  return value;
+}
+
+function buildWorkspacePageCacheKey(editableData, pageId, scope = "") {
+  const registry = findSlotRegistry(editableData || {}, pageId);
+  const slotState = (registry?.slots || []).map((slot) => `${slot.slotId}:${slot.activeSourceId || ""}`).join("|");
+  const patchState = listComponentPatches(editableData || {}, pageId)
+    .map((item) => `${item.componentId}:${item.sourceId || ""}:${item.updatedAt || ""}`)
+    .join("|");
+  const acceptanceState = Array.isArray(editableData?.acceptanceResults)
+    ? editableData.acceptanceResults
+        .filter((item) => !pageId || String(item.pageId || "").trim() === String(pageId || "").trim())
+        .map((item) => `${item.bundleId}:${item.status}:${item.updatedAt || ""}`)
+        .join("|")
+    : "";
+  return [scope, pageId, slotState, patchState, acceptanceState].join("::");
+}
 
 function sendJson(res, status, payload) {
   const body = JSON.stringify(payload, null, 2);
@@ -102,13 +142,98 @@ function readDataForRequest(req) {
   return {
     user,
     workspace,
-    data: JSON.parse(JSON.stringify(workspace.data || readEditableData())),
+    data: normalizeEditableData(JSON.parse(JSON.stringify(workspace.data || readEditableData()))),
     source: "user-workspace",
   };
 }
 
+function clonePlain(value, fallback) {
+  if (typeof value === "undefined") return fallback;
+  try {
+    return JSON.parse(JSON.stringify(value));
+  } catch {
+    return fallback;
+  }
+}
+
+function extractPageScopedSnapshot(editableData, pageId) {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return null;
+  const page = (editableData?.pages || []).find((item) => item.id === normalizedPageId) || null;
+  const slotRegistry = (editableData?.slotRegistries || []).find((item) => item.pageId === normalizedPageId) || null;
+  const componentPatches = (editableData?.componentPatches || []).filter((item) => String(item.pageId || "").trim() === normalizedPageId);
+  return {
+    pageId: normalizedPageId,
+    page: clonePlain(page, null),
+    slotRegistry: clonePlain(slotRegistry, null),
+    componentPatches: clonePlain(componentPatches, []),
+  };
+}
+
+function applyPageScopedSnapshot(editableData, snapshot, pageId) {
+  const normalizedPageId = String(pageId || snapshot?.pageId || "").trim();
+  if (!normalizedPageId || !snapshot || typeof snapshot !== "object") {
+    return normalizeEditableData(clonePlain(editableData, {}));
+  }
+  const next = normalizeEditableData(clonePlain(editableData, {}));
+  if (snapshot.page && typeof snapshot.page === "object") {
+    const pageIndex = (next.pages || []).findIndex((item) => item.id === normalizedPageId);
+    if (pageIndex >= 0) next.pages[pageIndex] = clonePlain(snapshot.page, next.pages[pageIndex]);
+    else next.pages.push(clonePlain(snapshot.page, null));
+  }
+  if (snapshot.slotRegistry && typeof snapshot.slotRegistry === "object") {
+    const registryIndex = (next.slotRegistries || []).findIndex((item) => item.pageId === normalizedPageId);
+    if (registryIndex >= 0) next.slotRegistries[registryIndex] = clonePlain(snapshot.slotRegistry, next.slotRegistries[registryIndex]);
+    else next.slotRegistries.push(clonePlain(snapshot.slotRegistry, null));
+  }
+  if (Array.isArray(snapshot.componentPatches)) {
+    next.componentPatches = (next.componentPatches || []).filter((item) => String(item.pageId || "").trim() !== normalizedPageId);
+    next.componentPatches.push(...clonePlain(snapshot.componentPatches, []));
+  }
+  return normalizeEditableData(next);
+}
+
+function resolvePinnedDataForPage(req, pageId) {
+  const payload = readDataForRequest(req);
+  const normalizedPageId = String(pageId || "").trim();
+  if (!payload.user || !normalizedPageId) return payload;
+  const pinned = getPinnedView(payload.user.userId, normalizedPageId);
+  const pageSnapshot = pinned?.version?.snapshotData?.pageSnapshot || null;
+  if (!pageSnapshot) {
+    return {
+      ...payload,
+      pinnedView: pinned,
+      effectiveSource: payload.source,
+    };
+  }
+  return {
+    ...payload,
+    data: applyPageScopedSnapshot(payload.data, pageSnapshot, normalizedPageId),
+    pinnedView: pinned,
+    effectiveSource: `${payload.source}:pinned-view`,
+  };
+}
+
+function readWorkspaceData(userId) {
+  return normalizeEditableData(JSON.parse(JSON.stringify(getWorkspace(userId).data || readEditableData())));
+}
+
 function saveDataForUser(user, data, summary) {
   return saveWorkspace(user.userId, data, summary);
+}
+
+function buildWorkspaceMetaSummary(workspace) {
+  if (!workspace) return null;
+  return {
+    updatedAt: workspace.updatedAt || null,
+    llmUsageCount: Number(workspace.llmUsageCount || 0),
+    workHistory: (workspace.workHistory || []).slice(0, 20),
+    requirementPlanCount: Array.isArray(workspace.requirementPlans) ? workspace.requirementPlans.length : 0,
+    draftBuildCount: Array.isArray(workspace.draftBuilds) ? workspace.draftBuilds.length : 0,
+    savedVersionCount: Array.isArray(workspace.savedVersions) ? workspace.savedVersions.length : 0,
+    pinnedViewPageCount: workspace.pinnedViewsByPage ? Object.keys(workspace.pinnedViewsByPage).length : 0,
+    pinnedViewsByPage: workspace.pinnedViewsByPage || {},
+  };
 }
 
 function escapeHtml(value) {
@@ -155,6 +280,13 @@ function slugLoose(input) {
     .replace(/[^a-zA-Z0-9가-힣]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
+}
+
+function safeArray(values, limit = 20) {
+  return Array.from(new Set((Array.isArray(values) ? values : []).map((item) => String(item || "").trim()).filter(Boolean))).slice(
+    0,
+    limit
+  );
 }
 
 function archiveSlugFromUrl(rawUrl) {
@@ -525,11 +657,13 @@ function buildPdpWorkbench(pageId, viewportProfile) {
   const targets = readWorkbenchTargets();
   const normalizedPageId = String(pageId || "category-tvs").trim() || "category-tvs";
   const normalizedViewportProfile = String(viewportProfile || "pc").trim() || "pc";
+  const pdpContext = resolvePdpRuntimeContext(normalizedPageId);
+  const workbenchPageId = pdpContext?.runtimePageId || normalizedPageId;
   const pdpTarget = (targets.pdpTargets || []).find(
-    (item) => item.pageId === normalizedPageId && item.viewportProfile === normalizedViewportProfile
+    (item) => item.pageId === workbenchPageId && item.viewportProfile === normalizedViewportProfile
   ) || null;
   const plpTarget = (targets.plpTargets || []).find(
-    (item) => item.pageId === normalizedPageId && item.viewportProfile === normalizedViewportProfile
+    (item) => item.pageId === workbenchPageId && item.viewportProfile === normalizedViewportProfile
   ) || null;
   const checks = [];
   if (!pdpTarget) {
@@ -551,11 +685,20 @@ function buildPdpWorkbench(pageId, viewportProfile) {
       detail: pdpTarget.fallbackUsed ? "using fallback representative set" : "direct representative set",
     });
   }
-  const captures = (pdpTarget?.representativeProducts || []).map((item) => {
-    const matched = findPdpVisualCapture(normalizedPageId, normalizedViewportProfile, item.href, "reference");
-    const working = findPdpVisualCapture(normalizedPageId, normalizedViewportProfile, item.href, "working");
-    const referenceGroups = findPdpGroupEntry(normalizedPageId, normalizedViewportProfile, item.href, "reference");
-    const workingGroups = findPdpGroupEntry(normalizedPageId, normalizedViewportProfile, item.href, "working");
+  const representativeProducts = pdpContext
+    ? [
+        {
+          href: pdpContext.href,
+          pathname: pdpContext.route,
+          text: pdpContext.title,
+        },
+      ]
+    : (pdpTarget?.representativeProducts || []);
+  const captures = representativeProducts.map((item) => {
+    const matched = findPdpVisualCapture(workbenchPageId, normalizedViewportProfile, item.href, "reference");
+    const working = findPdpVisualCapture(workbenchPageId, normalizedViewportProfile, item.href, "working");
+    const referenceGroups = findPdpGroupEntry(workbenchPageId, normalizedViewportProfile, item.href, "reference");
+    const workingGroups = findPdpGroupEntry(workbenchPageId, normalizedViewportProfile, item.href, "working");
     const groupChecks = buildPdpGroupChecks(referenceGroups?.groups, workingGroups?.groups);
     return {
       ...item,
@@ -613,6 +756,7 @@ function buildPdpWorkbench(pageId, viewportProfile) {
   }
   return {
     pageId: normalizedPageId,
+    runtimePageId: workbenchPageId,
     viewportProfile: normalizedViewportProfile,
     generatedAt: targets.generatedAt || null,
     pdpTarget,
@@ -2157,6 +2301,58 @@ function readCloneSourceHtmlByPageId(pageId, viewportProfile = "pc") {
   return readArchiveHtmlByPageId(pageId);
 }
 
+const PDP_CASE_PAGE_CONFIG = {
+  "pdp-tv-general": {
+    runtimePageId: "category-tvs",
+    href: "https://www.lge.co.kr/tvs/32lq635bkna-stand",
+    title: "PDP - TV 일반형",
+  },
+  "pdp-tv-premium": {
+    runtimePageId: "category-tvs",
+    href: "https://www.lge.co.kr/tvs/oled97g5kna-stand",
+    title: "PDP - TV 프리미엄형",
+  },
+  "pdp-refrigerator-general": {
+    runtimePageId: "category-refrigerators",
+    href: "https://www.lge.co.kr/refrigerators/t873mee111",
+    title: "PDP - 냉장고 일반형",
+  },
+  "pdp-refrigerator-knockon": {
+    runtimePageId: "category-refrigerators",
+    href: "https://www.lge.co.kr/refrigerators/t875mee412",
+    title: "PDP - 냉장고 노크온형",
+  },
+  "pdp-refrigerator-glass": {
+    runtimePageId: "category-refrigerators",
+    href: "https://www.lge.co.kr/refrigerators/h875gbb111",
+    title: "PDP - 냉장고 글라스형",
+  },
+};
+
+function isPdpCasePageId(pageId) {
+  return Boolean(PDP_CASE_PAGE_CONFIG[String(pageId || "").trim()]);
+}
+
+function resolvePdpRuntimeContext(pageId, href = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  const config = PDP_CASE_PAGE_CONFIG[normalizedPageId];
+  if (!config) return null;
+  const resolvedHref = String(href || config.href || "").trim() || String(config.href || "").trim();
+  let route = "/";
+  try {
+    route = new URL(resolvedHref).pathname || "/";
+  } catch {
+    route = "/";
+  }
+  return {
+    workspacePageId: normalizedPageId,
+    runtimePageId: String(config.runtimePageId || "").trim(),
+    href: resolvedHref,
+    route,
+    title: String(config.title || normalizedPageId).trim(),
+  };
+}
+
 function resolveBaselineInfo(pageId) {
   const normalized = String(pageId || "home").trim() || "home";
   if (normalized === "home") {
@@ -2206,6 +2402,17 @@ function resolveBaselineInfo(pageId) {
         source: "rule:mobile-category",
       };
     }
+  }
+  const pdpContext = resolvePdpRuntimeContext(normalized);
+  if (pdpContext) {
+    return {
+      pageId: normalized,
+      url: pdpContext.href,
+      route: pdpContext.route,
+      mode: "product-detail",
+      source: "rule:pdp-case",
+      runtimePageId: pdpContext.runtimePageId,
+    };
   }
   const archive = getArchiveRowByPageId(normalized);
   if (archive?.url) {
@@ -2888,6 +3095,73 @@ function buildWorkingInteractionSnapshot(pageId) {
     };
   }
 
+  if (isPdpCasePageId(pageId)) {
+    return {
+      pageId,
+      source: "working",
+      url: baseline.url,
+      mode: baseline.mode,
+      interactions: [
+        {
+          interactionId: "pdp.gallery.carousel",
+          kind: "carousel",
+          slotId: "gallery",
+          trigger: { type: "swipe-or-click", target: "gallery-main" },
+          result: { area: "gallery", viewportProfiles: ["pc", "mo"] },
+        },
+        {
+          interactionId: "pdp.summary.default",
+          kind: "summary-default",
+          slotId: "summary",
+          trigger: { type: "default", target: "product-summary" },
+          result: { section: "summary" },
+        },
+        {
+          interactionId: "pdp.price.default",
+          kind: "price-default",
+          slotId: "price",
+          trigger: { type: "default", target: "price-box" },
+          result: { section: "price" },
+        },
+        {
+          interactionId: "pdp.gallery.thumbnail.sync",
+          kind: "thumbnail-sync",
+          slotId: "gallery",
+          trigger: { type: "click", target: "gallery-thumbnail" },
+          result: { area: "gallery", viewportProfiles: ["pc"] },
+        },
+        {
+          interactionId: "pdp.option.select",
+          kind: "select",
+          slotId: "option",
+          trigger: { type: "click-or-change", target: "option-selector" },
+          result: { affects: ["summary", "price", "option"] },
+        },
+        {
+          interactionId: "pdp.sticky.buybox",
+          kind: "sticky-buybox",
+          slotId: "sticky",
+          trigger: { type: "scroll", target: "buybox-sticky" },
+          result: { section: "sticky" },
+        },
+        {
+          interactionId: "pdp.review.expand",
+          kind: "expand",
+          slotId: "review",
+          trigger: { type: "click", target: "review-more" },
+          result: { section: "review" },
+        },
+        {
+          interactionId: "pdp.qna.expand",
+          kind: "expand",
+          slotId: "qna",
+          trigger: { type: "click", target: "qna-more" },
+          result: { section: "qna" },
+        },
+      ],
+    };
+  }
+
   if (String(pageId || "").startsWith("category-")) {
     return {
       pageId,
@@ -2915,41 +3189,6 @@ function buildWorkingInteractionSnapshot(pageId) {
           slotId: "firstProduct",
           trigger: { type: "hover", target: "product-card" },
           result: { visualState: "hover" },
-        },
-        {
-          interactionId: "pdp.gallery.carousel",
-          kind: "carousel",
-          slotId: "gallery",
-          trigger: { type: "swipe-or-click", target: "gallery-main" },
-          result: { area: "gallery", viewportProfiles: ["pc", "mo"] },
-        },
-        {
-          interactionId: "pdp.gallery.thumbnail.sync",
-          kind: "thumbnail-sync",
-          slotId: "gallery",
-          trigger: { type: "click", target: "gallery-thumbnail" },
-          result: { area: "gallery", viewportProfiles: ["pc"] },
-        },
-        {
-          interactionId: "pdp.option.select",
-          kind: "select",
-          slotId: "option",
-          trigger: { type: "click-or-change", target: "option-selector" },
-          result: { affects: ["summary", "price", "option"] },
-        },
-        {
-          interactionId: "pdp.review.expand",
-          kind: "expand",
-          slotId: "review",
-          trigger: { type: "click", target: "review-more" },
-          result: { section: "review" },
-        },
-        {
-          interactionId: "pdp.qna.expand",
-          kind: "expand",
-          slotId: "qna",
-          trigger: { type: "click", target: "qna-more" },
-          result: { section: "qna" },
         },
       ],
     };
@@ -3013,59 +3252,62 @@ function buildWorkingInteractionSnapshot(pageId) {
 
 function buildWorkingComponentInventory(pageId, options = {}) {
   const editableData = options.editableData || null;
-  const slotsSnapshot = buildWorkingSlotSnapshot(pageId);
-  const interactionsSnapshot = buildWorkingInteractionSnapshot(pageId);
-  const interactions = interactionsSnapshot?.interactions || [];
-  const slots = (slotsSnapshot?.slots || []).length
-    ? slotsSnapshot.slots
-    : buildDerivedWorkingSlots(pageId, interactions);
-  const sourceMode = resolveBaselineInfo(pageId).mode === "mobile" ? "mobile-derived" : "pc-like";
-  const activeSourceOverrides = new Map(
-    ((findSlotRegistry(editableData || {}, pageId)?.slots) || [])
-      .filter((slot) => String(slot.slotId || "").trim() && String(slot.activeSourceId || "").trim())
-      .map((slot) => [String(slot.slotId).trim(), String(slot.activeSourceId).trim()])
-  );
-  const normalizedSlots = slots.map((slot) => {
-    const fallbackSourceId = slot.sourceId || slot.layout?.sourceId || sourceMode;
-    const overriddenSourceId = activeSourceOverrides.get(String(slot.slotId || "").trim()) || fallbackSourceId;
+  const cacheKey = buildWorkspacePageCacheKey(editableData || {}, pageId, "component-inventory");
+  return readCachedValue(WORKING_COMPONENT_INVENTORY_CACHE, cacheKey, () => {
+    const slotsSnapshot = buildWorkingSlotSnapshot(pageId);
+    const interactionsSnapshot = buildWorkingInteractionSnapshot(pageId);
+    const interactions = interactionsSnapshot?.interactions || [];
+    const slots = (slotsSnapshot?.slots || []).length
+      ? slotsSnapshot.slots
+      : buildDerivedWorkingSlots(pageId, interactions);
+    const sourceMode = resolveBaselineInfo(pageId).mode === "mobile" ? "mobile-derived" : "pc-like";
+    const activeSourceOverrides = new Map(
+      ((findSlotRegistry(editableData || {}, pageId)?.slots) || [])
+        .filter((slot) => String(slot.slotId || "").trim() && String(slot.activeSourceId || "").trim())
+        .map((slot) => [String(slot.slotId).trim(), String(slot.activeSourceId).trim()])
+    );
+    const normalizedSlots = slots.map((slot) => {
+      const fallbackSourceId = slot.sourceId || slot.layout?.sourceId || sourceMode;
+      const overriddenSourceId = activeSourceOverrides.get(String(slot.slotId || "").trim()) || fallbackSourceId;
+      return {
+        ...slot,
+        sourceId: overriddenSourceId,
+        layout: slot.layout ? { ...slot.layout, sourceId: overriddenSourceId } : slot.layout,
+      };
+    });
+    const components = normalizedSlots.map((slot) => {
+      const slotId = String(slot.slotId || "").trim();
+      const componentId = pageId === "home" ? `home.${slotId}` : `${pageId}.${slotId}`;
+      const activeSourceId = slot.sourceId || slot.layout?.sourceId || null;
+      const sourceResolution = resolveComponentSourceResolution(pageId, slotId, activeSourceId, editableData || {});
+      const componentPatch = findComponentPatch(editableData || {}, pageId, componentId, activeSourceId)?.patch || null;
+      return {
+        componentId,
+        pageId,
+        slotId,
+        activeSourceId,
+        activeSourceType: sourceResolution.activeSourceType || null,
+        sourceResolution: sourceResolution.sourceResolution || "missing",
+        renderMode: sourceResolution.renderMode || "missing",
+        resolvedRenderSourceId: sourceResolution.resolvedRenderSourceId || null,
+        resolvedRenderSourceType: sourceResolution.resolvedRenderSourceType || null,
+        sourceResolutionDetail: sourceResolution.detail || null,
+        containerMode: slot.containerMode || null,
+        kind: slot.kind || null,
+        itemCount: typeof slot.itemCount === "number" ? slot.itemCount : null,
+        hasPatch: Boolean(componentPatch && typeof componentPatch === "object" && Object.keys(componentPatch).length),
+        patchKeys: componentPatch && typeof componentPatch === "object" ? Object.keys(componentPatch) : [],
+        interactionIds: interactions
+          .filter((interaction) => String(interaction.slotId || "") === slotId)
+          .map((interaction) => interaction.interactionId),
+      };
+    });
     return {
-      ...slot,
-      sourceId: overriddenSourceId,
-      layout: slot.layout ? { ...slot.layout, sourceId: overriddenSourceId } : slot.layout,
-    };
-  });
-  const components = normalizedSlots.map((slot) => {
-    const slotId = String(slot.slotId || "").trim();
-    const componentId = pageId === "home" ? `home.${slotId}` : `${pageId}.${slotId}`;
-    const activeSourceId = slot.sourceId || slot.layout?.sourceId || null;
-    const sourceResolution = resolveComponentSourceResolution(pageId, slotId, activeSourceId, editableData || {});
-    const componentPatch = findComponentPatch(editableData || {}, pageId, componentId, activeSourceId)?.patch || null;
-    return {
-      componentId,
       pageId,
-      slotId,
-      activeSourceId,
-      activeSourceType: sourceResolution.activeSourceType || null,
-      sourceResolution: sourceResolution.sourceResolution || "missing",
-      renderMode: sourceResolution.renderMode || "missing",
-      resolvedRenderSourceId: sourceResolution.resolvedRenderSourceId || null,
-      resolvedRenderSourceType: sourceResolution.resolvedRenderSourceType || null,
-      sourceResolutionDetail: sourceResolution.detail || null,
-      containerMode: slot.containerMode || null,
-      kind: slot.kind || null,
-      itemCount: typeof slot.itemCount === "number" ? slot.itemCount : null,
-      hasPatch: Boolean(componentPatch && typeof componentPatch === "object" && Object.keys(componentPatch).length),
-      patchKeys: componentPatch && typeof componentPatch === "object" ? Object.keys(componentPatch) : [],
-      interactionIds: interactions
-        .filter((interaction) => String(interaction.slotId || "") === slotId)
-        .map((interaction) => interaction.interactionId),
+      source: "working",
+      components,
     };
   });
-  return {
-    pageId,
-    source: "working",
-    components,
-  };
 }
 
 function buildDerivedWorkingSlots(pageId, interactions = []) {
@@ -3089,7 +3331,28 @@ function buildDerivedWorkingSlots(pageId, interactions = []) {
     slotMap.set(key, { ...slotMap.get(key), ...patch });
   };
 
-  if (String(pageId || "").startsWith("category-")) {
+  if (isPdpCasePageId(pageId)) {
+    const pdpContext = resolvePdpRuntimeContext(pageId);
+    const groups =
+      (
+        findPdpGroupEntry(pdpContext?.runtimePageId || "", "pc", pdpContext?.href || "", "reference") ||
+        findPdpGroupEntry(pdpContext?.runtimePageId || "", "mo", pdpContext?.href || "", "reference")
+      )?.groups || {};
+    for (const [groupId, group] of Object.entries(groups)) {
+      if (!group?.found) continue;
+      addSlot(groupId, {
+        containerMode: groupId === "gallery" ? "full" : "narrow",
+        kind:
+          groupId === "gallery"
+            ? "gallery"
+            : groupId === "option"
+              ? "controls"
+              : groupId === "review" || groupId === "qna"
+                ? "content"
+                : "section",
+      });
+    }
+  } else if (String(pageId || "").startsWith("category-")) {
     const viewportProfile = baseline.mode === "mobile" ? "mo" : "pc";
     const workbench = buildPlpWorkbench(pageId, viewportProfile);
     const groups = workbench?.workingGroups?.groups || {};
@@ -3138,11 +3401,14 @@ function buildDerivedWorkingSlots(pageId, interactions = []) {
 }
 
 function buildWorkingEditableComponentCatalog(pageId, options = {}) {
-  const componentInventory = buildWorkingComponentInventory(pageId, options);
-  const catalog = (componentInventory.components || []).map((component) => {
-    const slotId = component.slotId;
-    const base = {
-      componentId: component.componentId,
+  const editableData = options.editableData || null;
+  const cacheKey = buildWorkspacePageCacheKey(editableData || {}, pageId, "component-editability");
+  return readCachedValue(WORKING_EDITABILITY_CACHE, cacheKey, () => {
+    const componentInventory = buildWorkingComponentInventory(pageId, options);
+    const catalog = (componentInventory.components || []).map((component) => {
+      const slotId = component.slotId;
+      const base = {
+        componentId: component.componentId,
       pageId,
       slotId,
       activeSourceId: component.activeSourceId,
@@ -3162,8 +3428,26 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
         base.editableProps = ["slides", "headline", "description", "badge", "image", "ctaHref"];
         base.editableStyles = ["height", "copyPosition", "indicatorStyle"];
         base.patchSchema = {
-          rootKeys: ["badge", "headline", "description", "ctaHref", "visibility"],
-          styleKeys: ["background", "radius", "height", "titleColor"],
+          rootKeys: ["badge", "headline", "description", "ctaHref", "ctaLabel", "visibility"],
+          styleKeys: [
+            "background",
+            "radius",
+            "height",
+            "minHeight",
+            "borderColor",
+            "borderWidth",
+            "borderStyle",
+            "boxShadow",
+            "padding",
+            "opacity",
+            "titleColor",
+            "subtitleColor",
+            "titleWeight",
+            "subtitleWeight",
+            "titleSize",
+            "subtitleSize",
+            "textAlign",
+          ],
         };
       } else if (slotId === "quickmenu") {
         base.editableProps = ["items", "title", "icon", "href"];
@@ -3172,8 +3456,8 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
         base.editableProps = ["tabs", "items", "badges", "rankVisual", "moreLink"];
         base.editableStyles = ["cardRadius", "rankPosition", "badgeStyle", "priceStyle"];
         base.patchSchema = {
-          rootKeys: ["title", "subtitle", "moreLabel", "visibility"],
-          styleKeys: ["background", "radius", "titleColor", "subtitleColor"],
+          rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+          styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
         };
       } else if (slotId === "summary-banner-2") {
         base.editableProps = ["items", "image", "href", "alt"];
@@ -3182,7 +3466,7 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
         base.editableProps = ["items", "title", "subtitle", "image", "href", "visibility"];
         base.editableStyles = ["width", "gap", "titleStyle", "cardStyle"];
       }
-    } else if (String(pageId || "").startsWith("category-")) {
+    } else if (String(pageId || "").startsWith("category-") || isPdpCasePageId(pageId)) {
       if (slotId === "filter" || slotId === "sort") {
         base.editableProps = ["filters", "sortOptions", "visibility"];
         base.editableStyles = ["panelStyle", "chipStyle", "spacing"];
@@ -3192,9 +3476,21 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
       } else if (slotId === "gallery") {
         base.editableProps = ["images", "thumbnailOrder", "visibility"];
         base.editableStyles = ["aspectRatio", "thumbnailStyle", "spacing"];
+      } else if (slotId === "summary") {
+        base.editableProps = ["title", "subtitle", "badges", "visibility"];
+        base.editableStyles = ["background", "radius", "titleStyle", "spacing"];
+      } else if (slotId === "price") {
+        base.editableProps = ["title", "subtitle", "visibility"];
+        base.editableStyles = ["background", "radius", "titleStyle", "spacing"];
       } else if (slotId === "option") {
         base.editableProps = ["options", "selectedOption", "visibility"];
         base.editableStyles = ["selectorStyle", "spacing"];
+      } else if (slotId === "sticky") {
+        base.editableProps = ["title", "subtitle", "visibility"];
+        base.editableStyles = ["background", "radius", "spacing"];
+      } else if (slotId === "review" || slotId === "qna") {
+        base.editableProps = ["title", "subtitle", "items", "visibility"];
+        base.editableStyles = ["background", "radius", "spacing", "titleStyle"];
       } else {
         base.editableProps = ["items", "badges", "href", "visibility"];
         base.editableStyles = ["gridColumns", "cardStyle", "spacing"];
@@ -3211,13 +3507,14 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
         base.editableStyles = ["cardStyle", "spacing", "titleStyle"];
       }
     }
-    return base;
+      return base;
+    });
+    return {
+      pageId,
+      source: "working",
+      components: catalog,
+    };
   });
-  return {
-    pageId,
-    source: "working",
-    components: catalog,
-  };
 }
 
 function sanitizeComponentPatch(inputPatch, patchSchema = {}) {
@@ -3241,6 +3538,37 @@ function sanitizeComponentPatch(inputPatch, patchSchema = {}) {
   return next;
 }
 
+const GENERIC_PATCH_ROOT_KEYS = [
+  "title",
+  "subtitle",
+  "description",
+  "badge",
+  "ctaLabel",
+  "ctaHref",
+  "moreLabel",
+  "visibility",
+];
+
+const GENERIC_PATCH_STYLE_KEYS = [
+  "background",
+  "radius",
+  "height",
+  "minHeight",
+  "borderColor",
+  "borderWidth",
+  "borderStyle",
+  "boxShadow",
+  "padding",
+  "opacity",
+  "titleColor",
+  "subtitleColor",
+  "titleWeight",
+  "subtitleWeight",
+  "titleSize",
+  "subtitleSize",
+  "textAlign",
+];
+
 function getGenericPatchSchema(pageId, slotId) {
   const normalizedPageId = String(pageId || "").trim();
   const normalizedSlotId = String(slotId || "").trim();
@@ -3249,28 +3577,28 @@ function getGenericPatchSchema(pageId, slotId) {
 
   if (normalizedPageId === "home") {
     return {
-      rootKeys: ["title", "subtitle", "visibility"],
-      styleKeys: ["background", "radius", "titleColor", "subtitleColor"],
+      rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+      styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
     };
   }
 
   if (normalizedPageId === "support") {
     const slotSchemas = {
       mainService: {
-        rootKeys: ["title", "subtitle", "visibility"],
-        styleKeys: ["background", "radius", "titleColor", "subtitleColor"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
       notice: {
-        rootKeys: ["visibility"],
-        styleKeys: ["background", "radius"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
       tipsBanner: {
-        rootKeys: ["title", "visibility"],
-        styleKeys: ["background", "radius", "titleColor"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
       bestcare: {
-        rootKeys: ["title", "subtitle", "visibility"],
-        styleKeys: ["background", "radius", "titleColor", "subtitleColor"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
     };
     return slotSchemas[normalizedSlotId] || empty;
@@ -3279,12 +3607,12 @@ function getGenericPatchSchema(pageId, slotId) {
   if (normalizedPageId === "bestshop") {
     const slotSchemas = {
       hero: {
-        rootKeys: ["title", "subtitle", "visibility"],
-        styleKeys: ["background", "radius", "titleColor", "subtitleColor"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
       review: {
-        rootKeys: ["title", "subtitle", "visibility"],
-        styleKeys: ["background", "radius", "titleColor", "subtitleColor"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
     };
     return slotSchemas[normalizedSlotId] || empty;
@@ -3293,35 +3621,61 @@ function getGenericPatchSchema(pageId, slotId) {
   if (normalizedPageId === "care-solutions") {
     const slotSchemas = {
       hero: {
-        rootKeys: ["title", "subtitle", "visibility"],
-        styleKeys: ["background", "radius", "titleColor", "subtitleColor"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
       ranking: {
-        rootKeys: ["title", "visibility"],
-        styleKeys: ["background", "radius", "titleColor"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
       benefit: {
-        rootKeys: ["title", "visibility"],
-        styleKeys: ["background", "radius", "titleColor"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
       tabs: {
-        rootKeys: ["visibility"],
-        styleKeys: ["background", "radius"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
       careBanner: {
-        rootKeys: ["title", "subtitle", "visibility"],
-        styleKeys: ["background", "radius", "titleColor", "subtitleColor"],
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
       },
     };
     return slotSchemas[normalizedSlotId] || empty;
   }
 
-  if (normalizedPageId.startsWith("category-")) {
-    if (normalizedSlotId !== "banner") return empty;
-    return {
-      rootKeys: ["title", "subtitle", "visibility"],
-      styleKeys: ["background", "radius", "titleColor", "subtitleColor"],
+  if (normalizedPageId.startsWith("category-") || isPdpCasePageId(normalizedPageId)) {
+    const slotSchemas = {
+      banner: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      summary: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      price: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      option: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      sticky: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      review: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
+      qna: {
+        rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      },
     };
+    return slotSchemas[normalizedSlotId] || empty;
   }
 
   return empty;
@@ -3523,43 +3877,47 @@ function buildLlmReadinessReport(pageId, options = {}) {
 }
 
 function buildPreLlmGapReport(pageId, options = {}) {
-  const readiness = buildLlmReadinessReport(pageId, options);
-  const components = Array.isArray(readiness.components) ? readiness.components : [];
-  const componentGaps = components
-    .filter((component) => component.status !== "pass")
-    .map((component) => ({
-      componentId: component.componentId,
-      slotId: component.slotId,
-      status: component.status,
-      missing: (component.checks || [])
-        .filter((check) => check.status !== "pass")
-        .map((check) => ({
-          id: check.id,
-          status: check.status,
-          detail: check.detail,
-        })),
-    }));
-  return {
-    pageId,
-    source: "working",
-    overallStatus: readiness.overallStatus,
-    globalGaps: readiness.globalGaps || [],
-    componentGapCount: componentGaps.length,
-    componentGaps,
-    advisoryComponentCount: components.filter((component) => Array.isArray(component.advisories) && component.advisories.length > 0).length,
-    fallbackComponentCount: components.filter((component) => component.sourceResolution && component.sourceResolution !== "direct").length,
-    fallbackComponents: components
-      .filter((component) => component.sourceResolution && component.sourceResolution !== "direct")
+  const editableData = options.editableData || null;
+  const cacheKey = buildWorkspacePageCacheKey(editableData || {}, pageId, "pre-llm-gap");
+  return readCachedValue(PRE_LLM_GAP_CACHE, cacheKey, () => {
+    const readiness = buildLlmReadinessReport(pageId, options);
+    const components = Array.isArray(readiness.components) ? readiness.components : [];
+    const componentGaps = components
+      .filter((component) => component.status !== "pass")
       .map((component) => ({
         componentId: component.componentId,
         slotId: component.slotId,
-        activeSourceId: component.activeSourceId,
-        sourceResolution: component.sourceResolution,
-        resolvedRenderSourceId: component.resolvedRenderSourceId,
-        detail: component.sourceResolutionDetail || null,
-      })),
-    linkCoverage: readiness.linkCoverage || null,
-  };
+        status: component.status,
+        missing: (component.checks || [])
+          .filter((check) => check.status !== "pass")
+          .map((check) => ({
+            id: check.id,
+            status: check.status,
+            detail: check.detail,
+          })),
+      }));
+    return {
+      pageId,
+      source: "working",
+      overallStatus: readiness.overallStatus,
+      globalGaps: readiness.globalGaps || [],
+      componentGapCount: componentGaps.length,
+      componentGaps,
+      advisoryComponentCount: components.filter((component) => Array.isArray(component.advisories) && component.advisories.length > 0).length,
+      fallbackComponentCount: components.filter((component) => component.sourceResolution && component.sourceResolution !== "direct").length,
+      fallbackComponents: components
+        .filter((component) => component.sourceResolution && component.sourceResolution !== "direct")
+        .map((component) => ({
+          componentId: component.componentId,
+          slotId: component.slotId,
+          activeSourceId: component.activeSourceId,
+          sourceResolution: component.sourceResolution,
+          resolvedRenderSourceId: component.resolvedRenderSourceId,
+          detail: component.sourceResolutionDetail || null,
+        })),
+      linkCoverage: readiness.linkCoverage || null,
+    };
+  });
 }
 
 function buildVisualReviewManifest() {
@@ -3717,95 +4075,98 @@ function buildFinalAcceptanceBundles() {
 function buildAcceptanceResultsReport(options = {}) {
   const editableData = options.editableData || {};
   const pageIdFilter = String(options.pageId || "").trim();
-  const bundlesPayload = buildFinalAcceptanceBundles();
-  const bundles = Array.isArray(bundlesPayload.bundles) ? bundlesPayload.bundles : [];
-  const pageAdvisories = buildPageOperationalAdvisories();
-  const advisoryMetaMap = buildPageAdvisoryMetaMap();
-  const pageGapMap = new Map();
-  for (const pageId of new Set(bundles.map((bundle) => String(bundle.pageId || "").trim()).filter(Boolean))) {
-    pageGapMap.set(pageId, buildPreLlmGapReport(pageId, { editableData }));
-  }
-  const allItems = bundles.map((bundle) => {
-    const result = findAcceptanceResult(editableData, bundle.bundleId);
-    const pageGap = pageGapMap.get(bundle.pageId) || { componentGaps: [], fallbackComponents: [] };
-    const itemSlotIds = new Set((bundle.items || []).map((item) => String(item || "").trim()).filter(Boolean));
-    const componentGaps = (pageGap.componentGaps || []).filter((item) => {
-      const itemSlotId = String(item.slotId || "").trim();
-      return itemSlotIds.has(itemSlotId);
+  const cacheKey = buildWorkspacePageCacheKey(editableData || {}, pageIdFilter || "all", `acceptance-results:${pageIdFilter || "all"}`);
+  return readCachedValue(ACCEPTANCE_RESULTS_CACHE, cacheKey, () => {
+    const bundlesPayload = buildFinalAcceptanceBundles();
+    const bundles = Array.isArray(bundlesPayload.bundles) ? bundlesPayload.bundles : [];
+    const targetBundles = pageIdFilter ? bundles.filter((bundle) => bundle.pageId === pageIdFilter) : bundles;
+    const pageAdvisories = buildPageOperationalAdvisories();
+    const advisoryMetaMap = buildPageAdvisoryMetaMap();
+    const pageGapMap = new Map();
+    for (const pageId of new Set(targetBundles.map((bundle) => String(bundle.pageId || "").trim()).filter(Boolean))) {
+      pageGapMap.set(pageId, buildPreLlmGapReport(pageId, { editableData }));
+    }
+    const allItems = targetBundles.map((bundle) => {
+      const result = findAcceptanceResult(editableData, bundle.bundleId);
+      const pageGap = pageGapMap.get(bundle.pageId) || { componentGaps: [], fallbackComponents: [] };
+      const itemSlotIds = new Set((bundle.items || []).map((item) => String(item || "").trim()).filter(Boolean));
+      const componentGaps = (pageGap.componentGaps || []).filter((item) => {
+        const itemSlotId = String(item.slotId || "").trim();
+        return itemSlotIds.has(itemSlotId);
+      });
+      const fallbackComponents = (pageGap.fallbackComponents || []).filter((item) => itemSlotIds.has(String(item.slotId || "").trim()));
+      const pageAdvisoryItems = Array.isArray(pageAdvisories?.[bundle.pageId]) ? pageAdvisories[bundle.pageId] : [];
+      const pageAdvisoryMeta = advisoryMetaMap?.[bundle.pageId] || { count: 0, highestSeverity: "none", advisoryRiskScore: 0 };
+      const componentGapCount = componentGaps.length;
+      const fallbackComponentCount = fallbackComponents.length;
+      const reviewPriority =
+        componentGapCount > 0 ? "high" : fallbackComponentCount > 0 || pageAdvisoryMeta.advisoryRiskScore > 0 ? "medium" : "normal";
+      const riskScore = componentGapCount * 100 + fallbackComponentCount * 10 + Number(pageAdvisoryMeta.advisoryRiskScore || 0);
+      return {
+        bundleId: bundle.bundleId,
+        pageId: bundle.pageId,
+        title: bundle.title,
+        items: bundle.items || [],
+        status: result?.status || "pending",
+        note: result?.note || "",
+        updatedAt: result?.updatedAt || null,
+        review: bundle.review || null,
+        bundleContext: {
+          componentGapCount,
+          fallbackComponentCount,
+          pageAdvisoryCount: pageAdvisoryMeta.count,
+          pageAdvisorySeverity: pageAdvisoryMeta.highestSeverity,
+          reviewPriority,
+          riskScore,
+          componentGaps,
+          fallbackComponents,
+          pageAdvisories: pageAdvisoryItems,
+        },
+      };
     });
-    const fallbackComponents = (pageGap.fallbackComponents || []).filter((item) => itemSlotIds.has(String(item.slotId || "").trim()));
-    const pageAdvisoryItems = Array.isArray(pageAdvisories?.[bundle.pageId]) ? pageAdvisories[bundle.pageId] : [];
-    const pageAdvisoryMeta = advisoryMetaMap?.[bundle.pageId] || { count: 0, highestSeverity: "none", advisoryRiskScore: 0 };
-    const componentGapCount = componentGaps.length;
-    const fallbackComponentCount = fallbackComponents.length;
-    const reviewPriority =
-      componentGapCount > 0 ? "high" : fallbackComponentCount > 0 || pageAdvisoryMeta.advisoryRiskScore > 0 ? "medium" : "normal";
-    const riskScore = componentGapCount * 100 + fallbackComponentCount * 10 + Number(pageAdvisoryMeta.advisoryRiskScore || 0);
+    const pageSummaries = Array.from(
+      allItems.reduce((map, item) => {
+        const current = map.get(item.pageId) || { pageId: item.pageId, total: 0, pass: 0, fail: 0, pending: 0, componentGapCount: 0, fallbackComponentCount: 0, pageAdvisoryCount: 0, pageAdvisorySeverity: "none", maxRiskScore: 0 };
+        current.total += 1;
+        current[item.status] += 1;
+        current.componentGapCount += Number(item.bundleContext?.componentGapCount || 0);
+        current.fallbackComponentCount += Number(item.bundleContext?.fallbackComponentCount || 0);
+        current.pageAdvisoryCount = Math.max(Number(current.pageAdvisoryCount || 0), Number(item.bundleContext?.pageAdvisoryCount || 0));
+        const severityRank = { none: 0, info: 1, warning: 2, error: 3 };
+        const nextSeverity = String(item.bundleContext?.pageAdvisorySeverity || "none");
+        if ((severityRank[nextSeverity] || 0) > (severityRank[current.pageAdvisorySeverity] || 0)) {
+          current.pageAdvisorySeverity = nextSeverity;
+        }
+        current.maxRiskScore = Math.max(Number(current.maxRiskScore || 0), Number(item.bundleContext?.riskScore || 0));
+        map.set(item.pageId, current);
+        return map;
+      }, new Map()).values()
+    );
+    const nextPendingBundle =
+      allItems
+        .filter((item) => item.status === "pending")
+        .sort((a, b) => {
+          const ar = Number(a.bundleContext?.riskScore || 0);
+          const br = Number(b.bundleContext?.riskScore || 0);
+          if (ar !== br) return br - ar;
+          return 0;
+        })[0] || null;
+    const counts = {
+      total: allItems.length,
+      pass: allItems.filter((item) => item.status === "pass").length,
+      fail: allItems.filter((item) => item.status === "fail").length,
+      pending: allItems.filter((item) => item.status === "pending").length,
+    };
     return {
-      bundleId: bundle.bundleId,
-      pageId: bundle.pageId,
-      title: bundle.title,
-      items: bundle.items || [],
-      status: result?.status || "pending",
-      note: result?.note || "",
-      updatedAt: result?.updatedAt || null,
-      review: bundle.review || null,
-      bundleContext: {
-        componentGapCount,
-        fallbackComponentCount,
-        pageAdvisoryCount: pageAdvisoryMeta.count,
-        pageAdvisorySeverity: pageAdvisoryMeta.highestSeverity,
-        reviewPriority,
-        riskScore,
-        componentGaps,
-        fallbackComponents,
-        pageAdvisories: pageAdvisoryItems,
-      },
+      pageId: pageIdFilter || null,
+      generatedAt: new Date().toISOString(),
+      counts,
+      overallStatus: counts.total > 0 && counts.pass === counts.total ? "accepted" : counts.fail > 0 ? "needs-review" : "in-progress",
+      nextPendingBundle,
+      pageSummaries,
+      items: allItems,
     };
   });
-  const filteredItems = pageIdFilter ? allItems.filter((bundle) => bundle.pageId === pageIdFilter) : allItems;
-  const pageSummaries = Array.from(
-    allItems.reduce((map, item) => {
-      const current = map.get(item.pageId) || { pageId: item.pageId, total: 0, pass: 0, fail: 0, pending: 0, componentGapCount: 0, fallbackComponentCount: 0, pageAdvisoryCount: 0, pageAdvisorySeverity: "none", maxRiskScore: 0 };
-      current.total += 1;
-      current[item.status] += 1;
-      current.componentGapCount += Number(item.bundleContext?.componentGapCount || 0);
-      current.fallbackComponentCount += Number(item.bundleContext?.fallbackComponentCount || 0);
-      current.pageAdvisoryCount = Math.max(Number(current.pageAdvisoryCount || 0), Number(item.bundleContext?.pageAdvisoryCount || 0));
-      const severityRank = { none: 0, info: 1, warning: 2, error: 3 };
-      const nextSeverity = String(item.bundleContext?.pageAdvisorySeverity || "none");
-      if ((severityRank[nextSeverity] || 0) > (severityRank[current.pageAdvisorySeverity] || 0)) {
-        current.pageAdvisorySeverity = nextSeverity;
-      }
-      current.maxRiskScore = Math.max(Number(current.maxRiskScore || 0), Number(item.bundleContext?.riskScore || 0));
-      map.set(item.pageId, current);
-      return map;
-    }, new Map()).values()
-  );
-  const nextPendingBundle =
-    allItems
-      .filter((item) => item.status === "pending" && (!pageIdFilter || item.pageId === pageIdFilter))
-      .sort((a, b) => {
-        const ar = Number(a.bundleContext?.riskScore || 0);
-        const br = Number(b.bundleContext?.riskScore || 0);
-        if (ar !== br) return br - ar;
-        return 0;
-      })[0] || null;
-  const counts = {
-    total: filteredItems.length,
-    pass: filteredItems.filter((item) => item.status === "pass").length,
-    fail: filteredItems.filter((item) => item.status === "fail").length,
-    pending: filteredItems.filter((item) => item.status === "pending").length,
-  };
-  return {
-    pageId: pageIdFilter || null,
-    generatedAt: new Date().toISOString(),
-    counts,
-    overallStatus: counts.total > 0 && counts.pass === counts.total ? "accepted" : counts.fail > 0 ? "needs-review" : "in-progress",
-    nextPendingBundle,
-    pageSummaries,
-    items: filteredItems,
-  };
 }
 
 function buildAcceptanceQueueReport(options = {}) {
@@ -3863,6 +4224,410 @@ function buildLlmEditableList(pageId, options = {}) {
     source: "working",
     componentCount: components.length,
     components,
+  };
+}
+
+function mergeReferenceSlotMatches(referenceAnalyses = []) {
+  const slotMap = new Map();
+  for (const analysis of referenceAnalyses || []) {
+    for (const match of analysis?.slotMatches || []) {
+      const slotId = String(match?.slotId || "").trim();
+      if (!slotId) continue;
+      const score = Number(match?.score || 0);
+      const current = slotMap.get(slotId);
+      if (!current || score > Number(current.score || 0)) {
+        slotMap.set(slotId, {
+          slotId,
+          confidence: String(match?.confidence || "low"),
+          score,
+          reasons: Array.isArray(match?.reasons) ? match.reasons.slice(0, 3) : [],
+          referenceUrl: analysis?.requestedUrl || analysis?.finalUrl || null,
+        });
+      }
+    }
+  }
+  return Array.from(slotMap.values()).sort(
+    (a, b) => Number(b.score || 0) - Number(a.score || 0) || String(a.slotId).localeCompare(String(b.slotId), "ko")
+  );
+}
+
+function buildPlannerPageContext(pageId, viewportProfile, editableData) {
+  const normalizedPageId = String(pageId || "").trim();
+  const page = findPage(editableData || {}, normalizedPageId);
+  const pdpContext = resolvePdpRuntimeContext(normalizedPageId);
+  return {
+    workspacePageId: normalizedPageId,
+    runtimePageId: pdpContext?.runtimePageId || normalizedPageId,
+    pageLabel: pdpContext?.title || page?.title || normalizedPageId,
+    pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
+    viewportProfile: String(viewportProfile || "pc").trim() || "pc",
+  };
+}
+
+function buildPlannerWorkspaceContext(userId, pageId) {
+  const pinned = getPinnedView(userId, pageId);
+  const recentVersions = listSavedVersions(userId, { pageId, limit: 10 });
+  return {
+    currentWorkingVersionId: recentVersions[0]?.id || null,
+    currentViewVersionId: pinned?.versionId || null,
+    recentVersionCount: recentVersions.length,
+  };
+}
+
+function normalizeDesignChangeLevel(value, fallback = "medium") {
+  const normalized = String(value || fallback).trim().toLowerCase();
+  if (normalized === "low" || normalized === "medium" || normalized === "high") return normalized;
+  return fallback;
+}
+
+function buildPlannerPageSummary(pageId, editableData, options = {}) {
+  const editableList = buildLlmEditableList(pageId, { editableData });
+  const targetScope = String(options.targetScope || "page").trim() || "page";
+  const targetComponents = safeArray(options.targetComponents || [], 50)
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  const targetComponentSet = new Set(targetComponents);
+  const filteredComponents =
+    targetScope === "components" && targetComponentSet.size
+      ? (editableList.components || []).filter((item) => targetComponentSet.has(String(item.componentId || "").trim()))
+      : (editableList.components || []);
+  const patches = listComponentPatches(editableData || {}, pageId).map((item) => ({
+    componentId: item.componentId,
+    sourceId: item.sourceId || null,
+    patchedKeys: item.patch && typeof item.patch === "object" ? Object.keys(item.patch) : [],
+    updatedAt: item.updatedAt || null,
+  })).filter((item) => {
+    if (targetScope !== "components" || !targetComponentSet.size) return true;
+    return targetComponentSet.has(String(item.componentId || "").trim());
+  });
+  return {
+    editableSlots: filteredComponents.map((item) => item.slotId),
+    existingComponents: filteredComponents.map((item) => item.componentId),
+    currentPatchSummary: patches.slice(0, 20),
+    targeting: {
+      scope: targetScope,
+      componentIds: targetComponents,
+    },
+  };
+}
+
+function buildBuilderDesignGuidance(pageId, editableComponents = [], options = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const targetScope = String(options.targetScope || "page").trim() || "page";
+  const designChangeLevel = normalizeDesignChangeLevel(options.designChangeLevel, "medium");
+  const slotIds = Array.from(
+    new Set((editableComponents || []).map((item) => String(item?.slotId || "").trim()).filter(Boolean))
+  );
+  const isPdp = isPdpCasePageId(normalizedPageId);
+  const isPlp = normalizedPageId.startsWith("category-");
+  const pageType = isPdp ? "pdp" : isPlp ? "plp" : normalizedPageId === "home" ? "home" : "generic";
+  const visualFocusByType = {
+    home: [
+      "첫 인상과 브랜드 톤을 우선한다.",
+      "상단 주요 메시지와 하단 큐레이션 섹션의 연결감을 맞춘다.",
+      "완성형 구현보다 고객 프리뷰로서 설득력 있는 화면 인상을 만든다.",
+    ],
+    plp: [
+      "상품 탐색성이 흔들리지 않게 필터/정렬/그리드의 가독성을 우선한다.",
+      "프로모션 톤은 주되 상품 비교 흐름을 방해하지 않는다.",
+      "카드 밀도와 정보 위계를 정리해 스캔이 쉬운 화면을 만든다.",
+    ],
+    pdp: [
+      "상품 요약, 가격, 구매 유도 영역의 신뢰감과 명료함을 우선한다.",
+      "핵심 메시지는 갤러리/요약/고정 구매 영역에 집중한다.",
+      "사양, 가격, 옵션 정보는 보존하고 톤과 카피 정리 중심으로 접근한다.",
+    ],
+    generic: [
+      "현재 페이지의 핵심 사용자 흐름을 유지한다.",
+      "수정 범위 안에서 가장 체감이 큰 시각 변화를 우선한다.",
+    ],
+  };
+  const changeProfiles = {
+    low: {
+      label: "하",
+      layoutShift: "minimal",
+      copyShift: "light",
+      sourceSwap: "minimal",
+      motionLevel: "minimal",
+      emphasisLevel: "soft",
+      guidance: [
+        "현재 화면 인상을 유지하면서 카피, 톤, 강조점만 가볍게 정리한다.",
+        "기존 source와 구조를 최대한 유지한다.",
+      ],
+    },
+    medium: {
+      label: "중",
+      layoutShift: "controlled",
+      copyShift: "noticeable",
+      sourceSwap: "selective",
+      motionLevel: "subtle",
+      emphasisLevel: "moderate",
+      guidance: [
+        "현재 구조를 유지하되 섹션 인상과 시각 위계를 체감되게 조정한다.",
+        "필요한 슬롯에서는 source 교체와 patch를 함께 쓸 수 있다.",
+      ],
+    },
+    high: {
+      label: "상",
+      layoutShift: "assertive-within-baseline",
+      copyShift: "strong",
+      sourceSwap: "active",
+      motionLevel: "meaningful",
+      emphasisLevel: "strong",
+      guidance: [
+        "브랜드 baseline을 유지한 채 핵심 슬롯의 인상 변화가 분명하게 느껴지도록 만든다.",
+        "hero, summary, gallery, sticky 같은 핵심 슬롯에서 시각 체감을 적극적으로 만든다.",
+      ],
+    },
+  };
+  return {
+    pageType,
+    targetScope,
+    designChangeLevel,
+    designChangeProfile: changeProfiles[designChangeLevel] || changeProfiles.medium,
+    targetSlotIds: slotIds,
+    targetComponentCount: Array.isArray(editableComponents) ? editableComponents.length : 0,
+    visualFocus: visualFocusByType[pageType] || visualFocusByType.generic,
+    visualRules: [
+      "고객 프리뷰용 시안이므로 브랜드 디자인 우선으로 설득력 있는 방향성을 만든다.",
+      "지원된 slot/source/patch 범위 안에서만 변경하되, 변화율이 허용하는 탐색 폭은 적극 활용한다.",
+      "사실 정보와 실제 상품 데이터는 왜곡하지 않는다.",
+    ],
+    changeLevelGuidance: Object.fromEntries(
+      Object.entries(changeProfiles).map(([key, value]) => [key, value.guidance])
+    ),
+  };
+}
+
+function buildBuilderSystemContext(pageId, editableData, options = {}) {
+  const slotRegistry = findSlotRegistry(editableData || {}, pageId) || { pageId, slots: [] };
+  const editableComponentsPayload = buildLlmEditableList(pageId, { editableData });
+  const targetScope = String(options.targetScope || "page").trim() || "page";
+  const targetComponents = safeArray(options.targetComponents || [], 50)
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  const designChangeLevel = normalizeDesignChangeLevel(options.designChangeLevel, "medium");
+  const targetComponentSet = new Set(targetComponents);
+  const editableComponents =
+    targetScope === "components" && targetComponentSet.size
+      ? (editableComponentsPayload.components || []).filter((item) => targetComponentSet.has(String(item.componentId || "").trim()))
+      : (editableComponentsPayload.components || []);
+  const allowedSlotIds = new Set(editableComponents.map((item) => String(item.slotId || "").trim()).filter(Boolean));
+  const currentPatches = listComponentPatches(editableData || {}, pageId)
+    .filter((item) => {
+      if (targetScope !== "components" || !targetComponentSet.size) return true;
+      return targetComponentSet.has(String(item.componentId || "").trim());
+    })
+    .map((item) => ({
+    componentId: item.componentId,
+    sourceId: item.sourceId || null,
+    updatedAt: item.updatedAt || null,
+    patch: item.patch && typeof item.patch === "object" ? item.patch : {},
+  }));
+  const patchSchemaMap = Object.fromEntries(
+    editableComponents.map((item) => [item.componentId, item.patchSchema || { rootKeys: [], styleKeys: [] }])
+  );
+  return {
+    slotRegistry: {
+      ...slotRegistry,
+      slots:
+        targetScope === "components" && allowedSlotIds.size
+          ? (slotRegistry.slots || []).filter((item) => allowedSlotIds.has(String(item.slotId || "").trim()))
+          : (slotRegistry.slots || []),
+    },
+    editableComponents,
+    patchSchemaMap,
+    currentPatches,
+    targeting: {
+      scope: targetScope,
+      componentIds: targetComponents,
+    },
+    designToolContext: {
+      designChangeLevel,
+      availableTools: [
+        {
+          id: "slot_source_switch",
+          category: "editing",
+          whenToUse: "기존 캡처/커스텀/피그마 파생 소스 중 시안 방향에 더 맞는 소스로 바꿀 때",
+        },
+        {
+          id: "component_patch",
+          category: "editing",
+          whenToUse: "허용된 patch schema 안에서 제목/부제/설명/스타일을 미세 조정할 때",
+        },
+        {
+          id: "preview_render",
+          category: "preview",
+          whenToUse: "변경 결과를 clone 미리보기에서 바로 확인할 때",
+        },
+        {
+          id: "version_save",
+          category: "versioning",
+          whenToUse: "현재 draft를 저장 가능한 시안 버전으로 확정할 때",
+        },
+        {
+          id: "view_pin",
+          category: "versioning",
+          whenToUse: "저장된 버전을 clone에 실제로 노출할 대표 View로 고정할 때",
+        },
+      ],
+      workflowOrder: [
+        "approved_plan_review",
+        "slot_source_switch",
+        "component_patch",
+        "preview_render",
+        "version_save",
+        "view_pin",
+      ],
+      patchStrategy: [
+        "브랜드 인상을 살리는 방향이라면 변화율이 허용하는 범위에서 source switch와 component patch를 적극 사용할 수 있다.",
+        "허용된 rootKeys/styleKeys 밖의 필드는 만들지 않는다.",
+        "targetScope가 components이면 해당 범위 바깥 slot은 건드리지 않는다.",
+      ],
+      designSurfaces: [
+        {
+          id: "copy_tone",
+          whenToUse: "제목/부제/설명 카피의 톤과 강도를 조절할 때",
+        },
+        {
+          id: "content_hierarchy",
+          whenToUse: "요약/강조 문구의 노출 우선순위를 조정할 때",
+        },
+        {
+          id: "visual_emphasis",
+          whenToUse: "hero, summary, gallery, sticky 등 핵심 슬롯의 인상을 조절할 때",
+        },
+        {
+          id: "source_choice",
+          whenToUse: "같은 슬롯 안에서 더 적합한 캡처/커스텀 소스를 선택할 때",
+        },
+        {
+          id: "local_style_patch",
+          whenToUse: "허용된 style patch로 분위기와 밀도를 미세 조정할 때",
+        },
+      ],
+      brandSafetyRules: [
+        "현재 페이지 baseline을 기준으로 움직이고 외부 레퍼런스는 분위기 참고용으로만 사용한다.",
+        "브랜드 디자인을 우선하되 변화율이 허용하는 탐색 폭은 제한하지 않는다.",
+        "브랜드 정체성을 벗어나는 과한 실험적 패턴만 금지한다.",
+        "가격/스펙/상품 사실 정보는 바꾸지 않는다.",
+      ],
+      visualPrinciples: buildBuilderDesignGuidance(pageId, editableComponents, {
+        targetScope,
+        designChangeLevel,
+      }),
+    },
+  };
+}
+
+function buildPreviewUrlForWorkspacePage(pageId) {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return "/admin";
+  if (isPdpCasePageId(normalizedPageId)) {
+    const pdpContext = resolvePdpRuntimeContext(normalizedPageId);
+    const params = new URLSearchParams();
+    params.set("pageId", normalizedPageId);
+    if (pdpContext?.href) params.set("href", pdpContext.href);
+    if (pdpContext?.route) params.set("title", pdpContext.route);
+    return `/clone-product?${params.toString()}`;
+  }
+  return `/clone/${encodeURIComponent(normalizedPageId)}`;
+}
+
+function buildBuilderInputPayload({
+  editableData,
+  pageId,
+  viewportProfile,
+  approvedPlan,
+  intensity,
+  versionLabelHint,
+  designChangeLevel,
+  targetScope,
+  targetComponents,
+}) {
+  const pageContext = buildPlannerPageContext(pageId, viewportProfile, editableData);
+  const normalizedDesignChangeLevel = normalizeDesignChangeLevel(
+    designChangeLevel || approvedPlan?.designChangeLevel,
+    "medium"
+  );
+  return {
+    pageContext,
+    approvedPlan,
+    systemContext: buildBuilderSystemContext(pageId, editableData, {
+      designChangeLevel: normalizedDesignChangeLevel,
+      targetScope,
+      targetComponents,
+    }),
+    generationOptions: {
+      intensity: String(intensity || "balanced").trim() || "balanced",
+      createNewVersion: true,
+      versionLabelHint: String(versionLabelHint || "").trim(),
+      designChangeLevel: normalizedDesignChangeLevel,
+      targetScope: String(targetScope || "page").trim() || "page",
+      targetComponents: safeArray(targetComponents || [], 50),
+    },
+  };
+}
+
+async function buildPlannerInputPayload({
+  user,
+  editableData,
+  pageId,
+  viewportProfile,
+  mode,
+  requestText,
+  keyMessage,
+  preferredDirection,
+  avoidDirection,
+  toneAndMood,
+  referenceUrls,
+  designChangeLevel,
+  targetScope,
+  targetComponents,
+}) {
+  const pageContext = buildPlannerPageContext(pageId, viewportProfile, editableData);
+  const normalizedTargetScope = String(targetScope || "page").trim() || "page";
+  const normalizedDesignChangeLevel = normalizeDesignChangeLevel(designChangeLevel, "medium");
+  const normalizedTargetComponents = safeArray(targetComponents || [], 50)
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  const pageSummary = buildPlannerPageSummary(pageId, editableData, {
+    targetScope: normalizedTargetScope,
+    targetComponents: normalizedTargetComponents,
+  });
+  const referenceAnalyses = await analyzeReferenceUrls(referenceUrls, {
+    pageId,
+    pageGroup: pageContext.pageGroup,
+    viewportProfile,
+    editableSlots: pageSummary.editableSlots,
+  });
+  const guardrailBundle = buildGuardrailBundle({
+    pageId,
+    pageGroup: pageContext.pageGroup,
+    editableSlots: pageSummary.editableSlots,
+    referenceAnalyses,
+  });
+  return {
+    mode: String(mode || "direct").trim() || "direct",
+    pageContext,
+    workspaceContext: buildPlannerWorkspaceContext(user.userId, pageId),
+    userInput: {
+      requestText: String(requestText || "").trim(),
+      keyMessage: String(keyMessage || "").trim(),
+      preferredDirection: String(preferredDirection || "").trim(),
+      avoidDirection: String(avoidDirection || "").trim(),
+      toneAndMood: String(toneAndMood || "").trim(),
+      referenceUrls: safeArray(referenceUrls || [], 5),
+      designChangeLevel: normalizedDesignChangeLevel,
+      targetScope: normalizedTargetScope,
+      targetComponents: normalizedTargetComponents,
+    },
+    pageSummary,
+    referenceSummary: {
+      analyses: referenceAnalyses,
+      mergedSlotMatches: mergeReferenceSlotMatches(referenceAnalyses),
+    },
+    guardrailBundle,
   };
 }
 
@@ -4823,16 +5588,23 @@ function renderSpaceRenewalSection(data = {}, activeSourceId = "custom-renderer"
   const styles = componentPatch.styles && typeof componentPatch.styles === "object" ? componentPatch.styles : {};
   const title = String(componentPatch.title || data.title || "");
   const subTitle = String(componentPatch.subtitle || data.subTitle || "");
-  const titleColor = String(styles.titleColor || data.titleRgb || "#111111");
-  const subTitleColor = String(styles.subTitleColor || data.subTitleRgb || "#727780");
+  const titleStyle = buildTextPatchStyleText({
+    ...styles,
+    titleColor: styles.titleColor || data.titleRgb || "#111111",
+  }, "title");
+  const subtitleStyle = buildTextPatchStyleText({
+    ...styles,
+    subtitleColor: styles.subtitleColor || data.subTitleRgb || "#727780",
+  }, "subtitle");
+  const sectionStyle = buildSectionPatchStyleText(styles, { hidden: componentPatch.visibility === false });
   const hero = toLgeAbsoluteUrl(products[0]?.additionalMobileImageUrl || "");
   const heroAlt = products[0]?.additionalMobileImageAlt || title || "";
   return `
-    <section data-codex-slot="space-renewal" data-codex-source="custom-renderer" data-codex-component-id="home.space-renewal" data-codex-active-source-id="${escapeHtml(activeSourceId)}" data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}" data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId || activeSourceId)}" data-codex-render-mode="${escapeHtml(resolution.renderMode)}" class="codex-home-space-renewal codex-home-space-renewal--workspace-variant">
+    <section data-codex-slot="space-renewal" data-codex-source="custom-renderer" data-codex-component-id="home.space-renewal" data-codex-active-source-id="${escapeHtml(activeSourceId)}" data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}" data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId || activeSourceId)}" data-codex-render-mode="${escapeHtml(resolution.renderMode)}" class="codex-home-space-renewal codex-home-space-renewal--workspace-variant" ${sectionStyle ? `style="${escapeHtml(sectionStyle)}"` : ""}>
       <div class="codex-home-space-renewal-head">
         <div class="title-home_title-home__Jw_7z">
-          <h2 class="title-home_title-home_tit__tE_5M" style="color:${escapeHtml(titleColor)}">${escapeHtml(title)}</h2>
-          ${subTitle ? `<span class="title-home_title-home_sub_tit__ivkxK" style="color:${escapeHtml(subTitleColor)}">${escapeHtml(subTitle)}</span>` : ""}
+          <h2 class="title-home_title-home_tit__tE_5M" ${titleStyle ? `style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
+          ${subTitle ? `<span class="title-home_title-home_sub_tit__ivkxK" ${subtitleStyle ? `style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subTitle)}</span>` : ""}
         </div>
         ${data.moreText && data.moreTextLink ? `<a class="codex-home-space-renewal-more" href="${data.moreTextLink}">${data.moreText}</a>` : ""}
       </div>
@@ -4869,20 +5641,16 @@ function renderBrandShowroomCustomSection(items = [], activeSourceId = "custom-r
   const resolution = resolveComponentSourceResolution("home", "brand-showroom", activeSourceId);
   const title = String(componentPatch.title || "브랜드 쇼룸");
   const styles = componentPatch.styles && typeof componentPatch.styles === "object" ? componentPatch.styles : {};
-  const titleColor = String(styles.titleColor || "#111111");
-  const background = String(styles.background || "");
-  const radius = Number.isFinite(Number(styles.radius)) ? Number(styles.radius) : null;
-  const inlineStyle = [
-    background ? `background:${background}` : "",
-    radius != null ? `border-radius:${radius}px` : "",
-  ]
-    .filter(Boolean)
-    .join(";");
+  const titleStyle = buildTextPatchStyleText({
+    ...styles,
+    titleColor: styles.titleColor || "#111111",
+  }, "title");
+  const inlineStyle = buildSectionPatchStyleText(styles, { hidden: componentPatch.visibility === false });
   return `
     <section data-codex-slot="brand-showroom" data-codex-source="custom-renderer" data-codex-component-id="home.brand-showroom" data-codex-active-source-id="${escapeHtml(activeSourceId)}" data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}" data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId || activeSourceId)}" data-codex-render-mode="${escapeHtml(resolution.renderMode)}" class="codex-home-brand-showroom codex-home-brand-showroom--workspace-variant" ${inlineStyle ? `style="${escapeHtml(inlineStyle)}"` : ""}>
       <div class="codex-home-brand-showroom-head">
         <div class="title-home_title-home__Jw_7z">
-          <h2 class="title-home_title-home_tit__tE_5M" style="color:${escapeHtml(titleColor)}">${escapeHtml(title)}</h2>
+          <h2 class="title-home_title-home_tit__tE_5M" ${titleStyle ? `style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
         </div>
       </div>
       <div class="codex-home-brand-showroom-grid">
@@ -4914,20 +5682,16 @@ function renderLatestProductNewsCustomSection(items = [], activeSourceId = "cust
   const visibleItems = items.slice(0, 6);
   const title = String(componentPatch.title || "최신 제품 소식");
   const styles = componentPatch.styles && typeof componentPatch.styles === "object" ? componentPatch.styles : {};
-  const titleColor = String(styles.titleColor || "#111111");
-  const background = String(styles.background || "");
-  const radius = Number.isFinite(Number(styles.radius)) ? Number(styles.radius) : null;
-  const inlineStyle = [
-    background ? `background:${background}` : "",
-    radius != null ? `border-radius:${radius}px` : "",
-  ]
-    .filter(Boolean)
-    .join(";");
+  const titleStyle = buildTextPatchStyleText({
+    ...styles,
+    titleColor: styles.titleColor || "#111111",
+  }, "title");
+  const inlineStyle = buildSectionPatchStyleText(styles, { hidden: componentPatch.visibility === false });
   return `
     <section data-codex-slot="latest-product-news" data-codex-source="custom-renderer" data-codex-component-id="home.latest-product-news" data-codex-active-source-id="${escapeHtml(activeSourceId)}" data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}" data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId || activeSourceId)}" data-codex-render-mode="${escapeHtml(resolution.renderMode)}" class="codex-home-latest-news codex-home-latest-news--workspace-variant" ${inlineStyle ? `style="${escapeHtml(inlineStyle)}"` : ""}>
       <div class="codex-home-latest-news-head">
         <div class="title-home_title-home__Jw_7z">
-          <h2 class="title-home_title-home_tit__tE_5M" style="color:${escapeHtml(titleColor)}">${escapeHtml(title)}</h2>
+          <h2 class="title-home_title-home_tit__tE_5M" ${titleStyle ? `style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
         </div>
       </div>
       <div class="codex-home-latest-news-grid">
@@ -5040,12 +5804,10 @@ function applyHomeHeroPatch(sectionHtml, activeSourceId = "", componentPatch = {
   const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
   next = next.replace(/<section([^>]*)>/, (match) => {
     const styleMatch = match.match(/\sstyle="([^"]*)"/);
-    const styleParts = styleMatch ? [styleMatch[1]] : [];
-    if (styles.background) styleParts.push(`background:${styles.background}`);
-    if (Number.isFinite(Number(styles.radius))) styleParts.push(`border-radius:${Number(styles.radius)}px`);
-    if (Number.isFinite(Number(styles.height))) styleParts.push(`min-height:${Number(styles.height)}px`);
+    const inlineStyle = [styleMatch ? styleMatch[1] : "", buildSectionPatchStyleText(styles, { includeHeight: true, hidden: patch.visibility === false })]
+      .filter(Boolean)
+      .join(";");
     const cleaned = match.replace(/\sstyle="[^"]*"/, "");
-    const inlineStyle = styleParts.filter(Boolean).join(";");
     return cleaned.replace(/>$/, `${inlineStyle ? ` style="${escapeHtml(inlineStyle)}"` : ""}>`);
   });
   if (patch.badge) {
@@ -5076,14 +5838,34 @@ function applyHomeHeroPatch(sectionHtml, activeSourceId = "", componentPatch = {
       (match) => match[0].replace(/href="[^"]*"/, `href="${escapeHtml(patch.ctaHref)}"`)
     );
   }
-  if (styles.titleColor) {
+  if (patch.ctaLabel) {
+    next = replaceFirstMatch(
+      next,
+      /<a class="(?:HomePcBannerHero_banner_hero_item__|HomeTaBannerHero_banner_hero_item__|HomeMoBannerHero_banner_hero_item__)[^"]*"[^>]*>[\s\S]*?<\/a>/,
+      (match) => match[0].replace(/>[\s\S]*?</, `>${escapeHtml(patch.ctaLabel)}<`)
+    );
+  }
+  const titleStyleText = buildTextPatchStyleText(styles, "title");
+  const subtitleStyleText = buildTextPatchStyleText(styles, "subtitle") || titleStyleText;
+  if (titleStyleText) {
     next = next.replace(
-      /<(strong|p)( class="(?:HomePcBannerHero_banner_hero_headline__|HomeTaBannerHero_banner_hero_headline__|HomeMoBannerHero_banner_hero_headline__|HomePcBannerHero_banner_hero_description__|HomeTaBannerHero_banner_hero_description__|HomeMoBannerHero_banner_hero_description__)[^"]*")([^>]*)>/g,
+      /<(strong)( class="(?:HomePcBannerHero_banner_hero_headline__|HomeTaBannerHero_banner_hero_headline__|HomeMoBannerHero_banner_hero_headline__)[^"]*")([^>]*)>/g,
       (match, tag, classes, rest) => {
         if (/style="/.test(rest)) {
-          return `<${tag}${classes}${rest.replace(/style="([^"]*)"/, (_, value) => ` style="${escapeHtml(`${value};color:${styles.titleColor}`)}"`)}>`;
+          return `<${tag}${classes}${rest.replace(/style="([^"]*)"/, (_, value) => ` style="${escapeHtml(`${value};${titleStyleText}`)}"`)}>`;
         }
-        return `<${tag}${classes}${rest} style="color:${escapeHtml(styles.titleColor)}">`;
+        return `<${tag}${classes}${rest} style="${escapeHtml(titleStyleText)}">`;
+      }
+    );
+  }
+  if (subtitleStyleText) {
+    next = next.replace(
+      /<(p)( class="(?:HomePcBannerHero_banner_hero_description__|HomeTaBannerHero_banner_hero_description__|HomeMoBannerHero_banner_hero_description__)[^"]*")([^>]*)>/g,
+      (match, tag, classes, rest) => {
+        if (/style="/.test(rest)) {
+          return `<${tag}${classes}${rest.replace(/style="([^"]*)"/, (_, value) => ` style="${escapeHtml(`${value};${subtitleStyleText}`)}"`)}>`;
+        }
+        return `<${tag}${classes}${rest} style="${escapeHtml(subtitleStyleText)}">`;
       }
     );
   }
@@ -5102,11 +5884,10 @@ function applyHomeLowerSectionPatch(sectionHtml, slotId = "", activeSourceId = "
     /<section([^>]*)>/,
     (match) => {
       const styleMatch = match.match(/\sstyle="([^"]*)"/);
-      const styleParts = styleMatch ? [styleMatch[1]] : [];
-      if (styles.background) styleParts.push(`background:${styles.background}`);
-      if (Number.isFinite(Number(styles.radius))) styleParts.push(`border-radius:${Number(styles.radius)}px`);
+      const inlineStyle = [styleMatch ? styleMatch[1] : "", buildSectionPatchStyleText(styles, { hidden: patch.visibility === false })]
+        .filter(Boolean)
+        .join(";");
       const cleaned = match.replace(/\sstyle="[^"]*"/, "");
-      const inlineStyle = styleParts.filter(Boolean).join(";");
       return cleaned.replace(/>$/, `${inlineStyle ? ` style="${escapeHtml(inlineStyle)}"` : ""}>`);
     }
   );
@@ -5124,25 +5905,37 @@ function applyHomeLowerSectionPatch(sectionHtml, slotId = "", activeSourceId = "
       (match) => match[0].replace(/>[\s\S]*?</, `>${escapeHtml(patch.subtitle)}<`)
     );
   }
-  if (styles.titleColor) {
+  if (patch.moreLabel) {
+    next = replaceFirstTextMatch(
+      next,
+      [
+        /<(?:a|button)\b[^>]*class="[^"]*(?:more|btn-more)[^"]*"[^>]*>[\s\S]*?<\/(?:a|button)>/i,
+        /<span\b[^>]*class="[^"]*(?:more)[^"]*"[^>]*>[\s\S]*?<\/span>/i,
+      ],
+      patch.moreLabel
+    );
+  }
+  const titleStyleText = buildTextPatchStyleText(styles, "title");
+  const subtitleStyleText = buildTextPatchStyleText(styles, "subtitle");
+  if (titleStyleText) {
     next = next.replace(
       /<h2 class="([^"]*title-home_title-home_tit__[^"]*)"([^>]*)>/g,
       (match, classes, rest) => {
         if (/style="/.test(rest)) {
-          return `<h2 class="${classes}"${rest.replace(/style="([^"]*)"/, (_, value) => ` style="${escapeHtml(`${value};color:${styles.titleColor}`)}"`)}>`;
+          return `<h2 class="${classes}"${rest.replace(/style="([^"]*)"/, (_, value) => ` style="${escapeHtml(`${value};${titleStyleText}`)}"`)}>`;
         }
-        return `<h2 class="${classes}"${rest} style="color:${escapeHtml(styles.titleColor)}">`;
+        return `<h2 class="${classes}"${rest} style="${escapeHtml(titleStyleText)}">`;
       }
     );
   }
-  if (styles.subtitleColor) {
+  if (subtitleStyleText) {
     next = next.replace(
       /<span class="([^"]*title-home_title-home_sub_tit__[^"]*)"([^>]*)>/g,
       (match, classes, rest) => {
         if (/style="/.test(rest)) {
-          return `<span class="${classes}"${rest.replace(/style="([^"]*)"/, (_, value) => ` style="${escapeHtml(`${value};color:${styles.subtitleColor}`)}"`)}>`;
+          return `<span class="${classes}"${rest.replace(/style="([^"]*)"/, (_, value) => ` style="${escapeHtml(`${value};${subtitleStyleText}`)}"`)}>`;
         }
-        return `<span class="${classes}"${rest} style="color:${escapeHtml(styles.subtitleColor)}">`;
+        return `<span class="${classes}"${rest} style="${escapeHtml(subtitleStyleText)}">`;
       }
     );
   }
@@ -5225,6 +6018,58 @@ function findMatchingClosingTagRange(html, startIndex, tagName) {
   return null;
 }
 
+function normalizeCssSizeValue(value) {
+  if (value == null) return "";
+  const raw = String(value).trim();
+  if (!raw) return "";
+  if (/^-?\d+(?:\.\d+)?$/.test(raw)) return `${raw}px`;
+  return raw;
+}
+
+function buildSectionPatchStyleText(styles = {}, options = {}) {
+  const nextStyles = styles && typeof styles === "object" ? styles : {};
+  const styleParts = [];
+  if (nextStyles.background) styleParts.push(`background:${nextStyles.background}`);
+  const radius = normalizeCssSizeValue(nextStyles.radius);
+  if (radius) styleParts.push(`border-radius:${radius}`);
+  if (options.includeHeight) {
+    const height = normalizeCssSizeValue(nextStyles.height);
+    if (height) styleParts.push(`min-height:${height}`);
+  }
+  const minHeight = normalizeCssSizeValue(nextStyles.minHeight);
+  if (minHeight) styleParts.push(`min-height:${minHeight}`);
+  const borderWidth = normalizeCssSizeValue(nextStyles.borderWidth);
+  const borderStyle = String(nextStyles.borderStyle || "").trim();
+  const borderColor = String(nextStyles.borderColor || "").trim();
+  if (borderWidth) styleParts.push(`border-width:${borderWidth}`);
+  if (borderStyle) styleParts.push(`border-style:${borderStyle}`);
+  if (borderColor) styleParts.push(`border-color:${borderColor}`);
+  if ((borderWidth || borderColor) && !borderStyle) styleParts.push("border-style:solid");
+  if (nextStyles.boxShadow) styleParts.push(`box-shadow:${nextStyles.boxShadow}`);
+  if (nextStyles.padding) styleParts.push(`padding:${nextStyles.padding}`);
+  if (nextStyles.opacity !== undefined && nextStyles.opacity !== null && String(nextStyles.opacity).trim() !== "") {
+    const opacity = Number(nextStyles.opacity);
+    if (Number.isFinite(opacity)) styleParts.push(`opacity:${opacity}`);
+  }
+  if (nextStyles.textAlign) styleParts.push(`text-align:${nextStyles.textAlign}`);
+  if (options.hidden) styleParts.push("display:none");
+  return styleParts.filter(Boolean).join(";");
+}
+
+function buildTextPatchStyleText(styles = {}, kind = "title") {
+  const nextStyles = styles && typeof styles === "object" ? styles : {};
+  const colorKey = kind === "subtitle" ? "subtitleColor" : "titleColor";
+  const weightKey = kind === "subtitle" ? "subtitleWeight" : "titleWeight";
+  const sizeKey = kind === "subtitle" ? "subtitleSize" : "titleSize";
+  const styleParts = [];
+  if (nextStyles[colorKey]) styleParts.push(`color:${nextStyles[colorKey]}`);
+  if (nextStyles[weightKey]) styleParts.push(`font-weight:${nextStyles[weightKey]}`);
+  const size = normalizeCssSizeValue(nextStyles[sizeKey]);
+  if (size) styleParts.push(`font-size:${size}`);
+  if (nextStyles.textAlign) styleParts.push(`text-align:${nextStyles.textAlign}`);
+  return styleParts.filter(Boolean).join(";");
+}
+
 function upsertOpeningTagAttribute(openingTag, name, value) {
   const safeName = String(name || "").trim();
   if (!safeName) return openingTag;
@@ -5247,17 +6092,17 @@ function appendOpeningTagStyle(openingTag, styleText) {
   return openingTag.replace(/>$/, ` style="${escapeHtml(nextStyle)}">`);
 }
 
-function styleFirstPattern(blockHtml, patterns, color) {
+function styleFirstPattern(blockHtml, patterns, styleText) {
   let next = String(blockHtml || "");
-  const targetColor = String(color || "").trim();
-  if (!targetColor) return next;
+  const targetStyle = String(styleText || "").trim();
+  if (!targetStyle) return next;
   for (const pattern of patterns) {
     const match = next.match(pattern);
     if (!match) continue;
     const openingTag = match[0];
     const styledTag = /style="/i.test(openingTag)
-      ? openingTag.replace(/style="([^"]*)"/i, (_, value) => `style="${escapeHtml(`${value};color:${targetColor}`)}"`)
-      : openingTag.replace(/>$/, ` style="color:${escapeHtml(targetColor)}">`);
+      ? openingTag.replace(/style="([^"]*)"/i, (_, value) => `style="${escapeHtml(`${value};${targetStyle}`)}"`)
+      : openingTag.replace(/>$/, ` style="${escapeHtml(targetStyle)}">`);
     next = next.replace(openingTag, styledTag);
     return next;
   }
@@ -5282,11 +6127,10 @@ function applyGenericWorkspaceSectionPatch(sectionHtml, componentPatch = {}) {
   let next = String(sectionHtml);
   next = next.replace(/<([a-zA-Z][\w:-]*)([^>]*)>/, (match) => {
     let openingTag = match;
-    const styleParts = [];
-    if (styles.background) styleParts.push(`background:${styles.background}`);
-    if (Number.isFinite(Number(styles.radius))) styleParts.push(`border-radius:${Number(styles.radius)}px`);
-    if (patch.visibility === false) styleParts.push("display:none");
-    openingTag = appendOpeningTagStyle(openingTag, styleParts.join(";"));
+    openingTag = appendOpeningTagStyle(
+      openingTag,
+      buildSectionPatchStyleText(styles, { includeHeight: true, hidden: patch.visibility === false })
+    );
     if (Object.keys(patch).length) {
       openingTag = upsertOpeningTagAttribute(openingTag, "data-codex-patched", "true");
     }
@@ -5314,24 +6158,71 @@ function applyGenericWorkspaceSectionPatch(sectionHtml, componentPatch = {}) {
       patch.subtitle
     );
   }
-  if (styles.titleColor) {
+  if (patch.description) {
+    next = replaceFirstTextMatch(
+      next,
+      [
+        /<p\b[^>]*>[\s\S]*?<\/p>/i,
+        /<div\b class="[^"]*(?:bestcare-description|desc|description)[^"]*"[^>]*>[\s\S]*?<\/div>/i,
+        /<span\b class="[^"]*(?:desc|description)[^"]*"[^>]*>[\s\S]*?<\/span>/i,
+      ],
+      patch.description
+    );
+  }
+  if (patch.badge) {
+    next = replaceFirstTextMatch(
+      next,
+      [
+        /<span\b class="[^"]*(?:badge)[^"]*"[^>]*>[\s\S]*?<\/span>/i,
+        /<div\b class="[^"]*(?:badge)[^"]*"[^>]*>[\s\S]*?<\/div>/i,
+      ],
+      patch.badge
+    );
+  }
+  if (patch.moreLabel) {
+    next = replaceFirstTextMatch(
+      next,
+      [
+        /<(?:a|button)\b[^>]*class="[^"]*(?:more|btn-more)[^"]*"[^>]*>[\s\S]*?<\/(?:a|button)>/i,
+        /<span\b[^>]*class="[^"]*(?:more)[^"]*"[^>]*>[\s\S]*?<\/span>/i,
+      ],
+      patch.moreLabel
+    );
+  }
+  if (patch.ctaLabel) {
+    next = replaceFirstTextMatch(
+      next,
+      [/<(?:a|button)\b[^>]*>[\s\S]*?<\/(?:a|button)>/i],
+      patch.ctaLabel
+    );
+  }
+  if (patch.ctaHref) {
+    next = replaceFirstMatch(
+      next,
+      /<a\b[^>]*href="[^"]*"[^>]*>/i,
+      (match) => match[0].replace(/href="[^"]*"/, `href="${escapeHtml(patch.ctaHref)}"`)
+    );
+  }
+  const titleStyleText = buildTextPatchStyleText(styles, "title");
+  const subtitleStyleText = buildTextPatchStyleText(styles, "subtitle");
+  if (titleStyleText) {
     next = styleFirstPattern(
       next,
       [
         /<((?:h[1-6])\b[^>]*)([^>]*)>/i,
         /<((?:div|strong)\b[^>]*class="[^"]*(?:section-title|section__title|bestcare-title|banner-tit|tit|title)[^"]*"[^>]*)([^>]*)>/i,
       ],
-      styles.titleColor
+      titleStyleText
     );
   }
-  if (styles.subtitleColor) {
+  if (subtitleStyleText) {
     next = styleFirstPattern(
       next,
       [
         /<((?:p)\b[^>]*)([^>]*)>/i,
         /<((?:div|span)\b[^>]*class="[^"]*(?:bestcare-description|desc|description)[^"]*"[^>]*)([^>]*)>/i,
       ],
-      styles.subtitleColor
+      subtitleStyleText
     );
   }
   return next;
@@ -5408,6 +6299,55 @@ function applyWorkspacePageVariants(html, pageId, viewportProfile, editableData)
     }
   }
 
+  return next;
+}
+
+function applyWorkspaceProductVariants(html, pageId, viewportProfile, href, editableData) {
+  let next = String(html || "");
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile = String(viewportProfile || "pc").trim() || "pc";
+  const normalizedHref = String(href || "").trim();
+  if (!normalizedPageId || !normalizedHref) return next;
+
+  const pdpContext = resolvePdpRuntimeContext(normalizedPageId, normalizedHref);
+  const capturePageId = pdpContext?.runtimePageId || normalizedPageId;
+  const captureHref = pdpContext?.href || normalizedHref;
+  const entry =
+    findPdpGroupEntry(capturePageId, normalizedViewportProfile, captureHref, "reference") ||
+    findPdpGroupEntry(capturePageId, normalizedViewportProfile === "pc" ? "mo" : "pc", captureHref, "reference");
+  const groups = normalizeGroupMap(entry?.groups);
+  if (!Object.keys(groups || {}).length) return next;
+
+  const annotateSlot = (slotId, selector) => {
+    if (!selector) return;
+    const sourceMeta = getWorkspaceSlotSourceMeta(editableData || {}, normalizedPageId, slotId);
+    const componentId = `${normalizedPageId}.${slotId}`;
+    const patchSchema = getGenericPatchSchema(normalizedPageId, slotId);
+    const hasPatchSupport = (patchSchema.rootKeys || []).length > 0 || (patchSchema.styleKeys || []).length > 0;
+    const patch = hasPatchSupport
+      ? findComponentPatch(editableData || {}, normalizedPageId, componentId, sourceMeta.sourceId)?.patch || null
+      : null;
+    next = transformFirstSelectorBlock(next, selector, (block) => {
+      let patched = String(block || "");
+      patched = patched.replace(/<([a-zA-Z][\w:-]*)([^>]*)>/, (openingTag) => {
+        let result = openingTag;
+        result = upsertOpeningTagAttribute(result, "data-codex-slot", slotId);
+        result = upsertOpeningTagAttribute(result, "data-codex-source", sourceMeta.sourceType);
+        result = upsertOpeningTagAttribute(result, "data-codex-component-id", componentId);
+        result = upsertOpeningTagAttribute(result, "data-codex-active-source-id", sourceMeta.sourceId);
+        return result;
+      });
+      if (patch && hasPatchSupport) {
+        patched = applyGenericWorkspaceSectionPatch(patched, patch);
+      }
+      return patched;
+    });
+  };
+
+  for (const [slotId, group] of Object.entries(groups || {})) {
+    if (!group?.found || !group?.selector) continue;
+    annotateSlot(slotId, group.selector);
+  }
   return next;
 }
 
@@ -6392,10 +7332,12 @@ function buildRuntimePageSummary(data) {
     "category-tvs",
     "category-refrigerators",
   ];
+  const pdpCasePageIds = Object.keys(PDP_CASE_PAGE_CONFIG);
   const existingPageIds = new Set((data.pages || []).map((page) => String(page.id || "").trim()).filter(Boolean));
   const corePages = corePageIds.filter((pageId) => existingPageIds.has(pageId));
   const infoPages = infoPageIds.filter((pageId) => existingPageIds.has(pageId));
   const plpPages = plpPageIds.filter((pageId) => existingPageIds.has(pageId));
+  const pdpCasePages = pdpCasePageIds.filter((pageId) => existingPageIds.has(pageId));
   const routeCatalog = [
     ...corePages.map((pageId) => ({
       type: "core-page",
@@ -6412,24 +7354,31 @@ function buildRuntimePageSummary(data) {
       id: pageId,
       route: `/clone/${pageId}`,
     })),
+    ...pdpCasePages.map((pageId) => ({
+      type: "pdp-case-page",
+      id: pageId,
+      route: `/clone-product?pageId=${encodeURIComponent(pageId)}`,
+    })),
     {
       type: "pdp-route",
       id: "clone-product",
       route: "/clone-product",
     },
   ];
-  const uniqueRuntimePageCount = new Set([...corePages, ...infoPages, ...plpPages]).size;
+  const uniqueRuntimePageCount = new Set([...corePages, ...infoPages, ...plpPages, ...pdpCasePages]).size;
   return {
     totalRuntimePages: uniqueRuntimePageCount + 1,
     corePages,
     infoPages,
     plpPages,
+    pdpCasePages,
     pdpRoutes: ["/clone-product"],
     routeCatalog,
     counts: {
       corePages: corePages.length,
-      infoPages: infoPageIds.length,
-      plpPages: plpPageIds.length,
+      infoPages: infoPages.length,
+      plpPages: plpPages.length,
+      pdpCasePages: pdpCasePages.length,
       pdpRoutes: 1,
     },
   };
@@ -6467,6 +7416,46 @@ function buildPageOperationalAdvisories() {
         severity: "info",
         title: "Shared PDP route",
         detail: "PDP is currently exposed through `/clone-product` rather than per-product static routes.",
+      },
+    ],
+    "pdp-tv-general": [
+      {
+        id: "pdp-tv-general-case-boundary",
+        severity: "info",
+        title: "Independent PDP case",
+        detail: "This PDP case stores patches independently, while capture/group selectors are reused from `category-tvs` for rendering.",
+      },
+    ],
+    "pdp-tv-premium": [
+      {
+        id: "pdp-tv-premium-case-boundary",
+        severity: "info",
+        title: "Independent PDP case",
+        detail: "This PDP case stores patches independently, while capture/group selectors are reused from `category-tvs` for rendering.",
+      },
+    ],
+    "pdp-refrigerator-general": [
+      {
+        id: "pdp-refrigerator-general-case-boundary",
+        severity: "info",
+        title: "Independent PDP case",
+        detail: "This PDP case stores patches independently, while capture/group selectors are reused from `category-refrigerators` for rendering.",
+      },
+    ],
+    "pdp-refrigerator-knockon": [
+      {
+        id: "pdp-refrigerator-knockon-case-boundary",
+        severity: "info",
+        title: "Independent PDP case",
+        detail: "This PDP case stores patches independently, while capture/group selectors are reused from `category-refrigerators` for rendering.",
+      },
+    ],
+    "pdp-refrigerator-glass": [
+      {
+        id: "pdp-refrigerator-glass-case-boundary",
+        severity: "info",
+        title: "Independent PDP case",
+        detail: "This PDP case stores patches independently, while capture/group selectors are reused from `category-refrigerators` for rendering.",
       },
     ],
   };
@@ -6849,23 +7838,22 @@ function renderBestRankingSandboxSection(activeSourceId = "custom-renderer", com
   const subtitle = String(componentPatch.subtitle || "LGE.COM 인기 제품 추천");
   const moreLabel = String(componentPatch.moreLabel || "더보기");
   const styles = componentPatch.styles && typeof componentPatch.styles === "object" ? componentPatch.styles : {};
-  const titleColor = String(styles.titleColor || "#111111");
-  const subtitleColor = String(styles.subtitleColor || "#727780");
-  const background = String(styles.background || "");
-  const radius = Number.isFinite(Number(styles.radius)) ? Number(styles.radius) : null;
-  const sectionStyle = [
-    background ? `background:${background}` : "",
-    radius != null ? `border-radius:${radius}px` : "",
-  ]
-    .filter(Boolean)
-    .join(";");
+  const titleStyle = buildTextPatchStyleText({
+    ...styles,
+    titleColor: styles.titleColor || "#111111",
+  }, "title");
+  const subtitleStyle = buildTextPatchStyleText({
+    ...styles,
+    subtitleColor: styles.subtitleColor || "#727780",
+  }, "subtitle");
+  const sectionStyle = buildSectionPatchStyleText(styles, { hidden: componentPatch.visibility === false });
   return `
     <section data-codex-slot="best-ranking" data-codex-source="custom-renderer" data-codex-component-id="home.best-ranking" data-codex-active-source-id="${escapeHtml(activeSourceId)}" data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}" data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId || activeSourceId)}" data-codex-render-mode="${escapeHtml(resolution.renderMode)}" class="codex-home-best-ranking${variantClass}" ${sectionStyle ? `style="${escapeHtml(sectionStyle)}"` : ""}>
       <div class="codex-home-best-ranking-inner">
         <div class="codex-home-best-ranking-headline">
           <div class="title-home_title-home__Jw_7z">
-            <h2 class="title-home_title-home_tit__tE_5M" style="color:${escapeHtml(titleColor)}">${escapeHtml(title)}</h2>
-            <span class="title-home_title-home_sub_tit__ivkxK" style="color:${escapeHtml(subtitleColor)}">${escapeHtml(subtitle)}</span>
+            <h2 class="title-home_title-home_tit__tE_5M" ${titleStyle ? `style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
+            <span class="title-home_title-home_sub_tit__ivkxK" ${subtitleStyle ? `style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</span>
           </div>
         </div>
         <div class="codex-home-best-ranking-content">
@@ -7717,7 +8705,7 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
   const internalLinkMap = buildInternalCloneLinkMap();
   const pdpCaptureMap = buildPdpCapturePageMap(viewportProfile);
   const isHome = pageId === "home";
-  const preservePageHeader = isHome || ["support", "bestshop", "care-solutions"].includes(pageId);
+  const preservePageHeader = true;
   const useCapturedHomeHeader =
     isHome &&
     isCapturedSourceActive(editableData, "home", "header-top") &&
@@ -10322,7 +11310,7 @@ function rewriteReferenceHtml(rawHtml, pageId) {
   return html;
 }
 
-function rewriteProductCapturedHtml(rawHtml) {
+function rewriteProductCapturedHtml(rawHtml, pageId = "", viewportProfile = "pc", href = "", editableData = null) {
   let html = rawHtml;
   html = html.replace(/<script\b[\s\S]*?<\/script>/gi, "");
   html = html.replace(/<iframe\b[\s\S]*?<\/iframe>/gi, "");
@@ -10331,6 +11319,7 @@ function rewriteProductCapturedHtml(rawHtml) {
   html = html.replace(/<link[^>]+rel=("|')manifest\1[^>]*>/gi, "");
   html = html.replace(/\b(href|src|poster)=("|')\/(?!\/)/gi, `$1=$2https://www.lge.co.kr/`);
   html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
+  html = applyWorkspaceProductVariants(html, pageId, viewportProfile, href, editableData || {});
   html = html.replace(
     /<\/head>/i,
     `<style>
@@ -10349,7 +11338,7 @@ function sendCloneContent(req, res, pageId, requestUrl = null) {
     const homeSandbox = String(requestUrl?.searchParams?.get("homeSandbox") || "").trim();
     const homeVariant = String(requestUrl?.searchParams?.get("homeVariant") || "").trim();
     const editorEnabled = String(requestUrl?.searchParams?.get("editor") || "").trim() === "1";
-    const { data: editableData } = readDataForRequest(req);
+    const { data: editableData } = resolvePinnedDataForPage(req, pageId);
     const rawHtml = readCloneSourceHtmlByPageId(pageId, viewportProfile);
     if (!rawHtml) {
       return sendRawHtml(
@@ -10374,29 +11363,35 @@ function sendCloneContent(req, res, pageId, requestUrl = null) {
   }
 }
 
-function sendCloneProductContent(res, requestUrl) {
+function sendCloneProductContent(req, res, requestUrl) {
   try {
     const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
     const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "pc").trim() || "pc";
     const href = String(requestUrl.searchParams.get("href") || "").trim();
-    if (!pageId || !href) {
+    const { data: editableData } = resolvePinnedDataForPage(req, pageId);
+    const pdpContext = resolvePdpRuntimeContext(pageId, href);
+    const capturePageId = pdpContext?.runtimePageId || pageId;
+    const effectiveHref = pdpContext?.href || href;
+    if (!pageId || !effectiveHref) {
       return sendRawHtml(
         res,
         400,
         `<!doctype html><html><head><meta charset="utf-8"><title>Clone product missing params</title></head><body><h1>Missing params</h1></body></html>`
       );
     }
-    const capture = findPdpVisualCapture(pageId, viewportProfile, href, "reference");
+    const capture =
+      findPdpVisualCapture(capturePageId, viewportProfile, effectiveHref, "reference") ||
+      findPdpVisualCapture(capturePageId, viewportProfile === "pc" ? "mo" : "pc", effectiveHref, "reference");
     const htmlPath = capture?.artifact?.htmlPath || "";
     if (!htmlPath || !fs.existsSync(htmlPath)) {
       return sendRawHtml(
         res,
         404,
-        `<!doctype html><html><head><meta charset="utf-8"><title>Clone product source not found</title></head><body><h1>Clone product source not found</h1><p>${escapeHtml(href)}</p></body></html>`
+        `<!doctype html><html><head><meta charset="utf-8"><title>Clone product source not found</title></head><body><h1>Clone product source not found</h1><p>${escapeHtml(effectiveHref)}</p></body></html>`
       );
     }
     const rawHtml = fs.readFileSync(htmlPath, "utf-8");
-    const transformed = rewriteProductCapturedHtml(rawHtml);
+    const transformed = rewriteProductCapturedHtml(rawHtml, pageId, viewportProfile, effectiveHref, editableData);
     return sendRawHtml(res, 200, transformed);
   } catch (error) {
     return sendRawHtml(
@@ -10407,11 +11402,13 @@ function sendCloneProductContent(res, requestUrl) {
   }
 }
 
-function sendCloneProductShell(res, requestUrl) {
+function sendCloneProductShell(req, res, requestUrl) {
   const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
   const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "pc").trim() || "pc";
   const href = String(requestUrl.searchParams.get("href") || "").trim();
+  const { pinnedView } = resolvePinnedDataForPage(req, pageId);
   const title = escapeHtml(requestUrl.searchParams.get("title") || href || "PDP");
+  const visibleTitle = `${title}${pinnedView?.version?.versionLabel ? ` · ${escapeHtml(pinnedView.version.versionLabel)}` : ""}`;
   const iframeSrc = `/clone-product-content?pageId=${encodeURIComponent(pageId)}&viewportProfile=${encodeURIComponent(viewportProfile)}&href=${encodeURIComponent(href)}&v=${Date.now()}`;
   return sendRawHtml(
     res,
@@ -10433,7 +11430,7 @@ function sendCloneProductShell(res, requestUrl) {
   <body>
     <div class="pdp-clone-shell">
       <div class="pdp-clone-bar">
-        <span>${title}</span>
+        <span>${visibleTitle}</span>
         <a href="/workbench/pdp?pageId=${encodeURIComponent(pageId)}&viewportProfile=${encodeURIComponent(viewportProfile)}">workbench</a>
       </div>
       <iframe class="pdp-clone-frame" src="${iframeSrc}" title="${title}"></iframe>
@@ -10466,7 +11463,7 @@ function sendReferenceContent(res, pageId, requestUrl = null) {
   }
 }
 
-function sendCloneShell(res, pageId, requestUrl = null) {
+function sendCloneShell(req, res, pageId, requestUrl = null) {
   const safePageId = String(pageId || "home");
   const homeSandbox = String(requestUrl?.searchParams?.get("homeSandbox") || "").trim();
   const homeVariant = String(requestUrl?.searchParams?.get("homeVariant") || "").trim();
@@ -10479,7 +11476,8 @@ function sendCloneShell(res, pageId, requestUrl = null) {
     .toLowerCase();
   const homeSandboxQuery = homeSandbox ? `&homeSandbox=${encodeURIComponent(homeSandbox)}` : "";
   const homeVariantQuery = homeVariant ? `&homeVariant=${encodeURIComponent(homeVariant)}` : "";
-  const editableData = readEditableData();
+  const { pinnedView, effectiveSource } = resolvePinnedDataForPage(req, safePageId);
+  const workspaceSource = effectiveSource || "shared-default";
   const baseline = resolveBaselineInfo(safePageId);
   const shellViewportProfile = requestedView === "mo" || requestedView === "pc"
     ? requestedView
@@ -10487,11 +11485,7 @@ function sendCloneShell(res, pageId, requestUrl = null) {
       ? "mo"
       : "pc";
   const isMobileShell = shellViewportProfile === "mo";
-  const useCapturedShellHeader =
-    safePageId === "home" ||
-    safePageId === "support" ||
-    safePageId === "bestshop" ||
-    safePageId === "care-solutions";
+  const useCapturedShellHeader = true;
   const gnb = isMobileShell ? { topLinks: [], brandTabs: [], utilityLinks: [], dropdownMenus: {} } : buildShellGnbData();
   const dropdownPanelsHtml = Object.values(gnb.dropdownMenus || {})
     .map(
@@ -10569,7 +11563,8 @@ function sendCloneShell(res, pageId, requestUrl = null) {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Clone | ${safePageId}</title>
+    <meta name="codex-workspace-source" content="${escapeHtml(workspaceSource || "shared-default")}" />
+    <title>Clone | ${safePageId}${pinnedView?.version?.versionLabel ? ` | ${escapeHtml(pinnedView.version.versionLabel)}` : ""}</title>
     <style>
       html, body {
         margin: 0;
@@ -11959,10 +12954,10 @@ function route(req, res) {
     return sendAcceptanceWorkbench(res);
   }
   if (pathname === "/clone-product-content") {
-    return sendCloneProductContent(res, requestUrl);
+    return sendCloneProductContent(req, res, requestUrl);
   }
   if (pathname === "/clone-product") {
-    return sendCloneProductShell(res, requestUrl);
+    return sendCloneProductShell(req, res, requestUrl);
   }
   if (pathname.startsWith("/clone-content/")) {
     const pageId = decodeURIComponent(pathname.slice("/clone-content/".length));
@@ -12118,7 +13113,7 @@ function route(req, res) {
   }
   if (pathname.startsWith("/clone/")) {
     const pageId = decodeURIComponent(pathname.slice("/clone/".length));
-    return sendCloneShell(res, pageId, requestUrl);
+    return sendCloneShell(req, res, pageId, requestUrl);
   }
   if (pathname.startsWith("/p/")) {
     return sendHtml(res, 200, "page.html");
@@ -12196,9 +13191,7 @@ function route(req, res) {
       user: sanitizeUser(user),
       workspace: {
         base: workspace.base || "shared-default",
-        updatedAt: workspace.updatedAt || null,
-        llmUsageCount: Number(workspace.llmUsageCount || 0),
-        workHistory: (workspace.workHistory || []).slice(0, 20),
+        ...buildWorkspaceMetaSummary(workspace),
       },
     });
   }
@@ -12254,11 +13247,125 @@ function route(req, res) {
       items: (workspace.workHistory || []).slice(0, 50),
     });
   }
+  if (pathname === "/api/workspace/plans") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+    const limit = Math.max(1, Math.min(200, Number(requestUrl.searchParams.get("limit") || 50)));
+    return sendJson(res, 200, {
+      items: listRequirementPlans(user.userId, { pageId, limit }),
+    });
+  }
+  if (pathname === "/api/workspace/plan" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const saved = saveRequirementPlan(user.userId, payload);
+        return sendJson(res, 200, { ok: true, item: saved });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_plan_save_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/draft-builds") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+    const limit = Math.max(1, Math.min(200, Number(requestUrl.searchParams.get("limit") || 50)));
+    return sendJson(res, 200, {
+      items: listDraftBuilds(user.userId, { pageId, limit }),
+    });
+  }
+  if (pathname === "/api/workspace/draft-build" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const saved = saveDraftBuild(user.userId, payload);
+        return sendJson(res, 200, { ok: true, item: saved });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_draft_build_save_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/versions") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+    const limit = Math.max(1, Math.min(200, Number(requestUrl.searchParams.get("limit") || 50)));
+    return sendJson(res, 200, {
+      items: listSavedVersions(user.userId, { pageId, limit }),
+    });
+  }
+  if (pathname === "/api/workspace/version-save" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const currentData = readWorkspaceData(user.userId);
+        const buildId = String(payload.buildId || "").trim();
+        const draftBuild =
+          buildId
+            ? listDraftBuilds(user.userId, { pageId, limit: 200 }).find((item) => item.id === buildId) || null
+            : null;
+        const pageSnapshot =
+          (payload.snapshotData && payload.snapshotData.pageSnapshot) ||
+          draftBuild?.snapshotData?.pageSnapshot ||
+          extractPageScopedSnapshot(currentData, pageId);
+        const changedComponentIds = Array.isArray(payload.snapshotData?.changedComponentIds)
+          ? payload.snapshotData.changedComponentIds.filter(Boolean)
+          : Array.isArray(draftBuild?.snapshotData?.changedComponentIds)
+            ? draftBuild.snapshotData.changedComponentIds.filter(Boolean)
+            : [];
+        if (!changedComponentIds.length) {
+          return sendJson(res, 400, { error: "no_effect_build_cannot_save" });
+        }
+        const item = saveSavedVersion(user.userId, {
+          ...payload,
+          snapshotData: {
+            ...(payload.snapshotData && typeof payload.snapshotData === "object" ? payload.snapshotData : {}),
+            changedComponentIds,
+            pageSnapshot,
+          },
+          createdBy: user.userId,
+        });
+        return sendJson(res, 200, { ok: true, item });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_version_save_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/view-pin") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    if (req.method === "GET") {
+      const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+      if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+      return sendJson(res, 200, {
+        item: getPinnedView(user.userId, pageId),
+      });
+    }
+    if (req.method === "POST") {
+      return readBody(req)
+        .then((body) => {
+          const payload = body ? JSON.parse(body) : {};
+          const pageId = String(payload.pageId || "").trim();
+          const versionId = String(payload.versionId || "").trim();
+          const item = pinSavedVersion(user.userId, pageId, versionId);
+          return sendJson(res, 200, { ok: true, item });
+        })
+        .catch((error) => sendJson(res, 500, { error: "workspace_view_pin_failed", detail: String(error) }));
+    }
+  }
   if (pathname === "/api/workspace/slot-registry") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     const registry = findSlotRegistry(data, pageId);
     if (!registry) return sendJson(res, 404, { error: "slot_registry_not_found", pageId });
     return sendJson(res, 200, registry);
@@ -12268,7 +13375,7 @@ function route(req, res) {
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
     const slotId = requestUrl.searchParams.get("slotId") || "";
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     const slot = findSlotConfig(data, pageId, slotId);
     if (!slot) return sendJson(res, 404, { error: "slot_not_found", pageId, slotId });
     return sendJson(res, 200, {
@@ -12290,7 +13397,7 @@ function route(req, res) {
         if (!slotId || !sourceId) {
           return sendJson(res, 400, { error: "slot_id_and_source_id_required" });
         }
-        const data = getWorkspace(user.userId).data;
+        const data = readWorkspaceData(user.userId);
         const registry = findSlotRegistry(data, pageId);
         if (!registry) return sendJson(res, 404, { error: "slot_registry_not_found", pageId });
         const slot = (registry.slots || []).find((item) => item.slotId === slotId);
@@ -12326,7 +13433,7 @@ function route(req, res) {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildWorkingComponentInventory(pageId, { editableData: data }));
   }
   if (pathname === "/api/workspace/component-patches") {
@@ -12335,7 +13442,7 @@ function route(req, res) {
     const pageId = requestUrl.searchParams.get("pageId") || "";
     const componentId = requestUrl.searchParams.get("componentId") || "";
     const sourceId = requestUrl.searchParams.get("sourceId") || "";
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     if (componentId) {
       return sendJson(res, 200, {
         pageId,
@@ -12362,7 +13469,7 @@ function route(req, res) {
         if (!pageId || !componentId || !sourceId || !patch) {
           return sendJson(res, 400, { error: "page_id_component_id_source_id_patch_required" });
         }
-        const data = getWorkspace(user.userId).data;
+        const data = readWorkspaceData(user.userId);
         const editableCatalog = buildWorkingEditableComponentCatalog(pageId, { editableData: data });
         const editable = (editableCatalog.components || []).find((item) => item.componentId === componentId);
         if (!editable) {
@@ -12386,14 +13493,14 @@ function route(req, res) {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildWorkingEditableComponentCatalog(pageId, { editableData: data }));
   }
   if (pathname === "/api/workspace/component-rollback") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildWorkingRollbackCatalog(pageId, { editableData: data }));
   }
   if (pathname === "/api/workspace/interaction-verification") {
@@ -12406,40 +13513,40 @@ function route(req, res) {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildLlmReadinessReport(pageId, { editableData: data }));
   }
   if (pathname === "/api/workspace/pre-llm-gaps") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildPreLlmGapReport(pageId, { editableData: data }));
   }
   if (pathname === "/api/workspace/llm-editable-list") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildLlmEditableList(pageId, { editableData: data }));
   }
   if (pathname === "/api/workspace/final-readiness") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildFinalReadinessReport({ editableData: data }));
   }
   if (pathname === "/api/workspace/acceptance-results") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     const pageId = requestUrl.searchParams.get("pageId") || "";
     return sendJson(res, 200, buildAcceptanceResultsReport({ editableData: data, pageId }));
   }
   if (pathname === "/api/workspace/acceptance-queue") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
-    const data = getWorkspace(user.userId).data;
+    const data = readWorkspaceData(user.userId);
     const pageId = requestUrl.searchParams.get("pageId") || "";
     return sendJson(res, 200, buildAcceptanceQueueReport({ editableData: data, pageId }));
   }
@@ -12465,7 +13572,7 @@ function route(req, res) {
         if (!bundle) {
           return sendJson(res, 404, { error: "acceptance_bundle_not_found", bundleId });
         }
-        const data = getWorkspace(user.userId).data;
+        const data = readWorkspaceData(user.userId);
         const nextData = upsertAcceptanceResult(data, bundle, status, note);
         saveDataForUser(user, nextData, `acceptance_result:${bundleId}:${status}`);
         logEvent(user.userId, "acceptance_result_saved", {
@@ -12512,24 +13619,21 @@ function route(req, res) {
       const { linkMap, heroMap } = buildPageEnhancementMaps(data);
       const runtimePageSummary = buildRuntimePageSummary(data);
       const pageAdvisories = buildPageOperationalAdvisories();
-      const coverageMap = Object.fromEntries((data.pages || []).map((page) => [page.id, buildCoverageModel(page.id)]));
+      const includeCoverage = requestUrl.searchParams.get("includeCoverage") === "1";
+      const coverageMap = includeCoverage
+        ? Object.fromEntries((data.pages || []).map((page) => [page.id, buildCoverageModel(page.id)]))
+        : undefined;
       return sendJson(res, 200, {
         ...data,
         linkMap,
         heroMap,
         runtimePageSummary,
         pageAdvisories,
-        coverageMap,
+        ...(includeCoverage ? { coverageMap } : {}),
         homePageId: (data.pages || []).find((p) => p.id === "home") ? "home" : (data.pages || [])[0]?.id,
         workspaceSource: source,
         currentUser: sanitizeUser(user),
-        workspaceMeta: workspace
-          ? {
-              updatedAt: workspace.updatedAt || null,
-              llmUsageCount: Number(workspace.llmUsageCount || 0),
-              workHistory: (workspace.workHistory || []).slice(0, 20),
-            }
-          : null,
+        workspaceMeta: buildWorkspaceMetaSummary(workspace),
       });
     } catch (error) {
       return sendJson(res, 500, { error: "failed_to_read_data", detail: String(error) });
@@ -12539,7 +13643,201 @@ function route(req, res) {
     return sendJson(res, 200, {
       configured: Boolean(process.env.OPENROUTER_API_KEY),
       model: process.env.OPENROUTER_MODEL || "openai/gpt-4.1-mini",
+      plannerModel: process.env.PLANNER_MODEL || process.env.OPENROUTER_MODEL || "openai/gpt-4.1-mini",
+      builderModel: process.env.BUILDER_MODEL || process.env.OPENROUTER_MODEL || "openai/gpt-4.1-mini",
     });
+  }
+  if (pathname === "/api/llm/plan" && req.method === "POST") {
+    return readBody(req)
+      .then(async (body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        const viewportProfile = String(payload.viewportProfile || "pc").trim() || "pc";
+        const mode = String(payload.mode || "direct").trim() || "direct";
+        const requestText = String(payload.requestText || "").trim();
+        const keyMessage = String(payload.keyMessage || "").trim();
+        const preferredDirection = String(payload.preferredDirection || "").trim();
+        const avoidDirection = String(payload.avoidDirection || "").trim();
+        const toneAndMood = String(payload.toneAndMood || "").trim();
+        const referenceUrls = safeArray(payload.referenceUrls || [], 5);
+        const designChangeLevel = normalizeDesignChangeLevel(payload.designChangeLevel, "medium");
+        const targetScope = String(payload.targetScope || "page").trim() || "page";
+        const targetComponents = safeArray(payload.targetComponents || [], 50)
+          .map((item) => String(item || "").trim())
+          .filter(Boolean);
+        if (!pageId) {
+          return sendJson(res, 400, { error: "page_id_required" });
+        }
+        if (!requestText && referenceUrls.length === 0) {
+          return sendJson(res, 400, { error: "request_text_or_reference_required" });
+        }
+        const data = readWorkspaceData(user.userId);
+        const page = findPage(data, pageId);
+        if (!page) {
+          return sendJson(res, 404, { error: "page_not_found", pageId });
+        }
+        const plannerInput = await buildPlannerInputPayload({
+          user,
+          editableData: data,
+          pageId,
+          viewportProfile,
+          mode,
+          requestText,
+          keyMessage,
+          preferredDirection,
+          avoidDirection,
+          toneAndMood,
+          referenceUrls,
+          designChangeLevel,
+          targetScope,
+          targetComponents,
+        });
+        const plannerResult = await handleLlmPlan(plannerInput);
+        const savedPlan = saveRequirementPlan(user.userId, {
+          pageId,
+          viewportProfile,
+          mode,
+          status: "draft",
+          title: plannerResult.requirementPlan?.title || "",
+          summary: plannerResult.summary || "",
+          input: plannerInput,
+          output: {
+            requirementPlan: plannerResult.requirementPlan || {},
+            toolContext: {
+              referenceSummary: plannerInput.referenceSummary,
+              guardrailBundle: plannerInput.guardrailBundle,
+            },
+          },
+        });
+        incrementLlmUsage(user.userId, {
+          kind: "planner",
+          pageId,
+          promptLength: requestText.length,
+          referenceCount: referenceUrls.length,
+        });
+        logEvent(user.userId, "llm_plan_created", {
+          pageId,
+          planId: savedPlan?.id || null,
+          referenceCount: referenceUrls.length,
+          viewportProfile,
+        });
+        return sendJson(res, 200, {
+          summary: plannerResult.summary || "요구사항 정리 완료",
+          planId: savedPlan?.id || null,
+          requirementPlan: plannerResult.requirementPlan || {},
+          toolContext: {
+            referenceSummary: plannerInput.referenceSummary,
+            guardrailBundle: plannerInput.guardrailBundle,
+          },
+        });
+      })
+      .catch((error) => {
+        return sendJson(res, 500, {
+          error: "llm_plan_failed",
+          detail: String(error),
+        });
+      });
+  }
+  if (pathname === "/api/llm/build" && req.method === "POST") {
+    return readBody(req)
+      .then(async (body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        const viewportProfile = String(payload.viewportProfile || "pc").trim() || "pc";
+        const planId = String(payload.planId || "").trim();
+        const intensity = String(payload.intensity || "balanced").trim() || "balanced";
+        const versionLabelHint = String(payload.versionLabelHint || "").trim();
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const data = readWorkspaceData(user.userId);
+        const page = findPage(data, pageId);
+        if (!page) return sendJson(res, 404, { error: "page_not_found", pageId });
+        const savedPlans = listRequirementPlans(user.userId, { pageId, limit: 200 });
+        const matchedPlan = planId
+          ? savedPlans.find((item) => item.id === planId) || null
+          : savedPlans[0] || null;
+        const targetScope = String(payload.targetScope || matchedPlan?.input?.userInput?.targetScope || "page").trim() || "page";
+        const designChangeLevel = normalizeDesignChangeLevel(
+          payload.designChangeLevel ||
+            payload.approvedPlan?.designChangeLevel ||
+            matchedPlan?.output?.requirementPlan?.designChangeLevel ||
+            matchedPlan?.input?.userInput?.designChangeLevel,
+          "medium"
+        );
+        const targetComponents = safeArray(payload.targetComponents || matchedPlan?.input?.userInput?.targetComponents || [], 50)
+          .map((item) => String(item || "").trim())
+          .filter(Boolean);
+        const approvedPlan =
+          payload.approvedPlan && typeof payload.approvedPlan === "object"
+            ? payload.approvedPlan
+            : matchedPlan?.output?.requirementPlan || null;
+        if (!approvedPlan) {
+          return sendJson(res, 400, { error: "approved_plan_required" });
+        }
+        const builderInput = buildBuilderInputPayload({
+          editableData: data,
+          pageId,
+          viewportProfile,
+          approvedPlan,
+          intensity,
+          versionLabelHint,
+          designChangeLevel,
+          targetScope,
+          targetComponents,
+        });
+        const buildResult = await handleLlmBuildOnData(builderInput, data);
+        const changedComponentIds = Array.from(
+          new Set(
+            (buildResult.buildResult?.changedTargets || [])
+              .map((item) => String(item.componentId || "").trim())
+              .filter(Boolean)
+          )
+        );
+        const pageSnapshot = extractPageScopedSnapshot(buildResult.data || data, pageId);
+        const saved = saveDraftBuild(user.userId, {
+          pageId,
+          viewportProfile,
+          planId: matchedPlan?.id || planId || "",
+          status: "draft",
+          summary: buildResult.summary || "",
+          proposedVersionLabel: buildResult.buildResult?.proposedVersionLabel || "",
+          operations: buildResult.buildResult?.operations || [],
+          report: buildResult.buildResult?.report || {},
+          snapshotData: {
+            changedComponentIds,
+            previewUrl: buildPreviewUrlForWorkspacePage(pageId),
+            intensity,
+            designChangeLevel,
+            pageSnapshot,
+          },
+        });
+        incrementLlmUsage(user.userId, {
+          kind: "builder",
+          pageId,
+          planId: matchedPlan?.id || planId || null,
+          operationCount: Array.isArray(buildResult.buildResult?.operations) ? buildResult.buildResult.operations.length : 0,
+        });
+        logEvent(user.userId, "llm_build_created", {
+          pageId,
+          draftBuildId: saved?.id || null,
+          planId: matchedPlan?.id || planId || null,
+          intensity,
+        });
+        return sendJson(res, 200, {
+          summary: buildResult.summary || "시안 생성 완료",
+          draftBuildId: saved?.id || null,
+          buildResult: buildResult.buildResult || {},
+        });
+      })
+      .catch((error) => {
+        return sendJson(res, 500, {
+          error: "llm_build_failed",
+          detail: String(error),
+        });
+      });
   }
   if (pathname === "/api/llm/change" && req.method === "POST") {
     return readBody(req)
@@ -12552,7 +13850,8 @@ function route(req, res) {
           return sendJson(res, 400, { error: "prompt_required" });
         }
         const workspace = getWorkspace(user.userId);
-        const finalReadiness = buildFinalReadinessReport({ editableData: workspace.data });
+        const normalizedWorkspaceData = normalizeEditableData(workspace.data || {});
+        const finalReadiness = buildFinalReadinessReport({ editableData: normalizedWorkspaceData });
         if (finalReadiness.llmGateStatus !== "ready-for-llm") {
           return sendJson(res, 400, {
             error: "llm_gate_blocked",
@@ -12561,7 +13860,7 @@ function route(req, res) {
             nextAcceptanceTarget: finalReadiness.nextAcceptanceTarget || null,
           });
         }
-        const result = await handleLlmChangeOnData(prompt, workspace.data);
+        const result = await handleLlmChangeOnData(prompt, normalizedWorkspaceData);
         saveDataForUser(user, result.data, result.summary || "llm_change");
         incrementLlmUsage(user.userId, { promptLength: prompt.length });
         logEvent(user.userId, "llm_change_applied", {
@@ -12582,7 +13881,7 @@ function route(req, res) {
       const user = requireAuthenticatedUser(req, res);
       if (!user) return;
       const pageId = requestUrl.searchParams.get("id") || "";
-      const data = getWorkspace(user.userId).data;
+      const data = readWorkspaceData(user.userId);
       const page = findPage(data, pageId);
       if (!page) return sendJson(res, 404, { error: "page_not_found", pageId });
       return sendJson(res, 200, page);
@@ -12596,7 +13895,7 @@ function route(req, res) {
         const user = requireAuthenticatedUser(req, res);
         if (!user) return;
         const payload = body ? JSON.parse(body) : {};
-        const data = getWorkspace(user.userId).data;
+        const data = readWorkspaceData(user.userId);
         const page = findPage(data, payload.pageId);
         if (!page) return sendJson(res, 404, { error: "page_not_found", pageId: payload.pageId });
         const nextPage = updatePageSections(page, (draft) => {
@@ -12618,7 +13917,7 @@ function route(req, res) {
         const user = requireAuthenticatedUser(req, res);
         if (!user) return;
         const payload = body ? JSON.parse(body) : {};
-        const data = getWorkspace(user.userId).data;
+        const data = readWorkspaceData(user.userId);
         const page = findPage(data, payload.pageId);
         if (!page) return sendJson(res, 404, { error: "page_not_found", pageId: payload.pageId });
         const nextPage = updatePageSections(page, (draft) => {

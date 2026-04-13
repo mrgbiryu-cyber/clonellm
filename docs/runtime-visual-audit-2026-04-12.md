@@ -2,6 +2,10 @@
 
 Date: 2026-04-12
 
+> Document status:
+> This document is a dated runtime/visual audit snapshot.
+> Findings here are useful as historical context, but they should not be treated as the latest live status without re-checking current code and runtime behavior.
+
 ## Scope
 
 - server runtime routes
@@ -9,9 +13,9 @@ Date: 2026-04-12
 - visual asset reachability
 - route/data consistency against current repository state
 
-## Summary
+## Snapshot Summary
 
-The current runtime is not failing because of a broad image outage. The main problems are data coverage gaps and route/runtime inconsistency.
+At the time of this audit, the runtime was not failing because of a broad image outage. The main problems observed were data coverage gaps and route/runtime inconsistency.
 
 - `editable-prototype.json` currently contains only the `home` page.
 - README and runtime summary code describe more pages than the live data actually provides.
@@ -19,14 +23,14 @@ The current runtime is not failing because of a broad image outage. The main pro
 - clone page rendering ignores section `visible` state
 - image URLs sampled from the home clone content mostly resolve correctly through LG CDN redirects
 
-## What Was Verified
+## What Was Verified At That Time
 
 ### Server availability
 
 - app listens on `0.0.0.0:3000`
 - local and external HTTP access were both confirmed
 
-### Data payload shape
+### Data payload shape at audit time
 
 File checked:
 
@@ -39,7 +43,7 @@ Observed state:
 - no slot registries
 - no component patches
 
-This means the runtime data model is currently centered on a single-page prototype, not the broader route set described elsewhere in the repo.
+At that time, this meant the runtime data model was centered on a single-page prototype, not the broader route set described elsewhere in the repo.
 
 ### Clone API results
 
@@ -99,14 +103,14 @@ Observed:
 - sampled LG image URLs: mostly `302 -> 200`
 - no broad pattern of `404` image failures was found in the sampled set
 
-Conclusion:
+Conclusion at audit time:
 
 - current evidence does not point to a large-scale broken-image problem
 - current evidence points to route/data incompleteness as the primary issue
 
 ## Code Findings
 
-### 1. Data coverage is narrower than the declared runtime scope
+### 1. Data coverage was narrower than the declared runtime scope
 
 Relevant files:
 
@@ -121,7 +125,7 @@ Impact:
 - clone metadata APIs fail for most documented pages
 - admin/editor features tied to page data cannot operate on the missing pages
 
-### 2. Runtime page summary overstates supported pages
+### 2. Runtime page summary overstated supported pages
 
 Relevant function:
 
@@ -137,7 +141,7 @@ Impact:
 - API consumers can infer support for routes that are not actually backed by current data
 - documentation and runtime introspection drift apart
 
-### 3. Clone page rendering ignores section visibility
+### 3. Clone page rendering ignored section visibility
 
 Relevant file:
 

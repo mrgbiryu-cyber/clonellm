@@ -2,6 +2,11 @@
 
 > 먼저 읽을 기준 문서:
 > `docs/project-purpose-reference.md`
+>
+> 문서 상태:
+> 이 문서는 `home` 작업의 누적 진행 로그다.
+> 날짜별 기록이 섞여 있으므로, 여기의 `current`, `active`, `next` 같은 표현은 해당 시점 기준일 수 있다.
+> 현재 활성 기준은 `docs/decision-history.md`와 최신 설계 문서를 우선한다.
 
 ## Purpose
 
@@ -9,9 +14,9 @@
 
 기록 목적은 3가지다.
 
-1. 현재 메인 `/clone/home`에서 어디까지 수용 가능한지 빠르게 확인
+1. 각 시점의 메인 `/clone/home`에서 어디까지 수용 가능했는지 빠르게 확인
 2. 어떤 섹션이 `sandbox` 단계인지, 어떤 섹션이 `main` 반영됐는지 추적
-3. Claude/Codex가 다음 작업을 시작할 때 이미 실패한 시도와 현재 활성 작업을 바로 확인
+3. Claude/Codex가 다음 작업을 시작할 때 이미 실패한 시도와 당시 활성 작업을 바로 확인
 
 관련 기준 문서:
 
@@ -20,11 +25,11 @@
 - `docs/home-remediation-plan.md`
 - `docs/decision-history.md`
 
-## Current Baseline
+## Baseline Snapshot (2026-04-11)
 
 기준 날짜: `2026-04-11`
 
-현재 메인 `/clone/home`에서 잠정 수용 가능한 영역:
+기준 날짜 시점의 메인 `/clone/home`에서 잠정 수용 가능한 영역:
 
 1. `header-top`
 2. `header-bottom`
@@ -36,16 +41,16 @@
 8. `timedeal`
 9. `best-ranking`
 
-현재 원칙:
+기준 날짜 시점의 원칙:
 
 1. 신규 하단 섹션은 메인에 바로 넣지 않는다
 2. `homeSandbox=<slot>`에서 먼저 맞춘다
 3. 시각 수용 가능 후 메인 반영
 4. 반영 후 `data-codex-slot` 기준 component 후보로 유지
 
-## Active Target
+## Target Snapshot (2026-04-11)
 
-현재 다음 작업 대상:
+기준 날짜 시점의 다음 작업 대상:
 
 1. `brand-showroom` sandbox 구조 확인
 2. `latest-product-news` sandbox 구조 확인
@@ -320,7 +325,7 @@
 
 - `space-renewal`은 custom renderer보다 raw mobile `HomeMoListBannertype` section이 더 정확하다고 판단
 - `메인 추천 상품 영역`의 실제 raw section과 embedded data를 함께 확인
-- current plan:
+- plan at that time:
   1. raw mobile section 추출
   2. 이미지 주입 규칙 보정
   3. compare artifact 재생성

@@ -100,6 +100,10 @@ System behavior:
 
 LLM should receive structured input, not raw page HTML dumps.
 
+Example note:
+1. external URLs use reserved-domain samples so they are not mistaken for live production defaults
+2. sample JSON should prefer representative values over empty placeholder objects
+
 ```json
 {
   "mode": "reference-driven",
@@ -114,9 +118,15 @@ LLM should receive structured input, not raw page HTML dumps.
     "componentType": "quickmenu-grid"
   },
   "reference": {
-    "url": "https://www.company.com/main",
-    "groups": {},
-    "checks": []
+    "url": "https://reference.example.invalid/premium-home",
+    "groups": {
+      "hero": { "headlineCount": 1, "ctaCount": 2 },
+      "quickmenu": { "itemCount": 10 }
+    },
+    "checks": [
+      { "id": "hero-dominant-visual", "status": "pass" },
+      { "id": "dense-icon-grid", "status": "pass" }
+    ]
   },
   "working": {
     "activeSourceId": "custom-home-quickmenu-pc-v1",
@@ -125,8 +135,13 @@ LLM should receive structured input, not raw page HTML dumps.
       "custom-home-quickmenu-pc-v1",
       "figma-home-quickmenu-pc-v1"
     ],
-    "groups": {},
-    "checks": []
+    "groups": {
+      "quickmenu": { "itemCount": 8, "layout": "4-column" }
+    },
+    "checks": [
+      { "id": "slot-editable", "status": "pass" },
+      { "id": "source-switch-available", "status": "pass" }
+    ]
   },
   "instruction": "퀵메뉴를 좀 더 촘촘하고 아이콘 중심으로 바꿔줘"
 }
@@ -144,9 +159,22 @@ LLM output must always be structured into:
 
 ```json
 {
-  "plan": {},
-  "patch": {},
-  "report": {}
+  "plan": {
+    "affectedSlots": ["quickmenu"],
+    "changeMode": "create_variant",
+    "reason": "reference uses a denser icon-first quick menu"
+  },
+  "patch": {
+    "action": "create_variant",
+    "pageId": "home",
+    "slotId": "quickmenu"
+  },
+  "report": {
+    "summary": "퀵메뉴를 아이콘 중심 5열 변형안으로 제안",
+    "assumptions": [
+      "기존 quickmenu component contract 유지"
+    ]
+  }
 }
 ```
 
