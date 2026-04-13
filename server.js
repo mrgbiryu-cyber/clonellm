@@ -3,6 +3,19 @@ const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
 const crypto = require("crypto");
+
+const ENV_PATH = path.join(__dirname, ".env");
+
+if (typeof process.loadEnvFile === "function") {
+  try {
+    process.loadEnvFile(ENV_PATH);
+  } catch (error) {
+    if (error?.code !== "ENOENT") {
+      console.warn(`[env] failed to load ${ENV_PATH}: ${error.message}`);
+    }
+  }
+}
+
 const { handleLlmChange, handleLlmChangeOnData, handleLlmPlan, handleLlmBuildOnData, normalizeEditableData, readEditableData, writeEditableData } = require("./llm");
 const { analyzeReferenceUrls, buildGuardrailBundle } = require("./planner-tools");
 const {
@@ -2871,6 +2884,7 @@ function buildPdpGroupChecks(referenceGroups, workingGroups) {
 function toVisualUrl(filePath) {
   if (!filePath) return null;
   const normalized = path.normalize(filePath);
+  if (!fs.existsSync(normalized)) return null;
   const visualRoot = path.normalize(VISUAL_DIR + path.sep);
   const normalizedFolded = normalized.toLowerCase();
   const visualRootFolded = visualRoot.toLowerCase();
@@ -12299,8 +12313,8 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
 
 function sendCompareShell(res, pageId) {
   const safePageId = String(pageId || "home");
-  const liveReferenceSrc = `/visual/${encodeURIComponent(safePageId)}/live-reference.png`;
   const baseline = resolveBaselineInfo(safePageId);
+  const liveReferenceSrc = toVisualUrl(path.join(VISUAL_DIR, safePageId, "live-reference.png"));
   const usesMobileHomeBaseline = baseline.mode === "mobile";
   const liveReferenceUrl = baseline.url;
   const html = `<!doctype html>
@@ -12321,7 +12335,7 @@ function sendCompareShell(res, pageId) {
       .compare-shell {
         height: 100%;
         display: grid;
-        grid-template-rows: 56px 1fr;
+        grid-template-rows: 56px 1fr 104px;
       }
       .compare-toolbar {
         display: flex;
@@ -12350,7 +12364,7 @@ function sendCompareShell(res, pageId) {
         min-width: 0;
         min-height: 0;
         display: grid;
-        grid-template-rows: 40px 1fr 180px;
+        grid-template-rows: 40px 1fr 92px;
         background: #fff;
       }
       .compare-label {
@@ -12401,20 +12415,35 @@ function sendCompareShell(res, pageId) {
         display: block;
         background: #fff;
       }
+      .compare-empty {
+        width: ${DEFAULT_CANVAS_WIDTH}px;
+        min-height: 320px;
+        box-sizing: border-box;
+        padding: 24px;
+        background: #e2e8f0;
+        color: #0f172a;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .compare-empty a {
+        color: #0f172a;
+        font-weight: 700;
+      }
       .compare-measure {
         overflow: auto;
-        padding: 12px;
+        padding: 8px 10px;
         border-top: 1px solid #e5e7eb;
-        font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
         color: #111827;
         background: #f8fafc;
         white-space: pre-wrap;
       }
       .compare-diff {
         overflow: auto;
-        padding: 12px;
+        padding: 8px 10px;
         border-top: 1px solid #c7d2fe;
-        font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
         color: #111827;
         background: #eef2ff;
         white-space: pre-wrap;
@@ -12432,12 +12461,19 @@ function sendCompareShell(res, pageId) {
           <div class="compare-label">Live Visual Baseline · ${baseline.route}</div>
           <div class="compare-canvas-wrap" data-compare-wrap>
             <div class="compare-canvas-stage" data-compare-stage>
-              <img
-                class="compare-image"
-                id="reference-image"
-                src="${liveReferenceSrc}?v=${Date.now()}"
-                alt="Live visual baseline"
-              />
+              ${liveReferenceSrc
+                ? `<img
+                    class="compare-image"
+                    id="reference-image"
+                    src="${liveReferenceSrc}?v=${Date.now()}"
+                    alt="Live visual baseline"
+                  />`
+                : `<div class="compare-empty">
+                    <strong>Live visual baseline capture is missing.</strong>
+                    <div>현재 기준 캡처 이미지가 없어 비교 화면에 직접 표시할 수 없습니다.</div>
+                    <div>기준 경로: ${escapeHtml(baseline.route)}</div>
+                    <a href="${escapeHtml(liveReferenceUrl)}" target="_blank" rel="noopener">원본 기준 페이지 열기</a>
+                  </div>`}
             </div>
           </div>
           <pre class="compare-measure" id="reference-measure">reference metrics pending…</pre>
@@ -13667,6 +13703,9 @@ function route(req, res) {
         const targetComponents = safeArray(payload.targetComponents || [], 50)
           .map((item) => String(item || "").trim())
           .filter(Boolean);
+        console.log(
+          `[planner] request user=${user.userId} page=${pageId || "n/a"} mode=${mode} refs=${referenceUrls.length} requestLength=${requestText.length} scope=${targetScope} components=${targetComponents.length}`
+        );
         if (!pageId) {
           return sendJson(res, 400, { error: "page_id_required" });
         }
@@ -13723,6 +13762,9 @@ function route(req, res) {
           referenceCount: referenceUrls.length,
           viewportProfile,
         });
+        console.log(
+          `[planner] success user=${user.userId} page=${pageId} planId=${savedPlan?.id || "n/a"} summaryLength=${String(plannerResult.summary || "").length}`
+        );
         return sendJson(res, 200, {
           summary: plannerResult.summary || "요구사항 정리 완료",
           planId: savedPlan?.id || null,
@@ -13734,6 +13776,7 @@ function route(req, res) {
         });
       })
       .catch((error) => {
+        console.error(`[planner] failed ${String(error)}`);
         return sendJson(res, 500, {
           error: "llm_plan_failed",
           detail: String(error),
@@ -13789,6 +13832,8 @@ function route(req, res) {
           targetComponents,
         });
         const buildResult = await handleLlmBuildOnData(builderInput, data);
+        const nextData = buildResult.data || data;
+        saveDataForUser(user, nextData, buildResult.summary || `llm_build:${pageId}`);
         const changedComponentIds = Array.from(
           new Set(
             (buildResult.buildResult?.changedTargets || [])
@@ -13796,7 +13841,7 @@ function route(req, res) {
               .filter(Boolean)
           )
         );
-        const pageSnapshot = extractPageScopedSnapshot(buildResult.data || data, pageId);
+        const pageSnapshot = extractPageScopedSnapshot(nextData, pageId);
         const saved = saveDraftBuild(user.userId, {
           pageId,
           viewportProfile,

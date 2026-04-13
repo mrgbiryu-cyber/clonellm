@@ -7,7 +7,7 @@ import time
 import urllib.request
 from pathlib import Path
 
-ROOT = Path("/mnt/c/Users/mrgbi/lge-site-analysis")
+ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_ROOT = ROOT / "data" / "visual"
 DEFAULT_PAGE_ID = "home"
 DEFAULT_WIDTH = 1460

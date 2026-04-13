@@ -1005,6 +1005,27 @@ function resolveOpenRouterModel(...envKeys) {
   return process.env.OPENROUTER_MODEL || "openai/gpt-4.1-mini";
 }
 
+function parseJsonResponseContent(content) {
+  const raw = String(content || "").trim();
+  if (!raw) {
+    throw new Error("OpenRouter returned empty content");
+  }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    const fenced = raw.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+    if (fenced?.[1]) {
+      return JSON.parse(fenced[1].trim());
+    }
+    const firstBrace = raw.indexOf("{");
+    const lastBrace = raw.lastIndexOf("}");
+    if (firstBrace >= 0 && lastBrace > firstBrace) {
+      return JSON.parse(raw.slice(firstBrace, lastBrace + 1));
+    }
+    throw new Error(`OpenRouter returned non-JSON content: ${raw.slice(0, 160)}`);
+  }
+}
+
 async function callOpenRouterJson({ model, messages, temperature = 0.1, demoFallback = null }) {
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
@@ -1014,6 +1035,7 @@ async function callOpenRouterJson({ model, messages, temperature = 0.1, demoFall
 
   const siteUrl = process.env.OPENROUTER_SITE_URL || "http://localhost:3000";
   const siteName = process.env.OPENROUTER_SITE_NAME || "lge-site-analysis";
+  const resolvedModel = model || resolveOpenRouterModel("OPENROUTER_MODEL");
   const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -1023,7 +1045,7 @@ async function callOpenRouterJson({ model, messages, temperature = 0.1, demoFall
       "X-Title": siteName,
     },
     body: JSON.stringify({
-      model: model || resolveOpenRouterModel("OPENROUTER_MODEL"),
+      model: resolvedModel,
       temperature,
       response_format: { type: "json_object" },
       messages,
@@ -1035,10 +1057,7 @@ async function callOpenRouterJson({ model, messages, temperature = 0.1, demoFall
   }
   const payload = await response.json();
   const content = payload?.choices?.[0]?.message?.content;
-  if (!content) {
-    throw new Error("OpenRouter returned empty content");
-  }
-  return JSON.parse(content);
+  return parseJsonResponseContent(content);
 }
 
 function toStringArray(value, fallback = []) {
@@ -1083,6 +1102,78 @@ function normalizeDesignChangeLevel(value, fallback = "medium") {
   return fallback;
 }
 
+function uniqueNonEmptyLines(values = []) {
+  return Array.from(new Set((Array.isArray(values) ? values : []).map((item) => String(item || "").trim()).filter(Boolean)));
+}
+
+function ensureNarrativeDepth(values = [], fallback = [], minCount = 5) {
+  return uniqueNonEmptyLines([...(Array.isArray(values) ? values : []), ...(Array.isArray(fallback) ? fallback : [])]).slice(0, Math.max(minCount, 12));
+}
+
+function buildPlannerNarrativeFallbacks(plannerInput = {}) {
+  const pageLabel = String(plannerInput?.pageContext?.pageLabel || plannerInput?.pageContext?.workspacePageId || "페이지").trim();
+  const requestText = String(plannerInput?.userInput?.requestText || "").trim();
+  const keyMessage = String(plannerInput?.userInput?.keyMessage || "").trim();
+  const preferredDirection = String(plannerInput?.userInput?.preferredDirection || "").trim();
+  const avoidDirection = String(plannerInput?.userInput?.avoidDirection || "").trim();
+  const toneAndMood = String(plannerInput?.userInput?.toneAndMood || "").trim();
+  const designChangeLevel = normalizeDesignChangeLevel(plannerInput?.userInput?.designChangeLevel, "medium");
+  const editableSlots = toStringArray(plannerInput?.pageSummary?.editableSlots);
+  const focusSlots = editableSlots.slice(0, 4);
+  const referenceTakeaways = ((plannerInput?.referenceSummary?.analyses || []) || [])
+    .flatMap((item) => toStringArray(item?.takeaways))
+    .slice(0, 4);
+  const changeProfileLabel =
+    designChangeLevel === "high"
+      ? "시각적 체감 변화가 분명해야 하는 고강도 제안"
+      : designChangeLevel === "low"
+        ? "현재 구조와 정보 체계를 최대한 유지하는 저강도 제안"
+        : "기존 구조는 유지하되 체감 개선이 필요한 중강도 제안";
+
+  return {
+    requestSummary: uniqueNonEmptyLines([
+      requestText ? `고객이 현재 화면 변경을 요청한 직접 원인은 "${requestText}" 이며, 이번 정리본은 이 요청을 실행 가능한 기획 언어로 재해석해야 한다.` : "",
+      keyMessage ? `핵심 메시지는 "${keyMessage}" 이고, 변경 이후 사용자가 가장 먼저 인지해야 하는 포인트도 여기에 맞춰 재정렬되어야 한다.` : "",
+      `이번 제안은 ${pageLabel}의 디자인을 왜 바꾸는지부터 설명해야 하며, 단순 취향 변경이 아니라 고객 설득이 가능한 개선 배경을 포함해야 한다.`,
+      `허용된 편집 범위는 ${focusSlots.length ? focusSlots.join(", ") : "현재 편집 가능 슬롯"} 중심이며, 전체 재설계가 아니라 제한된 범위 안에서 변화 체감을 만드는 것이 목적이다.`,
+      `변화 강도는 ${changeProfileLabel} 로 해석하고, 고객 기대 수준과 운영 안정성 사이의 균형을 기획 문서 안에서 명확히 설명해야 한다.`,
+      referenceTakeaways.length ? `레퍼런스 분석에서 추출된 주요 신호는 ${referenceTakeaways.join(" / ")} 이며, 이를 복제하지 않고 방향성 판단 근거로만 활용해야 한다.` : "",
+    ]),
+    planningDirection: uniqueNonEmptyLines([
+      `기획 방향의 첫 축은 문제 정의다. 현재 ${pageLabel} 에서 무엇이 약하게 느껴지고 왜 지금 이 화면을 바꿔야 하는지 서두에서 분명하게 설명해야 한다.`,
+      `기획 방향의 둘째 축은 정보 위계 재정렬이다. 가장 먼저 보여야 할 메시지, 신뢰를 보강할 근거, 다음 행동으로 이어질 요소의 순서를 다시 설계해야 한다.`,
+      `기획 방향의 셋째 축은 범위 통제다. ${focusSlots[0] ? `${focusSlots[0]} 를 중심으로` : "핵심 슬롯을 중심으로"} 변화 체감을 만들되, 유지해야 할 구조와 새로 제안할 표현을 구분해서 서술해야 한다.`,
+      `이 정리본은 고객이 읽는 기획서 역할을 하므로, 무엇을 바꾸는지보다 왜 그 방향이 적절한지와 어떤 효과를 기대하는지를 더 구체적으로 설명해야 한다.`,
+      `빌더가 바로 실행할 수 있도록 유지 요소, 변경 요소, 우선순위, 금지 조건을 모호하지 않게 나눠 적는 것이 중요하다.`,
+      preferredDirection ? `선호 방향 "${preferredDirection}" 은 단순 취향 메모가 아니라 화면 전략과 설득 포인트로 확장해 설명해야 한다.` : "",
+    ]),
+    designDirection: uniqueNonEmptyLines([
+      `디자인 방향은 ${pageLabel} 의 현재 구조를 유지하되, 첫 인상에서 느껴지는 브랜드 밀도와 메시지 집중도를 높이는 쪽으로 정리해야 한다.`,
+      `비주얼 해법은 카피 톤, 타이포 위계, 여백, 강조 포인트, CTA 존재감처럼 실제 화면에서 확인 가능한 기준으로 설명되어야 한다.`,
+      `가장 먼저 보여야 할 정보와 그 다음에 따라오는 보조 정보의 강약을 분명히 나눠, 사용자가 한 번에 핵심을 읽도록 해야 한다.`,
+      `과한 프로모션성 표현이나 할인몰 인상 대신, 이유 있는 프리미엄 톤과 정제된 설득 흐름을 만드는 것이 중요하다.`,
+      toneAndMood ? `톤앤무드 "${toneAndMood}" 는 추상 키워드로 끝내지 말고 배경 밀도, 텍스트 호흡, 시각적 대비 수준처럼 디자인 언어로 번역해야 한다.` : "",
+      avoidDirection ? `특히 "${avoidDirection}" 같은 인상은 피해야 하므로, 과밀한 배치나 과도한 장식, 공격적 가격 강조는 억제하는 방향이 적절하다.` : "",
+      preferredDirection ? `원하는 방향 "${preferredDirection}" 은 비주얼 스타일뿐 아니라 섹션 리듬과 카피 인상까지 포함하는 화면 운영 원칙으로 정리해야 한다.` : "",
+    ]),
+    objectiveNarrative: uniqueNonEmptyLines([
+      keyMessage ? `이번 기획의 최종 목표는 고객이 중요하게 본 "${keyMessage}" 를 화면 첫 인상에서 더 분명하게 전달하도록 만드는 것이다.` : "",
+      `이번 기획의 목표는 ${pageLabel} 을 단순히 새롭게 보이게 하는 것이 아니라, 왜 이 방향이 더 설득력 있는지 고객이 바로 이해할 수 있는 제안 상태로 끌어올리는 데 있다.`,
+      `따라서 목표 문구는 결과 화면이 전달해야 할 사용자 인상, 브랜드 태도, 정보 우선순위를 함께 설명하는 문장이어야 한다.`,
+    ]),
+    mustKeepNarrative: uniqueNonEmptyLines([
+      "지원되는 슬롯 구조는 유지해야 한다. 이번 작업은 전체 재설계가 아니라 제한된 편집 시스템 안에서 설득력 있는 개선안을 제시하는 프리뷰 성격이기 때문이다.",
+      "핵심 사용자 흐름은 유지해야 한다. 사용자가 기존에 익숙한 탐색 방식이 깨지면 디자인 개선보다 사용성 저하가 먼저 인지될 수 있기 때문이다.",
+      "가격/스펙/상품 사실 정보는 유지해야 한다. 고객 설득 자료에서 사실 정보 왜곡은 바로 신뢰 저하로 이어지기 때문이다.",
+    ]),
+    mustChangeNarrative: uniqueNonEmptyLines([
+      focusSlots[0] ? `${focusSlots[0]} 영역은 반드시 바뀌어야 한다. 고객이 가장 먼저 체감하는 구간이므로 여기서 변화 이유와 브랜드 인상이 동시에 드러나야 하기 때문이다.` : "",
+      focusSlots[1] ? `${focusSlots[1]} 영역은 보조적으로라도 바뀌어야 한다. 메인 메시지 변화가 페이지 전체 리듬과 연결되어 보이도록 후속 설득 포인트가 필요하기 때문이다.` : "",
+      "카피 톤과 시각 위계는 반드시 재정리해야 한다. 이번 요청의 핵심은 단순 장식 변경이 아니라 화면이 전달하는 의미와 인상을 다시 설계하는 데 있기 때문이다.",
+    ]),
+  };
+}
+
 function buildPlannerSystemPrompt() {
   return [
     "You are the Planner LLM for an admin preview workbench.",
@@ -1098,15 +1189,25 @@ function buildPlannerSystemPrompt() {
     "Required top-level keys: summary, requirementPlan.",
     "Required requirementPlan keys: title, designChangeLevel, requestSummary, planningDirection, designDirection, priority, guardrails, referenceNotes, builderBrief.",
     "builderBrief must include objective, mustKeep, mustChange, suggestedFocusSlots.",
-    "Make the plan concise but explicit enough that a human can edit it and the Builder can execute it safely.",
+    "This output should read like customer-facing planning material, not a short internal memo.",
+    "requestSummary must contain 4 to 7 detailed bullets covering background, reason for change, objective, allowed scope, and expected change profile.",
+    "planningDirection must contain 5 to 8 detailed bullets covering problem definition, strategic direction, hierarchy changes, scope control, customer persuasion logic, and the rationale behind each major recommendation.",
+    "designDirection must contain 5 to 8 detailed bullets covering concrete visual direction such as hierarchy, tone, density, contrast, CTA presence, visual anti-patterns to avoid, and the rationale behind each design move.",
+    "For priority, every item must explain not only what is prioritized but why that target should come first in customer impact terms.",
+    "For builderBrief.objective, write a sentence-level objective that explains what success should look like and why that outcome matters to the customer.",
+    "For builderBrief.mustKeep and builderBrief.mustChange, each bullet must include both the directive and the reason. Do not write bare nouns or short fragments.",
+    "Do not output shorthand bullets like 'hero 개선' or '고급감 강화'. Every bullet should read like proposal copy spoken to a customer.",
   ].join(" ");
 }
 
 function buildPlannerUserPrompt(plannerInput) {
   return [
     "Use the following structured planner input.",
-    "Create a concise but detailed requirement plan that a human can edit before build.",
+    "Create a planning-document-level requirement plan that a human can edit before build.",
     "Do not mention slots or components outside the provided editable scope unless you are explicitly warning that they must remain unchanged.",
+    "Spend more detail on why the design should change, what customer problem it solves, and what visual direction should be approved before build.",
+    "Write in a customer-facing proposal tone. The customer should be able to read each section and understand the rationale behind priority, what must remain, what must change, and what goal the proposal is trying to achieve.",
+    "In planningDirection and designDirection, explicitly explain the reasons behind priority, mustKeep, mustChange, and objective. These sections should read like the narrative explanation of the plan, not separate disconnected bullets.",
     JSON.stringify(plannerInput, null, 2),
   ].join("\n\n");
 }
@@ -1120,6 +1221,7 @@ function buildDemoPlannerResult(plannerInput = {}) {
   const designChangeLevel = normalizeDesignChangeLevel(plannerInput?.userInput?.designChangeLevel, "medium");
   const editableSlots = toStringArray(plannerInput?.pageSummary?.editableSlots);
   const focusSlots = editableSlots.slice(0, 4);
+  const fallbackNarrative = buildPlannerNarrativeFallbacks(plannerInput);
   const referenceNotes = ((plannerInput?.referenceSummary?.analyses || []) || [])
     .filter((item) => item?.requestedUrl)
     .map((item) => ({
@@ -1132,26 +1234,29 @@ function buildDemoPlannerResult(plannerInput = {}) {
     requirementPlan: {
       title: `${pageLabel} 시안 기획안`,
       designChangeLevel,
-      requestSummary: toStringArray(
+      requestSummary: ensureNarrativeDepth(
         [
           requestText || `${pageLabel} 방향 정리`,
           keyMessage ? `핵심 메시지: ${keyMessage}` : "",
         ].filter(Boolean),
-        [`${pageLabel} 요구사항을 정리한다.`]
+        fallbackNarrative.requestSummary,
+        5
       ),
-      planningDirection: toStringArray(
+      planningDirection: ensureNarrativeDepth(
         [
           focusSlots[0] ? `${focusSlots[0]} 영역을 우선적으로 재정리한다.` : "",
           focusSlots[1] ? `${focusSlots[1]} 영역을 보조 시안 포인트로 사용한다.` : "",
         ].filter(Boolean),
-        ["현재 편집 가능한 슬롯 중심으로 시안 범위를 제한한다."]
+        fallbackNarrative.planningDirection,
+        6
       ),
-      designDirection: toStringArray(
+      designDirection: ensureNarrativeDepth(
         [
           preferredDirection ? preferredDirection : "",
           avoidDirection ? `${avoidDirection} 방향은 피한다.` : "",
         ].filter(Boolean),
-        ["과도한 구현보다 고객 프리뷰용 방향 제시에 집중한다."]
+        fallbackNarrative.designDirection,
+        6
       ),
       priority: normalizePlannerPriority([], focusSlots),
       guardrails: toStringArray(
@@ -1160,9 +1265,9 @@ function buildDemoPlannerResult(plannerInput = {}) {
       ),
       referenceNotes,
       builderBrief: {
-        objective: keyMessage || requestText || `${pageLabel} 방향 정리`,
-        mustKeep: ["지원되는 슬롯 구조", "핵심 사용자 흐름"],
-        mustChange: focusSlots.length ? focusSlots.map((slotId) => `${slotId} 영역 톤 조정`) : ["핵심 카피 톤 재정리"],
+        objective: fallbackNarrative.objectiveNarrative[0] || keyMessage || requestText || `${pageLabel} 방향 정리`,
+        mustKeep: fallbackNarrative.mustKeepNarrative.slice(0, 4),
+        mustChange: fallbackNarrative.mustChangeNarrative.slice(0, 4),
         suggestedFocusSlots: focusSlots,
       },
     },
@@ -1174,6 +1279,7 @@ function normalizePlannerResult(result, plannerInput = {}) {
   const pageLabel = String(plannerInput?.pageContext?.pageLabel || plannerInput?.pageContext?.workspacePageId || "페이지").trim();
   const editableSlots = toStringArray(plannerInput?.pageSummary?.editableSlots);
   const editableSlotSet = new Set(editableSlots);
+  const fallbackNarrative = buildPlannerNarrativeFallbacks(plannerInput);
   const fallbackRefNotes = ((plannerInput?.referenceSummary?.analyses || []) || [])
     .filter((item) => item?.requestedUrl)
     .map((item) => ({
@@ -1191,9 +1297,9 @@ function normalizePlannerResult(result, plannerInput = {}) {
         requirementPlan.designChangeLevel,
         plannerInput?.userInput?.designChangeLevel || "medium"
       ),
-      requestSummary: toStringArray(requirementPlan.requestSummary, [`${pageLabel} 요구사항 정리`]),
-      planningDirection: toStringArray(requirementPlan.planningDirection, ["편집 가능한 슬롯 범위 안에서 방향을 정리한다."]),
-      designDirection: toStringArray(requirementPlan.designDirection, ["고객 프리뷰용 비주얼 방향을 제안한다."]),
+      requestSummary: ensureNarrativeDepth(requirementPlan.requestSummary, fallbackNarrative.requestSummary, 5),
+      planningDirection: ensureNarrativeDepth(requirementPlan.planningDirection, fallbackNarrative.planningDirection, 6),
+      designDirection: ensureNarrativeDepth(requirementPlan.designDirection, fallbackNarrative.designDirection, 6),
       priority: normalizePlannerPriority(requirementPlan.priority, editableSlots),
       guardrails: toStringArray(
         requirementPlan.guardrails,
@@ -1201,9 +1307,14 @@ function normalizePlannerResult(result, plannerInput = {}) {
       ),
       referenceNotes: normalizePlannerReferenceNotes(requirementPlan.referenceNotes, fallbackRefNotes),
       builderBrief: {
-        objective: String(builderBrief.objective || source.summary || `${pageLabel} 방향 정리`).trim(),
-        mustKeep: toStringArray(builderBrief.mustKeep, ["지원되는 슬롯 구조", "핵심 사용자 흐름"]),
-        mustChange: toStringArray(builderBrief.mustChange, editableSlots.slice(0, 3).map((slotId) => `${slotId} 영역 조정`)),
+        objective: String(
+          builderBrief.objective ||
+          fallbackNarrative.objectiveNarrative[0] ||
+          source.summary ||
+          `${pageLabel} 방향 정리`
+        ).trim(),
+        mustKeep: ensureNarrativeDepth(builderBrief.mustKeep, fallbackNarrative.mustKeepNarrative, 3),
+        mustChange: ensureNarrativeDepth(builderBrief.mustChange, fallbackNarrative.mustChangeNarrative, 3),
         suggestedFocusSlots: toStringArray(builderBrief.suggestedFocusSlots, editableSlots.slice(0, 4))
           .filter((slotId) => !editableSlotSet.size || editableSlotSet.has(slotId))
           .slice(0, 4),
@@ -1236,7 +1347,9 @@ function buildBuilderSystemPrompt() {
     "Respect the provided target scope. If the system context is limited to selected components, do not create operations for anything outside that scope.",
     "Prioritize brand design first. Do not flatten the result into overly conservative output if the approved designChangeLevel calls for stronger visual exploration.",
     "Respect the approved designChangeLevel and its profile. Low means light refinement, medium means controlled but noticeable improvement, high means strong visual exploration inside the brand/system baseline.",
-    "Prefer high-signal supported changes over arbitrary generation. Source switching and component patches may be used assertively when they fit the approved change profile.",
+    "Prefer high-signal supported changes over arbitrary generation. Use update_component_patch and targeted text/image updates for visual changes.",
+    "Do not switch slot sources. Never emit toggle_slot_source or slot_source_switch in builder output.",
+    "Do not activate figma-derived, custom, alternate, experimental, or placeholder sources from the builder. Builder output must stay on the currently active source and modify it safely with patches only.",
     "Prefer update_component_patch when you need to change multiple supported root/style fields together on one slot.",
     "Preserve facts about products, prices, and specs.",
     "Return JSON only.",
@@ -1263,6 +1376,86 @@ function normalizeVersionLabel(value, fallback = "draft-v1") {
     .replace(/-+/g, "-")
     .replace(/^-+|-+$/g, "");
   return next || fallback;
+}
+
+function normalizeBuilderSummaryValue(value, fallback) {
+  if (typeof value === "string") return value.trim() || fallback;
+  if (value && typeof value === "object") {
+    return String(value.summary || value.title || value.message || fallback).trim() || fallback;
+  }
+  return fallback;
+}
+
+function inferSlotIdFromComponentId(componentId = "") {
+  const normalized = String(componentId || "").trim();
+  if (!normalized) return "";
+  const parts = normalized.split(".");
+  return parts[parts.length - 1] || "";
+}
+
+function isBuilderSourceSwitchAllowed(sourceId = "") {
+  const normalized = String(sourceId || "").trim().toLowerCase();
+  if (!normalized) return false;
+  if (normalized.startsWith("figma-")) return false;
+  if (normalized.startsWith("custom-")) return false;
+  if (normalized === "custom-renderer") return false;
+  if (normalized.includes("draft")) return false;
+  if (normalized.includes("experimental")) return false;
+  return false;
+}
+
+function normalizeBuilderOperation(item, pageId = "") {
+  const source = item && typeof item === "object" ? item : {};
+  const tool = String(source.tool || source.action || "").trim();
+  const slotId = String(source.slotId || inferSlotIdFromComponentId(source.componentId)).trim();
+  const resolvedPageId = String(source.pageId || pageId || "").trim();
+  if (!tool) return null;
+
+  if (tool === "toggle_slot_source" || tool === "slot_source_switch") {
+    const sourceId = String(source.sourceId || "").trim();
+    if (!resolvedPageId || !slotId || !sourceId) return null;
+    if (!isBuilderSourceSwitchAllowed(sourceId)) return null;
+    return {
+      action: "toggle_slot_source",
+      pageId: resolvedPageId,
+      slotId,
+      sourceId,
+    };
+  }
+
+  if (tool === "update_component_patch" || tool === "component_patch") {
+    const rawPatch = source.patch && typeof source.patch === "object" ? source.patch : {};
+    const normalizedPatch = {
+      ...((rawPatch.root && typeof rawPatch.root === "object") ? rawPatch.root : {}),
+      ...Object.fromEntries(
+        Object.entries(rawPatch).filter(([key]) => key !== "root" && key !== "style" && key !== "styles")
+      ),
+    };
+    const styleSource =
+      (rawPatch.styles && typeof rawPatch.styles === "object" ? rawPatch.styles : null) ||
+      (rawPatch.style && typeof rawPatch.style === "object" ? rawPatch.style : null);
+    if (styleSource && Object.keys(styleSource).length) {
+      normalizedPatch.styles = { ...styleSource };
+    }
+    if (!resolvedPageId || !slotId || !Object.keys(normalizedPatch).length) return null;
+    return {
+      action: "update_component_patch",
+      pageId: resolvedPageId,
+      slotId,
+      patch: normalizedPatch,
+    };
+  }
+
+  if (tool === "update_slot_text" || tool === "update_hero_field" || tool === "update_slot_image" || tool === "update_page_title") {
+    return {
+      ...source,
+      action: tool,
+      pageId: resolvedPageId,
+      slotId,
+    };
+  }
+
+  return source.action ? { ...source, pageId: resolvedPageId, slotId: slotId || source.slotId } : null;
 }
 
 function buildDemoBuilderResult(builderInput = {}) {
@@ -1418,11 +1611,19 @@ function normalizeBuilderResult(result, builderInput = {}) {
   const buildResult = source.buildResult && typeof source.buildResult === "object" ? source.buildResult : {};
   const pageId = String(builderInput?.pageContext?.workspacePageId || "").trim();
   const pageLabel = String(builderInput?.pageContext?.pageLabel || pageId || "page").trim();
-  const operations = Array.isArray(buildResult.operations) ? buildResult.operations.filter((item) => item && typeof item === "object") : [];
-  const changedTargets = Array.isArray(buildResult.changedTargets) ? buildResult.changedTargets.filter((item) => item && typeof item === "object") : [];
+  const operations = Array.isArray(buildResult.operations)
+    ? buildResult.operations.map((item) => normalizeBuilderOperation(item, pageId)).filter(Boolean)
+    : [];
+  const rawChangedTargets = Array.isArray(buildResult.changedTargets) ? buildResult.changedTargets.filter((item) => item && typeof item === "object") : [];
+  const inferredChangedTargets = operations.map((item) => ({
+    slotId: String(item.slotId || "").trim(),
+    componentId: String(item.componentId || `${pageId}.${item.slotId || ""}`).trim(),
+    changeType: item.action === "toggle_slot_source" ? "source_switch" : "component_patch",
+  }));
+  const changedTargets = rawChangedTargets.length ? rawChangedTargets : inferredChangedTargets;
   const report = buildResult.report && typeof buildResult.report === "object" ? buildResult.report : {};
   return {
-    summary: String(source.summary || `${pageLabel} 시안 생성 완료`).trim(),
+    summary: normalizeBuilderSummaryValue(source.summary, `${pageLabel} 시안 생성 완료`),
     buildResult: {
       proposedVersionLabel: String(buildResult.proposedVersionLabel || `${pageId || "page"}_draft-v1`).trim(),
       changedTargets: changedTargets.map((item) => ({

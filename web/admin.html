@@ -184,6 +184,7 @@
       let pageReviewMap = new Map();
       let refreshGeneration = 0;
       const plannerUiStateByPage = new Map();
+      const builderUiStateByPage = new Map();
       const adminTargetCatalog = [
         { id: "home", workspacePageId: "home", targetKind: "home", displayTitle: "홈 - 메인", order: 1 },
         { id: "category-tvs", workspacePageId: "category-tvs", targetKind: "plp", displayTitle: "PLP - TV 카테고리", order: 2 },
@@ -491,16 +492,67 @@
         return String(value);
       }
 
+      function createRequestError({ url, status = 0, code = "", detail = "", cause = null }) {
+        const error = new Error(detail || code || `Request failed: ${url}`);
+        error.url = url;
+        error.status = Number(status) || 0;
+        error.code = String(code || "").trim();
+        error.detail = String(detail || "").trim();
+        error.cause = cause || null;
+        return error;
+      }
+
+      function describeRequestError(error) {
+        const status = Number(error?.status || 0);
+        const code = String(error?.code || "").trim();
+        const detail = String(error?.detail || error?.message || "").trim();
+        if (status === 401 || status === 403) {
+          return "로그인 세션이 만료되었거나 권한이 없습니다. 새로고침 후 다시 로그인해 주세요.";
+        }
+        if (status >= 500) {
+          return `서버 처리 실패 (${code || status}). ${detail || "PM2 로그를 확인해 주세요."}`;
+        }
+        if (status > 0) {
+          return `요청 실패 (${status}). ${detail || code || "응답 내용을 확인해 주세요."}`;
+        }
+        if (error?.name === "TypeError") {
+          return "서버에 연결하지 못했습니다. 탭 새로고침 후 다시 시도하고, 계속되면 Network 탭과 PM2 로그를 확인해 주세요.";
+        }
+        return detail || "알 수 없는 요청 오류가 발생했습니다.";
+      }
+
       async function fetchJson(url, options) {
-        const response = await fetch(url, options);
-        const payload = await response.json();
+        let response;
+        try {
+          response = await fetch(url, options);
+        } catch (error) {
+          throw createRequestError({
+            url,
+            detail: `network_error: ${String(error?.message || error)}`,
+            cause: error,
+          });
+        }
+        let payload = null;
+        const rawText = await response.text();
+        try {
+          payload = rawText ? JSON.parse(rawText) : {};
+        } catch {
+          payload = { detail: rawText || "invalid_json_response" };
+        }
         if (!response.ok) {
-          throw new Error(payload.detail || payload.error || `Request failed: ${url}`);
+          throw createRequestError({
+            url,
+            status: response.status,
+            code: payload?.error || "",
+            detail: payload?.detail || payload?.error || `Request failed: ${url}`,
+          });
         }
         return payload;
       }
 
       let noticeTimer = null;
+      let plannerProgressTimer = null;
+      let builderProgressTimer = null;
       function showAdminNotice(message, type = "info") {
         if (!adminNoticeEl) return;
         adminNoticeEl.textContent = String(message || "");
@@ -519,6 +571,35 @@
         }
       }
 
+      function stopProgressMessages(kind = "planner") {
+        if (kind === "builder" && builderProgressTimer) {
+          window.clearInterval(builderProgressTimer);
+          builderProgressTimer = null;
+          return;
+        }
+        if (kind !== "builder" && plannerProgressTimer) {
+          window.clearInterval(plannerProgressTimer);
+          plannerProgressTimer = null;
+        }
+      }
+
+      function startProgressMessages(kind, statusEl, messages) {
+        stopProgressMessages(kind);
+        const steps = Array.isArray(messages) ? messages.filter(Boolean) : [];
+        if (!statusEl || !steps.length) return;
+        let index = 0;
+        statusEl.textContent = steps[0];
+        const timerId = window.setInterval(() => {
+          index = (index + 1) % steps.length;
+          statusEl.textContent = steps[index];
+        }, 2200);
+        if (kind === "builder") {
+          builderProgressTimer = timerId;
+        } else {
+          plannerProgressTimer = timerId;
+        }
+      }
+
       function readAdminStateFromUrl() {
         const params = new URLSearchParams(window.location.search);
         const pageIdFromUrl = params.get("pageId") || "";
@@ -526,6 +607,15 @@
         pendingSelectedId = pageIdFromUrl || pendingSelectedId || "";
         selectedBundleId = "";
         activityFilter = params.get("activityFilter") || "all";
+      }
+
+      async function rerenderDetailWithFocus({ selector = "", behavior = "auto", block = "start" } = {}) {
+        await renderDetail();
+        if (!selector) return;
+        window.requestAnimationFrame(() => {
+          const target = detailEl.querySelector(selector);
+          target?.scrollIntoView({ behavior, block });
+        });
       }
 
       function renderDetailIdleState() {
@@ -1034,8 +1124,11 @@
         const latestPlanInput = latestPlan?.input || {};
         const latestPlanUserInput = latestPlanInput?.userInput || {};
         const plannerUiState = plannerUiStateByPage.get(workspacePageId) || { draftVisible: false, loading: false };
-        const plannerDraftVisible = Boolean(plannerUiState.draftVisible);
+        const builderUiState = builderUiStateByPage.get(workspacePageId) || { loading: false };
+        const plannerDraftVisible = Boolean(plannerUiState.draftVisible || latestPlan);
         const plannerLoading = Boolean(plannerUiState.loading);
+        const builderLoading = Boolean(builderUiState.loading);
+        const hasReferenceAnalysis = Boolean((latestPlanUserInput?.referenceUrls || []).length || (latestToolContext?.referenceSummary?.analyses || []).length);
         const selectedTargetScope = latestPlanUserInput?.targetScope === "components" ? "components" : "page";
         const selectedTargetComponents = Array.isArray(latestPlanUserInput?.targetComponents) ? latestPlanUserInput.targetComponents : [];
         const plannerComponentTargets = Array.from(
@@ -1346,6 +1439,7 @@
               <div id="plannerDraftForm" class="planner-draft-form" ${plannerLoading ? "hidden" : ""}>
                 <div><strong>기획 초안</strong></div>
                 <div class="meta">${latestPlan ? `현재 편집 중인 planId ${escapeHtml(latestPlan.id)}` : "기획안 생성 버튼을 누르면 편집 가능한 초안이 여기에 생성됩니다."}</div>
+                <div class="meta">이 영역은 고객 설득용 기획 문서를 다듬는 단계입니다. 왜 바꾸는지와 어떤 방향으로 바꾸는지가 충분히 읽혀야 하며, 실제 디자인 생성은 아래 "생성 결과 / 버전 관리" 영역에서 실행합니다.</div>
                 ${latestPlan ? `
                   <div class="planner-grid">
                     <div class="planner-field">
@@ -1397,14 +1491,13 @@
                   </div>
                 ` : `<div class="meta" style="margin-top:10px;">아직 생성된 기획 초안이 없습니다.</div>`}
                 <div class="actions">
-                  <button type="button" class="btn" id="savePlanBtn" ${latestPlan ? "" : "disabled"}>정리본 저장</button>
-                  <button type="button" class="btn secondary" id="runBuilderFromPlanBtn" ${latestPlan ? "" : "disabled"}>디자인 생성</button>
+                  <button type="button" class="btn" id="savePlanBtn" ${latestPlan ? "" : "disabled"}>1. 기획안 저장</button>
                 </div>
-                <div class="planner-status" id="planSaveStatus">${latestPlan ? "편집 가능" : "기획안 생성 후 편집 및 저장 가능"}</div>
+                <div class="planner-status" id="planSaveStatus">${latestPlan ? "기획안 편집 가능 · 저장 후 아래에서 디자인 생성을 진행" : "기획안 생성 후 편집 및 저장 가능"}</div>
               </div>
             </div>
 
-            <div class="planner-subsection">
+            ${hasReferenceAnalysis ? `<div class="planner-subsection">
               <div><strong>레퍼런스 분석 결과</strong></div>
               <div class="planner-card-grid">
                 <div class="planner-card">
@@ -1435,11 +1528,11 @@
                     `).join("")
                   : `<div class="meta">아직 분석된 레퍼런스가 없습니다.</div>`}
               </div>
-            </div>
+            </div>` : ``}
           </div>
-          <div class="section">
+          <div class="section" id="builderWorkflowSection">
             <div><strong>생성 결과 / 버전 관리</strong></div>
-            <div class="meta">${latestPlan ? "기획 초안을 기준으로 디자인 생성 결과를 확인하고, 저장 버전과 현재 View를 관리합니다." : "먼저 위에서 요구사항 정리본을 만든 뒤 디자인 생성까지 진행해야 합니다."}</div>
+            <div class="meta">${latestPlan ? "이 영역이 실제 디자인 생성 실행 위치입니다. 2) 디자인 생성 실행 -> 3) draft 결과 확인 -> 4) 저장 버전 확정 -> 5) 현재 View 반영 순서로 진행합니다." : "먼저 위에서 요구사항 정리본을 만든 뒤 디자인 생성까지 진행해야 합니다."}</div>
             <div class="planner-inline-meta">
               <span class="chip ${latestDraftBuild ? "pass" : "warn"}">${latestDraftBuild ? `최근 draft ${escapeHtml(formatPlanUpdatedAt(latestDraftBuild.updatedAt || latestDraftBuild.createdAt))}` : "draft build 없음"}</span>
               <span class="chip ${pinnedViewItem?.versionId ? "pass" : "warn"}">${pinnedViewItem?.versionId ? `현재 View ${escapeHtml(pinnedViewItem.version?.versionLabel || pinnedViewItem.versionId)}` : "현재 View 미고정"}</span>
@@ -1456,24 +1549,36 @@
               </div>
             </div>
             <div class="actions">
-              <button class="run" id="runBuilder" ${latestPlan ? "" : "disabled"}>디자인 생성 실행</button>
-              <button type="button" class="btn secondary" id="saveVersionBtn" ${latestDraftBuild ? "" : "disabled"}>새 버전 저장</button>
+              <button class="run" id="runBuilder" ${latestPlan ? "" : "disabled"}>2. 디자인 생성 실행</button>
+              <button type="button" class="btn secondary" id="saveVersionBtn" ${latestDraftBuild ? "" : "disabled"}>4. 저장 버전 확정</button>
             </div>
-            <div class="planner-status" id="builderStatus">${latestPlan ? "정리본 기준으로 시안 생성 가능" : "정리본 필요"}</div>
+            <div class="planner-status" id="builderStatus">${latestPlan ? "기획안 저장 후 디자인 생성 가능" : "기획안 필요"}</div>
+            <div id="builderLoadingBox" class="planner-loading-box" ${builderLoading ? "" : "hidden"}>
+              <div><strong>디자인 생성중</strong></div>
+              <div class="meta">승인된 기획안을 기준으로 실제 draft 변경안을 만들고 있습니다.</div>
+              <div class="progress-track"><div class="progress-fill planner-loading-fill"></div></div>
+            </div>
 
-            <div class="planner-subsection">
+            <div class="planner-subsection" id="builderResultSection">
               <div><strong>적용 결과</strong></div>
-              <div class="meta">${latestDraftBuild ? "최근 생성된 draft 결과를 확인하고 미리보기/비교 액션을 사용할 수 있습니다." : "디자인 생성 실행 후 생성 결과와 미리보기 액션이 여기에 표시됩니다."}</div>
+              <div class="meta">${latestDraftBuild ? "3단계 영역입니다. 최근 생성된 draft 결과를 먼저 확인하고, 이상 없을 때만 아래에서 저장 버전으로 확정하면 됩니다." : "디자인 생성 실행 후 draft 결과와 확인 버튼이 여기에 표시됩니다."}</div>
+              <div class="meta">${latestDraftBuild ? "주의: draft 생성만으로는 현재 View에 자동 반영되지 않습니다. 실제 노출 반영은 저장 버전 확정 후 현재 View 고정을 해야 합니다." : "draft가 없으면 결과 확인 버튼도 활성화되지 않습니다."}</div>
               <div class="actions">
-                <a class="btn" href="${escapeHtml(previewUrl)}" target="_blank">변경 화면 새 탭으로 보기</a>
+                ${latestDraftBuild ? `<a class="btn" href="${escapeHtml(previewUrl)}" target="_blank">3. draft 결과 새 탭으로 보기</a>` : `<button type="button" class="btn" disabled>3. draft 결과 새 탭으로 보기</button>`}
                 <button type="button" class="btn secondary" id="copyDetailStateBtn">현재 설정 링크 복사</button>
-                ${!isPdpTarget && pageReviewMap.get(workspacePageId)?.compareUrl ? `<a class="btn secondary" id="openDetailPageCompareBtn" href="${escapeHtml(pageReviewMap.get(workspacePageId).compareUrl)}" target="_blank">기준 화면과 비교</a>` : ``}
+                ${!isPdpTarget && pageReviewMap.get(workspacePageId)?.compareUrl
+                  ? (latestDraftBuild
+                    ? `<a class="btn secondary" id="openDetailPageCompareBtn" href="${escapeHtml(pageReviewMap.get(workspacePageId).compareUrl)}" target="_blank">3. 기준 화면과 비교</a>`
+                    : `<button type="button" class="btn secondary" disabled>3. 기준 화면과 비교</button>`)
+                  : ``}
               </div>
               ${latestDraftBuild ? `
                 <div class="planner-card-grid">
                   <div class="planner-card">
                     <strong>${escapeHtml(latestDraftBuild.proposedVersionLabel || latestDraftBuild.id)}</strong>
                     <div class="meta">planId: ${escapeHtml(latestDraftBuild.planId || "n/a")} | updatedAt: ${escapeHtml(formatPlanUpdatedAt(latestDraftBuild.updatedAt || latestDraftBuild.createdAt))}</div>
+                    <div class="meta">이번 draft 결과: operations ${escapeHtml((latestDraftBuild.operations || []).length)}개 | changed components ${escapeHtml((latestDraftBuild.snapshotData?.changedComponentIds || []).length)}</div>
+                    <div class="meta">${(latestDraftBuild.operations || []).length ? "실제 변경 operation이 생성되었습니다. 미리보기/비교 버튼으로 바로 확인할 수 있습니다." : "이번 draft에는 실제 변경 operation이 생성되지 않았습니다. 아래 summary와 whatChanged를 먼저 확인하세요."}</div>
                     <div class="meta">summary: ${escapeHtml(latestDraftBuild.summary || "n/a")}</div>
                     <div class="meta">changed components: ${escapeHtml((latestDraftBuild.snapshotData?.changedComponentIds || []).join(", ") || "none")}</div>
                     ${(latestDraftBuild.report?.whatChanged || []).length ? latestDraftBuild.report.whatChanged.map((line) => `<div class="meta">${escapeHtml(line)}</div>`).join("") : `<div class="meta">변경 요약 없음</div>`}
@@ -1636,10 +1741,10 @@
         const plannerStatusEl = document.getElementById("plannerStatus");
         const savePlanBtn = document.getElementById("savePlanBtn");
         const planSaveStatusEl = document.getElementById("planSaveStatus");
-        const runBuilderFromPlanBtn = document.getElementById("runBuilderFromPlanBtn");
         const plannerDraftRegionEl = document.getElementById("plannerDraftRegion");
         const plannerLoadingBoxEl = document.getElementById("plannerLoadingBox");
         const plannerDraftFormEl = document.getElementById("plannerDraftForm");
+        const builderLoadingBoxEl = document.getElementById("builderLoadingBox");
         const runBtn = document.getElementById("runLlm");
         const resetWorkspaceBtn = document.getElementById("resetWorkspaceBtn");
         const promptEl = document.getElementById("llmPrompt");
@@ -1689,14 +1794,32 @@
           if (plannerDraftRegionEl) plannerDraftRegionEl.hidden = false;
           if (plannerLoadingBoxEl) plannerLoadingBoxEl.hidden = false;
           if (plannerDraftFormEl) plannerDraftFormEl.hidden = true;
-          if (plannerStatusEl) plannerStatusEl.textContent = statusText || "기획안 생성 중...";
+          startProgressMessages("planner", plannerStatusEl, [
+            statusText || "기획안 생성 중입니다.",
+            "기획안 생성 중입니다. 요청 내용을 해석하고 있습니다.",
+            "기획안 생성 중입니다. 명칭과 요구사항을 정리하고 있습니다.",
+            "기획안 생성 중입니다. 기획 방향과 디자인 방향을 구조화하고 있습니다.",
+            "잠시만 기다려주십시오. 정리본을 마무리하고 있습니다.",
+          ]);
         };
 
         const showPlannerDraftState = () => {
+          stopProgressMessages("planner");
           plannerUiStateByPage.set(workspacePageId, { draftVisible: true, loading: false });
           if (plannerDraftRegionEl) plannerDraftRegionEl.hidden = false;
           if (plannerLoadingBoxEl) plannerLoadingBoxEl.hidden = true;
           if (plannerDraftFormEl) plannerDraftFormEl.hidden = false;
+        };
+
+        const showBuilderLoadingState = () => {
+          builderUiStateByPage.set(workspacePageId, { loading: true });
+          if (builderLoadingBoxEl) builderLoadingBoxEl.hidden = false;
+        };
+
+        const showBuilderIdleState = () => {
+          stopProgressMessages("builder");
+          builderUiStateByPage.set(workspacePageId, { loading: false });
+          if (builderLoadingBoxEl) builderLoadingBoxEl.hidden = true;
         };
 
         const collectCurrentRequirementPlan = () => ({
@@ -1778,7 +1901,14 @@
             if (builderStatusEl) builderStatusEl.textContent = "기획 초안이 필요합니다.";
             return;
           }
-          if (builderStatusEl) builderStatusEl.textContent = "디자인 생성 중...";
+          showBuilderLoadingState();
+          startProgressMessages("builder", builderStatusEl, [
+            "디자인 생성 중입니다.",
+            "디자인 생성 중입니다. 승인된 기획안을 빌더 입력으로 변환하고 있습니다.",
+            "디자인 생성 중입니다. 적용 가능한 컴포넌트와 변경 범위를 검토하고 있습니다.",
+            "디자인 생성 중입니다. 실제 변경 operation을 구성하고 있습니다.",
+            "잠시만 기다려주십시오. 생성 결과를 정리하고 있습니다.",
+          ]);
           try {
             const payload = await fetchJson("/api/llm/build", {
               method: "POST",
@@ -1795,10 +1925,12 @@
                 targetComponents,
               }),
             });
+            showBuilderIdleState();
             if (builderStatusEl) builderStatusEl.textContent = payload.summary || "디자인 생성 완료";
             showAdminNotice("디자인 생성 완료");
-            await renderDetail();
+            await rerenderDetailWithFocus({ selector: "#builderResultSection", behavior: "smooth", block: "start" });
           } catch (error) {
+            showBuilderIdleState();
             if (builderStatusEl) builderStatusEl.textContent = "디자인 생성 실패: " + String(error);
           }
         };
@@ -1878,10 +2010,17 @@
             plannerUiStateByPage.set(workspacePageId, { draftVisible: true, loading: false });
             if (plannerStatusEl) plannerStatusEl.textContent = payload.summary || "기획안 생성 완료";
             showAdminNotice("기획안 생성 완료");
-            await renderDetail();
+            await rerenderDetailWithFocus({ selector: "#plannerDraftRegion", behavior: "smooth", block: "start" });
           } catch (error) {
+            console.error("[planner] plan request failed", {
+              pageId: workspacePageId,
+              error,
+              status: error?.status || 0,
+              code: error?.code || "",
+              detail: error?.detail || String(error),
+            });
             showPlannerDraftState();
-            if (plannerStatusEl) plannerStatusEl.textContent = "기획안 생성 실패: " + String(error);
+            if (plannerStatusEl) plannerStatusEl.textContent = "기획안 생성 실패: " + describeRequestError(error);
           }
         });
 
@@ -1891,14 +2030,10 @@
             await persistCurrentPlanDraft();
             if (planSaveStatusEl) planSaveStatusEl.textContent = "정리본 저장 완료";
             showAdminNotice("정리본 저장 완료");
-            await renderDetail();
+            await rerenderDetailWithFocus({ selector: "#plannerDraftRegion", behavior: "smooth", block: "start" });
           } catch (error) {
             if (planSaveStatusEl) planSaveStatusEl.textContent = "정리본 저장 실패: " + String(error);
           }
-        });
-
-        runBuilderFromPlanBtn?.addEventListener("click", async () => {
-          await runBuilderWorkflow();
         });
 
         const runBuilderBtn = document.getElementById("runBuilder");
@@ -1932,7 +2067,7 @@
             });
             if (versionStatusEl) versionStatusEl.textContent = `버전 저장 완료: ${item.item?.versionLabel || item.item?.id || "saved"}`;
             showAdminNotice("새 버전 저장 완료");
-            await renderDetail();
+            await rerenderDetailWithFocus({ selector: "#builderWorkflowSection", behavior: "smooth", block: "start" });
           } catch (error) {
             if (versionStatusEl) versionStatusEl.textContent = "버전 저장 실패: " + String(error);
           }
@@ -1954,7 +2089,7 @@
               });
               if (versionStatusEl) versionStatusEl.textContent = `현재 View 고정 완료: ${versionId}`;
               showAdminNotice("현재 View 고정 완료");
-              await renderDetail();
+              await rerenderDetailWithFocus({ selector: "#builderWorkflowSection", behavior: "smooth", block: "start" });
             } catch (error) {
               if (versionStatusEl) versionStatusEl.textContent = "현재 View 고정 실패: " + String(error);
             }
