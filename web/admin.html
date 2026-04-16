@@ -80,6 +80,22 @@
       .history-panel-inline { border-top: 1px solid #eceef7; background: #f8fafc; }
       .history-panel-inline .history-list { max-height: 36vh; overflow: auto; }
       .list-toolbar { padding: 10px 12px; border-bottom: 1px solid #eceef7; display: grid; gap: 8px; }
+      .list-search { width: 100%; border: 1px solid #d9ddea; border-radius: 12px; padding: 11px 12px; font: inherit; background: #fff; color: #111827; }
+      .list-search::placeholder { color: #98a2b3; }
+      .list-filter-row { display: flex; flex-wrap: wrap; gap: 8px; }
+      .list-filter-chip { border: 1px solid #d9ddea; border-radius: 999px; background: #fff; color: #475467; padding: 7px 11px; font-size: 12px; font-weight: 700; cursor: pointer; }
+      .list-filter-chip.active { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+      .list-summary { display: none; }
+      .page-status-dots { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; }
+      .page-status-dots .status-dot {
+        display: block;
+        width: 8px !important;
+        height: 8px !important;
+        min-width: 8px;
+        min-height: 8px;
+        flex: 0 0 8px;
+        border-radius: 999px;
+      }
       .list-toolbar-row { display: grid; gap: 6px; }
       .toolbar-label-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
       .list-toolbar-row label { font-size: 12px; color: #4b5563; font-weight: 700; }
@@ -182,6 +198,125 @@
       .identity-grid { display: grid; gap: 12px; margin-top: 12px; }
       .identity-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .identity-status { margin-top: 10px; font-size: 12px; color: #586075; }
+      .workspace-shell-detail { display: grid; gap: 16px; }
+      .workspace-header { display: grid; gap: 12px; }
+      .workspace-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+      .workspace-title-block { min-width: 0; display: grid; gap: 6px; }
+      .workspace-title-block strong { display: block; font-size: 24px; line-height: 1.2; letter-spacing: -0.03em; }
+      .workspace-title-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+      .workspace-title-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+      .workspace-summary-bar { display: grid; gap: 12px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .workspace-summary-card { border: 1px solid #e6e9f4; border-radius: 14px; background: #fff; padding: 14px; display: grid; gap: 6px; }
+      .workspace-summary-label { font-size: 12px; font-weight: 700; color: #667085; }
+      .workspace-summary-value { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #111827; }
+      .workspace-summary-meta { font-size: 12px; line-height: 1.5; color: #667085; }
+      .status-flag { display: inline-flex; align-items: center; gap: 6px; }
+      .status-dot { width: 10px; height: 10px; border-radius: 999px; background: #d0d5dd; flex-shrink: 0; }
+      .status-dot.empty { background: #d0d5dd; }
+      .status-dot.draft { background: #2563eb; }
+      .status-dot.ready { background: #16a34a; }
+      .status-dot.stale { background: #d97706; }
+      .workspace-anchor { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; background: linear-gradient(180deg, rgba(246,247,251,0.96) 0%, rgba(246,247,251,0.96) 78%, rgba(246,247,251,0) 100%); }
+      .workspace-anchor-item { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #dbe1ef; background: #fff; color: #475467; text-decoration: none; font-size: 12px; font-weight: 700; }
+      .workspace-anchor-item.active { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+      .workspace-anchor-item .status-dot { width: 8px; height: 8px; }
+      .workspace-detail-grid { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(300px, 360px); gap: 18px; align-items: start; }
+      .workspace-main, .workspace-aside { display: grid; gap: 16px; }
+      .workspace-aside { position: sticky; top: 56px; }
+      .workspace-main .section, .workspace-aside .section, .workspace-aside .fold-section { border: 1px solid #e6e9f4; border-radius: 14px; background: #fff; }
+      .workspace-main .section, .workspace-aside .section { padding: 16px; margin: 0; }
+      .workspace-main .fold-section, .workspace-aside .fold-section { margin: 0; }
+      .workspace-card-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+      .workspace-card-title strong { font-size: 15px; }
+      .workspace-help-inline { display: inline-flex; align-items: center; gap: 6px; }
+      .doc-preview { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: #fff; display: grid; grid-template-columns: 152px minmax(0, 1fr); gap: 0; margin-top: 16px; }
+      .doc-toc { position: sticky; top: 64px; align-self: start; padding: 20px 12px; border-right: 1px solid var(--line); background: #fafbff; }
+      .doc-toc-label { margin: 0 0 10px; font-size: 10px; font-weight: 700; color: var(--text-soft); letter-spacing: 0.06em; text-transform: uppercase; padding-left: 8px; }
+      .doc-toc-item { display: block; padding: 5px 8px; border-radius: 8px; font-size: 12px; color: var(--text-muted); text-decoration: none; line-height: 1.45; transition: background 0.1s, color 0.1s; }
+      .doc-toc-item:hover { background: var(--line); color: var(--text); }
+      .doc-toc-item.active { background: var(--brand-soft); color: var(--brand); font-weight: 700; }
+      .doc-body { display: grid; gap: 0; min-width: 0; }
+      .doc-card { padding: 20px 22px; border-bottom: 1px solid var(--line); display: grid; gap: 12px; }
+      .doc-card:last-child { border-bottom: 0; }
+      .doc-card--alt { background: #fafbff; }
+      .doc-card--warn { background: #fffbeb; border-left: 3px solid #f59e0b; }
+      .doc-card-title { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; font-weight: 700; color: var(--text); }
+      .doc-card-icon { font-size: 16px; line-height: 1; }
+      .doc-card p { margin: 0; font-size: 14px; line-height: 1.7; color: #344054; }
+      .doc-card ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+      .doc-card li { margin: 0; font-size: 14px; line-height: 1.7; color: #344054; }
+      .doc-table { width: 100%; border-collapse: collapse; }
+      .doc-table th { background: #f3f4f6; padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 700; color: #374151; border-bottom: 1px solid var(--line); }
+      .doc-table td { padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 13px; color: #111827; vertical-align: top; line-height: 1.5; }
+      .doc-table tr:last-child td { border-bottom: 0; }
+      .doc-badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+      .doc-badge--high { background: #fef2f2; color: #dc2626; }
+      .doc-badge--mid { background: #eff6ff; color: #2563eb; }
+      .doc-badge--low { background: #f3f4f6; color: #6b7280; }
+      .doc-flow { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+      .doc-flow-step { display: flex; align-items: center; gap: 12px; padding: 11px 14px; background: #f8fafc; border: 1px solid var(--line); border-radius: 10px; }
+      .doc-flow-num { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 999px; background: var(--brand); color: #fff; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+      .doc-flow-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+      .doc-flow-arrow { list-style: none; padding: 3px 0 3px 38px; font-size: 14px; color: var(--text-soft); }
+      .doc-roadmap { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 0; }
+      .doc-stage { padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: #fff; display: grid; gap: 5px; align-self: start; }
+      .doc-stage-num { font-size: 10px; font-weight: 700; color: var(--brand); letter-spacing: 0.05em; text-transform: uppercase; }
+      .doc-stage-label { font-size: 13px; font-weight: 700; color: var(--text); }
+      .doc-stage-done { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+      .doc-roadmap-arrow { padding: 0 10px; font-size: 18px; color: var(--text-soft); align-self: center; }
+      .doc-objective { display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+      .doc-objective p { flex: 1; min-width: 0; margin: 0; font-size: 14px; line-height: 1.7; color: #344054; }
+      .doc-change-level { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+      .doc-change-level--low { background: #ecfdf5; color: #166534; }
+      .doc-change-level--medium { background: #eff6ff; color: #1d4ed8; }
+      .doc-change-level--high { background: #fef2f2; color: #dc2626; }
+      .doc-constraint { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .doc-constraint-col { padding: 14px; border-radius: 10px; display: grid; gap: 8px; }
+      .doc-constraint-col--keep { background: #ecfdf5; border: 1px solid #bbf7d0; }
+      .doc-constraint-col--change { background: #fef2f2; border: 1px solid #fecaca; }
+      .doc-constraint-col h5 { margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+      .doc-constraint-col--keep h5 { color: #166534; }
+      .doc-constraint-col--change h5 { color: #991b1b; }
+      .doc-constraint-col ul { margin: 0; padding-left: 16px; display: grid; gap: 5px; }
+      .doc-constraint-col li { font-size: 13px; line-height: 1.6; color: #374151; }
+      .doc-direction-list { display: grid; gap: 8px; }
+      .doc-direction-item { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; background: #f8fafc; border: 1px solid var(--line); border-left: 3px solid var(--brand); border-radius: 8px; font-size: 14px; line-height: 1.6; color: #374151; }
+      .doc-screen-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .doc-screen-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: #fff; display: grid; gap: 10px; }
+      .doc-screen-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .doc-screen-card-head strong { font-size: 13px; color: var(--text); }
+      .doc-screen-slot { font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 999px; background: #f3f4f6; color: #6b7280; font-family: 'Menlo', monospace; }
+      .doc-screen-fields { display: grid; gap: 7px; }
+      .doc-screen-field { display: grid; gap: 3px; }
+      .doc-screen-field-label { font-size: 10px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+      .doc-screen-field-value { font-size: 13px; color: #374151; line-height: 1.55; }
+      .doc-screen-field-value--keep { color: #166534; }
+      .doc-screen-field-value--change { color: #b45309; }
+      .doc-guardrail-list { display: grid; gap: 8px; }
+      .doc-guardrail-item { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.6; color: #374151; }
+      .doc-guardrail-icon { flex-shrink: 0; margin-top: 2px; font-size: 14px; }
+      .doc-empty { padding: 40px 24px; text-align: center; display: grid; gap: 10px; justify-items: center; }
+      .doc-empty p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+      .page-identity-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .page-identity-item { display: grid; gap: 6px; padding: 12px; border: 1px solid #edf0f6; border-radius: 12px; background: #fbfcff; }
+      .page-identity-item.wide { grid-column: 1 / -1; }
+      .page-identity-item label { font-size: 12px; font-weight: 700; color: #667085; }
+      .page-identity-item .value { font-size: 13px; line-height: 1.6; color: #1f2937; white-space: pre-line; }
+      .link-list { display: grid; gap: 10px; }
+      .link-item { border: 1px solid #edf0f6; border-radius: 12px; padding: 12px; background: #fbfcff; display: grid; gap: 8px; }
+      .link-main { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .link-main strong { font-size: 13px; color: #111827; }
+      .workspace-main .section[id] { scroll-margin-top: 108px; }
+      .list-group { display: grid; gap: 8px; padding: 10px 12px 14px; }
+      .list-group-label { padding: 4px 4px 2px; font-size: 11px; font-weight: 800; color: #98a2b3; letter-spacing: 0.03em; text-transform: uppercase; }
+      .page-select-item { display: grid; gap: 6px; width: 100%; text-align: left; border: 1px solid transparent; background: #fff; padding: 12px; border-radius: 12px; cursor: pointer; }
+      .page-select-item:hover { background: #f8fbff; border-color: #e6edf9; }
+      .page-select-item.active { background: #eff6ff; border-color: #bfdbfe; }
+      .page-select-title { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+      .page-select-title strong { font-size: 14px; line-height: 1.35; }
+      .page-select-meta { font-size: 12px; color: #667085; line-height: 1.55; }
+      .list { padding: 0 0 14px; }
+      .hidden-history-host { display: none !important; }
       @keyframes planner-loading {
         0% { transform: translateX(-100%); }
         100% { transform: translateX(300%); }
@@ -198,6 +333,16 @@
         .identity-grid.two { grid-template-columns: 1fr; }
         .plan-digest-grid { grid-template-columns: 1fr; }
         .plan-screen-matrix { grid-template-columns: 1fr; }
+        .workspace-summary-bar { grid-template-columns: 1fr 1fr; }
+        .workspace-detail-grid { grid-template-columns: 1fr; }
+        .workspace-aside { position: static; }
+        .page-identity-grid { grid-template-columns: 1fr; }
+        .doc-preview { grid-template-columns: 1fr; }
+        .doc-toc { display: none; }
+        .doc-constraint { grid-template-columns: 1fr; }
+        .doc-screen-grid { grid-template-columns: 1fr; }
+        .doc-roadmap { grid-template-columns: 1fr; gap: 10px; }
+        .doc-roadmap-arrow { display: none; }
       }
     </style>
   </head>
@@ -219,16 +364,13 @@
         <div id="pageListSummary" class="list-summary"></div>
         <div id="adminNotice" class="admin-notice" hidden></div>
         <div id="pageList" class="list"></div>
-        <h3 class="panel-subtitle">작업 이력</h3>
-        <div class="history-panel-inline">
-          <div id="historyPanel"></div>
-        </div>
       </section>
       <section class="panel">
         <h2>페이지 상세</h2>
         <div id="detail" class="body">Loading...</div>
       </section>
     </main>
+    <div id="historyPanel" class="hidden-history-host"></div>
     <div id="pageIdentityModal" class="modal-backdrop" hidden>
       <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="pageIdentityModalTitle">
         <div class="modal-header">
@@ -320,6 +462,7 @@
       let acceptanceBundles = null;
       let workspaceMeta = null;
       let recentActivity = [];
+      let currentSession = null;
       let finalReadinessMeta = null;
       let activityFilter = "all";
       let runtimePageSummary = null;
@@ -328,9 +471,13 @@
       let refreshGeneration = 0;
       let activePageIdentityPageId = "";
       let sectionPreviewImageDiffEnabled = false;
+      const pageIdentityCacheByPage = new Map();
+      const deferredDetailCacheByPage = new Map();
       const homeViewportStateByPage = new Map();
       const plannerUiStateByPage = new Map();
       const builderUiStateByPage = new Map();
+      let pageSearchQuery = "";
+      let pageFilter = "all";
       const adminTargetCatalog = [
         { id: "home-pc", workspacePageId: "home", targetKind: "home", displayTitle: "홈 - PC", homeViewportProfile: "pc", order: 1 },
         { id: "home-ta", workspacePageId: "home", targetKind: "home", displayTitle: "홈 - 테블릿", homeViewportProfile: "ta", order: 2 },
@@ -1308,6 +1455,150 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
         `;
       }
 
+      function buildRequirementPlanPrdViewModel(input = {}) {
+        const requirementPlan = input.requirementPlan && typeof input.requirementPlan === "object" ? input.requirementPlan : {};
+        const pageIdentity = input.pageIdentity && typeof input.pageIdentity === "object" ? input.pageIdentity : {};
+        const sectionBlueprints = Array.isArray(input.sectionBlueprints) ? input.sectionBlueprints : [];
+        const builderBrief = requirementPlan.builderBrief && typeof requirementPlan.builderBrief === "object" ? requirementPlan.builderBrief : {};
+        const pageLabelText = String(input.pageLabel || "페이지").trim();
+        const viewportLabel = String(input.viewportLabel || "PC").trim();
+        const requestSummary = uniqueNarrativeLines(textToLines(linesToText(requirementPlan.requestSummary || [])));
+        const planningDirection = uniqueNarrativeLines(textToLines(linesToText(requirementPlan.planningDirection || [])));
+        const designDirection = uniqueNarrativeLines(textToLines(linesToText(requirementPlan.designDirection || [])));
+        const mustKeep = uniqueNarrativeLines([
+          ...textToLines(linesToText(builderBrief.mustKeep || [])),
+          ...textToLines(linesToText(pageIdentity.mustPreserve || [])),
+        ]);
+        const mustChange = uniqueNarrativeLines(textToLines(linesToText(builderBrief.mustChange || [])));
+        const guardrails = uniqueNarrativeLines([
+          ...textToLines(linesToText(requirementPlan.guardrails || [])),
+          ...textToLines(linesToText(pageIdentity.visualGuardrails || [])),
+        ]);
+        const priorityItems = Array.isArray(requirementPlan.priority) ? requirementPlan.priority : [];
+        const featuresDetail = priorityItems.length
+          ? priorityItems.map((item, index) => ({
+              name: slotLabel(item?.target || "") || String(item?.target || `우선 기능 ${index + 1}`).trim(),
+              description: String(item?.reason || planningDirection[index] || "우선 적용 이유가 아직 정리되지 않았습니다.").trim(),
+              priority: index === 0 ? "high" : index === 1 ? "mid" : "low",
+            }))
+          : planningDirection.slice(0, 3).map((line, index) => ({
+              name: `핵심 기능 ${index + 1}`,
+              description: line,
+              priority: index === 0 ? "high" : index === 1 ? "mid" : "low",
+            }));
+        const screenProposals = (sectionBlueprints.length ? sectionBlueprints : priorityItems.map((item, index) => ({
+          label: slotLabel(item?.target || "") || String(item?.target || `섹션 ${index + 1}`).trim(),
+          slotId: String(item?.target || "").trim(),
+          objective: String(item?.reason || "").trim(),
+          visualDirection: designDirection[index] || designDirection[0] || "시각 위계와 강조 포인트를 재정렬합니다.",
+          mustKeep: mustKeep[index] || mustKeep[0] || "페이지 역할과 주요 흐름은 유지합니다.",
+          mustChange: mustChange[index] || mustChange[0] || "메시지와 시각 구조를 다시 설계합니다.",
+          hierarchy: ["badge", "title", "summary", "action"],
+        }))).map((item, index) => ({
+          label: String(item.label || item.title || `섹션 ${index + 1}`).trim(),
+          slotId: String(item.slotId || "").trim(),
+          why: String(item.objective || item.problemStatement || planningDirection[index] || requestSummary[0] || `${pageLabelText} 구간의 설득 포인트를 더 분명히 합니다.`).trim(),
+          visual: String(item.visualDirection || designDirection[index] || designDirection[0] || "타이포, 강조 포인트, 여백 리듬을 조정합니다.").trim(),
+          keep: String(item.mustKeep || mustKeep[index] || mustKeep[0] || "기존 역할과 주요 흐름은 유지합니다.").trim(),
+          change: String(item.mustChange || mustChange[index] || mustChange[0] || "메시지와 시각 위계를 재구성합니다.").trim(),
+          zones: Array.isArray(item.hierarchy) ? item.hierarchy : ["badge", "title", "summary", "action"],
+          viewport: viewportLabel,
+        }));
+        const openIssues = uniqueNarrativeLines([
+          ...textToLines(linesToText(pageIdentity.shouldAvoid || [])),
+          ...guardrails,
+        ]);
+        return {
+          title: String(requirementPlan.title || `${pageLabelText} 기획서`).trim(),
+          summary: requestSummary[0] || `${pageLabelText}의 메시지 구조와 시각 흐름을 재정리하는 기획안입니다.`,
+          problem: requestSummary.join(" ") || `${pageLabelText}의 현재 메시지와 시각 흐름을 다시 정리할 필요가 있습니다.`,
+          objective: String(builderBrief.objective || "").trim() || `${pageLabelText} ${viewportLabel} 화면의 메시지 구조와 시각 흐름을 재정렬합니다.`,
+          changeLevel: String(requirementPlan.designChangeLevel || "medium").trim(),
+          scopeIn: planningDirection.length ? planningDirection : ["핵심 사용자 흐름과 설득 구조를 재정리합니다."],
+          scopeOut: openIssues.length ? openIssues : ["이번 단계에서는 실행 기준을 벗어나는 확장 변경은 포함하지 않습니다."],
+          direction: uniqueNarrativeLines([...planningDirection, ...designDirection]),
+          mustKeep,
+          mustChange,
+          guardrails,
+          featuresDetail,
+          features: featuresDetail.map((item) => item.name),
+          screenProposals,
+          flow: planningDirection.length ? planningDirection.slice(0, 4).map((line, index) => index === 0 ? `사용자가 ${pageLabelText}에 진입하면 ${line}` : line) : [`사용자가 ${pageLabelText}에 진입하면 핵심 메시지를 먼저 이해합니다.`, "주요 섹션을 따라 정보와 혜택을 확인합니다.", "필요한 경우 비교 또는 상세 확인으로 이동합니다."],
+          roadmap: ["1단계: 페이지 정체성과 요구사항 정리", "2단계: 기획서 확정 및 디자인 빌더 실행", "3단계: 결과 검토 후 저장 버전 확정"],
+          openIssues: openIssues.length ? openIssues : ["추가 확인이 필요한 항목은 디자인 빌더 실행 후 비교 화면에서 검토합니다."],
+          layoutMockupMarkdown: String(input.layoutMockupMarkdown || "").trim(),
+          designSpecMarkdown: String(input.designSpecMarkdown || "").trim(),
+        };
+      }
+
+      function renderPrdHtml(prd = {}, options = {}) {
+        if (!prd || !Object.keys(prd).length) {
+          return `<div class="doc-empty"><p>아직 기획서가 없습니다.<br>위 요구사항을 입력한 뒤 <strong>기획안 생성</strong>을 눌러 주세요.</p></div>`;
+        }
+        const toArr = (value) => Array.isArray(value) ? value : (value ? [value] : []);
+        const idPrefix = String(options.idPrefix || "prd").trim() || "prd";
+        const makeId = (suffix) => `${idPrefix}-${suffix}`;
+        const priorityMeta = { high: ["high", "높음"], mid: ["mid", "보통"], low: ["low", "낮음"] };
+        const featureRows = toArr(prd.featuresDetail).length
+          ? prd.featuresDetail.map((feature, index) => {
+              const [cls, txt] = priorityMeta[feature.priority] || priorityMeta.low;
+              return `<tr><td>${index + 1}</td><td><strong style="font-size:13px">${escapeHtml(feature.name || `기능 ${index + 1}`)}</strong></td><td>${escapeHtml(feature.description || "—")}</td><td><span class="doc-badge doc-badge--${cls}">${txt}</span></td></tr>`;
+            }).join("")
+          : toArr(prd.features).map((feature, index) => {
+              const key = index === 0 ? "high" : index === 1 ? "mid" : "low";
+              const [cls, txt] = priorityMeta[key];
+              return `<tr><td>${index + 1}</td><td>${escapeHtml(feature)}</td><td style="color:#9ca3af">—</td><td><span class="doc-badge doc-badge--${cls}">${txt}</span></td></tr>`;
+            }).join("");
+        const flowLines = toArr(prd.flow);
+        const flowHtml = flowLines.length > 1 ? `<ol class="doc-flow">${flowLines.map((line, index) => `${index > 0 ? `<li class="doc-flow-arrow">↓</li>` : ""}<li class="doc-flow-step"><span class="doc-flow-num">${index + 1}</span><span class="doc-flow-text">${escapeHtml(line)}</span></li>`).join("")}</ol>` : `<p>${escapeHtml(flowLines[0] || "")}</p>`;
+        const roadmapItems = toArr(prd.roadmap).slice(0, 3).map((item) => {
+          const match = String(item || "").match(/^(\d+단계)\s*[:：]\s*(.+)/);
+          return match ? { num: match[1], label: match[2] } : { num: "", label: String(item || "") };
+        });
+        const roadmapHtml = roadmapItems.length >= 2 ? `<div class="doc-roadmap">${roadmapItems.map((item, index) => `${index > 0 ? `<div class="doc-roadmap-arrow">→</div>` : ""}<div class="doc-stage">${item.num ? `<div class="doc-stage-num">${escapeHtml(item.num)}</div>` : ""}<div class="doc-stage-label">${escapeHtml(item.label)}</div></div>`).join("")}</div>` : `<ul>${roadmapItems.map((item) => `<li>${escapeHtml(item.label)}</li>`).join("")}</ul>`;
+        const hasObjective = Boolean(prd.objective);
+        const hasConstraint = toArr(prd.mustKeep).length || toArr(prd.mustChange).length;
+        const hasDirection = toArr(prd.direction).length;
+        const hasScreens = toArr(prd.screenProposals).length;
+        const hasGuardrails = toArr(prd.guardrails).length;
+        const tocItems = [
+          [makeId("summary"), "1. 요약"],
+          [makeId("background"), "2. 배경 / 문제"],
+          hasObjective && [makeId("objective"), "3. 기획 목표"],
+          hasConstraint && [makeId("constraint"), "4. 유지·변경 원칙"],
+          hasDirection && [makeId("direction"), "5. 기획 방향"],
+          [makeId("scope"), "6. 목표 범위"],
+          [makeId("features"), "7. 핵심 기능"],
+          hasScreens && [makeId("screens"), "8. 화면별 제안"],
+          [makeId("flow"), "9. 사용자 흐름"],
+          [makeId("roadmap"), "10. 로드맵"],
+          hasGuardrails && [makeId("guardrails"), "11. 가드레일"],
+          [makeId("issues"), "12. 미결 사항"],
+        ].filter(Boolean);
+        return `
+          <div class="doc-preview">
+            <nav class="doc-toc">
+              <p class="doc-toc-label">목차</p>
+              ${tocItems.map(([id, label], index) => `<a class="doc-toc-item ${index === 0 ? "active" : ""}" href="#${escapeHtml(id)}">${escapeHtml(label)}</a>`).join("")}
+            </nav>
+            <div class="doc-body">
+              <section id="${escapeHtml(makeId("summary"))}" class="doc-card"><h4 class="doc-card-title"><span class="doc-card-icon">📋</span>1. 요약</h4><p>${escapeHtml(prd.summary || "")}</p></section>
+              <section id="${escapeHtml(makeId("background"))}" class="doc-card doc-card--alt"><h4 class="doc-card-title"><span class="doc-card-icon">🔍</span>2. 배경 / 문제 정의</h4><p>${escapeHtml(prd.problem || "")}</p></section>
+              ${hasObjective ? `<section id="${escapeHtml(makeId("objective"))}" class="doc-card"><h4 class="doc-card-title"><span class="doc-card-icon">🎯</span>3. 기획 목표</h4><div class="doc-objective"><p>${escapeHtml(prd.objective || "")}</p>${(() => { const map = { low: ["low", "낮음 — 세부 조정"], medium: ["medium", "보통 — 주요 섹션 재편"], high: ["high", "높음 — 전체 흐름 재설계"] }; const [cls, txt] = map[prd.changeLevel] || map.medium; return `<span class="doc-change-level doc-change-level--${cls}">변화 강도: ${txt}</span>`; })()}</div></section>` : ""}
+              ${hasConstraint ? `<section id="${escapeHtml(makeId("constraint"))}" class="doc-card doc-card--alt"><h4 class="doc-card-title"><span class="doc-card-icon">⚖️</span>4. 유지·변경 원칙</h4><div class="doc-constraint"><div class="doc-constraint-col doc-constraint-col--keep"><h5>✅ 반드시 유지할 것</h5><ul>${toArr(prd.mustKeep).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul></div><div class="doc-constraint-col doc-constraint-col--change"><h5>🔄 반드시 바꿀 것</h5><ul>${toArr(prd.mustChange).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul></div></div></section>` : ""}
+              ${hasDirection ? `<section id="${escapeHtml(makeId("direction"))}" class="doc-card"><h4 class="doc-card-title"><span class="doc-card-icon">🧭</span>5. 기획·디자인 방향</h4><div class="doc-direction-list">${toArr(prd.direction).map((line) => `<div class="doc-direction-item">${escapeHtml(line)}</div>`).join("")}</div></section>` : ""}
+              <section id="${escapeHtml(makeId("scope"))}" class="doc-card doc-card--alt"><h4 class="doc-card-title"><span class="doc-card-icon">📐</span>6. 목표 범위</h4><ul>${toArr(prd.scopeIn).map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></section>
+              <section id="${escapeHtml(makeId("features"))}" class="doc-card"><h4 class="doc-card-title"><span class="doc-card-icon">⚡</span>7. 핵심 기능</h4><table class="doc-table"><thead><tr><th style="width:32px">#</th><th style="width:35%">기능명</th><th>설명</th><th style="width:60px">우선순위</th></tr></thead><tbody>${featureRows}</tbody></table></section>
+              ${hasScreens ? `<section id="${escapeHtml(makeId("screens"))}" class="doc-card doc-card--alt"><h4 class="doc-card-title"><span class="doc-card-icon">🖥️</span>8. 화면별 제안</h4><div class="doc-screen-grid">${toArr(prd.screenProposals).map((screen) => `<div class="doc-screen-card"><div class="doc-screen-card-head"><strong>${escapeHtml(screen.label || "화면 제안")}</strong>${screen.slotId ? `<span class="doc-screen-slot">${escapeHtml(screen.slotId)}</span>` : ""}</div><div class="doc-screen-fields"><div class="doc-screen-field"><span class="doc-screen-field-label">해결 문제</span><span class="doc-screen-field-value">${escapeHtml(screen.why || "")}</span></div><div class="doc-screen-field"><span class="doc-screen-field-label">시각 해법</span><span class="doc-screen-field-value">${escapeHtml(screen.visual || "")}</span></div><div class="doc-screen-field"><span class="doc-screen-field-label">유지</span><span class="doc-screen-field-value doc-screen-field-value--keep">${escapeHtml(screen.keep || "")}</span></div><div class="doc-screen-field"><span class="doc-screen-field-label">변경</span><span class="doc-screen-field-value doc-screen-field-value--change">${escapeHtml(screen.change || "")}</span></div></div></div>`).join("")}</div></section>` : ""}
+              <section id="${escapeHtml(makeId("flow"))}" class="doc-card"><h4 class="doc-card-title"><span class="doc-card-icon">🔄</span>9. 사용자 흐름</h4>${flowHtml}</section>
+              <section id="${escapeHtml(makeId("roadmap"))}" class="doc-card doc-card--alt"><h4 class="doc-card-title"><span class="doc-card-icon">📅</span>10. 단계별 로드맵</h4>${roadmapHtml}</section>
+              ${hasGuardrails ? `<section id="${escapeHtml(makeId("guardrails"))}" class="doc-card"><h4 class="doc-card-title"><span class="doc-card-icon">🛡️</span>11. 가드레일</h4><div class="doc-guardrail-list">${toArr(prd.guardrails).map((line) => `<div class="doc-guardrail-item"><span class="doc-guardrail-icon">🚫</span>${escapeHtml(line)}</div>`).join("")}</div></section>` : ""}
+              <section id="${escapeHtml(makeId("issues"))}" class="doc-card doc-card--warn"><h4 class="doc-card-title"><span class="doc-card-icon">⚠️</span>12. 미결 사항 / 제외 판단 이유</h4><ul>${toArr(prd.openIssues).map((line) => `<li>${escapeHtml(line)}</li>`).join("")}</ul></section>
+            </div>
+          </div>
+        `;
+      }
+
       function createRequestError({ url, status = 0, code = "", detail = "", cause = null }) {
         const error = new Error(detail || code || `Request failed: ${url}`);
         error.url = url;
@@ -1580,6 +1871,70 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
           </div>
         `;
         historyPanelEl.querySelector("#openHistoryModalBtn")?.addEventListener("click", renderHistoryModal);
+      }
+
+      async function fetchPageIdentityForPage(pageId = "") {
+        if (!pageId) return null;
+        if (pageIdentityCacheByPage.has(pageId)) return pageIdentityCacheByPage.get(pageId);
+        try {
+          const payload = await fetchJson(`/api/workspace/page-identity?pageId=${encodeURIComponent(pageId)}`);
+          pageIdentityCacheByPage.set(pageId, payload || null);
+          return payload || null;
+        } catch (error) {
+          console.error("failed to fetch page identity", pageId, error);
+          pageIdentityCacheByPage.set(pageId, null);
+          return null;
+        }
+      }
+
+      function hasMeaningfulIdentity(identity = {}) {
+        return Boolean(
+          String(identity.role || "").trim() ||
+          String(identity.purpose || "").trim() ||
+          String(identity.designIntent || "").trim() ||
+          (identity.mustPreserve || []).length ||
+          (identity.shouldAvoid || []).length ||
+          (identity.visualGuardrails || []).length
+        );
+      }
+
+      function hasRequirementInput(input = {}) {
+        return Boolean(
+          String(input.requestText || "").trim() ||
+          String(input.keyMessage || "").trim() ||
+          String(input.preferredDirection || "").trim() ||
+          String(input.avoidDirection || "").trim() ||
+          String(input.toneAndMood || "").trim() ||
+          (input.referenceUrls || []).length
+        );
+      }
+
+      function getDocState(meta = {}) {
+        if (meta.stale) return "stale";
+        if (meta.ready) return "ready";
+        if (meta.draft) return "draft";
+        return "empty";
+      }
+
+      function getDocStateLabel(state = "empty") {
+        return ({
+          empty: "없음",
+          draft: "작성 중",
+          ready: "준비됨",
+          stale: "업데이트 필요",
+        })[state] || "없음";
+      }
+
+      function renderStatusFlag(state = "empty") {
+        return `<span class="status-flag"><span class="status-dot ${escapeHtml(state)}"></span>${escapeHtml(getDocStateLabel(state))}</span>`;
+      }
+
+      function getPageGroupLabel(page = {}) {
+        if (page.targetKind === "home") return "홈";
+        if (page.targetKind === "service") return "서비스";
+        if (page.targetKind === "plp") return "PLP";
+        if (page.targetKind === "pdp") return "PDP";
+        return "기타";
       }
 
       function getSidebarSelection(pageId = "") {
@@ -1869,6 +2224,7 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
           location.href = "/login";
           return;
         }
+        currentSession = session || null;
         sessionMetaEl.textContent = `${session.user?.displayName || session.user?.loginId} · ${data.workspaceSource || "shared-default"}`;
         workspaceMeta = data.workspaceMeta || null;
         recentActivity = activity.items || [];
@@ -1904,77 +2260,136 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
       }
 
       function renderList() {
-        const pageAcceptanceMap = new Map((finalReadinessMeta?.pages || []).map((item) => [item.pageId, item]));
         const visiblePages = getVisiblePages();
-        const appliedPage = pages.find((page) => page.id === selectedId) || null;
-        const pendingPage =
-          visiblePages.find((page) => page.id === pendingSelectedId) ||
-          pages.find((page) => page.id === pendingSelectedId) ||
-          visiblePages[0] ||
-          pages[0] ||
-          null;
-        const pageReview = pendingPage && pendingPage.targetKind !== "pdp"
-          ? pageReviewMap.get(getTargetWorkspacePageId(pendingPage)) || null
-          : null;
         pageListToolbarEl.innerHTML = `
-          <div class="list-toolbar-row">
-            <div class="toolbar-label-row">
-              <label for="pageQuickSelect">수정할 페이지 선택</label>
-              ${buildHelpButtonHtml("페이지 선택 안내", [
-                "왼쪽에서는 작업할 페이지만 고릅니다.",
-                "페이지를 바꾸려면 선택 후 바로 아래 버튼을 눌러 오른쪽 상세 화면에 반영합니다.",
-              ])}
-            </div>
-            <div class="page-pick-row">
-              <select id="pageQuickSelect" class="list-select">
-                ${visiblePages.map((page) => `<option value="${escapeHtml(page.id)}" ${page.id === pendingSelectedId ? "selected" : ""}>${escapeHtml(pageLabel(page.id, page.title))}</option>`).join("")}
-              </select>
-            </div>
-            <div class="actions" style="margin-top:0;">
-              <button type="button" class="btn secondary apply-selected-page-btn" ${pendingPage ? `data-select-page-id="${escapeHtml(pendingPage.id)}"` : "disabled"}>선택하기</button>
-              ${pageReview?.compareUrl ? `<a class="btn secondary" href="${escapeHtml(pageReview.compareUrl)}" target="_blank">비교 보기</a>` : ``}
+          <div class="list-toolbar">
+            <input id="pageSearchInput" class="list-search" type="text" placeholder="페이지 검색" value="${escapeHtml(pageSearchQuery)}" />
+            <div class="list-filter-row">
+              <button type="button" class="list-filter-chip ${pageFilter === "all" ? "active" : ""}" data-page-filter="all">전체</button>
+              <button type="button" class="list-filter-chip ${pageFilter === "working" ? "active" : ""}" data-page-filter="working">작업중</button>
+              <button type="button" class="list-filter-chip ${pageFilter === "prd" ? "active" : ""}" data-page-filter="prd">기획서 있음</button>
             </div>
           </div>
         `;
-        pageListToolbarEl.querySelector("#pageQuickSelect")?.addEventListener("change", (event) => {
-          pendingSelectedId = event.target.value || "";
-          renderList();
-        });
         pageListSummaryEl.innerHTML = "";
         pageListSummaryEl.hidden = true;
-        if (!visiblePages.length || !pendingPage) {
+        if (!visiblePages.length) {
           pageListEl.hidden = false;
           pageListEl.innerHTML = `<div class="empty">조건에 맞는 페이지가 없습니다. 필터를 바꿔보세요.</div>`;
+          bindListControls();
           return;
         }
+        const groupedPages = visiblePages.reduce((acc, page) => {
+          const group = getPageGroupLabel(page);
+          if (!acc[group]) acc[group] = [];
+          acc[group].push(page);
+          return acc;
+        }, {});
         pageListEl.hidden = false;
-        pageListEl.innerHTML = renderSidebarRecordSections(pendingPage.id);
-        pageListToolbarEl.querySelector(".apply-selected-page-btn")?.addEventListener("click", async () => {
-          selectedId = pendingPage.id;
-          pendingSelectedId = pendingPage.id;
-          selectedBundleId = "";
-          syncAdminStateUrl("push");
-          renderList();
-          await renderDetail();
-        });
-        pageListEl.querySelectorAll("[data-sidebar-record-key]").forEach((button) => {
+        pageListEl.innerHTML = Object.entries(groupedPages).map(([groupLabel, items]) => `
+          <div class="list-group">
+            <div class="list-group-label">${escapeHtml(groupLabel)}</div>
+            ${items.map((page) => {
+              const workspacePageId = getTargetWorkspacePageId(page);
+              const cache = sidebarRecordCacheByPage.get(page.id) || { plans: [], draftBuilds: [], versions: [] };
+              const latestPlan = (cache.plans || [])[0] || null;
+              const latestPlanInput = latestPlan?.input?.userInput || {};
+              const hasPlan = (cache.plans || []).length > 0;
+              const hasDraft = (cache.draftBuilds || []).length > 0;
+              const hasVersion = (cache.versions || []).length > 0;
+              const identityPayload = pageIdentityCacheByPage.get(workspacePageId) || null;
+              const effectiveIdentity = identityPayload?.effectiveIdentity || identityPayload || {};
+              const identityState = getDocState({
+                ready: hasMeaningfulIdentity(effectiveIdentity),
+              });
+              const requirementState = getDocState({
+                ready: hasRequirementInput(latestPlanInput),
+                draft: hasRequirementInput(latestPlanInput) && !latestPlan,
+              });
+              const prdState = getDocState({
+                ready: hasPlan,
+              });
+              const pageReview = page.targetKind !== "pdp" ? pageReviewMap.get(workspacePageId) || null : null;
+              return `
+                <button type="button" class="page-select-item ${page.id === selectedId ? "active" : ""}" data-page-select-id="${escapeHtml(page.id)}">
+                  <div class="page-select-title">
+                    <strong>${escapeHtml(pageLabel(page.id, page.title))}</strong>
+                    <span class="page-status-dots" aria-label="상태">
+                      <span class="status-dot ${escapeHtml(identityState)}" title="페이지 정체성"></span>
+                      <span class="status-dot ${escapeHtml(requirementState)}" title="요구사항"></span>
+                      <span class="status-dot ${escapeHtml(prdState)}" title="기획서"></span>
+                    </span>
+                  </div>
+                  <div class="page-select-meta">
+                    작업 pageId ${escapeHtml(workspacePageId)}
+                    ${hasPlan ? " · 기획안 있음" : ""}
+                    ${hasDraft ? " · draft 있음" : ""}
+                    ${hasVersion ? " · 버전 있음" : ""}
+                    ${pageReview?.compareUrl ? " · 비교 가능" : ""}
+                  </div>
+                </button>
+              `;
+            }).join("")}
+          </div>
+        `).join("");
+        pageListEl.querySelectorAll("[data-page-select-id]").forEach((button) => {
           button.addEventListener("click", async () => {
-            const recordKey = button.getAttribute("data-sidebar-record-key") || "";
-            if (!recordKey) return;
-            selectedId = pendingPage.id;
-            pendingSelectedId = pendingPage.id;
+            const pageId = button.getAttribute("data-page-select-id") || "";
+            if (!pageId) return;
+            selectedId = pageId;
+            pendingSelectedId = pageId;
             selectedBundleId = "";
-            sidebarSelectionByPage.set(pendingPage.id, { recordKey });
             syncAdminStateUrl("push");
             renderList();
             await renderDetail();
-            detailEl.querySelector("#plannerDraftRegion")?.scrollIntoView({ behavior: "smooth", block: "start" });
           });
         });
+        bindListControls();
       }
 
       function getVisiblePages() {
-        return pages.slice();
+        return pages.filter((page) => {
+          const query = pageSearchQuery.trim().toLowerCase();
+          const workspacePageId = getTargetWorkspacePageId(page);
+          const searchable = [
+            page.title,
+            page.id,
+            workspacePageId,
+            getTargetKindLabel(page),
+            getPageGroupLabel(page),
+          ].map((item) => String(item || "").toLowerCase());
+          const matchesQuery = !query || searchable.some((item) => item.includes(query));
+          if (!matchesQuery) return false;
+
+          const cache = sidebarRecordCacheByPage.get(page.id) || { plans: [], draftBuilds: [], versions: [] };
+          const hasPlan = (cache.plans || []).length > 0;
+          const hasDraft = (cache.draftBuilds || []).length > 0;
+          const hasVersion = (cache.versions || []).length > 0;
+          const identityPayload = pageIdentityCacheByPage.get(workspacePageId) || null;
+          const hasIdentity = hasMeaningfulIdentity(identityPayload?.effectiveIdentity || identityPayload || {});
+
+          if (pageFilter === "working") return hasIdentity || hasPlan || hasDraft || hasVersion;
+          if (pageFilter === "prd") return hasPlan;
+          return true;
+        });
+      }
+
+      function bindListControls() {
+        const searchInput = document.getElementById("pageSearchInput");
+        if (searchInput) {
+          searchInput.addEventListener("input", (event) => {
+            pageSearchQuery = String(event.target.value || "");
+            renderList();
+          });
+        }
+        pageListToolbarEl.querySelectorAll("[data-page-filter]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const next = button.getAttribute("data-page-filter") || "all";
+            if (pageFilter === next) return;
+            pageFilter = next;
+            renderList();
+          });
+        });
       }
 
       function focusNextPendingBundle(bundleId) {
@@ -2141,43 +2556,72 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
         let versionList = { items: [] };
         let pinnedView = { item: null };
         try {
-          const requests = [
-            fetchJson(`/api/workspace/component-inventory?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
-            fetchJson(`/api/workspace/component-editability?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
-            fetchJson(`/api/workspace/slot-registry?pageId=${encodeURIComponent(workspacePageId)}`),
-            fetchJson(`/api/workspace/share-section-registry?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
-            fetchJson(`/api/workspace/artifact-section-registry?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
-            fetchJson(`/api/workspace/design-reference-library?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
-            fetchJson(`/api/workspace/pre-llm-gaps?pageId=${encodeURIComponent(workspacePageId)}`),
-            fetchJson(`/api/visual-batch-summary`),
+          const criticalRequests = [
             fetchJson(`/api/workspace/plans?pageId=${encodeURIComponent(workspacePageId)}&limit=10${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
             fetchJson(`/api/workspace/draft-builds?pageId=${encodeURIComponent(workspacePageId)}&limit=10${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
             fetchJson(`/api/workspace/versions?pageId=${encodeURIComponent(workspacePageId)}&limit=10${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
             fetchJson(`/api/workspace/view-pin?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
-            ...(isPdpTarget ? [] : [
-              fetchJson(`/api/final-acceptance-bundles`),
-              fetchJson(`/api/workspace/acceptance-results?pageId=${encodeURIComponent(workspacePageId)}`),
-            ]),
           ];
-          const results = await Promise.allSettled(requests);
-          if (results[0].status === "fulfilled") inventory = results[0].value;
-          if (results[1].status === "fulfilled") editability = results[1].value;
-          if (results[2].status === "fulfilled") slotRegistry = results[2].value;
-          if (results[3].status === "fulfilled") shareSectionRegistry = results[3].value;
-          if (results[4].status === "fulfilled") artifactSectionRegistry = results[4].value;
-          if (results[5].status === "fulfilled") designReferenceLibrary = results[5].value;
-          if (results[6].status === "fulfilled") gaps = results[6].value;
-          if (results[7].status === "fulfilled") visualBatch = results[7].value;
-          if (results[8].status === "fulfilled") planList = results[8].value;
-          if (results[9].status === "fulfilled") draftBuildList = results[9].value;
-          if (results[10].status === "fulfilled") versionList = results[10].value;
-          if (results[11].status === "fulfilled") pinnedView = results[11].value;
-          if (!isPdpTarget) {
-            if (results[12].status === "fulfilled") acceptanceBundles = results[12].value;
-            if (results[13].status === "fulfilled") acceptanceResults = results[13].value;
+          const criticalResults = await Promise.allSettled(criticalRequests);
+          if (criticalResults[0].status === "fulfilled") planList = criticalResults[0].value;
+          if (criticalResults[1].status === "fulfilled") draftBuildList = criticalResults[1].value;
+          if (criticalResults[2].status === "fulfilled") versionList = criticalResults[2].value;
+          if (criticalResults[3].status === "fulfilled") pinnedView = criticalResults[3].value;
+
+          const deferredCacheKey = `${workspacePageId}:${isHomeTarget ? selectedViewportProfile : "default"}`;
+          const deferredCached = deferredDetailCacheByPage.get(deferredCacheKey);
+          if (deferredCached) {
+            inventory = deferredCached.inventory || inventory;
+            editability = deferredCached.editability || editability;
+            slotRegistry = deferredCached.slotRegistry || slotRegistry;
+            shareSectionRegistry = deferredCached.shareSectionRegistry || shareSectionRegistry;
+            artifactSectionRegistry = deferredCached.artifactSectionRegistry || artifactSectionRegistry;
+            designReferenceLibrary = deferredCached.designReferenceLibrary || designReferenceLibrary;
+            gaps = deferredCached.gaps || gaps;
+            visualBatch = deferredCached.visualBatch || visualBatch;
+            if (!isPdpTarget) {
+              acceptanceBundles = deferredCached.acceptanceBundles || null;
+              acceptanceResults = deferredCached.acceptanceResults || null;
+            }
           } else {
-            acceptanceBundles = null;
-            acceptanceResults = null;
+            window.setTimeout(async () => {
+              try {
+                const deferredRequests = [
+                  fetchJson(`/api/workspace/component-inventory?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
+                  fetchJson(`/api/workspace/component-editability?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
+                  fetchJson(`/api/workspace/slot-registry?pageId=${encodeURIComponent(workspacePageId)}`),
+                  fetchJson(`/api/workspace/share-section-registry?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
+                  fetchJson(`/api/workspace/artifact-section-registry?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
+                  fetchJson(`/api/workspace/design-reference-library?pageId=${encodeURIComponent(workspacePageId)}${isHomeTarget ? `&viewportProfile=${encodeURIComponent(selectedViewportProfile)}` : ""}`),
+                  fetchJson(`/api/workspace/pre-llm-gaps?pageId=${encodeURIComponent(workspacePageId)}`),
+                  fetchJson(`/api/visual-batch-summary`),
+                  ...(isPdpTarget ? [] : [
+                    fetchJson(`/api/final-acceptance-bundles`),
+                    fetchJson(`/api/workspace/acceptance-results?pageId=${encodeURIComponent(workspacePageId)}`),
+                  ]),
+                ];
+                const deferredResults = await Promise.allSettled(deferredRequests);
+                deferredDetailCacheByPage.set(deferredCacheKey, {
+                  inventory: deferredResults[0].status === "fulfilled" ? deferredResults[0].value : { components: [] },
+                  editability: deferredResults[1].status === "fulfilled" ? deferredResults[1].value : { components: [] },
+                  slotRegistry: deferredResults[2].status === "fulfilled" ? deferredResults[2].value : { slots: [] },
+                  shareSectionRegistry: deferredResults[3].status === "fulfilled" ? deferredResults[3].value : { sections: [] },
+                  artifactSectionRegistry: deferredResults[4].status === "fulfilled" ? deferredResults[4].value : { sections: [] },
+                  designReferenceLibrary: deferredResults[5].status === "fulfilled" ? deferredResults[5].value : { entries: [] },
+                  gaps: deferredResults[6].status === "fulfilled" ? deferredResults[6].value : { overallStatus: "warning", componentGaps: [], globalGaps: [], componentGapCount: 0 },
+                  visualBatch: deferredResults[7].status === "fulfilled" ? deferredResults[7].value : null,
+                  acceptanceBundles: !isPdpTarget && deferredResults[8]?.status === "fulfilled" ? deferredResults[8].value : null,
+                  acceptanceResults: !isPdpTarget && deferredResults[9]?.status === "fulfilled" ? deferredResults[9].value : null,
+                });
+                if (selectedId === currentPageId) {
+                  renderDetail().catch((error) => {
+                    console.error("failed to rerender detail after deferred fetch", error);
+                  });
+                }
+              } catch (error) {
+                console.error("failed to fetch deferred admin detail", error);
+              }
+            }, 0);
           }
         } catch (error) {
           detailEl.innerHTML = `Failed to load page detail: ${escapeHtml(String(error))}`;
@@ -2246,10 +2690,29 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
         const latestToolContext = latestPlan?.output?.toolContext || {};
         const latestPlanInput = latestPlan?.input || {};
         const latestPlanUserInput = latestPlanInput?.userInput || {};
+        const pageIdentityPayload = await fetchPageIdentityForPage(workspacePageId);
+        const effectivePageIdentity =
+          pageIdentityPayload?.effectiveIdentity ||
+          latestToolContext?.pageContext?.pageIdentity ||
+          {};
+        const identityState = getDocState({
+          ready: hasMeaningfulIdentity(effectivePageIdentity),
+        });
+        const requirementState = getDocState({
+          ready: hasRequirementInput(latestPlanUserInput),
+          draft: hasRequirementInput(latestPlanUserInput) && !latestPlan,
+        });
+        const prdState = getDocState({
+          ready: Boolean(latestPlan),
+        });
+        const builderState = getDocState({
+          ready: Boolean(latestDraftBuild),
+          draft: Boolean(latestPlan) && !latestDraftBuild,
+        });
         const generatedMarkdownDocs = buildRequirementPlanMarkdownDocsClient(latestRequirementPlan || {}, {
           pageLabel: pageLabel(page.id, page.title),
           viewportLabel: isHomeTarget ? getViewportLabel(selectedViewportProfile) : "PC",
-          pageIdentity: latestToolContext?.pageContext?.pageIdentity || {},
+          pageIdentity: effectivePageIdentity || {},
         });
         const rawBuilderMarkdownDoc = String(latestRequirementPlan?.builderMarkdown || "").trim();
         const rawLayoutMockupDoc = String(latestRequirementPlan?.layoutMockupMarkdown || "").trim();
@@ -2263,12 +2726,28 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
         const designSpecDoc = shouldPreferGeneratedDoc(rawDesignSpecDoc)
           ? String(generatedMarkdownDocs.designSpecMarkdown || "").trim()
           : rawDesignSpecDoc;
+        const prdViewModel = buildRequirementPlanPrdViewModel({
+          requirementPlan: latestRequirementPlan || {},
+          builderMarkdown: builderMarkdownDoc,
+          layoutMockupMarkdown: layoutMockupDoc,
+          designSpecMarkdown: designSpecDoc,
+          sectionBlueprints: generatedMarkdownDocs.sectionBlueprints || latestRequirementPlan?.sectionBlueprints || [],
+          pageIdentity: latestToolContext?.pageContext?.pageIdentity || {},
+          pageLabel: pageLabel(page.id, page.title),
+          viewportLabel: isHomeTarget ? getViewportLabel(selectedViewportProfile) : "PC",
+        });
         const requirementPlanDigestHtml = renderRequirementPlanDigestHtml(
           buildRequirementPlanDigest(latestRequirementPlan || {}, {
             pageLabel: pageLabel(page.id, page.title),
             viewportLabel: isHomeTarget ? getViewportLabel(selectedViewportProfile) : "PC",
           })
         );
+        const prdPreviewHtml = latestPlan
+          ? renderPrdHtml(prdViewModel, { idPrefix: "preview-prd" })
+          : `<div class="doc-empty"><p>아직 생성된 기획서가 없습니다.<br>위 요구사항을 입력한 뒤 <strong>기획안 생성</strong>을 눌러 주세요.</p></div>`;
+        const prdEditHtml = latestPlan
+          ? renderPrdHtml(prdViewModel, { idPrefix: "edit-prd" })
+          : `<div class="doc-empty"><p>아직 생성된 기획서가 없습니다.</p></div>`;
         const builderMarkdownPreviewHtml = builderMarkdownDoc ? renderMarkdownPreview(builderMarkdownDoc) : `<div class="meta">아직 생성된 builder 문서가 없습니다.</div>`;
         const layoutMockupPreviewHtml = layoutMockupDoc ? renderMarkdownPreview(layoutMockupDoc) : `<div class="meta">아직 생성된 목업 문서가 없습니다.</div>`;
         const designSpecPreviewHtml = designSpecDoc ? renderMarkdownPreview(designSpecDoc) : `<div class="meta">아직 생성된 실행 스펙 문서가 없습니다.</div>`;
@@ -2759,8 +3238,8 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
                   </div>
                   <div id="plannerPreviewPanel" class="planner-preview-panel" ${plannerEditMode ? "hidden" : ""}>
                     <div class="planner-field">
-                      <label>기획서 요약</label>
-                      ${requirementPlanDigestHtml}
+                      <label>기획서</label>
+                      ${prdPreviewHtml}
                     </div>
                     <details class="fold-section">
                       <summary>기획서 원문 보기</summary>
@@ -2783,8 +3262,8 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
                   </div>
                   <div id="plannerEditPanel" class="planner-edit-panel" ${plannerEditMode ? "" : "hidden"}>
                     <div class="planner-field">
-                      <label>기획서 요약</label>
-                      ${requirementPlanDigestHtml}
+                      <label>기획서</label>
+                      ${prdEditHtml}
                     </div>
                     <details class="fold-section">
                       <summary>기획서 원문 보기</summary>
@@ -2977,13 +3456,13 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
                     <div class="meta">createdAt: ${escapeHtml(formatPlanUpdatedAt(item.createdAt))} | buildId: ${escapeHtml(item.buildId || "n/a")}</div>
                     <div class="meta">${escapeHtml(item.summary || "요약 없음")}</div>
                     <div class="actions">
-                      <button type="button" class="btn secondary pin-version-btn" data-version-id="${escapeHtml(item.id)}">현재 View로 고정</button>
-                      ${pinnedViewItem?.versionId === item.id ? `<span class="chip pass">현재 View</span>` : ``}
+                      <button type="button" class="btn secondary pin-version-btn" data-version-id="${escapeHtml(item.id)}">클론에 적용</button>
+                      ${pinnedViewItem?.versionId === item.id ? `<span class="chip pass">적용 중</span>` : ``}
                     </div>
                   </div>
                 `).join("") : `<div class="meta">저장된 버전이 없습니다.</div>`}
               </div>
-              <div class="planner-status" id="versionStatus">${pinnedViewItem?.versionId ? `현재 View: ${pinnedViewItem.version?.versionLabel || pinnedViewItem.versionId}` : "현재 View 미고정"}</div>
+              <div class="planner-status" id="versionStatus">${pinnedViewItem?.versionId ? `현재 적용 버전: ${pinnedViewItem.version?.versionLabel || pinnedViewItem.versionId}` : "현재 적용 버전 없음"}</div>
             </div>
           </div>
           <details class="fold-section">
@@ -3135,6 +3614,292 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
             </div>
           </details>
         `;
+
+        const detailHeaderEl = detailEl.querySelector(".detail-header");
+        const previewFrameEl = detailEl.querySelector(".preview-frame");
+        const topLevelDetailNodes = Array.from(detailEl.children).filter((node) => {
+          const className = String(node.className || "");
+          return className.includes("detail-header") || className.includes("preview-frame") || className.includes("section") || className.includes("fold-section");
+        });
+        const requirementSectionEl = topLevelDetailNodes.find((node) => node.classList?.contains("section") && node.querySelector("#runPlanner")) || null;
+        const builderSectionEl = topLevelDetailNodes.find((node) => node.classList?.contains("section") && node.querySelector("#runBuilder")) || null;
+        const legacyOpsSectionEl = topLevelDetailNodes.find((node) => node.classList?.contains("fold-section") && /직접 AI 적용/.test(node.textContent || "")) || null;
+        const editableComponentsSectionEl = topLevelDetailNodes.find((node) => node.classList?.contains("section") && /수정 가능한 컴포넌트/.test(node.textContent || "")) || null;
+        const shareSectionEl = topLevelDetailNodes.find((node) => node.classList?.contains("section") && /공유용 섹션/.test(node.textContent || "")) || null;
+        const artifactSectionEl = topLevelDetailNodes.find((node) => node.classList?.contains("section") && /원본 섹션 추출/.test(node.textContent || "")) || null;
+        const designReferenceSectionEl = topLevelDetailNodes.find((node) => node.classList?.contains("section") && /디자인 레퍼런스 라이브러리/.test(node.textContent || "")) || null;
+        const compareOpsSectionEl = topLevelDetailNodes.find((node) => node.classList?.contains("fold-section") && /비교 자료 \/ 운영 정보/.test(node.textContent || "")) || null;
+        const technicalSectionEl = topLevelDetailNodes.find((node) => node.classList?.contains("fold-section") && /기술 정보/.test(node.textContent || "")) || null;
+        const plannerDraftRegionNode = requirementSectionEl?.querySelector("#plannerDraftRegion") || null;
+        const referenceAnalysisNode = Array.from(requirementSectionEl?.querySelectorAll(".planner-subsection") || []).find((node) => /레퍼런스 분석 결과/.test(node.textContent || "")) || null;
+        const versionSubsectionNode = builderSectionEl?.querySelectorAll(".planner-subsection")?.[1] || null;
+        const builderActionsEl = builderSectionEl?.querySelector(".actions") || null;
+        const saveVersionButtonNode = builderSectionEl?.querySelector("#saveVersionBtn") || null;
+        const relatedOriginalUrl = String(page.href || pageReviewMap.get(workspacePageId)?.liveReference || "").trim();
+        const recentEditorLabel = currentSession?.user?.displayName || currentSession?.user?.loginId || "알 수 없음";
+
+        const workspaceShellEl = document.createElement("div");
+        workspaceShellEl.className = "workspace-shell-detail";
+        workspaceShellEl.innerHTML = `
+          <div class="workspace-header">
+            <div class="workspace-title-row">
+              <div class="workspace-title-block">
+                <strong>${escapeHtml(page.title || page.id)}</strong>
+                <div class="workspace-title-meta">
+                  <span class="chip">${escapeHtml(getTargetKindLabel(page))}</span>
+                  <span class="chip">${escapeHtml(`작업 pageId ${workspacePageId}`)}</span>
+                  ${isHomeTarget ? `<span class="chip">${escapeHtml(getViewportLabel(selectedViewportProfile))}</span>` : ``}
+                  ${page.cloneTitle ? `<span class="chip">${escapeHtml(page.cloneTitle)}</span>` : ``}
+                </div>
+                <div class="meta">최근 편집자 ${escapeHtml(recentEditorLabel)} · 최근 작업 ${escapeHtml(workspaceMeta?.updatedAt || "n/a")}</div>
+              </div>
+              <div class="workspace-title-tools"></div>
+            </div>
+            <div class="workspace-summary-bar">
+              <div class="workspace-summary-card">
+                <div class="workspace-summary-label">페이지 정체성</div>
+                <div class="workspace-summary-value">${renderStatusFlag(identityState)}</div>
+                <div class="workspace-summary-meta">${escapeHtml(hasMeaningfulIdentity(effectivePageIdentity) ? "기준 문서가 준비되어 있습니다." : "아직 페이지 정체성이 비어 있습니다.")}</div>
+              </div>
+              <div class="workspace-summary-card">
+                <div class="workspace-summary-label">요구사항</div>
+                <div class="workspace-summary-value">${renderStatusFlag(requirementState)}</div>
+                <div class="workspace-summary-meta">${escapeHtml(hasRequirementInput(latestPlanUserInput) ? "현재 입력값이 저장되어 있습니다." : "요청 내용을 먼저 입력해 주세요.")}</div>
+              </div>
+              <div class="workspace-summary-card">
+                <div class="workspace-summary-label">기획서</div>
+                <div class="workspace-summary-value">${renderStatusFlag(prdState)}</div>
+                <div class="workspace-summary-meta">${escapeHtml(latestPlan ? `최근 생성 ${formatPlanUpdatedAt(latestPlan.updatedAt || latestPlan.createdAt)}` : "생성된 기획서가 없습니다.")}</div>
+              </div>
+              <div class="workspace-summary-card">
+                <div class="workspace-summary-label">디자인 빌더</div>
+                <div class="workspace-summary-value">${renderStatusFlag(builderState)}</div>
+                <div class="workspace-summary-meta">${escapeHtml(latestDraftBuild ? `최근 draft ${formatPlanUpdatedAt(latestDraftBuild.updatedAt || latestDraftBuild.createdAt)}` : "아직 실행 전 상태입니다.")}</div>
+              </div>
+            </div>
+            <nav class="workspace-anchor">
+              <a class="workspace-anchor-item" href="#identitySection" data-anchor-link="identitySection"><span class="status-dot ${escapeHtml(identityState)}"></span>페이지 정체성</a>
+              <a class="workspace-anchor-item" href="#requirementsSection" data-anchor-link="requirementsSection"><span class="status-dot ${escapeHtml(requirementState)}"></span>요구사항</a>
+              <a class="workspace-anchor-item" href="#prdSection" data-anchor-link="prdSection"><span class="status-dot ${escapeHtml(prdState)}"></span>기획서</a>
+              <a class="workspace-anchor-item" href="#builderWorkflowSection" data-anchor-link="builderWorkflowSection"><span class="status-dot ${escapeHtml(builderState)}"></span>디자인 빌더</a>
+            </nav>
+          </div>
+          <div class="workspace-detail-grid">
+            <div class="workspace-main"></div>
+            <aside class="workspace-aside"></aside>
+          </div>
+        `;
+
+        const workspaceTitleToolsEl = workspaceShellEl.querySelector(".workspace-title-tools");
+        const workspaceMainEl = workspaceShellEl.querySelector(".workspace-main");
+        const workspaceAsideEl = workspaceShellEl.querySelector(".workspace-aside");
+        if (detailHeaderEl?.querySelector(".toolbar-actions")) {
+          workspaceTitleToolsEl.appendChild(detailHeaderEl.querySelector(".toolbar-actions"));
+        }
+
+        const identitySectionEl = document.createElement("section");
+        identitySectionEl.className = "section";
+        identitySectionEl.id = "identitySection";
+        identitySectionEl.innerHTML = `
+          <div class="workspace-card-title">
+            <strong>페이지 정체성</strong>
+            <div class="workspace-help-inline">
+              ${buildHelpButtonHtml("페이지 정체성 안내", [
+                "이 페이지의 역할과 유지해야 할 인상을 정리합니다.",
+                "기획서와 디자인 빌더가 이 기준을 함께 참고합니다.",
+              ], "i")}
+            </div>
+          </div>
+          <div class="page-identity-grid">
+            <div class="page-identity-item">
+              <label>페이지 역할</label>
+              <div class="value">${escapeHtml(effectivePageIdentity.role || "아직 정리되지 않았습니다.")}</div>
+            </div>
+            <div class="page-identity-item">
+              <label>디자인 의도</label>
+              <div class="value">${escapeHtml(effectivePageIdentity.designIntent || "아직 정리되지 않았습니다.")}</div>
+            </div>
+            <div class="page-identity-item wide">
+              <label>페이지 목적</label>
+              <div class="value">${escapeHtml(effectivePageIdentity.purpose || "아직 정리되지 않았습니다.")}</div>
+            </div>
+            <div class="page-identity-item">
+              <label>반드시 유지할 것</label>
+              <div class="value">${escapeHtml(linesToText(effectivePageIdentity.mustPreserve || []) || "아직 정리되지 않았습니다.")}</div>
+            </div>
+            <div class="page-identity-item">
+              <label>피해야 할 것</label>
+              <div class="value">${escapeHtml(linesToText(effectivePageIdentity.shouldAvoid || []) || "아직 정리되지 않았습니다.")}</div>
+            </div>
+            <div class="page-identity-item wide">
+              <label>시각 가드레일</label>
+              <div class="value">${escapeHtml(linesToText(effectivePageIdentity.visualGuardrails || []) || "아직 정리되지 않았습니다.")}</div>
+            </div>
+          </div>
+        `;
+        if (detailHeaderEl?.querySelector("#editPageIdentityBtn")) {
+          const identityActionsEl = document.createElement("div");
+          identityActionsEl.className = "actions";
+          identityActionsEl.appendChild(detailHeaderEl.querySelector("#editPageIdentityBtn"));
+          identitySectionEl.appendChild(identityActionsEl);
+        }
+        workspaceMainEl.appendChild(identitySectionEl);
+
+        if (requirementSectionEl) {
+          requirementSectionEl.id = "requirementsSection";
+          const headingRow = requirementSectionEl.querySelector(".section-heading-row");
+          if (headingRow?.querySelector("strong")) headingRow.querySelector("strong").textContent = "요구사항";
+          requirementSectionEl.querySelectorAll(":scope > .meta").forEach((node, index) => {
+            if (index < 2) node.remove();
+          });
+          if (plannerDraftRegionNode) plannerDraftRegionNode.remove();
+          if (referenceAnalysisNode) referenceAnalysisNode.remove();
+          workspaceMainEl.appendChild(requirementSectionEl);
+        }
+
+        const prdSectionEl = document.createElement("section");
+        prdSectionEl.className = "section";
+        prdSectionEl.id = "prdSection";
+        prdSectionEl.innerHTML = `
+          <div class="workspace-card-title">
+            <strong>기획서</strong>
+            <div class="workspace-help-inline">
+              ${buildHelpButtonHtml("기획서 안내", [
+                "요구사항을 바탕으로 생성된 고객용 문서입니다.",
+                "저장 후 아래 디자인 빌더 실행 기준 문서로 사용됩니다.",
+              ], "i")}
+            </div>
+          </div>
+        `;
+        if (plannerDraftRegionNode) {
+          plannerDraftRegionNode.hidden = false;
+          prdSectionEl.appendChild(plannerDraftRegionNode);
+        } else {
+          const prdEmptyEl = document.createElement("div");
+          prdEmptyEl.className = "empty";
+          prdEmptyEl.textContent = "아직 생성된 기획서가 없습니다.";
+          prdSectionEl.appendChild(prdEmptyEl);
+        }
+        workspaceMainEl.appendChild(prdSectionEl);
+
+        if (builderSectionEl) {
+          const builderHeading = builderSectionEl.querySelector("strong");
+          if (builderHeading) builderHeading.textContent = "디자인 빌더";
+          const builderLead = builderSectionEl.querySelector(":scope > .meta");
+          if (builderLead) builderLead.remove();
+          if (builderActionsEl && saveVersionButtonNode && builderActionsEl.contains(saveVersionButtonNode)) {
+            saveVersionButtonNode.remove();
+          }
+          if (versionSubsectionNode) versionSubsectionNode.remove();
+          workspaceMainEl.appendChild(builderSectionEl);
+        }
+
+        const relatedScreensSectionEl = document.createElement("section");
+        relatedScreensSectionEl.className = "section";
+        relatedScreensSectionEl.innerHTML = `
+          <div class="workspace-card-title">
+            <strong>관련 화면</strong>
+            <div class="workspace-help-inline">
+              ${buildHelpButtonHtml("관련 화면 안내", [
+                "문서 작업과 결과 확인은 분리합니다.",
+                "미리보기와 비교는 새 창에서 확인하세요.",
+              ], "i")}
+            </div>
+          </div>
+          <div class="link-list">
+            <div class="link-item">
+              <div class="link-main">
+                <strong>작업 미리보기</strong>
+                <a class="btn secondary" href="${escapeHtml(previewUrl)}" target="_blank" rel="noreferrer">열기</a>
+              </div>
+            </div>
+            <div class="link-item">
+              <div class="link-main">
+                <strong>전후 비교</strong>
+                ${compareUrl ? `<a class="btn secondary" id="openDetailPageCompareBtn" href="${escapeHtml(compareUrl)}" target="_blank" rel="noreferrer">열기</a>` : `<button type="button" class="btn secondary" disabled>열기</button>`}
+              </div>
+            </div>
+            <div class="link-item">
+              <div class="link-main">
+                <strong>${escapeHtml(isHomeTarget ? "원본 홈페이지 디자인" : "원본 기준 화면")}</strong>
+                ${relatedOriginalUrl ? `<a class="btn secondary" href="${escapeHtml(relatedOriginalUrl)}" target="_blank" rel="noreferrer">열기</a>` : `<button type="button" class="btn secondary" disabled>열기</button>`}
+              </div>
+            </div>
+          </div>
+        `;
+        workspaceAsideEl.appendChild(relatedScreensSectionEl);
+
+        const versionAsideSectionEl = document.createElement("section");
+        versionAsideSectionEl.className = "section";
+        versionAsideSectionEl.innerHTML = `
+          <div class="workspace-card-title">
+            <strong>버전 확인</strong>
+            <div class="workspace-help-inline">
+              ${buildHelpButtonHtml("버전 안내", [
+                "저장된 버전을 확인하고 현재 화면에 적용합니다.",
+                "디자인 빌더 실행 후 저장 버전 확정을 진행하세요.",
+              ], "i")}
+            </div>
+          </div>
+        `;
+        if (saveVersionButtonNode) {
+          const versionActionEl = document.createElement("div");
+          versionActionEl.className = "actions";
+          versionActionEl.appendChild(saveVersionButtonNode);
+          versionAsideSectionEl.appendChild(versionActionEl);
+        }
+        if (versionSubsectionNode) {
+          versionAsideSectionEl.appendChild(versionSubsectionNode);
+        } else {
+          versionAsideSectionEl.insertAdjacentHTML("beforeend", `<div class="empty">저장된 버전이 없습니다.</div>`);
+        }
+        workspaceAsideEl.appendChild(versionAsideSectionEl);
+
+        const supportFoldEl = document.createElement("details");
+        supportFoldEl.className = "fold-section";
+        supportFoldEl.innerHTML = `<summary>접어두는 보조 기능</summary><div class="fold-body"></div>`;
+        const supportFoldBodyEl = supportFoldEl.querySelector(".fold-body");
+        supportFoldBodyEl.insertAdjacentHTML("beforeend", `
+          <div class="section">
+            <div class="workspace-card-title">
+              <strong>작업 이력</strong>
+              ${buildHelpButtonHtml("작업 이력 안내", [
+                "최근 저장과 승인/확정 흐름은 모달에서 확인합니다.",
+              ], "i")}
+            </div>
+            <div class="actions" style="margin-top:0;">
+              <button type="button" class="btn secondary" id="openInlineHistoryModalBtn">작업 이력 보기</button>
+            </div>
+          </div>
+        `);
+        if (referenceAnalysisNode) supportFoldBodyEl.appendChild(referenceAnalysisNode);
+        if (designReferenceSectionEl) supportFoldBodyEl.appendChild(designReferenceSectionEl);
+        if (compareOpsSectionEl) supportFoldBodyEl.appendChild(compareOpsSectionEl);
+        workspaceAsideEl.appendChild(supportFoldEl);
+
+        const opsFoldEl = document.createElement("details");
+        opsFoldEl.className = "fold-section";
+        opsFoldEl.innerHTML = `<summary>운영 전용 도구</summary><div class="fold-body"></div>`;
+        const opsFoldBodyEl = opsFoldEl.querySelector(".fold-body");
+        if (legacyOpsSectionEl) opsFoldBodyEl.appendChild(legacyOpsSectionEl);
+        if (editableComponentsSectionEl) opsFoldBodyEl.appendChild(editableComponentsSectionEl);
+        if (technicalSectionEl) opsFoldBodyEl.appendChild(technicalSectionEl);
+        workspaceAsideEl.appendChild(opsFoldEl);
+
+        shareSectionEl?.remove();
+        artifactSectionEl?.remove();
+        previewFrameEl?.remove();
+        detailHeaderEl?.remove();
+        detailEl.innerHTML = "";
+        detailEl.appendChild(workspaceShellEl);
+        detailEl.querySelector("#openInlineHistoryModalBtn")?.addEventListener("click", renderHistoryModal);
+        detailEl.querySelectorAll("[data-anchor-link]").forEach((anchor) => {
+          anchor.addEventListener("click", () => {
+            detailEl.querySelectorAll("[data-anchor-link]").forEach((item) => item.classList.remove("active"));
+            anchor.classList.add("active");
+          });
+        });
+        detailEl.querySelector('[data-anchor-link="identitySection"]')?.classList.add("active");
 
         const plannerRunBtn = document.getElementById("runPlanner");
         const plannerStatusEl = document.getElementById("plannerStatus");
@@ -3501,7 +4266,7 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
           button.addEventListener("click", async () => {
             const versionId = button.getAttribute("data-version-id") || "";
             if (!versionId) return;
-            if (versionStatusEl) versionStatusEl.textContent = "현재 View 고정 중...";
+            if (versionStatusEl) versionStatusEl.textContent = "클론 적용 중...";
             try {
               await fetchJson("/api/workspace/view-pin", {
                 method: "POST",
@@ -3512,11 +4277,11 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
                   viewportProfile: isHomeTarget ? selectedViewportProfile : "pc",
                 }),
               });
-              if (versionStatusEl) versionStatusEl.textContent = `현재 View 고정 완료: ${versionId}`;
-              showAdminNotice("현재 View 고정 완료");
+              if (versionStatusEl) versionStatusEl.textContent = `클론 적용 완료: ${versionId}`;
+              showAdminNotice("클론 적용 완료");
               await rerenderDetailWithFocus({ selector: "#builderWorkflowSection", behavior: "smooth", block: "start" });
             } catch (error) {
-              if (versionStatusEl) versionStatusEl.textContent = "현재 View 고정 실패: " + String(error);
+              if (versionStatusEl) versionStatusEl.textContent = "클론 적용 실패: " + String(error);
             }
           });
         });
@@ -3851,6 +4616,7 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
               visualGuardrails: textToLines(document.getElementById("identityGuardrails").value || ""),
             }),
           });
+          pageIdentityCacheByPage.delete(pageId);
           if (pageIdentityStatusEl) pageIdentityStatusEl.textContent = "저장 완료";
           showAdminNotice("페이지 정체성 저장 완료");
           await refreshData();

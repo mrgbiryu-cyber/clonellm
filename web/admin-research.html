@@ -53,7 +53,7 @@
       }
 
       .sidebar-head {
-        padding: 18px 18px 14px;
+        padding: 18px 24px 16px;
         border-bottom: 1px solid var(--line);
       }
 
@@ -65,9 +65,9 @@
       }
 
       .sidebar-head h1 {
-        margin: 6px 0 0;
-        font-size: 20px;
-        line-height: 1.25;
+        margin: 0;
+        font-size: 26px;
+        line-height: 1.2;
         letter-spacing: -0.04em;
       }
 
@@ -79,7 +79,7 @@
       }
 
       .sidebar-tools {
-        padding: 14px 18px 12px;
+        padding: 14px 24px 12px;
         border-bottom: 1px solid var(--line);
         display: grid;
         gap: 10px;
@@ -316,46 +316,12 @@
       }
 
       .status-summary {
-        display: grid;
-        gap: 12px;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-      }
-
-      .summary-card {
-        border: 1px solid var(--line);
-        border-radius: var(--radius-lg);
-        background: var(--surface);
-        box-shadow: var(--shadow);
-        padding: 16px;
-        display: grid;
-        gap: 8px;
-      }
-
-      .summary-card-label {
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--text-soft);
-      }
-
-      .summary-card strong {
-        font-size: 16px;
-        line-height: 1.35;
-      }
-
-      .summary-card p {
-        margin: 0;
-        font-size: 13px;
-        line-height: 1.6;
-        color: var(--text-muted);
-      }
-
-      .anchor-bar {
         position: sticky;
         top: 86px;
         z-index: 15;
-        display: flex;
+        display: grid;
         gap: 10px;
-        flex-wrap: wrap;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
         padding: 12px;
         border: 1px solid var(--line);
         border-radius: 14px;
@@ -363,27 +329,49 @@
         backdrop-filter: blur(10px);
       }
 
-      .anchor-link {
-        display: inline-flex;
-        align-items: center;
+      .status-nav-item {
+        display: grid;
         gap: 8px;
-        padding: 9px 12px;
-        border-radius: 999px;
-        border: 1px solid transparent;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--surface);
         color: var(--text-muted);
         text-decoration: none;
-        font-size: 13px;
-        font-weight: 700;
+        min-width: 0;
       }
 
-      .anchor-link.active {
+      .status-nav-item.active {
         background: var(--brand-soft);
         color: #1d4ed8;
         border-color: #bfdbfe;
       }
 
-      .anchor-link[hidden] {
-        display: none;
+      .status-nav-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .status-nav-label {
+        font-size: 13px;
+        font-weight: 700;
+        line-height: 1.35;
+        color: var(--text);
+        min-width: 0;
+      }
+
+      .status-nav-state {
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1.4;
+        color: var(--text-muted);
+      }
+
+      .status-nav-item.active .status-nav-label,
+      .status-nav-item.active .status-nav-state {
+        color: #1d4ed8;
       }
 
       .doc-layout {
@@ -1193,7 +1181,6 @@
         .sidebar { border-right: 0; border-bottom: 1px solid var(--line); }
         .topbar-inner { flex-direction: column; align-items: flex-start; }
         .field-grid, .kv-grid { grid-template-columns: 1fr; }
-        .anchor-bar { top: 0; border-radius: 0; margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
         .doc-preview { grid-template-columns: 1fr; }
         .doc-toc { display: none; }
         .doc-roadmap { grid-template-columns: 1fr; }
@@ -1205,9 +1192,7 @@
     <div class="app">
       <aside class="sidebar">
         <div class="sidebar-head">
-          <div class="eyebrow">연구용 프로토타입</div>
-          <h1>페이지 문서 관리</h1>
-          <p>메인 유지 기능만 전면에 두고, 미리보기/비교/운영 도구는 분리한 관리자 구조 실험안입니다.</p>
+          <h1>CNS Atlas</h1>
         </div>
         <div class="sidebar-tools">
           <input id="searchInput" class="search" type="text" placeholder="페이지 검색" />
@@ -1240,15 +1225,7 @@
         </div>
 
         <main class="main">
-          <section class="status-summary" id="statusSummary"></section>
-
-          <nav class="anchor-bar">
-            <a class="anchor-link active" href="#identity"><span id="anchorIdentityDot" class="dot"></span>페이지 정체성</a>
-            <a class="anchor-link" href="#requirements"><span id="anchorRequirementsDot" class="dot"></span>요구사항</a>
-            <a class="anchor-link" href="#prd"><span id="anchorPrdDot" class="dot"></span>기획서</a>
-            <a class="anchor-link" id="anchorBuildLink" href="#builder" hidden><span id="anchorBuildDot" class="dot draft"></span>디자인 빌더</a>
-          </nav>
-
+          <nav class="status-summary" id="statusSummary"></nav>
           <div class="doc-layout">
             <div class="doc-column">
               <section id="identity" class="section-card">
@@ -1263,8 +1240,8 @@
                 </div>
                 <div class="section-body">
                   <div class="actions">
-                    <button class="btn secondary" type="button">편집</button>
-                    <button class="btn quiet" type="button">최근 변경 보기</button>
+                    <button class="btn secondary" id="editIdentityBtn" type="button">편집</button>
+                    <button class="btn quiet" id="showIdentityHistoryBtn" type="button">최근 변경 보기</button>
                   </div>
                   <div class="kv-grid" id="identityGrid"></div>
                   <div class="kv-card">
@@ -1335,8 +1312,8 @@
                   </div>
                   <div class="helper">이 단계에서는 기획서를 직접 고치지 않고, 이번 요청만 명확하게 입력합니다.</div>
                   <div class="actions">
-                    <button class="btn secondary" type="button">요구사항 저장</button>
-                    <button class="btn primary" type="button">기획서 생성</button>
+                    <button class="btn secondary" id="saveRequirementsBtn" type="button">요구사항 저장</button>
+                    <button class="btn primary" id="generatePrdBtn" type="button">기획서 생성</button>
                   </div>
                 </div>
               </section>
@@ -1354,9 +1331,9 @@
                 <div class="section-body">
                   <div class="actions">
                     <button class="btn primary" id="launchBuilderBtn" type="button">빌더 승인 및 실행</button>
-                    <button class="btn secondary" type="button">직접 편집</button>
-                    <button class="btn secondary" type="button">PDF 내보내기</button>
-                    <button class="btn quiet" type="button">마크다운 복사</button>
+                    <button class="btn secondary" id="editPrdBtn" type="button">직접 편집</button>
+                    <button class="btn secondary" id="exportPrdBtn" type="button">PDF 내보내기</button>
+                    <button class="btn quiet" id="copyPrdBtn" type="button">마크다운 복사</button>
                   </div>
                   <article class="doc-preview" id="prdPreview"></article>
                 </div>
@@ -1391,9 +1368,10 @@
                   </div>
                   <div class="builder-preview-grid" id="builderPreviewGrid"></div>
                   <div class="actions">
-                    <button class="btn primary" type="button">디자인 빌더 열기</button>
-                    <button class="btn secondary" type="button">비교 화면 열기</button>
-                    <button class="btn secondary" type="button">미리보기 열기</button>
+                    <button class="btn primary" id="openBuilderSurfaceBtn" type="button">디자인 빌더 열기</button>
+                    <button class="btn secondary" id="saveBuilderVersionBtn" type="button">저장 버전 확정</button>
+                    <button class="btn secondary" id="openBuilderCompareBtn" type="button">비교 화면 열기</button>
+                    <button class="btn secondary" id="openBuilderPreviewBtn" type="button">미리보기 열기</button>
                   </div>
                 </div>
               </section>
@@ -1456,7 +1434,7 @@
         stale: "업데이트 필요",
       };
 
-      const pages = [
+      const SAMPLE_PAGES = [
         {
           id: "home-pc",
           group: "홈",
@@ -2015,16 +1993,31 @@
         },
       ];
 
-      const supportItems = [
-        { label: "레퍼런스 분석 결과", value: "slot 매칭, reference analysis 결과, design-md 메타는 기본 화면에서 접어 둡니다." },
-        { label: "디자인 레퍼런스 라이브러리", value: "레퍼런스와 디자인 규칙은 필요할 때만 여는 보조 섹션으로 둡니다." },
-        { label: "저장 버전 / 현재 View", value: "version 저장, 현재 view 고정, 저장 버전 목록은 문서 3섹션 뒤로 내립니다." },
-        { label: "작업 이력", value: "사이드 기록과 작업 로그는 보조 목록 또는 별도 패널로 둡니다." },
+      const adminTargetCatalog = [
+        { id: "home-pc", workspacePageId: "home", targetKind: "home", displayTitle: "홈 - PC", homeViewportProfile: "pc", order: 1 },
+        { id: "home-ta", workspacePageId: "home", targetKind: "home", displayTitle: "홈 - 테블릿", homeViewportProfile: "ta", order: 2 },
+        { id: "support", workspacePageId: "support", targetKind: "service", displayTitle: "고객지원", order: 3 },
+        { id: "bestshop", workspacePageId: "bestshop", targetKind: "service", displayTitle: "베스트샵", order: 4 },
+        { id: "care-solutions", workspacePageId: "care-solutions", targetKind: "service", displayTitle: "가전 구독 메인", order: 5 },
+        { id: "care-solutions-pdp", workspacePageId: "care-solutions-pdp", targetKind: "service", displayTitle: "가전 구독 PDP", order: 6 },
+        { id: "homestyle-home", workspacePageId: "homestyle-home", targetKind: "service", displayTitle: "홈스타일 메인", order: 7 },
+        { id: "homestyle-pdp", workspacePageId: "homestyle-pdp", targetKind: "service", displayTitle: "홈스타일 PDP", order: 8 },
+        { id: "category-tvs", workspacePageId: "category-tvs", targetKind: "plp", displayTitle: "PLP - TV 카테고리", order: 9 },
+        { id: "category-refrigerators", workspacePageId: "category-refrigerators", targetKind: "plp", displayTitle: "PLP - 냉장고 카테고리", order: 10 },
+        { id: "pdp-tv-general", workspacePageId: "pdp-tv-general", runtimePageId: "category-tvs", targetKind: "pdp", displayTitle: "PDP - TV 일반형", order: 11, href: "https://www.lge.co.kr/tvs/32lq635bkna-stand", cloneTitle: "/tvs/32lq635bkna-stand" },
+        { id: "pdp-tv-premium", workspacePageId: "pdp-tv-premium", runtimePageId: "category-tvs", targetKind: "pdp", displayTitle: "PDP - TV 프리미엄형", order: 12, href: "https://www.lge.co.kr/tvs/oled97g5kna-stand", cloneTitle: "/tvs/oled97g5kna-stand" },
+        { id: "pdp-refrigerator-general", workspacePageId: "pdp-refrigerator-general", runtimePageId: "category-refrigerators", targetKind: "pdp", displayTitle: "PDP - 냉장고 일반형", order: 13, href: "https://www.lge.co.kr/refrigerators/t873mee111", cloneTitle: "/refrigerators/t873mee111" },
+        { id: "pdp-refrigerator-knockon", workspacePageId: "pdp-refrigerator-knockon", runtimePageId: "category-refrigerators", targetKind: "pdp", displayTitle: "PDP - 냉장고 노크온형", order: 14, href: "https://www.lge.co.kr/refrigerators/t875mee412", cloneTitle: "/refrigerators/t875mee412" },
+        { id: "pdp-refrigerator-glass", workspacePageId: "pdp-refrigerator-glass", runtimePageId: "category-refrigerators", targetKind: "pdp", displayTitle: "PDP - 냉장고 글라스형", order: 15, href: "https://www.lge.co.kr/refrigerators/h875gbb111", cloneTitle: "/refrigerators/h875gbb111" },
       ];
 
+      let pages = SAMPLE_PAGES.slice();
       let currentPageId = "home-pc";
       let currentFilter = "all";
       let searchQuery = "";
+      let currentSession = null;
+      let currentRawData = null;
+      let currentPageRecord = null;
 
       const pageListEl = document.getElementById("pageList");
       const pageTitleEl = document.getElementById("pageTitle");
@@ -2054,9 +2047,257 @@
       const supportListEl = document.getElementById("supportList");
       const searchInputEl = document.getElementById("searchInput");
       const filterChipEls = Array.from(document.querySelectorAll("#filterChips .chip"));
+      const editIdentityBtnEl = document.getElementById("editIdentityBtn");
+      const showIdentityHistoryBtnEl = document.getElementById("showIdentityHistoryBtn");
+      const saveRequirementsBtnEl = document.getElementById("saveRequirementsBtn");
+      const generatePrdBtnEl = document.getElementById("generatePrdBtn");
+      const editPrdBtnEl = document.getElementById("editPrdBtn");
+      const exportPrdBtnEl = document.getElementById("exportPrdBtn");
+      const copyPrdBtnEl = document.getElementById("copyPrdBtn");
+      const openBuilderSurfaceBtnEl = document.getElementById("openBuilderSurfaceBtn");
+      const saveBuilderVersionBtnEl = document.getElementById("saveBuilderVersionBtn");
+      const openBuilderCompareBtnEl = document.getElementById("openBuilderCompareBtn");
+      const openBuilderPreviewBtnEl = document.getElementById("openBuilderPreviewBtn");
+      let sectionObserver = null;
+      let identityEditMode = false;
 
       function dotClass(status) {
         return status && status !== "empty" ? `dot ${status}` : "dot";
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/\"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      async function fetchJson(url, options) {
+        const response = await fetch(url, {
+          credentials: "same-origin",
+          ...options,
+          headers: {
+            ...(options?.headers || {}),
+            Accept: "application/json",
+          },
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const error = new Error(payload?.detail || payload?.error || response.statusText);
+          error.status = response.status;
+          error.payload = payload;
+          throw error;
+        }
+        return payload;
+      }
+
+      function textToLines(value) {
+        return String(value || "")
+          .split(/\r?\n/)
+          .map((item) => item.trim())
+          .filter(Boolean);
+      }
+
+      function linesToText(values) {
+        return Array.isArray(values) ? values.map((item) => String(item || "").trim()).filter(Boolean).join("\n") : "";
+      }
+
+      function textToPriority(value) {
+        return textToLines(value).map((line, index) => {
+          const [target, ...rest] = line.split("|");
+          return {
+            rank: index + 1,
+            target: String(target || "").trim(),
+            reason: rest.join("|").trim(),
+          };
+        }).filter((item) => item.target);
+      }
+
+      function priorityToText(items) {
+        return (Array.isArray(items) ? items : [])
+          .map((item) => {
+            const target = String(item?.target || "").trim();
+            const reason = String(item?.reason || "").trim();
+            if (!target) return "";
+            return reason ? `${target} | ${reason}` : target;
+          })
+          .filter(Boolean)
+          .join("\n");
+      }
+
+      function getTargetKindLabel(page) {
+        return {
+          home: "브랜드 홈",
+          service: "서비스 페이지",
+          plp: "PLP",
+          pdp: "PDP",
+        }[page?.targetKind] || page?.type || "페이지";
+      }
+
+      function getTargetWorkspacePageId(page) {
+        return page?.workspacePageId || page?.id || "";
+      }
+
+      function isHomeTarget(page) {
+        return getTargetWorkspacePageId(page) === "home" || page?.targetKind === "home";
+      }
+
+      function getViewportProfile(page) {
+        return isHomeTarget(page) ? (page?.homeViewportProfile || "pc") : "pc";
+      }
+
+      function buildPreviewTargetUrl(page) {
+        if (!page) return "#";
+        if (page.targetKind === "pdp") {
+          const params = new URLSearchParams();
+          params.set("pageId", getTargetWorkspacePageId(page));
+          if (page.href) params.set("href", page.href);
+          if (page.cloneTitle) params.set("title", page.cloneTitle);
+          return `/clone-product?${params.toString()}`;
+        }
+        if (isHomeTarget(page)) {
+          return `/clone/${encodeURIComponent(getTargetWorkspacePageId(page))}?viewportProfile=${encodeURIComponent(getViewportProfile(page))}`;
+        }
+        return `/clone/${encodeURIComponent(getTargetWorkspacePageId(page))}`;
+      }
+
+      function buildCompareTargetUrl(page, draftBuildId = "") {
+        if (!page) return "#";
+        const params = new URLSearchParams();
+        if (isHomeTarget(page)) params.set("viewportProfile", getViewportProfile(page));
+        if (draftBuildId) params.set("draftBuildId", draftBuildId);
+        const query = params.toString();
+        return `/compare/${encodeURIComponent(getTargetWorkspacePageId(page))}${query ? `?${query}` : ""}`;
+      }
+
+      function hasMeaningfulIdentity(identity = {}) {
+        return Boolean(
+          String(identity?.role || "").trim() ||
+          String(identity?.purpose || "").trim() ||
+          String(identity?.designIntent || "").trim() ||
+          (Array.isArray(identity?.mustPreserve) && identity.mustPreserve.length) ||
+          (Array.isArray(identity?.shouldAvoid) && identity.shouldAvoid.length) ||
+          (Array.isArray(identity?.visualGuardrails) && identity.visualGuardrails.length)
+        );
+      }
+
+      function hasRequirementInput(input = {}) {
+        return Boolean(
+          String(input?.requestText || "").trim() ||
+          String(input?.keyMessage || "").trim() ||
+          String(input?.preferredDirection || "").trim() ||
+          String(input?.avoidDirection || "").trim() ||
+          String(input?.toneAndMood || "").trim() ||
+          (Array.isArray(input?.referenceUrls) && input.referenceUrls.length)
+        );
+      }
+
+      function buildPreviewTargets(rawPages = []) {
+        const pageMap = new Map((rawPages || []).map((page) => [page.id, page]));
+        return adminTargetCatalog
+          .map((spec) => {
+            const basePage = pageMap.get(spec.workspacePageId);
+            if (!basePage) return null;
+            return {
+              ...basePage,
+              ...spec,
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => Number(a.order || 999) - Number(b.order || 999));
+      }
+
+      function buildRequirementDraftFromInputs() {
+        return {
+          mode: reqModeEl.value || "hybrid",
+          changeLevel: reqChangeLevelEl.value || "medium",
+          title: (reqTitleEl.value || "").trim(),
+          message: (reqMessageEl.value || "").trim(),
+          background: (reqBackgroundEl.value || "").trim(),
+          direction: (reqDirectionEl.value || "").trim(),
+          tone: (reqToneEl.value || "").trim(),
+          avoid: (reqAvoidEl.value || "").trim(),
+          refs: (reqRefsEl.value || "").trim(),
+        };
+      }
+
+      function buildRequirementPlanFromForm(page) {
+        const draft = buildRequirementDraftFromInputs();
+        const requestSummary = [draft.title, draft.message, draft.background].filter(Boolean);
+        const planningDirection = textToLines(draft.direction);
+        const designDirection = textToLines(draft.direction);
+        const mustPreserve = textToLines(page?.identitySource?.mustPreserve || []);
+        const shouldAvoid = textToLines(page?.identitySource?.shouldAvoid || []);
+        return {
+          title: draft.title || `${page?.title || "페이지"} 기획안`,
+          designChangeLevel: draft.changeLevel || "medium",
+          requestSummary,
+          planningDirection,
+          designDirection,
+          priority: [],
+          guardrails: textToLines(draft.avoid).concat(textToLines(page?.identitySource?.visualGuardrails || [])),
+          builderBrief: {
+            objective: draft.message || draft.title,
+            mustKeep: mustPreserve,
+            mustChange: shouldAvoid,
+            suggestedFocusSlots: [],
+          },
+          builderMarkdown: "",
+          layoutMockupMarkdown: "",
+          designSpecMarkdown: "",
+          sectionBlueprints: [],
+        };
+      }
+
+      function buildPrdViewModel(page, latestPlan, identitySource = {}) {
+        const requirementPlan = latestPlan?.output?.requirementPlan || buildRequirementPlanFromForm(page);
+        const sectionBlueprints = Array.isArray(requirementPlan.sectionBlueprints) ? requirementPlan.sectionBlueprints : [];
+        const screenProposals = sectionBlueprints.length
+          ? sectionBlueprints.map((item) => ({
+              label: item.label || item.slotLabel || item.slotId || "섹션",
+              slotId: item.slotId || "",
+              why: item.why || item.priorityReason || "",
+              visual: item.visual || "",
+              keep: item.keep || "",
+              change: item.change || "",
+            }))
+          : [];
+        return {
+          summary: requirementPlan.requestSummary?.[0] || page.requirements.message || "이번 페이지 작업의 목적을 정리합니다.",
+          problem: requirementPlan.requestSummary?.[1] || page.requirements.background || "현재 문제 정의가 아직 명확히 정리되지 않았습니다.",
+          objective: requirementPlan.builderBrief?.objective || page.requirements.message || "",
+          changeLevel: requirementPlan.designChangeLevel || page.requirements.changeLevel || "medium",
+          scope: (requirementPlan.priority || []).map((item) => item.target).filter(Boolean),
+          mustKeep: requirementPlan.builderBrief?.mustKeep || identitySource.mustPreserve || [],
+          mustChange: requirementPlan.builderBrief?.mustChange || identitySource.shouldAvoid || [],
+          direction: [
+            ...(Array.isArray(requirementPlan.planningDirection) ? requirementPlan.planningDirection : []),
+            ...(Array.isArray(requirementPlan.designDirection) ? requirementPlan.designDirection : []),
+          ].filter(Boolean),
+          features: screenProposals.map((item) => item.label),
+          featuresDetail: screenProposals.map((item, index) => ({
+            name: item.label,
+            description: item.change || item.visual || item.why || "변경 방향 정리",
+            priority: index < 2 ? "high" : "mid",
+          })),
+          screenProposals,
+          flow: requirementPlan.requestSummary?.length ? requirementPlan.requestSummary : ["페이지 진입", "핵심 정보 확인", "다음 액션 이동"],
+          roadmap: ["1단계: 요구사항 정리", "2단계: 기획서 생성", "3단계: 디자인 빌더 실행"],
+          guardrails: requirementPlan.guardrails || identitySource.visualGuardrails || [],
+          open: "세부 구현과 후속 비교는 디자인 빌더와 비교 화면에서 이어서 검토합니다.",
+        };
+      }
+
+      function deriveStatuses(identitySource, latestPlan, latestDraftBuild) {
+        const requirementInput = latestPlan?.input?.userInput || {};
+        return {
+          identity: hasMeaningfulIdentity(identitySource) ? "ready" : "empty",
+          requirements: hasRequirementInput(requirementInput) ? "ready" : "empty",
+          prd: latestPlan ? "ready" : "empty",
+          builder: latestDraftBuild ? "ready" : (latestPlan ? "draft" : "empty"),
+        };
       }
 
       function renderPageList() {
@@ -2105,35 +2346,82 @@
 
       function renderStatusSummary(page) {
         const cards = [
-          { key: "identity", label: "페이지 정체성", desc: {
-            empty: "이 페이지의 역할과 기준을 아직 작성하지 않았습니다.",
-            draft: "정체성 초안이 있지만 아직 기준 문서로 확정되진 않았습니다.",
-            ready: "이 페이지의 역할과 유지 원칙이 기준 문서로 저장되어 있습니다.",
-            stale: "정체성 문서가 최신 컨텍스트와 어긋날 가능성이 있습니다.",
-          }},
-          { key: "requirements", label: "요구사항", desc: {
-            empty: "이번 요청 입력이 아직 없습니다.",
-            draft: "이번 요청은 작성 중이거나 저장 후 다시 검토가 필요합니다.",
-            ready: "이번 요청 입력이 저장되어 기획서 생성 기준으로 사용할 수 있습니다.",
-            stale: "요구사항 입력이 오래되어 최신 작업 의도와 어긋날 수 있습니다.",
-          }},
-          { key: "prd", label: "기획서", desc: {
-            empty: "아직 생성된 기획서가 없습니다.",
-            draft: "기획서가 생성 중이거나 직접 편집 중입니다.",
-            ready: "기획서가 최신 상태로 준비되어 있습니다.",
-            stale: "요구사항 또는 정체성이 바뀌어 기획서를 다시 생성해야 합니다.",
-          }},
+          { key: "identity", label: "페이지 정체성", href: "#identity" },
+          { key: "requirements", label: "요구사항", href: "#requirements" },
+          { key: "prd", label: "기획서", href: "#prd" },
+          { key: "builder", label: "디자인 빌더", href: "#builder" },
         ];
-        statusSummaryEl.innerHTML = cards.map((card) => `
-          <article class="summary-card">
-            <span class="summary-card-label">${card.label}</span>
-            <strong>${stateLabels[page.statuses[card.key]]}</strong>
-            <p>${card.desc[page.statuses[card.key]]}</p>
-          </article>
+        const stateTextMap = {
+          identity: {
+            empty: "없음",
+            draft: "작성 중",
+            ready: "완료",
+            stale: "업데이트 필요",
+          },
+          requirements: {
+            empty: "없음",
+            draft: "작성 중",
+            ready: "완료",
+            stale: "업데이트 필요",
+          },
+          prd: {
+            empty: "없음",
+            draft: "생성 중",
+            ready: "준비됨",
+            stale: "업데이트 필요",
+          },
+          builder: {
+            empty: "대기",
+            draft: "실행 가능",
+            ready: "결과 있음",
+            stale: "업데이트 필요",
+          },
+        };
+        statusSummaryEl.innerHTML = cards.map((card, index) => `
+          <a class="status-nav-item ${index === 0 ? "active" : ""}" href="${card.href}" data-anchor-link="${card.href.slice(1)}">
+            <div class="status-nav-head">
+              <span class="${dotClass(page.statuses[card.key])}"></span>
+              <span class="status-nav-label">${card.label}</span>
+            </div>
+            <span class="status-nav-state">${stateTextMap[card.key]?.[page.statuses[card.key]] || stateLabels[page.statuses[card.key]] || "없음"}</span>
+          </a>
         `).join("");
       }
 
       function renderIdentity(page) {
+        if (identityEditMode) {
+          identityGridEl.innerHTML = `
+            <div class="field full">
+              <label>페이지 역할</label>
+              <textarea id="identityRoleInput">${escapeHtml(page.identitySource?.role || "")}</textarea>
+            </div>
+            <div class="field full">
+              <label>디자인 의도</label>
+              <textarea id="identityDesignIntentInput">${escapeHtml(page.identitySource?.designIntent || "")}</textarea>
+            </div>
+            <div class="field">
+              <label>반드시 유지할 것</label>
+              <textarea id="identityMustPreserveInput">${escapeHtml(linesToText(page.identitySource?.mustPreserve || []))}</textarea>
+            </div>
+            <div class="field">
+              <label>피해야 할 것</label>
+              <textarea id="identityShouldAvoidInput">${escapeHtml(linesToText(page.identitySource?.shouldAvoid || []))}</textarea>
+            </div>
+            <div class="field full">
+              <label>시각 가드레일</label>
+              <textarea id="identityGuardrailsInput">${escapeHtml(linesToText(page.identitySource?.visualGuardrails || []))}</textarea>
+            </div>
+          `;
+          identityPurposeEl.innerHTML = `
+            <label class="label" style="display:block; margin-bottom:8px;">페이지 목적</label>
+            <textarea id="identityPurposeInput">${escapeHtml(page.identitySource?.purpose || "")}</textarea>
+            <div class="actions" style="margin-top:12px;">
+              <button class="btn primary" id="saveIdentityInlineBtn" type="button">저장</button>
+              <button class="btn secondary" id="cancelIdentityInlineBtn" type="button">취소</button>
+            </div>
+          `;
+          return;
+        }
         const items = [
           { label: "페이지 역할", value: page.identity.role },
           { label: "디자인 의도", value: page.identity.designIntent },
@@ -2242,11 +2530,10 @@
           ["prd-scope",      "6. 목표 범위"],
           ["prd-features",   "7. 핵심 기능"],
           hasScreens    && ["prd-screens",    "8. 화면별 제안"],
-          hasScreens    && ["prd-mockup",     "9. 와이어프레임"],
-          ["prd-flow",       "10. 사용자 흐름"],
-          ["prd-roadmap",    "11. 로드맵"],
-          hasGuardrails && ["prd-guardrails", "12. 가드레일"],
-          ["prd-issues",     "13. 미결 사항"],
+          ["prd-flow",       "9. 사용자 흐름"],
+          ["prd-roadmap",    "10. 로드맵"],
+          hasGuardrails && ["prd-guardrails", "11. 가드레일"],
+          ["prd-issues",     "12. 미결 사항"],
         ].filter(Boolean);
 
         /* ── 렌더링 ────────────────────────────── */
@@ -2349,63 +2636,19 @@
               </div>
             </section>` : ""}
 
-            ${hasScreens ? `
-            <section id="prd-mockup" class="doc-card">
-              <h4 class="doc-card-title"><span class="doc-card-icon">📐</span>9. 와이어프레임 목업</h4>
-              <div class="doc-wireframe-list">
-                ${toArr(p.screenProposals).map(s => {
-                  const vp = s.viewport || pageViewport;
-                  const zones = toArr(s.zones).length
-                    ? s.zones
-                    : ["badge", "title", "summary", "action", "support cue"];
-                  return `
-                  <div class="doc-wireframe">
-                    <div class="doc-wireframe-head">
-                      <strong>${s.label}${s.slotId ? ` · ${s.slotId}` : ""}</strong>
-                      <span class="doc-wireframe-viewport">${vp}</span>
-                    </div>
-                    <div class="doc-wireframe-body">
-                      <div class="doc-wireframe-row">
-                        <span class="doc-wireframe-key">message</span>
-                        <span class="doc-wireframe-val">${s.why}</span>
-                      </div>
-                      <div class="doc-wireframe-row">
-                        <span class="doc-wireframe-key">visual</span>
-                        <span class="doc-wireframe-val">${s.visual}</span>
-                      </div>
-                      <div class="doc-wireframe-row">
-                        <span class="doc-wireframe-key">keep</span>
-                        <span class="doc-wireframe-val doc-wireframe-val--keep">${s.keep}</span>
-                      </div>
-                      <div class="doc-wireframe-row">
-                        <span class="doc-wireframe-key">change</span>
-                        <span class="doc-wireframe-val doc-wireframe-val--change">${s.change}</span>
-                      </div>
-                      <div class="doc-wireframe-row">
-                        <span class="doc-wireframe-key">zones</span>
-                        <div class="doc-wireframe-zones">
-                          ${zones.map(z => `<span class="doc-wireframe-zone-chip">${z}</span>`).join("")}
-                        </div>
-                      </div>
-                    </div>
-                  </div>`;
-                }).join("")}
-              </div>
-            </section>` : ""}
-
             <section id="prd-flow" class="doc-card doc-card--alt">
-              <h4 class="doc-card-title"><span class="doc-card-icon">🔄</span>10. 사용자 흐름</h4>
+              <h4 class="doc-card-title"><span class="doc-card-icon">🔄</span>9. 사용자 흐름</h4>
               ${flowHtml}
             </section>
 
             <section id="prd-roadmap" class="doc-card">
-              <h4 class="doc-card-title"><span class="doc-card-icon">📅</span>11. 단계별 로드맵</h4>
+              <h4 class="doc-card-title"><span class="doc-card-icon">📅</span>10. 단계별 로드맵</h4>
               ${roadmapHtml}
             </section>
 
             ${hasGuardrails ? `
             <section id="prd-guardrails" class="doc-card doc-card--alt">
-              <h4 class="doc-card-title"><span class="doc-card-icon">🛡️</span>12. 가드레일</h4>
+              <h4 class="doc-card-title"><span class="doc-card-icon">🛡️</span>11. 가드레일</h4>
               <div class="doc-guardrail-list">
                 ${toArr(p.guardrails).map(line =>
                   `<div class="doc-guardrail-item"><span class="doc-guardrail-icon">🚫</span>${line}</div>`
@@ -2414,7 +2657,7 @@
             </section>` : ""}
 
             <section id="prd-issues" class="doc-card doc-card--warn">
-              <h4 class="doc-card-title"><span class="doc-card-icon">⚠️</span>13. 미결 사항 / 제외 판단 이유</h4>
+              <h4 class="doc-card-title"><span class="doc-card-icon">⚠️</span>12. 미결 사항 / 제외 판단 이유</h4>
               <p>${p.open}</p>
             </section>
 
@@ -2438,7 +2681,35 @@
         window.addEventListener("scroll", syncToc, { passive: true });
       }
 
-      function renderSupportItems() {
+      function renderSupportItems(page) {
+        const latestPlan = page?.latestPlan || null;
+        const latestDraftBuild = page?.latestDraftBuild || null;
+        const supportItems = [
+          {
+            label: "레퍼런스 분석 결과",
+            value: latestPlan?.input?.userInput?.referenceUrls?.length
+              ? `${latestPlan.input.userInput.referenceUrls.length}개 레퍼런스 URL이 현재 기획서 생성 기준에 포함돼 있습니다.`
+              : "현재 기획서에는 별도 레퍼런스 URL이 연결되어 있지 않습니다.",
+          },
+          {
+            label: "빌더 실행 스펙",
+            value: latestPlan?.output?.requirementPlan?.designSpecMarkdown
+              ? "최신 기획서에 디자인 실행 스펙 문서가 포함되어 있습니다."
+              : "디자인 실행 스펙 문서가 아직 생성되지 않았습니다.",
+          },
+          {
+            label: "저장 버전 / 현재 View",
+            value: page?.versions?.length
+              ? `저장 버전 ${page.versions.length}개 · 현재 적용 ${page.pinnedView?.version?.versionLabel || page.pinnedView?.versionId || "없음"}`
+              : "아직 저장된 버전이 없습니다.",
+          },
+          {
+            label: "최근 draft 결과",
+            value: latestDraftBuild
+              ? `${latestDraftBuild.summary || "최근 draft 결과가 있습니다."}`
+              : "아직 디자인 빌더 실행 결과가 없습니다.",
+          },
+        ];
         supportListEl.innerHTML = supportItems.map((item) => `
           <div class="support-item">
             <span class="label">${item.label}</span>
@@ -2452,30 +2723,28 @@
         const items = [
           {
             title: "작업 미리보기",
+            href: page.previewUrl || "#",
             cta: "열기",
           },
           {
             title: "전후 비교",
+            href: page.compareUrl || "#",
             cta: "열기",
           },
           {
             title: baseDesignLabel,
+            href: page.originalUrl || "#",
             cta: "열기",
           },
         ];
         relatedScreenListEl.innerHTML = items.map((item) => `
           <div class="link-item">
             <strong>${item.title}</strong>
-            <button class="btn secondary" type="button" ${item.disabled ? "disabled" : ""}>${item.cta}</button>
+            ${item.href && item.href !== "#"
+              ? `<a class="btn secondary" href="${escapeHtml(item.href)}" target="_blank" rel="noreferrer">${item.cta}</a>`
+              : `<button class="btn secondary" type="button" disabled>${item.cta}</button>`}
           </div>
         `).join("");
-      }
-
-      function renderAnchorDots(page) {
-        document.getElementById("anchorIdentityDot").className = dotClass(page.statuses.identity);
-        document.getElementById("anchorRequirementsDot").className = dotClass(page.statuses.requirements);
-        document.getElementById("anchorPrdDot").className = dotClass(page.statuses.prd);
-        document.getElementById("anchorBuildDot").className = page.builder?.activated ? "dot draft" : "dot";
       }
 
       function buildBuilderPreviewItems(page) {
@@ -2567,9 +2836,9 @@
             </div>
             <p>${item.summary}</p>
             <div class="builder-preview-actions">
-              <button class="btn primary" type="button">클론에 적용</button>
-              <button class="btn secondary" type="button">이 버전 보기</button>
-              <button class="btn secondary" type="button">비교 열기</button>
+              <button class="btn primary pin-version-btn" type="button" data-version-id="${escapeHtml(item.id || "")}">클론에 적용</button>
+              ${item.previewUrl ? `<a class="btn secondary" href="${escapeHtml(item.previewUrl)}" target="_blank" rel="noreferrer">이 버전 보기</a>` : `<button class="btn secondary" type="button" disabled>이 버전 보기</button>`}
+              ${item.compareUrl ? `<a class="btn secondary" href="${escapeHtml(item.compareUrl)}" target="_blank" rel="noreferrer">비교 열기</a>` : `<button class="btn secondary" type="button" disabled>비교 열기</button>`}
             </div>
           </div>
         `).join("");
@@ -2581,6 +2850,9 @@
         builderSectionEl.hidden = !activated;
         builderStatusTextEl.textContent = page.builder?.statusText || "실행 대기";
         launchBuilderBtnEl.textContent = activated ? "디자인 빌더 다시 열기" : "빌더 승인 및 실행";
+        if (saveBuilderVersionBtnEl) {
+          saveBuilderVersionBtnEl.disabled = !page.latestDraftBuild;
+        }
         renderBuilderPreview(page);
         renderVersions(page);
       }
@@ -2604,6 +2876,7 @@
       function renderPage(pageId) {
         currentPageId = pageId;
         const page = pages.find((item) => item.id === pageId) || pages[0];
+        currentPageRecord = page;
         pageTitleEl.textContent = page.title;
         pageDescriptionEl.textContent = page.description;
         pageTypePillEl.textContent = page.type;
@@ -2612,17 +2885,165 @@
         renderIdentity(page);
         renderRequirements(page);
         renderPrd(page);
-        renderSupportItems();
+        renderSupportItems(page);
         renderRelatedScreens(page);
-        renderAnchorDots(page);
         renderBuilder(page);
         renderPageList();
+        setupSectionNavigation();
+      }
+
+      function setupSectionNavigation() {
+        if (sectionObserver) {
+          sectionObserver.disconnect();
+          sectionObserver = null;
+        }
+        const links = Array.from(document.querySelectorAll("[data-anchor-link]"));
+        const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
+        if (!links.length || !sections.length) return;
+        sectionObserver = new IntersectionObserver((entries) => {
+          const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+          if (!visible) return;
+          links.forEach((link) => {
+            link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+          });
+        }, { rootMargin: "-25% 0px -55% 0px", threshold: [0.1, 0.3, 0.6] });
+        sections.forEach((section) => sectionObserver.observe(section));
+      }
+
+      function findOriginalUrlForPage(page) {
+        if (page?.href) return page.href;
+        if (page?.targetKind === "home") return "https://www.lge.co.kr";
+        return "";
+      }
+
+      async function loadLivePageState(pageId) {
+        const page = pages.find((item) => item.id === pageId);
+        if (!page) return null;
+        const workspacePageId = getTargetWorkspacePageId(page);
+        const viewportProfile = getViewportProfile(page);
+        const viewParams = isHomeTarget(page) ? `&viewportProfile=${encodeURIComponent(viewportProfile)}` : "";
+        const [identityPayload, plansPayload, draftsPayload, versionsPayload, pinPayload] = await Promise.all([
+          fetchJson(`/api/workspace/page-identity?pageId=${encodeURIComponent(workspacePageId)}`),
+          fetchJson(`/api/workspace/plans?pageId=${encodeURIComponent(workspacePageId)}&limit=10${viewParams}`),
+          fetchJson(`/api/workspace/draft-builds?pageId=${encodeURIComponent(workspacePageId)}&limit=10${viewParams}`),
+          fetchJson(`/api/workspace/versions?pageId=${encodeURIComponent(workspacePageId)}&limit=10${viewParams}`),
+          fetchJson(`/api/workspace/view-pin?pageId=${encodeURIComponent(workspacePageId)}${viewParams}`),
+        ]);
+
+        const identitySource = identityPayload?.item || {};
+        const plans = Array.isArray(plansPayload?.items) ? plansPayload.items : [];
+        const drafts = Array.isArray(draftsPayload?.items) ? draftsPayload.items : [];
+        const versions = Array.isArray(versionsPayload?.items) ? versionsPayload.items : [];
+        const pinned = pinPayload?.item || null;
+        const latestPlan = plans[0] || null;
+        const latestDraftBuild = drafts[0] || null;
+        const userInput = latestPlan?.input?.userInput || {};
+        const requirementDraft = {
+          mode: latestPlan?.input?.mode || "hybrid",
+          changeLevel: userInput.designChangeLevel || "medium",
+          title: latestPlan?.output?.requirementPlan?.title || userInput.keyMessage || "",
+          message: userInput.keyMessage || "",
+          background: userInput.requestText || "",
+          direction: [userInput.preferredDirection, ...(latestPlan?.output?.requirementPlan?.planningDirection || [])].filter(Boolean).join("\n"),
+          tone: userInput.toneAndMood || "",
+          avoid: userInput.avoidDirection || "",
+          refs: linesToText(userInput.referenceUrls || []),
+        };
+        const prd = latestPlan ? buildPrdViewModel({ ...page, requirements: requirementDraft }, latestPlan, identitySource) : null;
+        const statuses = deriveStatuses(identitySource, latestPlan, latestDraftBuild);
+        return {
+          ...page,
+          owner: `최근 편집자 ${currentSession?.user?.displayName || currentSession?.user?.loginId || "알 수 없음"}`,
+          description: page.description || `${page.displayTitle}의 기준 문서와 작업 요청을 정리합니다.`,
+          meta: `${page.group} / ${page.type || getTargetKindLabel(page)}`,
+          identitySource,
+          identity: {
+            role: identitySource.role || "아직 정리되지 않음",
+            designIntent: identitySource.designIntent || "아직 정리되지 않음",
+            mustKeep: linesToText(identitySource.mustPreserve || []) || "아직 정리되지 않음",
+            avoid: linesToText(identitySource.shouldAvoid || []) || "아직 정리되지 않음",
+            purpose: identitySource.purpose || "이 페이지의 정체성을 먼저 정리해야 합니다.",
+          },
+          requirements: requirementDraft,
+          prd,
+          statuses,
+          builder: {
+            activated: Boolean(latestDraftBuild),
+            statusText: latestDraftBuild ? `최근 실행 완료 · ${latestDraftBuild.summary || "결과 확인 가능"}` : (latestPlan ? "기획서 승인 후 실행 가능" : "기획서 생성 전에는 실행할 수 없음"),
+          },
+          latestPlan,
+          latestDraftBuild,
+          pinnedView: pinned,
+          previewUrl: buildPreviewTargetUrl(page),
+          compareUrl: buildCompareTargetUrl(page, latestDraftBuild?.id || ""),
+          originalUrl: findOriginalUrlForPage(page),
+          versions: versions.map((item) => ({
+            id: item.id,
+            label: item.versionLabel || item.id,
+            date: String(item.createdAt || item.updatedAt || "n/a"),
+            summary: item.summary || "요약 없음",
+            previewUrl: buildPreviewTargetUrl(page),
+            compareUrl: buildCompareTargetUrl(page, item.buildId || ""),
+          })),
+        };
+      }
+
+      async function refreshWorkspace() {
+        const [sessionPayload, dataPayload] = await Promise.all([
+          fetchJson("/api/auth/session"),
+          fetchJson("/api/data"),
+        ]);
+        if (!sessionPayload?.authenticated) {
+          location.href = "/login";
+          return;
+        }
+        currentSession = sessionPayload;
+        currentRawData = dataPayload;
+        pages = buildPreviewTargets(dataPayload?.pages || []).map((page) => ({
+          ...page,
+          title: page.displayTitle || page.title || page.id,
+          type: getTargetKindLabel(page),
+          group: {
+            home: "홈",
+            service: "서비스",
+            plp: "PLP",
+            pdp: "PDP",
+          }[page.targetKind] || "기타",
+          statuses: { identity: "empty", requirements: "empty", prd: "empty", builder: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 전에는 실행할 수 없음" },
+          identity: {
+            role: "로딩 중",
+            designIntent: "로딩 중",
+            mustKeep: "로딩 중",
+            avoid: "로딩 중",
+            purpose: "로딩 중",
+          },
+          requirements: { mode: "hybrid", changeLevel: "medium", title: "", message: "", background: "", direction: "", tone: "", avoid: "", refs: "" },
+          versions: [],
+          prd: null,
+        }));
+        if (!pages.length) {
+          pages = SAMPLE_PAGES.slice();
+        }
+        if (!pages.some((item) => item.id === currentPageId)) {
+          currentPageId = pages[0]?.id || "home-pc";
+        }
+        renderPageList();
+        await reloadCurrentPage();
+      }
+
+      async function reloadCurrentPage() {
+        const livePage = await loadLivePageState(currentPageId);
+        if (!livePage) return;
+        pages = pages.map((item) => item.id === currentPageId ? livePage : item);
+        renderPage(currentPageId);
       }
 
       document.addEventListener("click", (event) => {
         const pageItem = event.target.closest(".page-item");
         if (pageItem) {
           renderPage(pageItem.dataset.pageId);
+          reloadCurrentPage().catch((error) => console.error("[admin-research] page reload failed", error));
           return;
         }
         const filterChip = event.target.closest("#filterChips .chip");
@@ -2630,6 +3051,23 @@
           currentFilter = filterChip.dataset.filter;
           filterChipEls.forEach((chip) => chip.classList.toggle("active", chip === filterChip));
           renderPageList();
+        }
+        const pinVersionBtn = event.target.closest(".pin-version-btn");
+        if (pinVersionBtn && currentPageRecord) {
+          const versionId = pinVersionBtn.getAttribute("data-version-id") || "";
+          if (!versionId) return;
+          fetchJson("/api/workspace/view-pin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pageId: getTargetWorkspacePageId(currentPageRecord),
+              versionId,
+              viewportProfile: getViewportProfile(currentPageRecord),
+            }),
+          }).then(() => reloadCurrentPage()).catch((error) => {
+            console.error("[admin-research] version pin failed", error);
+            alert(`클론 적용 실패: ${error.message || error}`);
+          });
         }
       });
 
@@ -2640,30 +3078,217 @@
 
       reqModeEl.addEventListener("change", updateRequirementModeUi);
 
-      launchBuilderBtnEl.addEventListener("click", () => {
-        const page = pages.find((item) => item.id === currentPageId);
+      launchBuilderBtnEl.addEventListener("click", async () => {
+        const page = currentPageRecord || pages.find((item) => item.id === currentPageId);
         if (!page) return;
-        page.builder = {
-          ...(page.builder || {}),
-          activated: true,
-          statusText: "승인 완료 · 디자인 빌더 실행 가능",
-        };
-        renderPage(currentPageId);
-        builderSectionEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (!page.latestPlan?.id || !page.prd) {
+          alert("먼저 기획서를 생성해 주세요.");
+          return;
+        }
+        try {
+          await fetchJson("/api/llm/build", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pageId: getTargetWorkspacePageId(page),
+              viewportProfile: getViewportProfile(page),
+              planId: page.latestPlan.id,
+              approvedPlan: page.latestPlan.output?.requirementPlan || buildRequirementPlanFromForm(page),
+              intensity: { low: "conservative", medium: "balanced", high: "bold" }[reqChangeLevelEl.value || page.requirements.changeLevel || "medium"] || "balanced",
+              versionLabelHint: "",
+              designChangeLevel: reqChangeLevelEl.value || page.requirements.changeLevel || "medium",
+              targetScope: "page",
+              targetComponents: [],
+            }),
+          });
+          await reloadCurrentPage();
+          builderSectionEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (error) {
+          console.error("[admin-research] build failed", error);
+          alert(`빌더 실행 실패: ${error.message || error}`);
+        }
       });
 
-      const anchorLinks = Array.from(document.querySelectorAll(".anchor-link"));
-      const sections = anchorLinks.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
-      const observer = new IntersectionObserver((entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (!visible) return;
-        anchorLinks.forEach((link) => {
-          link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
-        });
-      }, { rootMargin: "-25% 0px -55% 0px", threshold: [0.1, 0.3, 0.6] });
-      sections.forEach((section) => observer.observe(section));
+      generatePrdBtnEl?.addEventListener("click", async () => {
+        const page = currentPageRecord || pages.find((item) => item.id === currentPageId);
+        if (!page) return;
+        const mode = reqModeEl.value || "hybrid";
+        const requestText = mode === "reference" ? "" : (reqBackgroundEl.value || "").trim();
+        const keyMessage = mode === "reference" ? "" : (reqMessageEl.value || "").trim();
+        const preferredDirection = mode === "direct" ? "" : (reqDirectionEl.value || "").trim();
+        const avoidDirection = (reqAvoidEl.value || "").trim();
+        const toneAndMood = mode === "hybrid" ? (reqToneEl.value || "").trim() : "";
+        const referenceUrls = mode === "direct" ? [] : textToLines(reqRefsEl.value || "");
+        if (!requestText && !referenceUrls.length) {
+          alert("고객 요청 또는 레퍼런스 URL 중 하나는 입력해야 합니다.");
+          return;
+        }
+        try {
+          await fetchJson("/api/llm/plan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pageId: getTargetWorkspacePageId(page),
+              viewportProfile: getViewportProfile(page),
+              mode,
+              requestText,
+              keyMessage,
+              preferredDirection,
+              avoidDirection,
+              toneAndMood,
+              referenceUrls,
+              designChangeLevel: reqChangeLevelEl.value || "medium",
+              targetScope: "page",
+              targetComponents: [],
+            }),
+          });
+          await reloadCurrentPage();
+          prdPreviewEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (error) {
+          console.error("[admin-research] generate plan failed", error);
+          alert(`기획서 생성 실패: ${error.message || error}`);
+        }
+      });
 
-      renderPage(currentPageId);
+      saveRequirementsBtnEl?.addEventListener("click", async () => {
+        const page = currentPageRecord || pages.find((item) => item.id === currentPageId);
+        if (!page) return;
+        if (!page.latestPlan?.id) {
+          return generatePrdBtnEl?.click();
+        }
+        const requirementPlan = buildRequirementPlanFromForm(page);
+        try {
+          await fetchJson("/api/workspace/plan", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              id: page.latestPlan.id,
+              pageId: getTargetWorkspacePageId(page),
+              viewportProfile: getViewportProfile(page),
+              mode: reqModeEl.value || page.latestPlan.input?.mode || "hybrid",
+              status: page.latestPlan.status || "draft",
+              title: requirementPlan.title,
+              summary: requirementPlan.title,
+              input: {
+                ...(page.latestPlan.input || {}),
+                userInput: {
+                  ...((page.latestPlan.input && page.latestPlan.input.userInput) || {}),
+                  requestText: (reqBackgroundEl.value || "").trim(),
+                  keyMessage: (reqMessageEl.value || "").trim(),
+                  preferredDirection: (reqDirectionEl.value || "").trim(),
+                  avoidDirection: (reqAvoidEl.value || "").trim(),
+                  toneAndMood: (reqToneEl.value || "").trim(),
+                  referenceUrls: textToLines(reqRefsEl.value || ""),
+                  designChangeLevel: reqChangeLevelEl.value || "medium",
+                },
+              },
+              output: {
+                requirementPlan: {
+                  ...(page.latestPlan.output?.requirementPlan || {}),
+                  ...requirementPlan,
+                },
+                toolContext: page.latestPlan.output?.toolContext || {},
+              },
+            }),
+          });
+          await reloadCurrentPage();
+        } catch (error) {
+          console.error("[admin-research] save requirements failed", error);
+          alert(`요구사항 저장 실패: ${error.message || error}`);
+        }
+      });
+
+      openBuilderSurfaceBtnEl?.addEventListener("click", () => {
+        if (currentPageRecord?.previewUrl) window.open(currentPageRecord.previewUrl, "_blank", "noopener,noreferrer");
+      });
+      saveBuilderVersionBtnEl?.addEventListener("click", async () => {
+        const page = currentPageRecord;
+        if (!page?.latestDraftBuild) return;
+        try {
+          await fetchJson("/api/workspace/version-save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pageId: getTargetWorkspacePageId(page),
+              viewportProfile: getViewportProfile(page),
+              planId: page.latestDraftBuild.planId || page.latestPlan?.id || "",
+              buildId: page.latestDraftBuild.id,
+              versionLabel: page.latestDraftBuild.proposedVersionLabel || `${getTargetWorkspacePageId(page)}-draft-v1`,
+              summary: page.latestDraftBuild.summary || "",
+              snapshotData: page.latestDraftBuild.snapshotData || {},
+            }),
+          });
+          await reloadCurrentPage();
+        } catch (error) {
+          console.error("[admin-research] save version failed", error);
+          alert(`버전 저장 실패: ${error.message || error}`);
+        }
+      });
+      openBuilderCompareBtnEl?.addEventListener("click", () => {
+        if (currentPageRecord?.compareUrl) window.open(currentPageRecord.compareUrl, "_blank", "noopener,noreferrer");
+      });
+      openBuilderPreviewBtnEl?.addEventListener("click", () => {
+        if (currentPageRecord?.previewUrl) window.open(currentPageRecord.previewUrl, "_blank", "noopener,noreferrer");
+      });
+      copyPrdBtnEl?.addEventListener("click", async () => {
+        const markdown = currentPageRecord?.latestPlan?.output?.requirementPlan?.builderMarkdown || currentPageRecord?.latestPlan?.output?.requirementPlan?.designSpecMarkdown || "";
+        if (!markdown) return;
+        await navigator.clipboard.writeText(markdown);
+      });
+      editIdentityBtnEl?.addEventListener("click", () => {
+        identityEditMode = true;
+        renderPage(currentPageId);
+      });
+      showIdentityHistoryBtnEl?.addEventListener("click", () => {
+        const page = currentPageRecord;
+        const lines = [
+          `페이지 정체성 수정 시각: ${page?.identitySource?.updatedAt || "n/a"}`,
+          `최근 기획서 생성: ${page?.latestPlan?.updatedAt || page?.latestPlan?.createdAt || "n/a"}`,
+          `최근 draft 생성: ${page?.latestDraftBuild?.updatedAt || page?.latestDraftBuild?.createdAt || "n/a"}`,
+        ];
+        alert(lines.join("\n"));
+      });
+      editPrdBtnEl?.addEventListener("click", () => {
+        document.getElementById("requirements").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+      exportPrdBtnEl?.addEventListener("click", () => window.print());
+      document.addEventListener("click", async (event) => {
+        const saveIdentityBtn = event.target.closest("#saveIdentityInlineBtn");
+        if (saveIdentityBtn && currentPageRecord) {
+          try {
+            await fetchJson("/api/workspace/page-identity", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                pageId: getTargetWorkspacePageId(currentPageRecord),
+                role: document.getElementById("identityRoleInput")?.value || "",
+                purpose: document.getElementById("identityPurposeInput")?.value || "",
+                designIntent: document.getElementById("identityDesignIntentInput")?.value || "",
+                mustPreserve: textToLines(document.getElementById("identityMustPreserveInput")?.value || ""),
+                shouldAvoid: textToLines(document.getElementById("identityShouldAvoidInput")?.value || ""),
+                visualGuardrails: textToLines(document.getElementById("identityGuardrailsInput")?.value || ""),
+              }),
+            });
+            identityEditMode = false;
+            await reloadCurrentPage();
+          } catch (error) {
+            console.error("[admin-research] save identity failed", error);
+            alert(`페이지 정체성 저장 실패: ${error.message || error}`);
+          }
+          return;
+        }
+        const cancelIdentityBtn = event.target.closest("#cancelIdentityInlineBtn");
+        if (cancelIdentityBtn) {
+          identityEditMode = false;
+          renderPage(currentPageId);
+        }
+      });
+
+      refreshWorkspace().catch((error) => {
+        console.error("[admin-research] bootstrap failed", error);
+        pages = SAMPLE_PAGES.slice();
+        renderPage(currentPageId);
+      });
     </script>
   </body>
 </html>

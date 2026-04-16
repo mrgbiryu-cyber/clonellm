@@ -17961,6 +17961,12 @@ function route(req, res) {
     }
     return sendHtml(res, 200, "admin.html");
   }
+  if (pathname === "/admin-research") {
+    if (!getUserFromRequest(req)) {
+      return sendRedirect(res, "/login");
+    }
+    return sendHtml(res, 200, "admin-research.html");
+  }
   if (pathname.startsWith("/reference-content/")) {
     const pageId = decodeURIComponent(pathname.slice("/reference-content/".length));
     return sendReferenceContent(res, pageId, requestUrl);
