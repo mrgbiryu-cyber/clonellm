@@ -932,6 +932,128 @@
         ];
       }
 
+      function inferSectionArchetypeClient(slotId = "") {
+        const normalized = String(slotId || "").trim();
+        const map = {
+          hero: "hero",
+          quickmenu: "icon-grid",
+          "md-choice": "product-list",
+          timedeal: "product-list",
+          "best-ranking": "product-list",
+          subscription: "banner-list",
+          "space-renewal": "editorial-product",
+          "brand-showroom": "editorial",
+          "latest-product-news": "editorial",
+          "smart-life": "editorial",
+          "summary-banner-2": "banner",
+          "missed-benefits": "banner-grid",
+          "lg-best-care": "service-card",
+          "bestshop-guide": "service-card",
+          "marketing-area": "promo-grid",
+          banner: "banner",
+          filter: "controls",
+          sort: "controls",
+          productGrid: "product-grid",
+          gallery: "gallery",
+          summary: "summary",
+          sticky: "sticky-buy",
+          review: "review",
+          qna: "qna",
+        };
+        return map[normalized] || "section";
+      }
+
+      function inferSectionHierarchyClient(slotId = "", changeLine = "") {
+        const archetype = inferSectionArchetypeClient(slotId);
+        if (archetype === "hero") return ["badge", "headline", "support copy", "primary action"];
+        if (archetype === "icon-grid") return ["section title", "icon row", "short labels", "support cue"];
+        if (archetype === "product-list" || archetype === "product-grid") return ["badge", "title", "support line", "card row", "cta"];
+        if (archetype === "banner" || archetype === "banner-list") return ["badge", "title", "summary", "visual", "cta"];
+        if (archetype === "service-card") return ["badge", "title", "trust cue", "summary", "action"];
+        if (archetype === "controls") return ["label", "current selection", "action cue"];
+        if (/cta|action|신청|문의|바로가기|탐색/i.test(String(changeLine || ""))) return ["badge", "title", "summary", "action"];
+        return ["badge", "title", "summary", "action"];
+      }
+
+      function inferContainerModeClient(slotId = "", options = {}) {
+        const pageId = String(options.pageId || "").trim();
+        if (pageId === "home") {
+          if (slotId === "hero" || slotId === "quickmenu") return "wide-shell";
+          if (slotId === "summary-banner-2") return "full-shell";
+          return "content-shell";
+        }
+        if (pageId.startsWith("pdp-") || pageId === "homestyle-pdp") {
+          if (slotId === "gallery" || slotId === "summary") return "content-shell";
+          return "narrow-shell";
+        }
+        return "content-shell";
+      }
+
+      function buildSectionBlueprintsClient(requirementPlan = {}, options = {}) {
+        const proposalSectionSpecs = buildProposalSectionSpecsClient(requirementPlan, options);
+        return proposalSectionSpecs.slice(0, 8).map((item) => ({
+          order: item.order,
+          slotId: item.slotId || "",
+          label: item.label,
+          archetype: inferSectionArchetypeClient(item.slotId),
+          containerMode: inferContainerModeClient(item.slotId, options),
+          objective: item.priorityReason || item.why,
+          problemStatement: item.why,
+          visualDirection: item.visual,
+          mustKeep: item.keep,
+          mustChange: item.change,
+          hierarchy: inferSectionHierarchyClient(item.slotId, item.change),
+          actionCue: /cta|action|신청|문의|바로가기|탐색/i.test(`${item.change} ${item.visual}`) ? "explicit" : "supportive",
+        }));
+      }
+
+      function buildDesignSpecMarkdownClient(requirementPlan = {}, options = {}, sectionBlueprints = []) {
+        const builderBrief = requirementPlan?.builderBrief && typeof requirementPlan?.builderBrief === "object" ? requirementPlan.builderBrief : {};
+        const pageLabelText = String(options.pageLabel || "페이지").trim();
+        const viewportLabel = String(options.viewportLabel || "PC").trim();
+        const title = String(requirementPlan?.title || `${pageLabelText} 시안 기획안`).trim();
+        const mustKeepLines = uniqueNarrativeLines(textToLines(linesToText(builderBrief.mustKeep || []))).slice(0, 4);
+        const mustChangeLines = uniqueNarrativeLines(textToLines(linesToText(builderBrief.mustChange || []))).slice(0, 5);
+        const guardrailLines = uniqueNarrativeLines(textToLines(linesToText(requirementPlan?.guardrails || []))).slice(0, 6);
+        return [
+          `# ${title} Execution Spec`,
+          "",
+          "> Builder execution reference. Treat this as an implementation-facing DESIGN.md layer that translates the approved proposal into actionable section rules.",
+          "",
+          "## Global Spec",
+          `- viewport: ${viewportLabel}`,
+          `- page-role: ${String(options.pageIdentity?.role || pageLabelText).trim()}`,
+          `- page-purpose: ${String(options.pageIdentity?.purpose || "").trim() || "기존 페이지 역할을 유지한 채 변경안을 제안한다."}`,
+          `- design-intent: ${String(options.pageIdentity?.designIntent || "").trim() || "브랜드 정체성을 유지하며 설득력 있는 방향성을 강화한다."}`,
+          `- change-level: ${String(requirementPlan?.designChangeLevel || "medium").trim()}`,
+          `- builder-objective: ${String(builderBrief.objective || "").trim() || "기획안에 맞는 실행 가능한 시안을 만든다."}`,
+          "",
+          "## Must Keep",
+          ...(mustKeepLines.length ? mustKeepLines.map((line) => `- ${line}`) : ["- none"]),
+          "",
+          "## Must Change",
+          ...(mustChangeLines.length ? mustChangeLines.map((line) => `- ${line}`) : ["- none"]),
+          "",
+          "## Visual Guardrails",
+          ...(guardrailLines.length ? guardrailLines.map((line) => `- ${line}`) : ["- none"]),
+          "",
+          "## Section Blueprints",
+          ...sectionBlueprints.flatMap((item) => ([
+            `### ${item.order}. ${item.label}${item.slotId ? ` (\`${item.slotId}\`)` : ""}`,
+            `- archetype: ${item.archetype}`,
+            `- container-mode: ${item.containerMode}`,
+            `- objective: ${item.objective}`,
+            `- problem: ${item.problemStatement}`,
+            `- visual-direction: ${item.visualDirection}`,
+            `- must-keep: ${item.mustKeep}`,
+            `- must-change: ${item.mustChange}`,
+            `- hierarchy: ${item.hierarchy.join(" -> ")}`,
+            `- action-cue: ${item.actionCue}`,
+            "",
+          ])),
+        ].join("\n").trim();
+      }
+
 function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = {}) {
         const pageLabelText = String(options.pageLabel || "페이지").trim();
         const viewportLabel = String(options.viewportLabel || "PC").trim();
@@ -955,6 +1077,7 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
           ...mustChangeLines,
         ]).slice(0, 8);
         const proposalSectionSpecs = buildProposalSectionSpecsClient(requirementPlan, options);
+        const sectionBlueprints = buildSectionBlueprintsClient(requirementPlan, options);
         const builderMarkdown = [
           `# ${title}`,
           "",
@@ -1057,7 +1180,8 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
             ...mustChangeLines,
           ]).slice(0, 6).map((line) => `- ${line}`),
         ].join("\n").trim();
-        return { builderMarkdown, layoutMockupMarkdown };
+        const designSpecMarkdown = buildDesignSpecMarkdownClient(requirementPlan, options, sectionBlueprints);
+        return { builderMarkdown, layoutMockupMarkdown, designSpecMarkdown, sectionBlueprints };
       }
 
       function truncateNarrativeLine(value = "", maxLength = 150) {
@@ -2129,12 +2253,16 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
         });
         const rawBuilderMarkdownDoc = String(latestRequirementPlan?.builderMarkdown || "").trim();
         const rawLayoutMockupDoc = String(latestRequirementPlan?.layoutMockupMarkdown || "").trim();
+        const rawDesignSpecDoc = String(latestRequirementPlan?.designSpecMarkdown || "").trim();
         const builderMarkdownDoc = shouldPreferGeneratedDoc(rawBuilderMarkdownDoc)
           ? String(generatedMarkdownDocs.builderMarkdown || "").trim()
           : rawBuilderMarkdownDoc;
         const layoutMockupDoc = shouldPreferGeneratedDoc(rawLayoutMockupDoc)
           ? String(generatedMarkdownDocs.layoutMockupMarkdown || "").trim()
           : rawLayoutMockupDoc;
+        const designSpecDoc = shouldPreferGeneratedDoc(rawDesignSpecDoc)
+          ? String(generatedMarkdownDocs.designSpecMarkdown || "").trim()
+          : rawDesignSpecDoc;
         const requirementPlanDigestHtml = renderRequirementPlanDigestHtml(
           buildRequirementPlanDigest(latestRequirementPlan || {}, {
             pageLabel: pageLabel(page.id, page.title),
@@ -2143,6 +2271,7 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
         );
         const builderMarkdownPreviewHtml = builderMarkdownDoc ? renderMarkdownPreview(builderMarkdownDoc) : `<div class="meta">아직 생성된 builder 문서가 없습니다.</div>`;
         const layoutMockupPreviewHtml = layoutMockupDoc ? renderMarkdownPreview(layoutMockupDoc) : `<div class="meta">아직 생성된 목업 문서가 없습니다.</div>`;
+        const designSpecPreviewHtml = designSpecDoc ? renderMarkdownPreview(designSpecDoc) : `<div class="meta">아직 생성된 실행 스펙 문서가 없습니다.</div>`;
         const componentMap = new Map((inventory.components || []).map((item) => [String(item.componentId || "").trim(), item]));
         const draftWhatChangedLines = Array.isArray(latestDraftBuild?.report?.whatChanged) ? latestDraftBuild.report.whatChanged : [];
         const buildSectionSummaryKeywords = (slotId, label) => {
@@ -2645,6 +2774,12 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
                         <div class="markdown-preview">${layoutMockupPreviewHtml}</div>
                       </div>
                     </details>
+                    <details class="fold-section">
+                      <summary>빌더 실행 스펙 보기</summary>
+                      <div class="fold-body">
+                        <div class="markdown-preview">${designSpecPreviewHtml}</div>
+                      </div>
+                    </details>
                   </div>
                   <div id="plannerEditPanel" class="planner-edit-panel" ${plannerEditMode ? "" : "hidden"}>
                     <div class="planner-field">
@@ -2661,6 +2796,12 @@ function buildRequirementPlanMarkdownDocsClient(requirementPlan = {}, options = 
                       <summary>화면 제안 와이어프레임 보기</summary>
                       <div class="fold-body">
                         <div class="markdown-preview">${layoutMockupPreviewHtml}</div>
+                      </div>
+                    </details>
+                    <details class="fold-section">
+                      <summary>빌더 실행 스펙 보기</summary>
+                      <div class="fold-body">
+                        <div class="markdown-preview">${designSpecPreviewHtml}</div>
                       </div>
                     </details>
                     <div class="planner-grid">

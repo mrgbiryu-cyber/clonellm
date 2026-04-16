@@ -878,6 +878,201 @@ function resolveWorkspacePageIdFromUrl(rawUrl) {
   return "";
 }
 
+function resolveAssetOriginForPage(pageId = "", href = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  if (normalizedPageId.startsWith("homestyle-")) return "https://homestyle.lge.co.kr";
+  const normalizedHref = String(href || "").trim();
+  if (normalizedHref) {
+    try {
+      const parsed = new URL(normalizedHref);
+      if (String(parsed.hostname || "").toLowerCase() === "homestyle.lge.co.kr") {
+        return "https://homestyle.lge.co.kr";
+      }
+    } catch {}
+  }
+  return "https://www.lge.co.kr";
+}
+
+function buildAssetProxyUrl(rawUrl = "") {
+  const normalized = String(rawUrl || "").trim();
+  if (!normalized) return "";
+  return `/asset-proxy?url=${encodeURIComponent(normalized)}`;
+}
+
+function toAbsoluteAssetUrl(rawValue = "", assetOrigin = "https://www.lge.co.kr") {
+  const value = String(rawValue || "").trim();
+  if (!value || value.startsWith("data:") || value.startsWith("blob:") || value.startsWith("#")) return value;
+  if (/^https?:\/\//i.test(value)) return value;
+  if (value.startsWith("//")) return `https:${value}`;
+  try {
+    return new URL(value, `${assetOrigin.replace(/\/+$/g, "")}/`).toString();
+  } catch {
+    return value;
+  }
+}
+
+function rewriteCssAssetUrls(cssText = "", cssUrl = "", assetOrigin = "https://www.lge.co.kr") {
+  const base = toAbsoluteAssetUrl(cssUrl, assetOrigin) || assetOrigin;
+  return String(cssText || "").replace(/url\((['"]?)([^'")]+)\1\)/gi, (match, quote, rawTarget) => {
+    const target = String(rawTarget || "").trim();
+    if (!target || target.startsWith("data:") || target.startsWith("blob:") || target.startsWith("#")) return match;
+    const absolute = toAbsoluteAssetUrl(target, base);
+    if (!absolute) return match;
+    return `url(${quote}${buildAssetProxyUrl(absolute)}${quote})`;
+  });
+}
+
+function rewriteHtmlAssetUrls(html = "", pageId = "", href = "") {
+  const assetOrigin = resolveAssetOriginForPage(pageId, href);
+  let next = String(html || "");
+  next = next.replace(/\b(href|src|poster)=("|')(\/(?!\/)[^"']*)\2/gi, (match, attr, quote, rawPath) => {
+    if (
+      rawPath.startsWith("/asset-proxy") ||
+      rawPath.startsWith("/clone") ||
+      rawPath.startsWith("/reference-content") ||
+      rawPath.startsWith("/admin") ||
+      rawPath.startsWith("/login")
+    ) {
+      return match;
+    }
+    return `${attr}=${quote}${toAbsoluteAssetUrl(rawPath, assetOrigin)}${quote}`;
+  });
+  next = next.replace(/<(img|source)\b([^>]*?)\s(src|poster)=(["'])(https?:\/\/[^"']+)\4/gi, (match, tag, before, attr, quote, absoluteUrl) => {
+    if (absoluteUrl.startsWith("/asset-proxy")) return match;
+    return `<${tag}${before} ${attr}=${quote}${buildAssetProxyUrl(absoluteUrl)}${quote}`;
+  });
+  next = next.replace(/\bsrcset=(["'])([^"']+)\1/gi, (match, quote, rawSrcset) => {
+    const transformed = String(rawSrcset || "")
+      .split(",")
+      .map((entry) => {
+        const trimmed = entry.trim();
+        if (!trimmed) return trimmed;
+        const parts = trimmed.split(/\s+/);
+        if (parts[0].startsWith("/asset-proxy")) return trimmed;
+        const absolute = toAbsoluteAssetUrl(parts[0], assetOrigin);
+        return [buildAssetProxyUrl(absolute), ...parts.slice(1)].join(" ");
+      })
+      .join(", ");
+    return `srcset=${quote}${transformed}${quote}`;
+  });
+  next = next.replace(/url\((["']?)(\/(?!\/)[^'")]+)\1\)/gi, (match, quote, rawPath) => {
+    if (rawPath.startsWith("/asset-proxy")) return match;
+    return `url(${quote}${toAbsoluteAssetUrl(rawPath, assetOrigin)}${quote})`;
+  });
+  next = next.replace(/<link([^>]*?)href=(["'])([^"']+\.css(?:\?[^"']*)?)\2([^>]*)>/gi, (match, before, quote, rawHref, after) => {
+    if (rawHref.startsWith("/asset-proxy")) return match;
+    const absolute = toAbsoluteAssetUrl(rawHref, assetOrigin);
+    return `<link${before}href=${quote}${buildAssetProxyUrl(absolute)}${quote}${after}>`;
+  });
+  return next;
+}
+
+function forceCloneEagerImages(html = "", pageId = "", viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  if (normalizedPageId !== "home") return String(html || "");
+  let next = String(html || "");
+  next = next.replace(/\sloading=(["'])lazy\1/gi, ' loading="eager"');
+  next = next.replace(/\sfetchpriority=(["'])low\1/gi, ' fetchpriority="high"');
+  return next;
+}
+
+function findBalancedDivEnd(html, startIndex) {
+  let depth = 0;
+  let cursor = startIndex;
+  while (cursor < html.length) {
+    const nextOpen = html.indexOf("<div", cursor);
+    const nextClose = html.indexOf("</div>", cursor);
+    if (nextClose === -1) return -1;
+    if (nextOpen !== -1 && nextOpen < nextClose) {
+      depth += 1;
+      cursor = nextOpen + 4;
+      continue;
+    }
+    depth -= 1;
+    cursor = nextClose + 6;
+    if (depth === 0) return cursor;
+  }
+  return -1;
+}
+
+function materializeStreamedMainContent(rawHtml) {
+  let html = String(rawHtml || "");
+  if (!html.includes('template id="P:') || !html.includes('id="S:')) return html;
+
+  let guard = 0;
+  while (guard < 12) {
+    guard += 1;
+    const placeholderMatch = html.match(/<div id="S:\d+"><main([^>]*)><template id="P:(\d+)"><\/template><\/main><\/div>/);
+    if (!placeholderMatch) break;
+    const placeholderMarkup = placeholderMatch[0];
+    const mainAttrs = placeholderMatch[1] || "";
+    const streamId = placeholderMatch[2];
+    const placeholderIndex = placeholderMatch.index || 0;
+    const streamStart = html.indexOf(`<div id="S:${streamId}">`);
+    if (streamStart === -1) break;
+    const streamOpenEnd = html.indexOf(">", streamStart);
+    if (streamOpenEnd === -1) break;
+    const streamEnd = findBalancedDivEnd(html, streamStart);
+    if (streamEnd === -1) break;
+    const streamInner = html.slice(streamOpenEnd + 1, streamEnd - 6);
+    html =
+      html.slice(0, placeholderIndex) +
+      `<main${mainAttrs}>${streamInner}</main>` +
+      html.slice(placeholderIndex + placeholderMarkup.length);
+    const updatedStreamStart = html.indexOf(`<div id="S:${streamId}">`);
+    if (updatedStreamStart !== -1) {
+      const updatedStreamEnd = findBalancedDivEnd(html, updatedStreamStart);
+      if (updatedStreamEnd !== -1) {
+        html = html.slice(0, updatedStreamStart) + html.slice(updatedStreamEnd);
+      }
+    }
+  }
+
+  return html;
+}
+
+function buildDetachedStreamRepairScript() {
+  return `
+        function stitchDetachedStreamContent() {
+          const container = document.querySelector('#container');
+          if (!container) return;
+          const placeholder = Array.from(document.querySelectorAll('template[id^="P:"]')).find((node) => /^P:\\d+$/.test(node.id || ''));
+          if (!placeholder) return;
+          const match = String(placeholder.id || '').match(/^P:(\\d+)$/);
+          if (!match) return;
+          const streamHost = document.getElementById('S:' + match[1]);
+          if (!streamHost) return;
+          const hasStructuredContent =
+            container.querySelector('main section, main footer') ||
+            container.querySelector('[class*="QuickMenu"], [class*="LabelBanner"], [class*="BrandStory"], [data-area*="홈 메인"]');
+          if (hasStructuredContent) return;
+          const streamMarkup = streamHost.innerHTML || '';
+          if (!streamMarkup.trim()) return;
+          Array.from(container.children).forEach((node) => {
+            if (!node || node.tagName === 'HEADER') return;
+            if (node.tagName === 'TEMPLATE') {
+              node.remove();
+              return;
+            }
+            if (
+              node.matches &&
+              node.matches('[class*="LazyLoad_lazyLoad__"], [data-area*="홈 메인 영역"]')
+            ) {
+              node.remove();
+            }
+          });
+          const range = document.createRange();
+          range.selectNode(container);
+          const fragment = range.createContextualFragment(streamMarkup);
+          container.appendChild(fragment);
+          const placeholderWrapper = placeholder.closest('div[id^="S:"]');
+          if (placeholderWrapper) placeholderWrapper.remove();
+          streamHost.remove();
+          document.querySelectorAll('template[id^="P:"]').forEach((node) => node.remove());
+        }
+  `;
+}
+
 function slugLoose(input) {
   return String(input || "")
     .replace(/^https?:\/\//, "")
@@ -1094,11 +1289,56 @@ function classifyPageTypeForDesignRefs(pageId = "", pageGroup = "") {
   return "generic";
 }
 
+function extractIdentitySignalsFromText(value = "") {
+  const text = String(value || "").toLowerCase();
+  const signals = new Set();
+  const tests = [
+    ["premium", /(premium|luxury|high-end|warm-premium|프리미엄|고급|하이엔드)/i],
+    ["trust", /(trust|reliable|assurance|enterprise|structured|documentation|신뢰|안심|전문|서비스|지원|care)/i],
+    ["editorial", /(editorial|story|brand-story|cinematic|감성|스토리|매거진|브랜드\s*스토리|에디토리얼)/i],
+    ["utility", /(utility|productivity|documentation-friendly|검색|필터|예약|실용|정돈|utility-layout|utility-navigation)/i],
+    ["conversion", /(conversion|cta|benefit|purchase|buy|shop|상담|구매|혜택|신청|전환)/i],
+    ["calm", /(calm|quiet|soft|절제|차분|정제|soft-contrast|calm-dark)/i],
+    ["dense", /(dense|data-rich|grid|calendar-like-density|정보\s*밀도|촘촘)/i],
+    ["minimal", /(minimal|clean-grid|monochrome|simple-hero|간결|미니멀|절제된)/i],
+    ["bold", /(bold|hero-led|high-contrast|strong|임팩트|강한|대형\s*타이포)/i],
+  ];
+  tests.forEach(([signal, pattern]) => {
+    if (pattern.test(text)) signals.add(signal);
+  });
+  return Array.from(signals);
+}
+
+function extractPageIdentitySignals(pageIdentity = {}) {
+  const source = pageIdentity && typeof pageIdentity === "object" ? pageIdentity : {};
+  const text = [
+    source.role,
+    source.purpose,
+    source.designIntent,
+    ...(Array.isArray(source.mustPreserve) ? source.mustPreserve : []),
+    ...(Array.isArray(source.shouldAvoid) ? source.shouldAvoid : []),
+    ...(Array.isArray(source.visualGuardrails) ? source.visualGuardrails : []),
+  ].filter(Boolean).join("\n");
+  return extractIdentitySignalsFromText(text);
+}
+
+function extractReferenceIdentitySignals(entry = {}) {
+  const source = entry && typeof entry === "object" ? entry : {};
+  const text = [
+    ...(Array.isArray(source.styleSignals) ? source.styleSignals : []),
+    ...(Array.isArray(source.recommendedFor) ? source.recommendedFor : []),
+    ...(Array.isArray(source.usageNotes) ? source.usageNotes : []),
+    ...(Array.isArray(source.collectFor) ? source.collectFor : []),
+  ].filter(Boolean).join("\n");
+  return extractIdentitySignalsFromText(text);
+}
+
 function buildDesignReferenceLibraryContext(pageId = "", options = {}) {
   const pageType = classifyPageTypeForDesignRefs(pageId, options.pageGroup || "");
   const viewportProfile = String(options.viewportProfile || "pc").trim() || "pc";
   const limit = Math.max(1, Math.min(Number(options.limit || 8) || 8, 20));
   const library = readDesignReferenceLibrary();
+  const identitySignals = extractPageIdentitySignals(options.pageIdentity);
   const scoredEntries = (library.entries || [])
     .map((entry) => {
       const pageTypes = Array.isArray(entry?.pageTypes) ? entry.pageTypes.map((item) => String(item || "").trim()) : [];
@@ -1107,6 +1347,7 @@ function buildDesignReferenceLibraryContext(pageId = "", options = {}) {
       const sampleClass = String(entry?.sampleClass || "").trim();
       const referenceType = String(entry?.referenceType || "").trim();
       const sampleCount = Array.isArray(entry?.sampleUrls) ? entry.sampleUrls.length : 0;
+      const referenceSignals = extractReferenceIdentitySignals(entry);
       let score = 0;
       if (pageTypes.includes(pageType)) score += 100;
       else if (pageTypes.includes("generic")) score += 30;
@@ -1116,10 +1357,15 @@ function buildDesignReferenceLibraryContext(pageId = "", options = {}) {
       else if (sampleClass === "showcase") score += 20;
       else if (sampleClass === "concept-shot") score -= 10;
       if (fetchStatus && fetchStatus !== "ok") score -= 120;
+      const identityOverlap = identitySignals.filter((signal) => referenceSignals.includes(signal));
+      score += identityOverlap.length * 35;
+      if (identitySignals.some((signal) => ["trust", "utility", "conversion"].includes(signal)) && sampleClass === "concept-shot") {
+        score -= 30;
+      }
       const excluded =
         (referenceType === "practical-sample-source" && fetchStatus && fetchStatus !== "ok") ||
         (referenceType === "practical-sample-source" && sampleClass === "practical" && sampleCount <= 0);
-      return { entry, score, excluded };
+      return { entry, score, excluded, referenceSignals, identityOverlap };
     })
     .filter((item) => item.score > 0 && !item.excluded)
     .sort((a, b) => b.score - a.score || String(a.entry?.title || "").localeCompare(String(b.entry?.title || ""), "en"));
@@ -1135,6 +1381,8 @@ function buildDesignReferenceLibraryContext(pageId = "", options = {}) {
     fetchStatus: String(item.entry?.fetchStatus || "").trim() || null,
     sampleCount: Array.isArray(item.entry?.sampleUrls) ? item.entry.sampleUrls.length : 0,
     styleSignals: Array.isArray(item.entry?.styleSignals) ? item.entry.styleSignals.map((signal) => String(signal || "").trim()).filter(Boolean) : [],
+    identitySignals: item.referenceSignals,
+    identityOverlap: item.identityOverlap,
     recommendedFor: Array.isArray(item.entry?.recommendedFor) ? item.entry.recommendedFor.map((signal) => String(signal || "").trim()).filter(Boolean) : [],
     usageNotes: Array.isArray(item.entry?.usageNotes) ? item.entry.usageNotes.map((note) => String(note || "").trim()).filter(Boolean) : [],
     score: item.score,
@@ -1144,6 +1392,7 @@ function buildDesignReferenceLibraryContext(pageId = "", options = {}) {
     generatedAt: library.generatedAt || null,
     pageType,
     viewportProfile,
+    identitySignals,
     count: entries.length,
     entries,
     sourceSeeds,
@@ -3179,6 +3428,28 @@ function readReferenceLiveFallbackHtml(fileName) {
   return fs.readFileSync(filePath, "utf-8");
 }
 
+function viewportProfileToReferenceLiveSuffix(viewportProfile = "pc") {
+  const profile = String(viewportProfile || "pc").trim().toLowerCase();
+  if (profile === "mo") return "mobile";
+  if (profile === "ta") return "tablet";
+  return "desktop";
+}
+
+function readPageReferenceLiveHtml(pageId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return null;
+  const suffix = viewportProfileToReferenceLiveSuffix(viewportProfile);
+  const candidates = [
+    `${normalizedPageId}.${suffix}.html`,
+    `${normalizedPageId}.${String(viewportProfile || "pc").trim().toLowerCase()}.html`,
+  ];
+  for (const fileName of candidates) {
+    const html = readReferenceLiveHtml(fileName);
+    if (html) return html;
+  }
+  return null;
+}
+
 function readHomeDesktopHtml() {
   return readReferenceLiveHtml("home.desktop.html") || readArchiveHtmlByPageId("home");
 }
@@ -3220,15 +3491,19 @@ function injectExtraHeadLinks(html, links) {
   return html.replace("</head>", `${links.join("")}</head>`);
 }
 
-function readReferenceSourceHtmlByPageId(pageId) {
+function readReferenceSourceHtmlByPageId(pageId, viewportProfile = "pc") {
   const baseline = resolveBaselineInfo(pageId);
   if (baseline.mode === "hybrid" && pageId === "home") {
     return readHomeTabletHtml();
   }
+  const liveHtml = readPageReferenceLiveHtml(pageId, viewportProfile);
+  if (liveHtml) return liveHtml;
   return readArchiveHtmlByPageId(pageId);
 }
 
 function readPlpReferenceHtml(pageId, viewportProfile = "pc") {
+  const liveHtml = readPageReferenceLiveHtml(pageId, viewportProfile);
+  if (liveHtml) return liveHtml;
   const profile = viewportProfile === "mo" ? "mo" : "pc";
   const filePath = path.join(ROOT, "data", "visual", "plp", pageId, profile, "reference.html");
   if (!fs.existsSync(filePath)) return null;
@@ -3245,6 +3520,12 @@ function readCloneSourceHtmlByPageId(pageId, viewportProfile = "pc") {
   if (String(pageId || "").startsWith("category-")) {
     return readPlpReferenceHtml(pageId, viewportProfile);
   }
+  if (isPdpCasePageId(pageId)) {
+    const liveHtml = readPageReferenceLiveHtml(pageId, viewportProfile);
+    if (liveHtml) return liveHtml;
+  }
+  const liveHtml = readPageReferenceLiveHtml(pageId, viewportProfile);
+  if (liveHtml) return liveHtml;
   return readArchiveHtmlByPageId(pageId);
 }
 
@@ -4253,9 +4534,16 @@ function buildWorkingComponentInventory(pageId, options = {}) {
     const slotsSnapshot = buildWorkingSlotSnapshot(pageId);
     const interactionsSnapshot = buildWorkingInteractionSnapshot(pageId);
     const interactions = interactionsSnapshot?.interactions || [];
-    const slots = (slotsSnapshot?.slots || []).length
-      ? slotsSnapshot.slots
-      : buildDerivedWorkingSlots(pageId, interactions);
+    const derivedSlots = buildDerivedWorkingSlots(pageId, interactions);
+    const preferDerivedSlots =
+      pageId !== "home" &&
+      (String(pageId || "").startsWith("category-") || isPdpCasePageId(pageId) || isServiceLikePageId(pageId)) &&
+      derivedSlots.length > 0;
+    const slots = preferDerivedSlots
+      ? derivedSlots
+      : (slotsSnapshot?.slots || []).length
+        ? slotsSnapshot.slots
+        : derivedSlots;
     const sourceMode = resolveBaselineInfo(pageId).mode === "mobile" ? "mobile-derived" : "pc-like";
     const activeSourceOverrides = new Map(
       ((findSlotRegistry(editableData || {}, pageId)?.slots) || [])
@@ -4701,7 +4989,98 @@ function sanitizeComponentPatch(inputPatch, patchSchema = {}, options = {}) {
     if (!rootKeys.has(key)) continue;
     next[key] = value;
   }
-  return next;
+  return sanitizeGovernedComponentPatch(normalizedPageId, normalizedSlotId, next);
+}
+
+function inferLayoutGovernanceForPatch(pageId = "", slotId = "", sectionType = "") {
+  return buildSidecarLayoutGovernance(String(pageId || "").trim(), String(slotId || "").trim(), String(sectionType || "").trim());
+}
+
+function sanitizeGovernedComponentPatch(pageId = "", slotId = "", patch = {}, options = {}) {
+  const source = patch && typeof patch === "object" ? JSON.parse(JSON.stringify(patch)) : {};
+  const governance =
+    options.layoutGovernance && typeof options.layoutGovernance === "object"
+      ? options.layoutGovernance
+      : inferLayoutGovernanceForPatch(pageId, slotId, options.sectionType || "");
+  const forbiddenMoves = new Set(Array.isArray(governance?.forbiddenMoves) ? governance.forbiddenMoves : []);
+  const widthPolicy = String(governance?.widthPolicy || "").trim();
+  const resizePolicy = String(governance?.resizePolicy || "").trim();
+  const next = {};
+  const violations = [];
+  const shouldStripExplicitWidth =
+    [
+      "follow-parent-column",
+      "follow-parent-container",
+      "follow-layout-token",
+      "follow-content-width",
+      "container-only",
+    ].includes(widthPolicy) || ["container-only", "group-only", "uniform-items-only"].includes(resizePolicy);
+  const blockedStyleKeys = new Set();
+  if (shouldStripExplicitWidth) {
+    ["width", "minWidth", "maxWidth"].forEach((key) => blockedStyleKeys.add(key));
+  }
+  if (forbiddenMoves.has("absolute-overlay-replacement")) {
+    ["position", "top", "right", "bottom", "left", "zIndex", "transform"].forEach((key) => blockedStyleKeys.add(key));
+  }
+  if (forbiddenMoves.has("single-item-width-change") || forbiddenMoves.has("single-card-width-change")) {
+    ["itemWidth", "cardWidth", "thumbWidth", "controlWidth"].forEach((key) => blockedStyleKeys.add(key));
+  }
+  if (forbiddenMoves.has("single-item-height-change") || forbiddenMoves.has("single-card-height-change")) {
+    ["itemHeight", "cardHeight", "thumbHeight", "controlHeight"].forEach((key) => blockedStyleKeys.add(key));
+  }
+
+  for (const [key, value] of Object.entries(source)) {
+    if (key === "styles" && value && typeof value === "object") {
+      const nextStyles = {};
+      for (const [styleKey, styleValue] of Object.entries(value)) {
+        if (blockedStyleKeys.has(styleKey)) {
+          violations.push({
+            type: "style_blocked",
+            pageId,
+            slotId,
+            key: styleKey,
+            reason: widthPolicy || resizePolicy || "governance",
+          });
+          continue;
+        }
+        nextStyles[styleKey] = styleValue;
+      }
+      if (Object.keys(nextStyles).length) next.styles = nextStyles;
+      continue;
+    }
+    const looksLikeChildScopedKey =
+      /(items?|cards?|thumbs?|thumbnails|controls?|options?|selectedState|selectedItem|activeIndex)/i.test(key);
+    if (
+      looksLikeChildScopedKey &&
+      ["container-only", "group-only", "uniform-items-only"].includes(resizePolicy) &&
+      (Array.isArray(value) || (value && typeof value === "object"))
+    ) {
+      violations.push({
+        type: "child_scope_blocked",
+        pageId,
+        slotId,
+        key,
+        reason: resizePolicy,
+      });
+      continue;
+    }
+    if (/(item|card|thumb|control)(Width|Height|Size)$/i.test(key)) {
+      violations.push({
+        type: "child_size_blocked",
+        pageId,
+        slotId,
+        key,
+        reason: resizePolicy || widthPolicy || "governance",
+      });
+      continue;
+    }
+    next[key] = value;
+  }
+
+  if (Object.keys(next).length === 1 && next.styles && !Object.keys(next.styles).length) {
+    delete next.styles;
+  }
+  return { patch: next, violations };
 }
 
 function clampNumber(value, min, max) {
@@ -5936,7 +6315,7 @@ function analyzeArtifactSectionMarkup(markup = "") {
       textLength: 0,
     };
   }
-  const classMatch = source.match(/<section[^>]*class="([^"]+)"/i);
+  const classMatch = source.match(/<[a-zA-Z][\w:-]*[^>]*class="([^"]+)"/i);
   const dataAreaMatch = source.match(/\sdata-area="([^"]+)"/i);
   const textLength = stripHtml(source).replace(/\s+/g, " ").trim().length;
   return {
@@ -5960,6 +6339,97 @@ function buildArtifactSectionSelectorHints(pageId, slotId, viewportProfile = "pc
     }
     if (profile.dataArea) hints.push(`data-area=${profile.dataArea}`);
     return hints;
+  }
+  const group = findArtifactGroupForSlot(normalizedPageId, normalizedSlotId, viewportProfile, "reference");
+  const hints = [];
+  if (group?.selector) hints.push(String(group.selector));
+  if (group?.groupId && String(group.groupId) !== normalizedSlotId) hints.push(`groupId=${group.groupId}`);
+  hints.push(...getArtifactFallbackSelectors(normalizedPageId, normalizedSlotId, viewportProfile));
+  return hints;
+}
+
+function readArtifactReferenceHtml(pageId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return "";
+  if (normalizedPageId === "home") {
+    return readReferenceSourceHtmlByPageId(normalizedPageId, viewportProfile) || "";
+  }
+  if (isPdpCasePageId(normalizedPageId)) {
+    return readPageReferenceLiveHtml(normalizedPageId, viewportProfile) || readReferenceSourceHtmlByPageId(normalizedPageId, viewportProfile) || "";
+  }
+  return readReferenceSourceHtmlByPageId(normalizedPageId, viewportProfile) || "";
+}
+
+function findArtifactGroupEntry(pageId, viewportProfile = "pc", sourceType = "reference") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewport = normalizeViewportProfile(viewportProfile, "pc");
+  if (isServiceLikePageId(normalizedPageId)) {
+    return resolveServiceGroupEntry(normalizedPageId, normalizedViewport, sourceType);
+  }
+  if (normalizedPageId.startsWith("category-")) {
+    const entry = findPlpGroupEntry(normalizedPageId, normalizedViewport, sourceType);
+    return entry ? { ...entry, groups: normalizeGroupMap(entry.groups) } : null;
+  }
+  if (isPdpCasePageId(normalizedPageId)) {
+    const pdpContext = resolvePdpRuntimeContext(normalizedPageId);
+    const runtimePageId = pdpContext?.runtimePageId || normalizedPageId;
+    const href = pdpContext?.href || "";
+    const entry =
+      findPdpGroupEntry(runtimePageId, normalizedViewport, href, sourceType) ||
+      findPdpGroupEntry(runtimePageId, normalizedViewport === "pc" ? "mo" : "pc", href, sourceType);
+    return entry ? { ...entry, groups: normalizeGroupMap(entry.groups) } : null;
+  }
+  return null;
+}
+
+function findArtifactGroupForSlot(pageId, slotId, viewportProfile = "pc", sourceType = "reference") {
+  const entry = findArtifactGroupEntry(pageId, viewportProfile, sourceType);
+  const groups = normalizeGroupMap(entry?.groups);
+  return groups[String(slotId || "").trim()] || null;
+}
+
+function simplifyGroupRect(group = null) {
+  const rect = group?.rect;
+  if (!rect || typeof rect !== "object") return null;
+  const width = Number(rect.width || 0);
+  const height = Number(rect.height || 0);
+  if (!width || !height) return null;
+  return {
+    x: Number(rect.x || 0),
+    y: Number(rect.y || 0),
+    width,
+    height,
+  };
+}
+
+function getArtifactFallbackSelectors(pageId, slotId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  if (normalizedPageId.startsWith("category-")) {
+    const plpFallbacks = {
+      filter: ['[class*="filter"]', '[id*="filter"]'],
+      sort: ['[class*="sort"]', '[id*="sort"]', '[class*="orderby"]'],
+      productGrid: ['[class*="product-list"]', '[class*="productList"]', '[class*="list-wrap"]', '[class*="list_wrap"]', '[class*="plp-list"]'],
+      firstRow: ['[class*="product-list"]', '[class*="productList"]', '[class*="list-wrap"]', '[class*="list_wrap"]'],
+      firstProduct: ['li[class*="item"]', '[class*="product-item"]', '[class*="item-card"]'],
+      banner: ['[data-area*="구매가이드"]'],
+    };
+    return plpFallbacks[normalizedSlotId] || [];
+  }
+  if (isPdpCasePageId(normalizedPageId)) {
+    const isMobile = normalizeViewportProfile(viewportProfile, "pc") === "mo";
+    const pdpFallbacks = {
+      gallery: isMobile
+        ? ['#mobile_summary_gallery', '#desktop_summary_gallery', '.pdp-visual-area', '[id*="summary_gallery"]']
+        : ['#desktop_summary_gallery', '#mobile_summary_gallery', '.pdp-visual-area', '[id*="summary_gallery"]'],
+      summary: ['.pdp-info-area', '[class*="pdp-info-area"]', '[class*="product-info"]'],
+      price: ['[class*="price"]', '[id*="price"]', '[class*="benefit"]'],
+      option: ['[class*="option"]', '[id*="option"]', '[class*="select"]', '[class*="model"]'],
+      sticky: ['[class*="sticky"]', '[id*="sticky"]', '[class*="purchase"]', '[class*="buy"]', '[class*="cart"]', '[class*="cta"]'],
+      review: ['#review', '[id*="review"]', '[class*="review"]'],
+      qna: ['#qna', '[id*="qna"]', '[class*="qna"]'],
+    };
+    return pdpFallbacks[normalizedSlotId] || [];
   }
   return [];
 }
@@ -6001,6 +6471,16 @@ function extractArtifactSectionMarkup(pageId, slotId, viewportProfile = "pc") {
   const normalizedPageId = String(pageId || "").trim();
   if (normalizedPageId === "home") {
     return extractHomeArtifactSectionMarkup(slotId, viewportProfile);
+  }
+  const html = readArtifactReferenceHtml(normalizedPageId, viewportProfile);
+  if (!html) return "";
+  const group = findArtifactGroupForSlot(normalizedPageId, slotId, viewportProfile, "reference");
+  const selectors = [];
+  if (group?.found && group?.selector) selectors.push(String(group.selector));
+  selectors.push(...getArtifactFallbackSelectors(normalizedPageId, slotId, viewportProfile));
+  for (const selector of selectors) {
+    const markup = extractFirstSelectorBlock(html, selector);
+    if (markup) return markup;
   }
   return "";
 }
@@ -6046,6 +6526,535 @@ function buildArtifactSectionRegistry(pageId, options = {}) {
     pageId: normalizedPageId,
     viewportProfile: normalizedViewport,
     source: "reference-artifact",
+    sectionCount: sections.length,
+    sections,
+  };
+}
+
+function simplifyMeasurementRect(slot = null) {
+  if (!slot || typeof slot !== "object") return null;
+  const width = Number(slot.width || 0);
+  const height = Number(slot.height || 0);
+  if (!width || !height) return null;
+  return {
+    x: Number(slot.x || 0),
+    y: Number(slot.y || 0),
+    width,
+    height,
+  };
+}
+
+function summarizeMeasurementItems(slot = null, limit = 12) {
+  const seen = new Set();
+  return safeArray(slot?.items || [], 60)
+    .map((item) => String(item?.label || "").replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .filter((label) => {
+      if (seen.has(label)) return false;
+      seen.add(label);
+      return true;
+    })
+    .slice(0, limit);
+}
+
+function inferMeasurementImageZones(slot = null) {
+  return safeArray(slot?.items || [], 40)
+    .filter((item) => /image|img|thumb|media|poster/i.test(String(item?.label || "")))
+    .map((item, index) => ({
+      id: `${String(slot?.slotId || "section").trim() || "section"}:measured-image-${index + 1}`,
+      x: Number(item.x || 0),
+      y: Number(item.y || 0),
+      width: Number(item.width || 0),
+      height: Number(item.height || 0),
+      source: "measurement",
+    }))
+    .filter((item) => item.width > 0 && item.height > 0)
+    .slice(0, 8);
+}
+
+function countMarkupMatches(markup = "", pattern) {
+  const source = String(markup || "");
+  if (!source || !pattern) return 0;
+  const matches = source.match(pattern);
+  return Array.isArray(matches) ? matches.length : 0;
+}
+
+function estimateRegionItemCount(slotId = "", markup = "", measurement = null) {
+  const normalizedSlotId = String(slotId || "").trim();
+  const labels = summarizeMeasurementItems(measurement, 40);
+  if (normalizedSlotId === "quickmenu") {
+    return labels.filter(Boolean).length || countMarkupMatches(markup, /<a\b/gi) || 0;
+  }
+  if (normalizedSlotId === "gallery") {
+    return countMarkupMatches(markup, /swiper-slide|thumbnail|thumb/gi) || countMarkupMatches(markup, /<li\b/gi) || 0;
+  }
+  if (normalizedSlotId === "productGrid" || normalizedSlotId === "firstRow" || normalizedSlotId === "firstProduct") {
+    return countMarkupMatches(markup, /<li\b/gi) || countMarkupMatches(markup, /product-item|item-card/gi) || 0;
+  }
+  if (normalizedSlotId === "review" || normalizedSlotId === "qna") {
+    return countMarkupMatches(markup, /<li\b/gi) || countMarkupMatches(markup, /review-item|qna-item|accordion-item/gi) || 0;
+  }
+  return 0;
+}
+
+function buildSidecarRepeaterItems(slotId = "", itemKind = "item", itemCount = 0, labels = [], editableFields = []) {
+  const normalizedSlotId = String(slotId || "").trim() || "section";
+  const count = Math.max(0, Number(itemCount || 0));
+  const safeLabels = safeArray(labels || [], Math.max(4, count || 0)).map((item) => String(item || "").trim());
+  return Array.from({ length: Math.min(count || safeLabels.length, 16) }, (_, index) => ({
+    itemId: `${normalizedSlotId}.${itemKind}.${index + 1}`,
+    itemIndex: index,
+    label: safeLabels[index] || `${itemKind} ${index + 1}`,
+    editableFields: safeArray(editableFields || [], 8),
+    layoutScope: "repeater-item",
+  }));
+}
+
+function buildSidecarNodeBlueprints(regionId = "", fields = [], labels = []) {
+  const safeFields = safeArray(fields || [], 10);
+  const safeLabels = safeArray(labels || [], 10);
+  return safeFields.map((field, index) => ({
+    nodeId: `${regionId}.${field}`,
+    field,
+    label: safeLabels[index] || field,
+    editable: true,
+  }));
+}
+
+function buildSidecarLayoutGovernance(pageId = "", slotId = "", sectionType = "", component = {}, shareSection = {}, editable = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedSectionType = String(sectionType || component.kind || "").trim();
+  const base = {
+    layoutScope: "container",
+    resizePolicy: "container-only",
+    widthPolicy: "follow-parent-container",
+    itemConsistency: "n/a",
+    alignmentPolicy: ["preserve-parent-grid"],
+    forbiddenMoves: [
+      "independent-width-expansion",
+      "independent-overflow-outside-container",
+      "absolute-overlay-replacement",
+    ],
+  };
+
+  if (normalizedSlotId === "quickmenu" || normalizedSectionType === "icon-grid") {
+    return {
+      ...base,
+      layoutScope: "repeater-container",
+      resizePolicy: "uniform-items-only",
+      widthPolicy: "container-only",
+      itemConsistency: "shared-item-size",
+      alignmentPolicy: ["shared-row-height", "shared-column-width", "preserve-parent-grid"],
+      forbiddenMoves: [
+        "single-item-width-change",
+        "single-item-height-change",
+        "break-parent-grid",
+        "independent-overflow-outside-container",
+      ],
+    };
+  }
+
+  if (["productGrid", "firstRow", "firstProduct"].includes(normalizedSlotId) || normalizedSectionType === "product-list") {
+    return {
+      ...base,
+      layoutScope: "grid-container",
+      resizePolicy: "uniform-items-only",
+      widthPolicy: "container-only",
+      itemConsistency: "shared-card-rhythm",
+      alignmentPolicy: ["shared-column-width", "shared-row-gap", "preserve-grid-rhythm"],
+      forbiddenMoves: [
+        "single-card-width-change",
+        "single-card-height-change",
+        "break-parent-grid",
+      ],
+    };
+  }
+
+  if (normalizedSlotId === "gallery") {
+    return {
+      ...base,
+      layoutScope: "section-group",
+      resizePolicy: "group-only",
+      widthPolicy: "follow-parent-column",
+      itemConsistency: "thumbnail-rail-uniform",
+      alignmentPolicy: ["main-and-thumbnail-sync", "preserve-media-ratio"],
+      forbiddenMoves: [
+        "independent-main-media-width-change",
+        "break-thumbnail-rail",
+        "replace-sticky-neighbor-layout",
+      ],
+    };
+  }
+
+  if (["summary", "price", "option", "sticky"].includes(normalizedSlotId)) {
+    return {
+      ...base,
+      layoutScope: "column-group",
+      resizePolicy: "container-only",
+      widthPolicy: "follow-parent-column",
+      itemConsistency: "shared-column-width",
+      alignmentPolicy: ["shared-column-width", "shared-stack-rhythm"],
+      forbiddenMoves: [
+        "break-parent-column",
+        "independent-width-expansion",
+        "single-control-protrusion",
+      ],
+    };
+  }
+
+  if (normalizedSlotId === "review" || normalizedSlotId === "qna") {
+    return {
+      ...base,
+      layoutScope: "content-list",
+      resizePolicy: "container-only",
+      widthPolicy: "follow-content-width",
+      itemConsistency: "shared-list-rhythm",
+      alignmentPolicy: ["shared-list-spacing", "preserve-content-stack"],
+      forbiddenMoves: [
+        "single-item-width-change",
+        "break-content-stack",
+      ],
+    };
+  }
+
+  if (normalizedPageId === "home" && ["hero", "timedeal", "best-ranking", "subscription", "space-renewal", "brand-showroom", "summary-banner-2", "lg-best-care", "bestshop-guide"].includes(normalizedSlotId)) {
+    return {
+      ...base,
+      layoutScope: "section-container",
+      resizePolicy: "container-only",
+      widthPolicy: "follow-layout-token",
+      itemConsistency: "section-rhythm-first",
+      alignmentPolicy: ["preserve-section-shell", "preserve-content-band"],
+      forbiddenMoves: [
+        "independent-child-width-expansion",
+        "break-section-shell",
+      ],
+    };
+  }
+
+  return base;
+}
+
+function buildSidecarRegions(pageId = "", slotId = "", sectionType = "", options = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedSectionType = String(sectionType || "").trim();
+  const markup = String(options.markup || "");
+  const measurement = options.measurement || null;
+  const allowedFields = options.allowedFields || {};
+  const labels = summarizeMeasurementItems(measurement, 12);
+  const layoutGovernance = options.layoutGovernance || null;
+  const baseEditableFields = safeArray([
+    ...(Array.isArray(allowedFields.rootKeys) ? allowedFields.rootKeys : []),
+    ...(Array.isArray(allowedFields.editableProps) ? allowedFields.editableProps : []),
+  ], 12);
+
+  const sectionRoot = {
+    regionId: `${normalizedSlotId || "section"}.root`,
+    role: "section-root",
+    replaceMode: "patch-fields",
+    editableFields: baseEditableFields,
+    visibleLabels: labels.slice(0, 4),
+    governance: layoutGovernance,
+  };
+
+  if (normalizedSlotId === "quickmenu" || normalizedSectionType === "icon-grid") {
+    const itemCount = estimateRegionItemCount(normalizedSlotId, markup, measurement);
+    return [
+      sectionRoot,
+      {
+        regionId: `${normalizedSlotId}.items`,
+        role: "repeater",
+        replaceMode: "patch-fields",
+        selectorHints: ["quickmenu-item", "icon-grid-item", "a"],
+        editableFields: ["label", "icon", "href", "visibility"],
+        repeater: {
+          itemCount,
+          itemKind: "quickmenu-item",
+          uniformItemContract: true,
+        },
+        items: buildSidecarRepeaterItems(normalizedSlotId, "quickmenu-item", itemCount, labels, ["label", "icon", "href", "visibility"]),
+        nodes: buildSidecarNodeBlueprints(`${normalizedSlotId}.items`, ["label", "icon", "href", "visibility"], labels),
+        visibleLabels: labels.slice(0, Math.min(itemCount || 10, 10)),
+        governance: layoutGovernance,
+      },
+    ];
+  }
+
+  if (normalizedSlotId === "gallery") {
+    const itemCount = estimateRegionItemCount(normalizedSlotId, markup, measurement);
+    return [
+      sectionRoot,
+      {
+        regionId: "gallery.main",
+        role: "media-primary",
+        replaceMode: "patch-fields",
+        selectorHints: ["main-gallery", "hero-media", "gallery-main"],
+        editableFields: ["image", "imageFit", "background", "frameStyles"],
+        nodes: buildSidecarNodeBlueprints("gallery.main", ["image", "imageFit", "background", "frameStyles"]),
+        governance: layoutGovernance,
+      },
+      {
+        regionId: "gallery.thumbnails",
+        role: "repeater",
+        replaceMode: "patch-fields",
+        selectorHints: ["gallery-thumbnail", "thumbnail-rail"],
+        editableFields: ["image", "selectedState", "visibility"],
+        repeater: {
+          itemCount,
+          itemKind: "thumbnail",
+          uniformItemContract: true,
+        },
+        items: buildSidecarRepeaterItems(normalizedSlotId, "thumbnail", itemCount, labels, ["image", "selectedState", "visibility"]),
+        nodes: buildSidecarNodeBlueprints("gallery.thumbnails", ["image", "selectedState", "visibility"]),
+        governance: layoutGovernance,
+      },
+    ];
+  }
+
+  if (normalizedSlotId === "summary") {
+    return [
+      sectionRoot,
+      {
+        regionId: "summary.title",
+        role: "content-block",
+        replaceMode: "patch-fields",
+        selectorHints: ["title", "headline", "subtitle"],
+        editableFields: ["title", "subtitle", "description", "badge"],
+        visibleLabels: labels.slice(0, 6),
+        nodes: buildSidecarNodeBlueprints("summary.title", ["badge", "title", "subtitle", "description"], labels),
+        governance: layoutGovernance,
+      },
+      {
+        regionId: "summary.meta",
+        role: "meta-block",
+        replaceMode: "patch-fields",
+        selectorHints: ["meta", "benefit", "info"],
+        editableFields: ["meta", "badge", "styles"],
+        nodes: buildSidecarNodeBlueprints("summary.meta", ["meta", "badge", "styles"], labels),
+        governance: layoutGovernance,
+      },
+    ];
+  }
+
+  if (normalizedSlotId === "price") {
+    return [
+      sectionRoot,
+      {
+        regionId: "price.stack",
+        role: "price-block",
+        replaceMode: "patch-fields",
+        selectorHints: ["price", "benefit", "discount"],
+        editableFields: ["price", "benefitPrice", "discountLabel", "badge"],
+        nodes: buildSidecarNodeBlueprints("price.stack", ["price", "benefitPrice", "discountLabel", "badge"], labels),
+        governance: layoutGovernance,
+      },
+    ];
+  }
+
+  if (normalizedSlotId === "option") {
+    return [
+      sectionRoot,
+      {
+        regionId: "option.controls",
+        role: "controls",
+        replaceMode: "patch-fields",
+        selectorHints: ["option-selector", "option-list", "select"],
+        editableFields: ["options", "selectedOption", "visibility", "styles"],
+        nodes: buildSidecarNodeBlueprints("option.controls", ["options", "selectedOption", "visibility", "styles"], labels),
+        governance: layoutGovernance,
+      },
+      {
+        regionId: "option.selectedState",
+        role: "selection-summary",
+        replaceMode: "patch-fields",
+        selectorHints: ["selected-option", "selection-summary", "option-state"],
+        editableFields: ["selectedOption", "description", "styles"],
+        nodes: buildSidecarNodeBlueprints("option.selectedState", ["selectedOption", "description", "styles"], labels),
+        governance: layoutGovernance,
+      },
+    ];
+  }
+
+  if (normalizedSlotId === "sticky") {
+    return [
+      sectionRoot,
+      {
+        regionId: "sticky.buybox",
+        role: "sticky-buybox",
+        replaceMode: "patch-fields",
+        selectorHints: ["sticky", "buybox", "cta"],
+        editableFields: ["ctaLabel", "price", "badge", "styles"],
+        nodes: buildSidecarNodeBlueprints("sticky.buybox", ["badge", "price", "ctaLabel", "styles"], labels),
+        governance: layoutGovernance,
+      },
+    ];
+  }
+
+  if (normalizedSlotId === "review" || normalizedSlotId === "qna") {
+    return [
+      sectionRoot,
+      {
+        regionId: `${normalizedSlotId}.list`,
+        role: "repeater",
+        replaceMode: "patch-fields",
+        selectorHints: [`${normalizedSlotId}-list`, `${normalizedSlotId}-item`, "accordion-item"],
+        editableFields: ["title", "description", "visibility", "styles"],
+        repeater: {
+          itemCount: estimateRegionItemCount(normalizedSlotId, markup, measurement),
+          itemKind: normalizedSlotId,
+          uniformItemContract: true,
+        },
+        items: buildSidecarRepeaterItems(normalizedSlotId, normalizedSlotId, estimateRegionItemCount(normalizedSlotId, markup, measurement), labels, ["title", "description", "visibility", "styles"]),
+        nodes: buildSidecarNodeBlueprints(`${normalizedSlotId}.list`, ["title", "description", "visibility", "styles"], labels),
+        governance: layoutGovernance,
+      },
+    ];
+  }
+
+  if (["productGrid", "firstRow", "firstProduct"].includes(normalizedSlotId)) {
+    return [
+      sectionRoot,
+      {
+        regionId: `${normalizedSlotId}.cards`,
+        role: "repeater",
+        replaceMode: "patch-fields",
+        selectorHints: ["product-card", "list-item", "grid-item"],
+        editableFields: ["title", "subtitle", "badge", "image", "price", "ctaLabel", "styles"],
+        repeater: {
+          itemCount: estimateRegionItemCount(normalizedSlotId, markup, measurement),
+          itemKind: "product-card",
+          uniformItemContract: true,
+        },
+        items: buildSidecarRepeaterItems(normalizedSlotId, "product-card", estimateRegionItemCount(normalizedSlotId, markup, measurement), labels, ["title", "subtitle", "badge", "image", "price", "ctaLabel", "styles"]),
+        nodes: buildSidecarNodeBlueprints(`${normalizedSlotId}.cards`, ["title", "subtitle", "badge", "image", "price", "ctaLabel", "styles"], labels),
+        governance: layoutGovernance,
+      },
+    ];
+  }
+
+  if (normalizedPageId === "home" && ["hero", "timedeal", "best-ranking", "subscription", "space-renewal", "brand-showroom", "latest-product-news", "smart-life", "summary-banner-2", "missed-benefits", "lg-best-care", "bestshop-guide"].includes(normalizedSlotId)) {
+    return [
+      sectionRoot,
+      {
+        regionId: `${normalizedSlotId}.content`,
+        role: "content-block",
+        replaceMode: "patch-fields",
+        selectorHints: ["headline", "body", "cta", "media"],
+        editableFields: ["badge", "title", "subtitle", "description", "ctaLabel", "image", "styles"],
+        visibleLabels: labels.slice(0, 6),
+        nodes: buildSidecarNodeBlueprints(`${normalizedSlotId}.content`, ["badge", "title", "subtitle", "description", "ctaLabel", "image", "styles"], labels),
+        governance: layoutGovernance,
+      },
+    ];
+  }
+
+  return [sectionRoot];
+}
+
+function pickMeasurementSlotMap(pageId, source = "clone-content") {
+  const measurements = readMeasurements(pageId);
+  const payload = measurements[source] || null;
+  return Object.fromEntries(safeArray(payload?.slots || [], 100).map((slot) => [String(slot?.slotId || "").trim(), slot]).filter(([slotId]) => Boolean(slotId)));
+}
+
+function buildArtifactSidecarRegistry(pageId, options = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const viewportProfile =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(options.viewportProfile || "pc", "pc")
+      : normalizeViewportProfile(options.viewportProfile || "pc", "pc");
+  const editableData = options.editableData || null;
+  const artifactRegistry = buildArtifactSectionRegistry(normalizedPageId, { editableData, viewportProfile });
+  const shareRegistry = buildShareSectionRegistry(normalizedPageId, { editableData, viewportProfile });
+  const editablePayload = buildLlmEditableList(normalizedPageId, { editableData, viewportProfile });
+  const shareMap = new Map((shareRegistry.sections || []).map((section) => [String(section.sectionId || "").trim(), section]));
+  const editableMap = new Map((editablePayload.components || []).map((item) => [String(item.componentId || "").trim(), item]));
+  const referenceMeasurementMap = pickMeasurementSlotMap(normalizedPageId, "reference-content");
+  const workingMeasurementMap = pickMeasurementSlotMap(normalizedPageId, "clone-content");
+  const referenceGroupEntry = findArtifactGroupEntry(normalizedPageId, viewportProfile, "reference");
+  const workingGroupEntry = findArtifactGroupEntry(normalizedPageId, viewportProfile, "working");
+  const referenceGroupMap = normalizeGroupMap(referenceGroupEntry?.groups);
+  const workingGroupMap = normalizeGroupMap(workingGroupEntry?.groups);
+  const sections = (artifactRegistry.sections || []).map((section) => {
+    const sectionId = String(section.sectionId || "").trim();
+    const slotId = String(section.slotId || "").trim();
+    const componentId = String(section.componentId || "").trim();
+    const shareSection = shareMap.get(sectionId) || section;
+    const editable = editableMap.get(componentId) || {};
+    const referenceMeasurement = referenceMeasurementMap[slotId] || null;
+    const workingMeasurement = workingMeasurementMap[slotId] || null;
+    const referenceGroup = referenceGroupMap[slotId] || null;
+    const workingGroup = workingGroupMap[slotId] || null;
+    const referenceRect = simplifyMeasurementRect(referenceMeasurement) || simplifyGroupRect(referenceGroup);
+    const workingRect = simplifyMeasurementRect(workingMeasurement) || simplifyGroupRect(workingGroup);
+    const measuredImageZones = inferMeasurementImageZones(workingMeasurement || referenceMeasurement);
+    const allowedFields = shareSection.allowedFields || section.allowedFields || null;
+    const patchBridge = editable.patchBridge || shareSection.patchBridge || section.patchBridge || null;
+    const mediaSpec = editable.mediaSpec || shareSection.mediaSpec || section.mediaSpec || null;
+    const artifactMarkup = extractArtifactSectionMarkup(normalizedPageId, slotId, viewportProfile);
+    const layoutGovernance = buildSidecarLayoutGovernance(
+      normalizedPageId,
+      slotId,
+      String(section.sectionType || shareSection.sectionType || editable?.patchBridge?.archetype || "section").trim() || "section",
+      editable,
+      shareSection,
+      { patchBridge, mediaSpec }
+    );
+    const regions = buildSidecarRegions(normalizedPageId, slotId, String(section.sectionType || shareSection.sectionType || "").trim(), {
+      markup: artifactMarkup,
+      measurement: workingMeasurement || referenceMeasurement,
+      allowedFields,
+      layoutGovernance,
+    });
+    return {
+      sectionId,
+      pageId: normalizedPageId,
+      viewportProfile,
+      slotId,
+      componentId,
+      label: String(section.sectionLabel || shareSection.sectionLabel || slotId || componentId).trim(),
+      sectionType: String(section.sectionType || shareSection.sectionType || editable?.patchBridge?.archetype || "section").trim() || "section",
+      artifact: {
+        source: "artifact-html",
+        artifactOrigin: section.artifactOrigin || null,
+        extractStatus: section.extractStatus || null,
+        selectorHints: Array.isArray(section.selectorHints) ? section.selectorHints : [],
+        referenceSection: section.referenceSection || null,
+      },
+      geometry: {
+        plannedSectionRect: shareSection.sectionRect || null,
+        plannedContentRect: shareSection.contentRect || null,
+        referenceRect,
+        workingRect,
+      },
+      media: {
+        imageZones: measuredImageZones.length ? measuredImageZones : (shareSection.imageZones || section.imageZones || []),
+        measuredScale: shareSection.measuredScale || section.measuredScale || editable?.mediaSpec?.measuredScale || null,
+      },
+      text: {
+        labels: summarizeMeasurementItems(workingMeasurement || referenceMeasurement),
+      },
+      regions,
+      layoutGovernance,
+      editing: {
+        replacementMode: shareSection.replacementMode || section.replacementMode || null,
+        allowedFields,
+        patchBridge,
+        mediaSpec,
+      },
+      sourceFidelity: {
+        hasReferenceMarkup: Boolean(section?.referenceSection?.available),
+        hasReferenceMeasurement: Boolean(referenceRect),
+        hasWorkingMeasurement: Boolean(workingRect),
+      },
+    };
+  });
+  return {
+    pageId: normalizedPageId,
+    viewportProfile,
+    source: "artifact+sidecar",
     sectionCount: sections.length,
     sections,
   };
@@ -6553,6 +7562,7 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
   const designReferenceLibrary = buildDesignReferenceLibraryContext(pageId, {
     pageGroup: pageContext.pageGroup,
     viewportProfile: options.viewportProfile || "pc",
+    pageIdentity: pageContext.pageIdentity,
     limit: 8,
   });
   const slotRegistry = findSlotRegistry(editableData || {}, pageId) || { pageId, slots: [] };
@@ -6562,6 +7572,10 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
     viewportProfile: options.viewportProfile || "pc",
   });
   const artifactSectionRegistry = buildArtifactSectionRegistry(pageId, {
+    editableData,
+    viewportProfile: options.viewportProfile || "pc",
+  });
+  const artifactSidecarRegistry = buildArtifactSidecarRegistry(pageId, {
     editableData,
     viewportProfile: options.viewportProfile || "pc",
   });
@@ -6604,6 +7618,7 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
     editableComponents: renderableEditableComponents,
     shareSectionRegistry,
     artifactSectionRegistry,
+    artifactSidecarRegistry,
     patchSchemaMap,
     currentPatches,
     designReferenceLibrary,
@@ -6660,6 +7675,7 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
         "editableComponents의 patchBridge를 보고 archetype별 rootPatchPriority와 imageHandling을 실제 수정 전략으로 사용한다.",
         "artifactSectionRegistry가 있으면 referenceSection.available=true 인 섹션의 원본 구조를 우선 존중하고, extractStatus가 missing-reference-section 인 섹션만 커스텀 block 후보로 본다.",
         "shareSectionRegistry가 있으면 섹션 단위 치환 가능 여부와 폭/콘텐츠 폭/이미지 존을 함께 참고한다.",
+        "artifactSidecarRegistry가 있으면 이를 구조 해석의 1차 계약으로 보고, 실제 화면 artifact는 건드리지 말고 sidecar가 설명하는 섹션 기하/이미지존/라벨을 따라 수정 판단을 내린다.",
         "home에서는 visualPrinciples.layoutTokens와 visualPrinciples.patchRules를 실제 제약으로 사용한다.",
         "home narrow 슬롯은 공통 section rhythm 안에서 움직여야 하며, isolated dark block이나 과도한 full-bleed 인상을 만들지 않는다.",
       ],
@@ -6736,6 +7752,8 @@ function buildBuilderInputPayload({
     designBriefDocuments: {
       builderMarkdown: String(approvedPlan?.builderMarkdown || "").trim(),
       layoutMockupMarkdown: String(approvedPlan?.layoutMockupMarkdown || "").trim(),
+      designSpecMarkdown: String(approvedPlan?.designSpecMarkdown || "").trim(),
+      sectionBlueprints: Array.isArray(approvedPlan?.sectionBlueprints) ? approvedPlan.sectionBlueprints : [],
     },
     systemContext: buildBuilderSystemContext(pageId, editableData, {
       viewportProfile,
@@ -6786,6 +7804,7 @@ async function buildPlannerInputPayload({
   const designReferenceLibrary = buildDesignReferenceLibraryContext(pageId, {
     pageGroup: pageContext.pageGroup,
     viewportProfile,
+    pageIdentity: pageContext.pageIdentity,
     limit: 8,
   });
   const referenceAnalyses = await analyzeReferenceUrls(referenceUrls, {
@@ -8245,7 +9264,7 @@ function buildHomeMobileBottomToolbar() {
 function applyHomeHeroPatch(sectionHtml, activeSourceId = "", componentPatch = {}) {
   if (!sectionHtml) return "";
   let next = String(sectionHtml);
-  const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
+  const patch = sanitizeGovernedComponentPatch("home", "hero", componentPatch, { sectionType: "hero" }).patch || {};
   const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
   next = next.replace(/<section([^>]*)>/, (match) => {
     const styleMatch = match.match(/\sstyle="([^"]*)"/);
@@ -8341,7 +9360,7 @@ function applyHomeHeroPatch(sectionHtml, activeSourceId = "", componentPatch = {
 
 function applyHomeLowerSectionPatch(sectionHtml, slotId = "", activeSourceId = "", componentPatch = {}) {
   if (!sectionHtml) return "";
-  const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
+  const patch = sanitizeGovernedComponentPatch("home", slotId, componentPatch).patch || {};
   const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
   let next = String(sectionHtml);
   next = next.replace(
@@ -8619,7 +9638,7 @@ function replaceSequentialAnchorHrefs(blockHtml, pattern, items = []) {
 
 function applyHomeHeaderTopPatch(sectionHtml, activeSourceId = "", componentPatch = {}) {
   if (!sectionHtml) return "";
-  const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
+  const patch = sanitizeGovernedComponentPatch("home", "header-top", componentPatch).patch || {};
   const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
   let next = String(sectionHtml);
   next = next.replace(/<section([^>]*)>/, (match) => {
@@ -8660,7 +9679,7 @@ function applyHomeHeaderTopPatch(sectionHtml, activeSourceId = "", componentPatc
 
 function applyHomeHeaderBottomPatch(sectionHtml, activeSourceId = "", componentPatch = {}) {
   if (!sectionHtml) return "";
-  const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
+  const patch = sanitizeGovernedComponentPatch("home", "header-bottom", componentPatch).patch || {};
   const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
   let next = String(sectionHtml);
   next = next.replace(/<section([^>]*)>/, (match) => {
@@ -8694,7 +9713,7 @@ function applyHomeHeaderBottomPatch(sectionHtml, activeSourceId = "", componentP
 
 function applyHomeQuickmenuPatch(sectionHtml, activeSourceId = "", componentPatch = {}, viewportProfile = "pc") {
   if (!sectionHtml) return "";
-  const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
+  const patch = sanitizeGovernedComponentPatch("home", "quickmenu", componentPatch, { sectionType: "icon-grid" }).patch || {};
   const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
   let next = String(sectionHtml);
   const contractStyle = buildHomeSectionContractStyle("quickmenu", viewportProfile);
@@ -8743,9 +9762,14 @@ function applyHomeQuickmenuPatch(sectionHtml, activeSourceId = "", componentPatc
   return next;
 }
 
-function applyGenericWorkspaceSectionPatch(sectionHtml, componentPatch = {}) {
+function applyGenericWorkspaceSectionPatch(sectionHtml, componentPatch = {}, context = {}) {
   if (!sectionHtml) return "";
-  const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
+  const patch = sanitizeGovernedComponentPatch(
+    String(context.pageId || "").trim(),
+    String(context.slotId || "").trim(),
+    componentPatch,
+    { sectionType: String(context.sectionType || "").trim() }
+  ).patch || {};
   const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
   let next = String(sectionHtml);
   next = next.replace(/<([a-zA-Z][\w:-]*)([^>]*)>/, (match) => {
@@ -8872,6 +9896,15 @@ function transformFirstSelectorBlock(html, selector, transform) {
   return `${source.slice(0, opening.start)}${nextBlock}${source.slice(closing.end)}`;
 }
 
+function extractFirstSelectorBlock(html, selector) {
+  let extracted = "";
+  transformFirstSelectorBlock(String(html || ""), selector, (block) => {
+    extracted = String(block || "");
+    return block;
+  });
+  return extracted;
+}
+
 function applyWorkspacePageVariants(html, pageId, viewportProfile, editableData) {
   let next = String(html || "");
   const normalizedPageId = String(pageId || "").trim();
@@ -8896,7 +9929,11 @@ function applyWorkspacePageVariants(html, pageId, viewportProfile, editableData)
         return result;
       });
       if (patch && hasPatchSupport) {
-        patched = applyGenericWorkspaceSectionPatch(patched, patch);
+        patched = applyGenericWorkspaceSectionPatch(patched, patch, {
+          pageId: normalizedPageId,
+          slotId,
+          sectionType: "",
+        });
       }
       return patched;
     });
@@ -8961,7 +9998,11 @@ function applyWorkspaceProductVariants(html, pageId, viewportProfile, href, edit
         return result;
       });
       if (patch && hasPatchSupport) {
-        patched = applyGenericWorkspaceSectionPatch(patched, patch);
+        patched = applyGenericWorkspaceSectionPatch(patched, patch, {
+          pageId: normalizedPageId,
+          slotId,
+          sectionType: "",
+        });
       }
       return patched;
     });
@@ -12189,19 +13230,30 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
     isCapturedSourceActive(editableData, "home", "header-bottom");
   const useCapturedHomeQuickmenu = isHome && isCapturedSourceActive(editableData, "home", "quickmenu");
   const homeMobileHtml = isHome ? readHomeMobileHtml() : "";
+  const isHomestylePage = String(pageId || "").startsWith("homestyle-");
+  const assetOrigin = resolveAssetOriginForPage(pageId);
   const headerTopSourceId = isHome ? getActiveSourceId(editableData, "home", "header-top", "captured-home-header-top") : "pc-like";
   const headerBottomSourceId = isHome ? getActiveSourceId(editableData, "home", "header-bottom", "captured-home-header-bottom") : "pc-like";
   const heroSourceId = isHome ? getActiveSourceId(editableData, "home", "hero", "captured-home-hero") : "pc-like";
   const quickmenuSourceId = isHome ? getActiveSourceId(editableData, "home", "quickmenu", "captured-home-quickmenu") : "mobile-derived";
 
-  let html = rawHtml;
+  let html = materializeStreamedMainContent(rawHtml);
   html = html.replace(/<script\b[\s\S]*?<\/script>/gi, "");
   html = html.replace(/<iframe\b[\s\S]*?<\/iframe>/gi, "");
   html = html.replace(/<base[^>]+href=("|')[^"']+\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+as=("|')font\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+rel=("|')manifest\1[^>]*>/gi, "");
-  html = html.replace(/\b(href|src|poster)=("|')\/(?!\/)/gi, `$1=$2https://www.lge.co.kr/`);
-  html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
+  html = forceCloneEagerImages(html, pageId, viewportProfile);
+  html = rewriteHtmlAssetUrls(html, pageId);
+  if (isHomestylePage) {
+    html = html.replace(/<body([^>]*)style=(["'])[^"']*\bposition:\s*fixed;?\s*top:\s*0px;?\s*width:\s*100%;?[^"']*\2([^>]*)>/i, '<body$1$3>');
+  }
+  if (isHomestylePage) {
+    html = html.replace(
+      /<meta[^>]+name=(["'])viewport\1[^>]+content=(["'])[^"']*\2[^>]*>/i,
+      '<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=yes" />'
+    );
+  }
   if (isHome) {
     html = injectHomeReplacements(html, rawHtml, homeMobileHtml, { ...options, editableData, viewportProfile });
     if (viewportProfile === "pc") {
@@ -12212,6 +13264,7 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
     }
   }
   html = applyWorkspacePageVariants(html, pageId, viewportProfile, editableData);
+  html = rewriteHtmlAssetUrls(html, pageId);
   if (isHome && viewportProfile === "mo" && homeMobileHtml && !html.includes('data-codex-slot="md-choice"')) {
     const mobileMdChoiceSection = extractMobileMdChoiceSection(homeMobileHtml);
     if (mobileMdChoiceSection) {
@@ -12247,22 +13300,37 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
     const extraMobileStyles = extractMissingStylesheetLinks(html, homeMobileHtml);
     html = injectExtraHeadLinks(html, extraMobileStyles);
   }
-  html = html.replace(/<section class="CommonPcGnb_top__([^"]*)"/, `<section data-codex-slot="header-top" data-codex-component-id="home.header-top" data-codex-active-source-id="${escapeHtml(headerTopSourceId)}" class="CommonPcGnb_top__$1"`);
-  html = html.replace(/<section class="CommonPcGnb_bottom__([^"]*)"/, `<section data-codex-slot="header-bottom" data-codex-component-id="home.header-bottom" data-codex-active-source-id="${escapeHtml(headerBottomSourceId)}" class="CommonPcGnb_bottom__$1"`);
-  html = html.replace(/<section class="HomePcBannerHero_banner_hero__([^"]*)"/, `<section data-codex-slot="hero" data-codex-component-id="home.hero" data-codex-active-source-id="${escapeHtml(heroSourceId)}" class="HomePcBannerHero_banner_hero__$1"`);
-  html = html.replace(/<section class="HomeTaBannerHero_banner_hero__([^"]*)"/, `<section data-codex-slot="hero" data-codex-component-id="home.hero" data-codex-active-source-id="${escapeHtml(heroSourceId)}" class="HomeTaBannerHero_banner_hero__$1"`);
-  html = html.replace(/<section class="HomePcQuickmenu_quickmenu__([^"]*)"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="HomePcQuickmenu_quickmenu__$1"`);
-  html = html.replace(/<section class="HomeMoQuickmenu_quickmenu__([^"]*)"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="HomeMoQuickmenu_quickmenu__$1"`);
-  html = html.replace(/<header class="CommonMoGnb_main__([^"]*)"/, `<header data-codex-slot="header-top" data-codex-component-id="home.header-top" data-codex-active-source-id="${escapeHtml(headerTopSourceId)}" class="CommonMoGnb_main__$1"`);
-  html = html.replace(/<section class="HomeMoBannerHero_banner_hero__([^"]*)"/, `<section data-codex-slot="hero" data-codex-component-id="home.hero" data-codex-active-source-id="${escapeHtml(heroSourceId)}" class="HomeMoBannerHero_banner_hero__$1"`);
-  html = html.replace(/<section class="HomeMoQuickmenu_quickmenu__([^"]*)"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="HomeMoQuickmenu_quickmenu__$1"`);
-  html = html.replace(/<section class="codex-home-section codex-home-quickmenu"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="codex-home-section codex-home-quickmenu"`);
+  if (isHome) {
+    html = html.replace(/<section class="CommonPcGnb_top__([^"]*)"/, `<section data-codex-slot="header-top" data-codex-component-id="home.header-top" data-codex-active-source-id="${escapeHtml(headerTopSourceId)}" class="CommonPcGnb_top__$1"`);
+    html = html.replace(/<section class="CommonPcGnb_bottom__([^"]*)"/, `<section data-codex-slot="header-bottom" data-codex-component-id="home.header-bottom" data-codex-active-source-id="${escapeHtml(headerBottomSourceId)}" class="CommonPcGnb_bottom__$1"`);
+    html = html.replace(/<section class="HomePcBannerHero_banner_hero__([^"]*)"/, `<section data-codex-slot="hero" data-codex-component-id="home.hero" data-codex-active-source-id="${escapeHtml(heroSourceId)}" class="HomePcBannerHero_banner_hero__$1"`);
+    html = html.replace(/<section class="HomeTaBannerHero_banner_hero__([^"]*)"/, `<section data-codex-slot="hero" data-codex-component-id="home.hero" data-codex-active-source-id="${escapeHtml(heroSourceId)}" class="HomeTaBannerHero_banner_hero__$1"`);
+    html = html.replace(/<section class="HomePcQuickmenu_quickmenu__([^"]*)"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="HomePcQuickmenu_quickmenu__$1"`);
+    html = html.replace(/<section class="HomeMoQuickmenu_quickmenu__([^"]*)"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="HomeMoQuickmenu_quickmenu__$1"`);
+    html = html.replace(/<header class="CommonMoGnb_main__([^"]*)"/, `<header data-codex-slot="header-top" data-codex-component-id="home.header-top" data-codex-active-source-id="${escapeHtml(headerTopSourceId)}" class="CommonMoGnb_main__$1"`);
+    html = html.replace(/<section class="HomeMoBannerHero_banner_hero__([^"]*)"/, `<section data-codex-slot="hero" data-codex-component-id="home.hero" data-codex-active-source-id="${escapeHtml(heroSourceId)}" class="HomeMoBannerHero_banner_hero__$1"`);
+    html = html.replace(/<section class="HomeMoQuickmenu_quickmenu__([^"]*)"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="HomeMoQuickmenu_quickmenu__$1"`);
+    html = html.replace(/<section class="codex-home-section codex-home-quickmenu"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="codex-home-section codex-home-quickmenu"`);
+  }
   const injectedHead = `
     <style>
       html, body { min-height: 100%; visibility: visible !important; opacity: 1 !important; }
       body { background: #fff; visibility: visible !important; opacity: 1 !important; }
       img[style*="visibility:hidden"][src]:not([src=""]) { visibility: visible !important; }
       img[style*="opacity:0"][src]:not([src=""]) { opacity: 1 !important; }
+      ${isHomestylePage ? `
+      body {
+        position: static !important;
+        top: auto !important;
+        width: auto !important;
+        overflow: auto !important;
+      }
+      .PcADBanner_adBannerDialog___Hw_p,
+      .com_dialogWrapper.PcADBanner_adBannerDialog___Hw_p,
+      .com_dialogOverlay,
+      .ins-preview-wrapper-82 {
+        display: none !important;
+      }` : ""}
       ${pageId === "category-refrigerators" && viewportProfile === "mo"
         ? `
       .CommonMoBannerTopinfo_hello_bar__jV54K,
@@ -12275,6 +13343,21 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       .skip-nav {
         display: none !important;
       }
+      ${!isHome ? `
+      .CommonPcGnb_nav_inner__I7DAQ > ul > li > div,
+      .CommonPcGnb_nav_inner__I7DAQ > ul > li.codex-active-li > div,
+      .CommonPcGnb_nav_inner__I7DAQ > ul > li.CommonPcGnb_active___XS51 > div,
+      .header-wrap .nav > li > .nav-category-layer,
+      .header-wrap .nav > li.codex-legacy-open > .nav-category-layer,
+      .header-wrap .nav > li:hover > .nav-category-layer,
+      .header-wrap .nav > li:focus-within > .nav-category-layer,
+      .codex-gnb-overlay {
+        display: none !important;
+      }
+      .PcGlobalHeader_category__lFkpN,
+      .PcGlobalHeader_subCategory__Uck9Z {
+        display: none !important;
+      }` : ""}
       ${isHome ? buildHomeHeroRuntimeCss() : ""}
       section[data-codex-slot="hero"][data-codex-active-source-id="custom-home-hero-v1"] .codex-hero-controls {
         right: 24px !important;
@@ -14017,7 +15100,9 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
     /<\/body>/i,
     `<script>
       (() => {
+        ${buildDetachedStreamRepairScript()}
         const state = window.__CODEX_EDITOR__;
+        const pageTitle = ${JSON.stringify(pageTitle)};
         const pageId = window.__CODEX_PAGE_ID__;
         const linkMap = window.__CODEX_LINK_MAP__ || {};
         const pdpCaptureMap = window.__CODEX_PDP_CAPTURE_MAP__ || {};
@@ -14046,6 +15131,7 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
         ${isHome ? buildHomeHeroRuntimeScript() : ""}
 
         function addMessage(kind, text) {
+          if (!log) return;
           const div = document.createElement('div');
           div.className = 'codex-chat-msg ' + kind;
           div.innerHTML = escapeHtml(text);
@@ -14705,55 +15791,62 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
           });
         });
 
-        sectionList.addEventListener('click', async (event) => {
-          const toggleId = event.target.getAttribute('data-toggle');
-          const moveDirection = event.target.getAttribute('data-move');
-          const moveSectionId = event.target.getAttribute('data-section');
-          if (toggleId) {
-            const section = (state.page?.sections || []).find((item) => item.id === toggleId);
-            if (!section) return;
-            const payload = await postJson('/api/editor/toggle-section', {
-              pageId,
-              sectionId: toggleId,
-              visible: !section.visible
-            });
-            state.page = payload.page;
-            addMessage('system', section.name + ' 섹션을 ' + (!section.visible ? '표시' : '숨김') + ' 상태로 저장했습니다.');
-            await loadSections();
-          }
-          if (moveDirection && moveSectionId) {
-            const section = (state.page?.sections || []).find((item) => item.id === moveSectionId);
-            if (!section) return;
-            const payload = await postJson('/api/editor/move-section', {
-              pageId,
-              sectionId: moveSectionId,
-              direction: moveDirection
-            });
-            state.page = payload.page;
-            addMessage('system', section.name + ' 섹션 순서를 변경했습니다.');
-            await loadSections();
-          }
-        });
+        if (sectionList) {
+          sectionList.addEventListener('click', async (event) => {
+            const toggleId = event.target.getAttribute('data-toggle');
+            const moveDirection = event.target.getAttribute('data-move');
+            const moveSectionId = event.target.getAttribute('data-section');
+            if (toggleId) {
+              const section = (state.page?.sections || []).find((item) => item.id === toggleId);
+              if (!section) return;
+              const payload = await postJson('/api/editor/toggle-section', {
+                pageId,
+                sectionId: toggleId,
+                visible: !section.visible
+              });
+              state.page = payload.page;
+              addMessage('system', section.name + ' 섹션을 ' + (!section.visible ? '표시' : '숨김') + ' 상태로 저장했습니다.');
+              await loadSections();
+            }
+            if (moveDirection && moveSectionId) {
+              const section = (state.page?.sections || []).find((item) => item.id === moveSectionId);
+              if (!section) return;
+              const payload = await postJson('/api/editor/move-section', {
+                pageId,
+                sectionId: moveSectionId,
+                direction: moveDirection
+              });
+              state.page = payload.page;
+              addMessage('system', section.name + ' 섹션 순서를 변경했습니다.');
+              await loadSections();
+            }
+          });
+        }
 
-        form.addEventListener('submit', async (event) => {
-          event.preventDefault();
-          const prompt = textarea.value.trim();
-          if (!prompt) return;
-          addMessage('user', prompt);
-          textarea.value = '';
-          const payload = await postJson('/api/llm/change', { prompt });
-          if (payload.error) {
-            addMessage('system', '요청 처리 실패: ' + payload.error);
-            return;
-          }
-          addMessage('system', payload.summary || '변경을 적용했습니다.');
-          sectionList.hidden = true;
-        });
+        if (form && textarea) {
+          form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const prompt = textarea.value.trim();
+            if (!prompt) return;
+            addMessage('user', prompt);
+            textarea.value = '';
+            const payload = await postJson('/api/llm/change', { prompt });
+            if (payload.error) {
+              addMessage('system', '요청 처리 실패: ' + payload.error);
+              return;
+            }
+            addMessage('system', payload.summary || '변경을 적용했습니다.');
+            if (sectionList) sectionList.hidden = true;
+          });
+        }
 
         addMessage('system', '오른쪽 하단에서 현재 화면을 수정할 수 있습니다.');
         if (window.top && window.top !== window) {
           window.top.postMessage({ type: 'codex:ready', pageId }, window.location.origin);
         }
+        stitchDetachedStreamContent();
+        document.addEventListener('DOMContentLoaded', stitchDetachedStreamContent);
+        window.addEventListener('load', stitchDetachedStreamContent);
         document.addEventListener('DOMContentLoaded', scheduleMeasurements);
         window.addEventListener('load', scheduleMeasurements);
         window.addEventListener('resize', scheduleMeasurements);
@@ -14766,16 +15859,26 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
 }
 
 function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
-  let html = rawHtml;
+  let html = materializeStreamedMainContent(rawHtml);
   const isHome = pageId === "home";
+  const isHomestylePage = String(pageId || "").startsWith("homestyle-");
+  const assetOrigin = resolveAssetOriginForPage(pageId);
   const homeMobileHtml = isHome ? readHomeMobileHtml() : "";
   html = html.replace(/<script\b[\s\S]*?<\/script>/gi, "");
   html = html.replace(/<iframe\b[\s\S]*?<\/iframe>/gi, "");
   html = html.replace(/<base[^>]+href=("|')[^"']+\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+as=("|')font\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+rel=("|')manifest\1[^>]*>/gi, "");
-  html = html.replace(/\b(href|src|poster)=("|')\/(?!\/)/gi, `$1=$2https://www.lge.co.kr/`);
-  html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
+  html = rewriteHtmlAssetUrls(html, pageId);
+  if (isHomestylePage) {
+    html = html.replace(/<body([^>]*)style=(["'])[^"']*\bposition:\s*fixed;?\s*top:\s*0px;?\s*width:\s*100%;?[^"']*\2([^>]*)>/i, '<body$1$3>');
+  }
+  if (isHomestylePage) {
+    html = html.replace(
+      /<meta[^>]+name=(["'])viewport\1[^>]+content=(["'])[^"']*\2[^>]*>/i,
+      '<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=yes" />'
+    );
+  }
   html = html.replace(/\shidden(?=[\s>])/gi, "");
   if (isHome) {
     html = injectHomeReplacements(html, rawHtml, homeMobileHtml, { viewportProfile });
@@ -14784,6 +15887,7 @@ function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
     const extraMobileStyles = extractMissingStylesheetLinks(html, homeMobileHtml);
     html = injectExtraHeadLinks(html, extraMobileStyles);
   }
+  html = rewriteHtmlAssetUrls(html, pageId);
   html = html.replace(/<section class="CommonPcGnb_top__([^"]*)"/, '<section data-codex-slot="header-top" class="CommonPcGnb_top__$1"');
   html = html.replace(/<section class="CommonPcGnb_bottom__([^"]*)"/, '<section data-codex-slot="header-bottom" class="CommonPcGnb_bottom__$1"');
   html = html.replace(/<section class="HomePcBannerHero_banner_hero__([^"]*)"/, '<section data-codex-slot="hero" class="HomePcBannerHero_banner_hero__$1"');
@@ -14800,6 +15904,40 @@ function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
       body { background: #fff; visibility: visible !important; opacity: 1 !important; }
       img[style*="visibility:hidden"][src]:not([src=""]) { visibility: visible !important; }
       img[style*="opacity:0"][src]:not([src=""]) { opacity: 1 !important; }
+      ${isHomestylePage ? `
+      body {
+        position: static !important;
+        top: auto !important;
+        width: auto !important;
+        overflow: auto !important;
+      }
+      .PcADBanner_adBannerDialog___Hw_p,
+      .com_dialogWrapper.PcADBanner_adBannerDialog___Hw_p,
+      .com_dialogOverlay,
+      .ins-preview-wrapper-82 {
+        display: none !important;
+      }` : ""}
+      ${!isHome ? `
+      .CommonPcGnb_nav_inner__I7DAQ > ul > li > div,
+      .CommonPcGnb_nav_inner__I7DAQ > ul > li.codex-active-li > div,
+      .CommonPcGnb_nav_inner__I7DAQ > ul > li.CommonPcGnb_active___XS51 > div,
+      .header-wrap .nav > li > .nav-category-layer,
+      .header-wrap .nav > li.codex-legacy-open > .nav-category-layer,
+      .header-wrap .nav > li:hover > .nav-category-layer,
+      .header-wrap .nav > li:focus-within > .nav-category-layer,
+      .codex-gnb-overlay,
+      .PcGlobalHeader_category__lFkpN,
+      .PcGlobalHeader_subCategory__Uck9Z {
+        display: none !important;
+      }
+      .container,
+      main,
+      [class*="PcQuickMenu_quickMenuSection"],
+      [class*="PcLabelBanner_labelBannerSection"],
+      [class*="PcBrandStory_brandSection"] {
+        visibility: visible !important;
+        opacity: 1 !important;
+      }` : ""}
       ${isHome ? buildHomeHeroRuntimeCss() : ""}
     </style></head>`
   );
@@ -14808,6 +15946,7 @@ function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
     /<\/body>/i,
     `<script>
       (() => {
+        ${buildDetachedStreamRepairScript()}
         function summarizeRows(items) {
           const rows = [];
           items.forEach((item) => {
@@ -14958,6 +16097,9 @@ function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
           }, 3200);
         }
         ${isHome ? buildHomeHeroRuntimeScript() : ""}
+        stitchDetachedStreamContent();
+        document.addEventListener('DOMContentLoaded', stitchDetachedStreamContent);
+        window.addEventListener('load', stitchDetachedStreamContent);
         document.addEventListener('DOMContentLoaded', startMeasurementBurst);
         document.addEventListener('DOMContentLoaded', () => {
         ${isHome ? "initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document);" : ""}
@@ -14980,15 +16122,20 @@ function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
 }
 
 function rewriteProductCapturedHtml(rawHtml, pageId = "", viewportProfile = "pc", href = "", editableData = null) {
-  let html = rawHtml;
+  const assetOrigin = resolveAssetOriginForPage(pageId, href);
+  let html = materializeStreamedMainContent(rawHtml);
+  const isHomestylePage = String(pageId || "").startsWith("homestyle-");
   html = html.replace(/<script\b[\s\S]*?<\/script>/gi, "");
   html = html.replace(/<iframe\b[\s\S]*?<\/iframe>/gi, "");
   html = html.replace(/<base[^>]+href=("|')[^"']+\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+as=("|')font\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+rel=("|')manifest\1[^>]*>/gi, "");
-  html = html.replace(/\b(href|src|poster)=("|')\/(?!\/)/gi, `$1=$2https://www.lge.co.kr/`);
-  html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
+  html = rewriteHtmlAssetUrls(html, pageId, href);
+  if (isHomestylePage) {
+    html = html.replace(/<body([^>]*)style=(["'])[^"']*\bposition:\s*fixed;?\s*top:\s*0px;?\s*width:\s*100%;?[^"']*\2([^>]*)>/i, '<body$1$3>');
+  }
   html = applyWorkspaceProductVariants(html, pageId, viewportProfile, href, editableData || {});
+  html = rewriteHtmlAssetUrls(html, pageId, href);
   html = html.replace(
     /<\/head>/i,
     `<style>
@@ -14996,6 +16143,19 @@ function rewriteProductCapturedHtml(rawHtml, pageId = "", viewportProfile = "pc"
       body { background: #fff; visibility: visible !important; opacity: 1 !important; }
       img[style*="visibility:hidden"][src]:not([src=""]) { visibility: visible !important; }
       img[style*="opacity:0"][src]:not([src=""]) { opacity: 1 !important; }
+      ${isHomestylePage ? `
+      body {
+        position: static !important;
+        top: auto !important;
+        width: auto !important;
+        overflow: auto !important;
+      }
+      .PcADBanner_adBannerDialog___Hw_p,
+      .com_dialogWrapper.PcADBanner_adBannerDialog___Hw_p,
+      .com_dialogOverlay,
+      .ins-preview-wrapper-82 {
+        display: none !important;
+      }` : ""}
     </style></head>`
   );
   return html;
@@ -15061,6 +16221,27 @@ function sendCloneProductContent(req, res, requestUrl) {
         res,
         400,
         `<!doctype html><html><head><meta charset="utf-8"><title>Clone product missing params</title></head><body><h1>Missing params</h1></body></html>`
+      );
+    }
+    const directLiveHtml = isPdpCasePageId(pageId) ? readPageReferenceLiveHtml(pageId, viewportProfile) : null;
+    if (directLiveHtml) {
+      const rawHtml = directLiveHtml;
+      const transformed = rewriteProductCapturedHtml(rawHtml, pageId, viewportProfile, effectiveHref, editableData);
+      const imageDiffMeta = sectionPreviewSlot
+        ? buildSectionPreviewImageDiffMeta({
+            req,
+            pageId,
+            viewportProfile,
+            slotId: sectionPreviewSlot,
+            rawHtml,
+            currentHtml: transformed,
+            href: effectiveHref,
+          })
+        : null;
+      return sendRawHtml(
+        res,
+        200,
+        sectionPreviewSlot ? applySectionPreviewMode(transformed, sectionPreviewSlot, { imageDiff: imageDiffMeta }) : transformed
       );
     }
     const capture =
@@ -15145,9 +16326,7 @@ function sendReferenceContent(res, pageId, requestUrl = null) {
     const viewportProfile = String(requestUrl?.searchParams?.get("viewportProfile") || "pc").trim() || "pc";
     const rawHtml = pageId === "home"
       ? readCloneSourceHtmlByPageId(pageId, viewportProfile)
-      : String(pageId || "").startsWith("category-")
-      ? readPlpReferenceHtml(pageId, viewportProfile)
-      : readReferenceSourceHtmlByPageId(pageId);
+      : readReferenceSourceHtmlByPageId(pageId, viewportProfile);
     if (!rawHtml) {
       return sendRawHtml(
         res,
@@ -15203,6 +16382,31 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         : "pc";
   const isMobileShell = shellViewportProfile === "mo";
   const useCapturedShellHeader = true;
+  const clonePageLinks = [
+    { label: "홈 - PC", href: "/clone/home?viewportProfile=pc" },
+    { label: "홈 - 테블릿", href: "/clone/home?viewportProfile=ta" },
+    { label: "고객지원", href: "/clone/support" },
+    { label: "베스트샵", href: "/clone/bestshop" },
+    { label: "가전 구독 메인", href: "/clone/care-solutions" },
+    { label: "가전 구독 PDP", href: "/clone/care-solutions-pdp" },
+    { label: "홈스타일 메인", href: "/clone/homestyle-home" },
+    { label: "홈스타일 PDP", href: "/clone/homestyle-pdp" },
+    { label: "TV PLP", href: "/clone/category-tvs" },
+    { label: "냉장고 PLP", href: "/clone/category-refrigerators" },
+    { label: "TV PDP 일반", href: "/clone/pdp-tv-general" },
+    { label: "TV PDP 프리미엄", href: "/clone/pdp-tv-premium" },
+    { label: "냉장고 PDP 일반", href: "/clone/pdp-refrigerator-general" },
+    { label: "냉장고 PDP 노크온", href: "/clone/pdp-refrigerator-knockon" },
+    { label: "냉장고 PDP 글라스", href: "/clone/pdp-refrigerator-glass" },
+  ];
+  const defaultCloneHref = "/clone/home?viewportProfile=pc";
+  const currentReferenceHref = `/reference-content/${encodeURIComponent(safePageId)}?viewportProfile=${encodeURIComponent(shellViewportProfile)}`;
+  const clonePageOptionsHtml = clonePageLinks
+    .map(
+      (item) =>
+        `<option value="${escapeHtml(item.href)}"${item.href === defaultCloneHref ? " selected" : ""}>${escapeHtml(item.label)}</option>`
+    )
+    .join("");
   const gnb = isMobileShell ? { topLinks: [], brandTabs: [], utilityLinks: [], dropdownMenus: {} } : buildShellGnbData();
   const dropdownPanelsHtml = Object.values(gnb.dropdownMenus || {})
     .map(
@@ -15297,6 +16501,75 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         height: 100%;
         display: flex;
         flex-direction: column;
+      }
+      .clone-topbar {
+        position: relative;
+        z-index: 30;
+        background: #111827;
+        color: #f9fafb;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+      }
+      .clone-topbar-inner {
+        width: ${DEFAULT_CANVAS_WIDTH}px;
+        max-width: ${DEFAULT_CANVAS_WIDTH}px;
+        min-height: 34px;
+        margin: 0 auto;
+        padding: 0 16px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .clone-topbar-left,
+      .clone-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+      .clone-topbar-label {
+        font: 700 11px/1 Arial, sans-serif;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #cbd5e1;
+        white-space: nowrap;
+      }
+      .clone-page-jump {
+        height: 26px;
+        min-width: 220px;
+        max-width: 340px;
+        border-radius: 7px;
+        border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.08);
+        color: #f9fafb;
+        font: 600 12px/1 Arial, sans-serif;
+        padding: 0 10px;
+      }
+      .clone-page-jump option,
+      .clone-page-jump optgroup {
+        color: #111827;
+        background: #ffffff;
+      }
+      .clone-topbar-button,
+      .clone-topbar-link {
+        height: 26px;
+        padding: 0 10px;
+        border-radius: 7px;
+        border: 1px solid rgba(255,255,255,0.14);
+        background: rgba(255,255,255,0.08);
+        color: #f9fafb;
+        text-decoration: none;
+        font: 600 12px/26px Arial, sans-serif;
+        white-space: nowrap;
+        box-sizing: border-box;
+      }
+      .clone-topbar-button {
+        cursor: pointer;
+      }
+      .clone-topbar-button:hover,
+      .clone-topbar-link:hover {
+        background: rgba(255,255,255,0.16);
       }
       .shell-header {
         position: relative;
@@ -15557,6 +16830,16 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
       }
       .shell-toast.is-visible { opacity: 1; }
       @media (max-width: 1280px) {
+        .clone-topbar-inner {
+          width: 100%;
+          max-width: 100%;
+          padding: 0 12px;
+          gap: 8px;
+        }
+        .clone-page-jump {
+          min-width: 180px;
+          max-width: 220px;
+        }
         .shell-top {
           gap: 10px;
           padding: 0 24px;
@@ -15584,6 +16867,21 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
   </head>
   <body>
     <div class="clone-shell">
+      <div class="clone-topbar">
+        <div class="clone-topbar-inner">
+          <div class="clone-topbar-left">
+            <span class="clone-topbar-label">Clone Nav</span>
+            <select class="clone-page-jump" id="clone-page-jump" aria-label="클론 페이지 이동">
+              ${clonePageOptionsHtml}
+            </select>
+            <button type="button" class="clone-topbar-button" id="clone-page-jump-go">이동</button>
+          </div>
+          <div class="clone-topbar-right">
+            <a class="clone-topbar-link" href="${currentReferenceHref}" target="_blank" rel="noopener noreferrer">Reference</a>
+            <a class="clone-topbar-link" href="/admin" target="_blank" rel="noopener noreferrer">Admin</a>
+          </div>
+        </div>
+      </div>
       ${isMobileShell || useCapturedShellHeader ? "" : `<header class="shell-header">
         <div class="shell-header-inner">
           <div class="shell-top">
@@ -15644,6 +16942,8 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         const frame = document.getElementById('clone-frame');
         const loading = document.getElementById('clone-loading');
         const toast = document.getElementById('shell-toast');
+        const pageJump = document.getElementById('clone-page-jump');
+        const pageJumpGo = document.getElementById('clone-page-jump-go');
         const productPanel = document.getElementById('shell-product-panel');
         const dropdownButtons = Array.from(document.querySelectorAll('[data-shell-dropdown]'));
         const dropdownPanels = Array.from(document.querySelectorAll('[data-shell-menu-panel]'));
@@ -15651,6 +16951,8 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         let toastTimer = null;
         let productPanelCloseTimer = null;
         let activeMenuId = null;
+        let shellMeasureTimer = null;
+        let shellMeasureInterval = null;
         const homeViewportMode = ${JSON.stringify(autoViewportEnabled ? "auto" : shellViewportProfile)};
 
         function detectHomeViewportProfile() {
@@ -15687,6 +16989,18 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
           toast.classList.add('is-visible');
           window.clearTimeout(toastTimer);
           toastTimer = window.setTimeout(() => toast.classList.remove('is-visible'), 1600);
+        }
+
+        function navigateClonePage() {
+          if (!pageJump || !pageJump.value) return;
+          window.location.href = pageJump.value;
+        }
+
+        if (pageJumpGo) pageJumpGo.addEventListener('click', navigateClonePage);
+        if (pageJump) {
+          pageJump.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') navigateClonePage();
+          });
         }
 
         function setPage(nextPageId) {
@@ -15738,6 +17052,7 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         });
 
         function openProductPanel(menuId) {
+          if (!productPanel) return;
           window.clearTimeout(productPanelCloseTimer);
           productPanel.classList.add('is-open');
           activeMenuId = menuId || activeMenuId || '제품/소모품';
@@ -15753,6 +17068,10 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
 
         function closeProductPanel() {
           window.clearTimeout(productPanelCloseTimer);
+          if (!productPanel) {
+            activeMenuId = null;
+            return;
+          }
           productPanel.classList.remove('is-open');
           dropdownPanels.forEach((panel) => panel.classList.remove('is-open'));
           dropdownButtons.forEach((button) => {
@@ -15775,7 +17094,7 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
           button.parentElement?.addEventListener('focusout', scheduleCloseProductPanel);
           button.addEventListener('click', (event) => {
             event.preventDefault();
-            if (activeMenuId === menuId && productPanel.classList.contains('is-open')) {
+            if (activeMenuId === menuId && productPanel?.classList.contains('is-open')) {
               closeProductPanel();
             } else {
               openProductPanel(menuId);
@@ -15783,10 +17102,12 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
           });
         });
 
-        productPanel.addEventListener('mouseenter', () => openProductPanel(activeMenuId));
-        productPanel.addEventListener('mouseleave', scheduleCloseProductPanel);
-        productPanel.addEventListener('focusin', () => openProductPanel(activeMenuId));
-        productPanel.addEventListener('focusout', scheduleCloseProductPanel);
+        if (productPanel) {
+          productPanel.addEventListener('mouseenter', () => openProductPanel(activeMenuId));
+          productPanel.addEventListener('mouseleave', scheduleCloseProductPanel);
+          productPanel.addEventListener('focusin', () => openProductPanel(activeMenuId));
+          productPanel.addEventListener('focusout', scheduleCloseProductPanel);
+        }
 
         document.querySelectorAll('.shell-panel-tab').forEach((button) => {
           button.addEventListener('mouseenter', () => {
@@ -15999,8 +17320,6 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
           emitMeasurement(collectFrameMetrics());
         }
 
-        let shellMeasureTimer = null;
-        let shellMeasureInterval = null;
         function scheduleShellMeasurements(delay = 120) {
           window.clearTimeout(shellMeasureTimer);
           window.clearInterval(shellMeasureInterval);
@@ -16574,6 +17893,53 @@ function selectHeroAsset(assets) {
   return pickByLargestFileSize(validImages) || pickByLargestFileSize(assets);
 }
 
+async function sendAssetProxy(res, requestUrl) {
+  const rawUrl = String(requestUrl.searchParams.get("url") || "").trim();
+  if (!rawUrl) return sendJson(res, 400, { error: "asset_proxy_url_required" });
+  let targetUrl = "";
+  try {
+    const parsed = new URL(rawUrl);
+    if (!/^https?:$/i.test(parsed.protocol)) throw new Error("unsupported_protocol");
+    targetUrl = parsed.toString();
+  } catch {
+    return sendJson(res, 400, { error: "asset_proxy_url_invalid" });
+  }
+
+  const upstream = await fetch(targetUrl, {
+    headers: {
+      "user-agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36",
+      accept: "*/*",
+      referer: resolveAssetOriginForPage(resolveWorkspacePageIdFromUrl(targetUrl), targetUrl),
+    },
+  });
+
+  if (!upstream.ok) {
+    return sendJson(res, upstream.status, { error: "asset_proxy_upstream_failed", status: upstream.status, url: targetUrl });
+  }
+
+  const contentType = upstream.headers.get("content-type") || "application/octet-stream";
+  const cacheControl = upstream.headers.get("cache-control") || "public, max-age=3600";
+  if (/text\/css|\/css\b/i.test(contentType) || /\.css(?:\?|$)/i.test(targetUrl)) {
+    const cssText = await upstream.text();
+    const rewritten = rewriteCssAssetUrls(cssText, targetUrl, `${new URL(targetUrl).origin}`);
+    res.writeHead(200, {
+      "Content-Type": "text/css; charset=utf-8",
+      "Cache-Control": cacheControl,
+      "Access-Control-Allow-Origin": "*",
+    });
+    res.end(rewritten);
+    return;
+  }
+
+  const buffer = Buffer.from(await upstream.arrayBuffer());
+  res.writeHead(200, {
+    "Content-Type": contentType,
+    "Cache-Control": cacheControl,
+    "Access-Control-Allow-Origin": "*",
+  });
+  res.end(buffer);
+}
+
 function route(req, res) {
   const requestUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   const pathname = requestUrl.pathname;
@@ -16583,6 +17949,11 @@ function route(req, res) {
   }
   if (pathname === "/login") {
     return sendHtml(res, 200, "login.html");
+  }
+  if (pathname === "/asset-proxy") {
+    return sendAssetProxy(res, requestUrl).catch((error) =>
+      sendJson(res, 500, { error: "asset_proxy_failed", detail: String(error) })
+    );
   }
   if (pathname === "/admin") {
     if (!getUserFromRequest(req)) {
@@ -17252,7 +18623,14 @@ function route(req, res) {
     const data = readWorkspaceData(user.userId);
     const page = findPage(data, pageId);
     const pageGroup = page?.pageGroup || "";
-    return sendJson(res, 200, buildDesignReferenceLibraryContext(pageId, { pageGroup, viewportProfile, limit: 12 }));
+    const pageIdentityOverride = getPageIdentityOverride(user.userId, pageId);
+    const pageContext = buildPlannerPageContext(pageId, viewportProfile, data, { pageIdentityOverride });
+    return sendJson(res, 200, buildDesignReferenceLibraryContext(pageId, {
+      pageGroup,
+      viewportProfile,
+      pageIdentity: pageContext.pageIdentity,
+      limit: 12,
+    }));
   }
   if (pathname === "/api/workspace/llm-progress") {
     const user = requireAuthenticatedUser(req, res);
@@ -17307,6 +18685,14 @@ function route(req, res) {
     const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
     const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildArtifactSectionRegistry(pageId, { editableData: data, viewportProfile }));
+  }
+  if (pathname === "/api/workspace/artifact-sidecar-registry") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
+    const data = readWorkspaceData(user.userId);
+    return sendJson(res, 200, buildArtifactSidecarRegistry(pageId, { editableData: data, viewportProfile }));
   }
   if (pathname === "/api/workspace/final-readiness") {
     const user = requireAuthenticatedUser(req, res);
@@ -17681,6 +19067,7 @@ function route(req, res) {
             previewUrl: buildPreviewUrlForWorkspacePage(pageId),
             intensity,
             designChangeLevel,
+            critic: buildResult.buildResult?.report?.critic || null,
             beforePageSnapshot,
             pageSnapshot,
           },
@@ -17714,6 +19101,7 @@ function route(req, res) {
         return sendJson(res, 200, {
           summary: buildResult.summary || "시안 생성 완료",
           draftBuildId: saved?.id || null,
+          criticReport: buildResult.buildResult?.report?.critic || null,
           buildResult: buildResult.buildResult || {},
         });
       })

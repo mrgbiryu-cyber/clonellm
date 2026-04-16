@@ -846,6 +846,97 @@ function normalizeHomeBuilderPatch(slotId = "", patch = {}) {
   return next;
 }
 
+function inferPatchGovernance(slotId = "", pageId = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  if (normalizedSlotId === "quickmenu") {
+    return {
+      resizePolicy: "uniform-items-only",
+      widthPolicy: "container-only",
+      forbiddenMoves: ["single-item-width-change", "single-item-height-change", "break-parent-grid"],
+    };
+  }
+  if (["productGrid", "firstRow", "firstProduct"].includes(normalizedSlotId)) {
+    return {
+      resizePolicy: "uniform-items-only",
+      widthPolicy: "container-only",
+      forbiddenMoves: ["single-card-width-change", "single-card-height-change", "break-parent-grid"],
+    };
+  }
+  if (normalizedSlotId === "gallery") {
+    return {
+      resizePolicy: "group-only",
+      widthPolicy: "follow-parent-column",
+      forbiddenMoves: ["independent-main-media-width-change", "break-thumbnail-rail"],
+    };
+  }
+  if (["summary", "price", "option", "sticky"].includes(normalizedSlotId)) {
+    return {
+      resizePolicy: "container-only",
+      widthPolicy: "follow-parent-column",
+      forbiddenMoves: ["break-parent-column", "independent-width-expansion", "single-control-protrusion"],
+    };
+  }
+  if (normalizedPageId === "home") {
+    return {
+      resizePolicy: "container-only",
+      widthPolicy: "follow-layout-token",
+      forbiddenMoves: ["independent-child-width-expansion", "break-section-shell"],
+    };
+  }
+  return {
+    resizePolicy: "container-only",
+    widthPolicy: "follow-parent-container",
+    forbiddenMoves: ["absolute-overlay-replacement", "independent-width-expansion"],
+  };
+}
+
+function sanitizeGovernedPatch(slotId = "", pageId = "", patch = {}) {
+  const source = patch && typeof patch === "object" ? JSON.parse(JSON.stringify(patch)) : {};
+  const governance = inferPatchGovernance(slotId, pageId);
+  const forbiddenMoves = new Set(governance.forbiddenMoves || []);
+  const next = {};
+  const violations = [];
+  const blockedStyleKeys = new Set();
+  if (
+    ["follow-parent-column", "follow-parent-container", "follow-layout-token", "container-only"].includes(governance.widthPolicy) ||
+    ["container-only", "group-only", "uniform-items-only"].includes(governance.resizePolicy)
+  ) {
+    ["width", "minWidth", "maxWidth"].forEach((key) => blockedStyleKeys.add(key));
+  }
+  if (forbiddenMoves.has("absolute-overlay-replacement")) {
+    ["position", "top", "right", "bottom", "left", "zIndex", "transform"].forEach((key) => blockedStyleKeys.add(key));
+  }
+  ["itemWidth", "itemHeight", "cardWidth", "cardHeight", "thumbWidth", "thumbHeight", "controlWidth", "controlHeight"].forEach((key) =>
+    blockedStyleKeys.add(key)
+  );
+  for (const [key, value] of Object.entries(source)) {
+    if (key === "styles" && value && typeof value === "object") {
+      const nextStyles = {};
+      for (const [styleKey, styleValue] of Object.entries(value)) {
+        if (blockedStyleKeys.has(styleKey)) {
+          violations.push({ type: "style_blocked", key: styleKey, slotId: String(slotId || "").trim(), reason: governance.widthPolicy || governance.resizePolicy });
+          continue;
+        }
+        nextStyles[styleKey] = styleValue;
+      }
+      if (Object.keys(nextStyles).length) next.styles = nextStyles;
+      continue;
+    }
+    const childScoped = /(items?|cards?|thumbs?|thumbnails|controls?|options?|selectedState|selectedItem|activeIndex)/i.test(key);
+    if (
+      childScoped &&
+      ["container-only", "group-only", "uniform-items-only"].includes(governance.resizePolicy) &&
+      (Array.isArray(value) || (value && typeof value === "object"))
+    ) {
+      violations.push({ type: "child_scope_blocked", key, slotId: String(slotId || "").trim(), reason: governance.resizePolicy });
+      continue;
+    }
+    next[key] = value;
+  }
+  return { patch: next, violations, governance };
+}
+
 function setSlotComponentPatch(data, pageId, slotId, sourceId, partialPatch, viewportProfile = "") {
   const componentId = resolveComponentId(pageId, slotId);
   const existing = findComponentPatch(data, pageId, componentId, sourceId, viewportProfile)?.patch || {};
@@ -853,7 +944,8 @@ function setSlotComponentPatch(data, pageId, slotId, sourceId, partialPatch, vie
     String(pageId || "").trim() === "home"
       ? normalizeHomeBuilderPatch(slotId, partialPatch)
       : partialPatch;
-  const merged = mergeComponentPatch(existing, normalizedPartial);
+  const governed = sanitizeGovernedPatch(slotId, pageId, normalizedPartial);
+  const merged = mergeComponentPatch(existing, governed.patch);
   return upsertComponentPatch(data, pageId, componentId, sourceId, merged, viewportProfile);
 }
 
@@ -1462,6 +1554,137 @@ function buildLayoutMockupLines(viewportLabel = "PC", sectionSpecs = []) {
   ].slice(0, -1);
 }
 
+function inferSectionArchetype(slotId = "") {
+  const normalized = String(slotId || "").trim();
+  const map = {
+    hero: "hero",
+    quickmenu: "icon-grid",
+    "md-choice": "product-list",
+    timedeal: "product-list",
+    "best-ranking": "product-list",
+    subscription: "banner-list",
+    "space-renewal": "editorial-product",
+    "brand-showroom": "editorial",
+    "latest-product-news": "editorial",
+    "smart-life": "editorial",
+    "summary-banner-2": "banner",
+    "missed-benefits": "banner-grid",
+    "lg-best-care": "service-card",
+    "bestshop-guide": "service-card",
+    "marketing-area": "promo-grid",
+    banner: "banner",
+    filter: "controls",
+    sort: "controls",
+    productGrid: "product-grid",
+    gallery: "gallery",
+    summary: "summary",
+    sticky: "sticky-buy",
+    review: "review",
+    qna: "qna",
+  };
+  return map[normalized] || "section";
+}
+
+function inferSectionHierarchy(slotId = "", changeLine = "") {
+  const archetype = inferSectionArchetype(slotId);
+  if (archetype === "hero") return ["badge", "headline", "support copy", "primary action"];
+  if (archetype === "icon-grid") return ["section title", "icon row", "short labels", "support cue"];
+  if (archetype === "product-list" || archetype === "product-grid") return ["badge", "title", "support line", "card row", "cta"];
+  if (archetype === "banner" || archetype === "banner-list") return ["badge", "title", "summary", "visual", "cta"];
+  if (archetype === "service-card") return ["badge", "title", "trust cue", "summary", "action"];
+  if (archetype === "controls") return ["label", "current selection", "action cue"];
+  if (/cta|action|신청|바로가기/i.test(String(changeLine || ""))) return ["badge", "title", "summary", "action"];
+  return ["badge", "title", "summary", "action"];
+}
+
+function inferContainerMode(slotId = "", pageContext = {}) {
+  const normalizedPageId = String(pageContext?.workspacePageId || "").trim();
+  if (normalizedPageId === "home") {
+    if (slotId === "hero" || slotId === "quickmenu") return "wide-shell";
+    if (slotId === "summary-banner-2") return "full-shell";
+    return "content-shell";
+  }
+  if (isPdpCasePageId(normalizedPageId)) {
+    if (slotId === "gallery" || slotId === "summary") return "content-shell";
+    return "narrow-shell";
+  }
+  return "content-shell";
+}
+
+function buildSectionBlueprints(requirementPlan = {}, pageContext = {}) {
+  const sectionSpecs = buildProposalSectionSpecs(requirementPlan, pageContext);
+  return sectionSpecs.slice(0, 8).map((item) => ({
+    order: item.order,
+    slotId: item.slotId || "",
+    label: item.label,
+    archetype: inferSectionArchetype(item.slotId),
+    containerMode: inferContainerMode(item.slotId, pageContext),
+    objective: item.priorityReason || item.why,
+    problemStatement: item.why,
+    visualDirection: item.visual,
+    mustKeep: item.keep,
+    mustChange: item.change,
+    hierarchy: inferSectionHierarchy(item.slotId, item.change),
+    actionCue: /cta|action|신청|문의|바로가기|탐색/i.test(`${item.change} ${item.visual}`) ? "explicit" : "supportive",
+  }));
+}
+
+function buildDesignSpecMarkdown(requirementPlan = {}, plannerInput = {}, sectionBlueprints = []) {
+  const pageContext = plannerInput?.pageContext || {};
+  const pageIdentity = pageContext?.pageIdentity || {};
+  const builderBrief = requirementPlan?.builderBrief && typeof requirementPlan?.builderBrief === "object" ? requirementPlan.builderBrief : {};
+  const title = String(requirementPlan?.title || pageContext?.pageLabel || "페이지 기획안").trim();
+  const referenceEntries = Array.isArray(plannerInput?.referenceSummary?.designReferenceLibrary?.entries)
+    ? plannerInput.referenceSummary.designReferenceLibrary.entries
+    : [];
+  const styleSignals = uniqueNonEmptyLines(
+    referenceEntries.flatMap((entry) => toStringArray(entry?.styleSignals || entry?.recommendedFor || [])).slice(0, 12)
+  ).slice(0, 8);
+  const guardrails = toStringArray(requirementPlan?.guardrails).slice(0, 6);
+  const mustKeep = toStringArray(builderBrief?.mustKeep).slice(0, 4);
+  const mustChange = toStringArray(builderBrief?.mustChange).slice(0, 5);
+  return [
+    `# ${title} Execution Spec`,
+    "",
+    "> Builder execution reference. Treat this as an implementation-facing DESIGN.md layer that translates the approved proposal into actionable section rules.",
+    "",
+    "## Global Spec",
+    `- viewport: ${String(pageContext?.viewportLabel || pageContext?.viewportProfile || "PC").trim()}`,
+    `- page-role: ${String(pageIdentity?.role || pageContext?.pageLabel || "페이지").trim()}`,
+    `- page-purpose: ${String(pageIdentity?.purpose || "").trim() || "기존 페이지 역할을 유지한 채 변경안을 제안한다."}`,
+    `- design-intent: ${String(pageIdentity?.designIntent || "").trim() || "브랜드 정체성을 유지하며 설득력 있는 방향성을 강화한다."}`,
+    `- change-level: ${normalizeDesignChangeLevel(requirementPlan?.designChangeLevel, "medium")}`,
+    `- builder-objective: ${String(builderBrief?.objective || "").trim() || "기획안에 맞는 실행 가능한 시안을 만든다."}`,
+    "",
+    "## Must Keep",
+    ...toMarkdownBulletLines(mustKeep),
+    "",
+    "## Must Change",
+    ...toMarkdownBulletLines(mustChange),
+    "",
+    "## Visual Guardrails",
+    ...toMarkdownBulletLines(guardrails),
+    "",
+    "## Reference Style Signals",
+    ...(styleSignals.length ? toMarkdownBulletLines(styleSignals) : ["- reference style signals: none"]),
+    "",
+    "## Section Blueprints",
+    ...sectionBlueprints.flatMap((item) => ([
+      `### ${item.order}. ${item.label}${item.slotId ? ` (\`${item.slotId}\`)` : ""}`,
+      `- archetype: ${item.archetype}`,
+      `- container-mode: ${item.containerMode}`,
+      `- objective: ${item.objective}`,
+      `- problem: ${item.problemStatement}`,
+      `- visual-direction: ${item.visualDirection}`,
+      `- must-keep: ${item.mustKeep}`,
+      `- must-change: ${item.mustChange}`,
+      `- hierarchy: ${item.hierarchy.join(" -> ")}`,
+      `- action-cue: ${item.actionCue}`,
+      "",
+    ])),
+  ].join("\n").trim();
+}
+
 function buildRequirementPlanMarkdownDocs(requirementPlan = {}, plannerInput = {}) {
   const pageContext = plannerInput?.pageContext || {};
   const pageIdentity = pageContext?.pageIdentity || {};
@@ -1474,6 +1697,7 @@ function buildRequirementPlanMarkdownDocs(requirementPlan = {}, plannerInput = {
     ...((Array.isArray(requirementPlan?.priority) ? requirementPlan.priority : []).map((item) => String(item?.target || "").trim())),
   ]).slice(0, 6);
   const proposalSectionSpecs = buildProposalSectionSpecs(requirementPlan, pageContext);
+  const sectionBlueprints = buildSectionBlueprints(requirementPlan, pageContext);
   const allChangeLines = uniqueNonEmptyLines([
     ...toStringArray(requirementPlan?.requestSummary),
     ...toStringArray(requirementPlan?.planningDirection),
@@ -1577,9 +1801,13 @@ function buildRequirementPlanMarkdownDocs(requirementPlan = {}, plannerInput = {
     ),
   ].join("\n").trim();
 
+  const designSpecMarkdown = buildDesignSpecMarkdown(requirementPlan, plannerInput, sectionBlueprints);
+
   return {
     builderMarkdown,
     layoutMockupMarkdown,
+    designSpecMarkdown,
+    sectionBlueprints,
   };
 }
 
@@ -1800,10 +2028,12 @@ function buildPlannerSystemPrompt() {
     "Preserve facts about products, prices, and specs.",
     "Return JSON only.",
     "Required top-level keys: summary, requirementPlan.",
-    "Required requirementPlan keys: title, designChangeLevel, requestSummary, planningDirection, designDirection, priority, guardrails, referenceNotes, builderBrief, builderMarkdown, layoutMockupMarkdown.",
+    "Required requirementPlan keys: title, designChangeLevel, requestSummary, planningDirection, designDirection, priority, guardrails, referenceNotes, builderBrief, builderMarkdown, layoutMockupMarkdown, designSpecMarkdown, sectionBlueprints.",
     "builderBrief must include objective, mustKeep, mustChange, suggestedFocusSlots.",
     "builderMarkdown must read like a customer-facing proposal document with a clear beginning-middle-end structure: background, objective, must-keep rules, must-change rules, planning direction, design direction, priority, and expected screens.",
     "layoutMockupMarkdown must contain a markdown wireframe/mockup representation. Use fenced text blocks and create a detailed wireframe section for every proposed screen/section, not just a short overall sketch.",
+    "designSpecMarkdown must translate the proposal into a builder-facing execution spec with global rules, must-keep / must-change, visual guardrails, and section blueprints.",
+    "sectionBlueprints must be an array of section-level execution specs. Each item should include order, slotId when known, label, archetype, objective, problemStatement, visualDirection, mustKeep, mustChange, hierarchy, and actionCue.",
     "This output should read like customer-facing planning material, not a short internal memo.",
     "requestSummary must contain 4 to 7 detailed bullets covering background, reason for change, objective, allowed scope, and expected change profile.",
     "planningDirection must contain 5 to 8 detailed bullets covering problem definition, strategic direction, hierarchy changes, scope control, customer persuasion logic, and the rationale behind each major recommendation.",
@@ -2006,7 +2236,7 @@ function buildBuilderSystemPrompt() {
     "Treat pageContext.pageIdentity and designToolContext.visualPrinciples.pageIdentity as hard constraints. The result must still feel like the same type of page with the same brand role, not a random campaign landing page.",
     "Treat pageContext.viewportProfile and pageContext.viewportLabel as hard constraints. Operations must be appropriate for the target viewport only.",
     "Treat designToolContext.visualPrinciples.layoutTokens and patchRules as hard constraints when they are provided.",
-    "Treat approvedPlan.builderMarkdown as the primary machine-readable DESIGN.md-style brief and approvedPlan.layoutMockupMarkdown as the primary section-level mockup/wireframe whenever they are present.",
+    "Treat approvedPlan.designSpecMarkdown as the primary execution-facing DESIGN.md brief, approvedPlan.sectionBlueprints as the primary section-level execution spec, approvedPlan.builderMarkdown as the customer-facing proposal document, and approvedPlan.layoutMockupMarkdown as the primary section-level mockup/wireframe whenever they are present.",
     "If systemContext.designReferenceLibrary or designToolContext.designReferenceLibrary is provided, treat it as a curated indexed design reference shelf. Use it to amplify design character, component rhythm, contrast strategy, and section mood with stronger intent than generic safe output.",
     "Prioritize brand design first. Do not flatten the result into overly conservative output if the approved designChangeLevel calls for stronger visual exploration.",
     "Respect the approved designChangeLevel and its profile. Low means light refinement, medium means controlled but noticeable improvement, high means strong visual exploration inside the brand/system baseline.",
@@ -2022,6 +2252,8 @@ function buildBuilderSystemPrompt() {
     "Respect each component's mediaSpec and layout. Do not propose image treatment that would make visuals look shrunken, over-cropped, or mismatched to the slot's intended fit.",
     "When mediaSpec.measuredScale or patchBridge.measuredScale is provided, keep the slot's usable width, image presence, and text scale close to that measured baseline unless the approved plan explicitly requires a stronger deviation.",
     "If artifactSectionRegistry is provided, treat it as the primary evidence for which sections come directly from lge.co.kr reference structure and which sections still need custom blocks.",
+    "If artifactSidecarRegistry is provided, treat it as the primary structure contract for geometry, image zones, visible labels, and section-level editability while preserving the existing rendered artifact.",
+    "If artifactSidecarRegistry includes layoutGovernance or regions, treat those as hard replacement constraints. Do not resize or restyle a single repeated item independently when the governance says container-only or uniform-items-only.",
     "If shareSectionRegistry is provided, use it as section-level evidence for section width, content width, image zones, and replacement feasibility. Do not contradict that geometry in your build logic.",
     "Preserve facts about products, prices, and specs.",
     "Return JSON only.",
@@ -2044,9 +2276,11 @@ function buildBuilderUserPrompt(builderInput) {
     "Use patchBridge.rootPatchPriority and patchBridge.stylePatchPriority to decide which patch fields fit each slot archetype.",
     "Use mediaSpec, containerMode, and layout as real constraints. Quickmenu icons should still feel icon-sized, product/gallery images should usually remain contain-oriented, and banner/hero visuals should not become visibly undersized inside their frames.",
     "Use measuredScale as a visual baseline for shell width, image frame size, and title scale before exploring stylistic variation.",
-    "Read the approved markdown brief as if it were a DESIGN.md file: extract layout intent, hierarchy, component emphasis, and guardrails before deciding operations.",
+    "Read approvedPlan.designSpecMarkdown and approvedPlan.sectionBlueprints first: extract layout intent, hierarchy, archetype, emphasis, and guardrails before deciding operations.",
     "Read the indexed design reference library before deciding visual tone. Use those references to strengthen color attitude, surface treatment, card density, hero drama, and information hierarchy without copying exact layouts.",
     "If artifactSectionRegistry exists, prefer sections where referenceSection.available=true and avoid inventing a new structure when the lge.co.kr reference section already exists.",
+    "If artifactSidecarRegistry exists, read it before deciding operations. Use its geometry/media/text hints to keep edits aligned to the real rendered artifact instead of reinterpreting the raw DOM freely.",
+    "When artifactSidecarRegistry provides regions and layoutGovernance, change the container or the full repeater rhythm rather than making one child item wider, taller, or more protruding than its siblings.",
     "If shareSectionRegistry exists, align your visual decisions to each section's sectionRect, contentRect, imageZones, and replacementMode before writing operations.",
     "If no operation is possible, explain the exact blocked slot and exact missing patch capability in report.assumptions.",
     "Expected schema example:",
@@ -2427,6 +2661,136 @@ function normalizeBuilderResult(result, builderInput = {}) {
   return normalized;
 }
 
+function getBuilderSidecarSection(builderInput = {}, pageId = "", slotId = "") {
+  const sections = Array.isArray(builderInput?.systemContext?.artifactSidecarRegistry?.sections)
+    ? builderInput.systemContext.artifactSidecarRegistry.sections
+    : [];
+  return sections.find(
+    (item) =>
+      String(item?.pageId || builderInput?.pageContext?.workspacePageId || "").trim() === String(pageId || "").trim() &&
+      String(item?.slotId || "").trim() === String(slotId || "").trim()
+  ) || null;
+}
+
+function enforceBuilderOperations(operations = [], builderInput = {}) {
+  const pageIdFallback = String(builderInput?.pageContext?.workspacePageId || "").trim();
+  const kept = [];
+  const violations = [];
+  for (const rawOp of operations || []) {
+    const op = rawOp && typeof rawOp === "object" ? { ...rawOp } : null;
+    if (!op) continue;
+    if (op.action !== "update_component_patch") {
+      kept.push(op);
+      continue;
+    }
+    const pageId = String(op.pageId || pageIdFallback).trim();
+    const slotId = String(op.slotId || "").trim();
+    const sidecarSection = getBuilderSidecarSection(builderInput, pageId, slotId);
+    const governed = sanitizeGovernedPatch(slotId, pageId, op.patch || {});
+    const patch = governed.patch && typeof governed.patch === "object" ? governed.patch : {};
+    if (!Object.keys(patch).length || (Object.keys(patch).length === 1 && patch.styles && !Object.keys(patch.styles || {}).length)) {
+      if (governed.violations.length) {
+        violations.push(...governed.violations.map((item) => ({
+          ...item,
+          pageId,
+          slotId,
+          action: "operation_removed",
+          sectionId: sidecarSection?.sectionId || null,
+        })));
+      }
+      continue;
+    }
+    if (governed.violations.length) {
+      violations.push(...governed.violations.map((item) => ({
+        ...item,
+        pageId,
+        slotId,
+        action: "patch_sanitized",
+        sectionId: sidecarSection?.sectionId || null,
+      })));
+    }
+    kept.push({
+      ...op,
+      patch,
+    });
+  }
+  return { operations: kept, violations };
+}
+
+function inferMentionedSlotIds(lines = [], knownSlotIds = []) {
+  const slotIds = Array.isArray(knownSlotIds) ? knownSlotIds.filter(Boolean) : [];
+  const mentions = new Set();
+  for (const line of lines || []) {
+    const text = String(line || "").trim().toLowerCase();
+    if (!text) continue;
+    for (const slotId of slotIds) {
+      if (text.includes(String(slotId || "").trim().toLowerCase())) mentions.add(slotId);
+    }
+  }
+  return Array.from(mentions);
+}
+
+function buildBuilderCriticReport(normalizedResult = {}, builderInput = {}, enforcement = {}) {
+  const approvedPlan = builderInput?.approvedPlan || {};
+  const editableComponents = Array.isArray(builderInput?.systemContext?.editableComponents)
+    ? builderInput.systemContext.editableComponents
+    : [];
+  const knownSlotIds = Array.from(new Set(editableComponents.map((item) => String(item?.slotId || "").trim()).filter(Boolean)));
+  const changedSlotIds = Array.from(
+    new Set(
+      safeArray(normalizedResult?.buildResult?.operations || [], 100)
+        .map((item) => String(item?.slotId || "").trim())
+        .filter(Boolean)
+    )
+  );
+  const requestedFocusSlots = Array.from(
+    new Set([
+      ...toStringArray(approvedPlan?.builderBrief?.suggestedFocusSlots),
+      ...(Array.isArray(approvedPlan?.priority) ? approvedPlan.priority.map((item) => String(item?.target || "").trim()) : []),
+    ].filter(Boolean))
+  );
+  const coveredFocusSlots = requestedFocusSlots.filter((slotId) => changedSlotIds.includes(slotId));
+  const missingFocusSlots = requestedFocusSlots.filter((slotId) => !changedSlotIds.includes(slotId));
+  const mentionedSlotIds = inferMentionedSlotIds(normalizedResult?.buildResult?.report?.whatChanged || [], knownSlotIds);
+  const unsupportedClaims = mentionedSlotIds.filter((slotId) => !changedSlotIds.includes(slotId));
+  const identitySignals = Array.isArray(builderInput?.systemContext?.designReferenceLibrary?.identitySignals)
+    ? builderInput.systemContext.designReferenceLibrary.identitySignals
+    : [];
+  const topReference = Array.isArray(builderInput?.systemContext?.designReferenceLibrary?.entries)
+    ? builderInput.systemContext.designReferenceLibrary.entries[0] || null
+    : null;
+  const identityOverlap = Array.isArray(topReference?.identityOverlap) ? topReference.identityOverlap : [];
+  const governanceViolations = Array.isArray(enforcement?.violations) ? enforcement.violations : [];
+  const scores = {
+    planCoverage: requestedFocusSlots.length ? Math.round((coveredFocusSlots.length / requestedFocusSlots.length) * 100) : (changedSlotIds.length ? 100 : 0),
+    governance: governanceViolations.length ? Math.max(0, 100 - governanceViolations.length * 20) : 100,
+    identityFit: identitySignals.length ? Math.min(100, 40 + identityOverlap.length * 20) : 70,
+    claimAccuracy: unsupportedClaims.length ? Math.max(0, 100 - unsupportedClaims.length * 35) : 100,
+  };
+  const findings = [];
+  if (missingFocusSlots.length) findings.push(`기획 우선 대상 중 아직 operation에 반영되지 않은 슬롯: ${missingFocusSlots.join(", ")}`);
+  if (governanceViolations.length) findings.push(`layout governance 위반 시도가 ${governanceViolations.length}건 감지되어 저장 전 제거 또는 축소했습니다.`);
+  if (unsupportedClaims.length) findings.push(`report.whatChanged 에 실제 operation 없는 슬롯 언급이 있습니다: ${unsupportedClaims.join(", ")}`);
+  const average = Math.round((scores.planCoverage + scores.governance + scores.identityFit + scores.claimAccuracy) / 4);
+  return {
+    status: average >= 85 && !missingFocusSlots.length && !unsupportedClaims.length ? "pass" : average >= 65 ? "warning" : "fail",
+    averageScore: average,
+    scores,
+    focusSlotCoverage: {
+      requested: requestedFocusSlots,
+      changed: changedSlotIds,
+      covered: coveredFocusSlots,
+      missing: missingFocusSlots,
+    },
+    identitySignals,
+    referenceIdentityOverlap: identityOverlap,
+    topReferenceId: topReference?.id || null,
+    governanceViolations,
+    unsupportedClaims,
+    findings,
+  };
+}
+
 async function handleLlmBuildOnData(builderInput, currentData) {
   const result = await withLlmTimeout(
     callOpenRouterJson({
@@ -2441,6 +2805,23 @@ async function handleLlmBuildOnData(builderInput, currentData) {
     "Builder request"
   );
   const normalizedResult = normalizeBuilderResult(result, builderInput);
+  const enforcement = enforceBuilderOperations(normalizedResult.buildResult.operations || [], builderInput);
+  normalizedResult.buildResult.operations = enforcement.operations;
+  normalizedResult.buildResult.changedTargets = Array.from(
+    new Set(
+      enforcement.operations.map((item) => `${String(item?.slotId || "").trim()}:${String(item?.action || "").trim()}`)
+    )
+  )
+    .map((key) => {
+      const [slotId, action] = key.split(":");
+      return {
+        slotId,
+        componentId: `${String(builderInput?.pageContext?.workspacePageId || "").trim()}.${slotId}`,
+        changeType: action === "toggle_slot_source" ? "source_switch" : "component_patch",
+      };
+    })
+    .filter((item) => item.slotId);
+  normalizedResult.buildResult.report.critic = buildBuilderCriticReport(normalizedResult, builderInput, enforcement);
   const current = normalizeEditableData(currentData || {});
   const next = applyOperations(current, normalizedResult.buildResult.operations || [], {
     viewportProfile: builderInput?.pageContext?.viewportProfile || "pc",
