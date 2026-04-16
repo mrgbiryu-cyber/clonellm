@@ -125,6 +125,20 @@
         overflow: auto;
       }
 
+      .group-block {
+        display: grid;
+        gap: 8px;
+      }
+
+      .group-label {
+        padding: 6px 8px 2px;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--text-soft);
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+
       .page-item {
         width: 100%;
         border: 1px solid transparent;
@@ -176,6 +190,7 @@
         height: 10px;
         border-radius: 999px;
         background: #d0d5dd;
+        display: inline-block;
       }
       .dot.draft { background: var(--brand); }
       .dot.ready { background: var(--success); }
@@ -211,10 +226,66 @@
         letter-spacing: -0.04em;
       }
 
-      .topbar-title p {
-        margin: 8px 0 0;
-        font-size: 13px;
-        color: var(--text-muted);
+      .title-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .title-line h2,
+      .title-line h3,
+      .title-line h4 {
+        margin: 0;
+      }
+
+      .title-help {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .title-help-btn {
+        width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        border: 1px solid var(--line-strong);
+        background: var(--surface);
+        color: var(--text-soft);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        cursor: default;
+        padding: 0;
+      }
+
+      .title-help-tip {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: 0;
+        min-width: 220px;
+        max-width: 320px;
+        padding: 10px 12px;
+        border: 1px solid var(--line-strong);
+        border-radius: 12px;
+        background: rgba(17, 24, 39, 0.96);
+        color: #f9fafb;
+        font-size: 12px;
+        line-height: 1.6;
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.18);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(-4px);
+        transition: opacity 0.16s ease, transform 0.16s ease;
+      }
+
+      .title-help:hover .title-help-tip,
+      .title-help:focus-within .title-help-tip {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
       }
 
       .topbar-meta {
@@ -311,9 +382,13 @@
         border-color: #bfdbfe;
       }
 
+      .anchor-link[hidden] {
+        display: none;
+      }
+
       .doc-layout {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 280px;
+        grid-template-columns: minmax(0, 1fr) 300px;
         gap: 18px;
         align-items: start;
       }
@@ -336,6 +411,7 @@
         border-radius: var(--radius-lg);
         background: var(--surface);
         box-shadow: var(--shadow);
+        scroll-margin-top: 148px;
       }
 
       .section-head,
@@ -346,18 +422,9 @@
 
       .section-head h3,
       .aside-head h4 {
-        margin: 0;
         font-size: 19px;
         line-height: 1.3;
         letter-spacing: -0.03em;
-      }
-
-      .section-head p,
-      .aside-head p {
-        margin: 8px 0 0;
-        color: var(--text-muted);
-        font-size: 13px;
-        line-height: 1.6;
       }
 
       .section-body,
@@ -373,14 +440,16 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .kv-card {
+      .kv-card,
+      .support-item {
         border: 1px solid var(--line);
         border-radius: 12px;
         padding: 14px;
         background: var(--surface-soft);
       }
 
-      .kv-card .label {
+      .kv-card .label,
+      .support-item .label {
         display: block;
         font-size: 12px;
         font-weight: 700;
@@ -388,7 +457,8 @@
         margin-bottom: 8px;
       }
 
-      .kv-card .value {
+      .kv-card .value,
+      .support-item .value {
         font-size: 14px;
         line-height: 1.65;
       }
@@ -416,6 +486,7 @@
       }
 
       input[type="text"],
+      select,
       textarea {
         width: 100%;
         border: 1px solid var(--line-strong);
@@ -470,40 +541,444 @@
         padding-right: 0;
       }
 
+      /* ── PRD 기획서 렌더링 ─────────────────────── */
       .doc-preview {
         border: 1px solid var(--line);
         border-radius: 14px;
+        overflow: hidden;
         background: #fff;
-        padding: 20px 22px;
         display: grid;
-        gap: 18px;
+        grid-template-columns: 152px minmax(0, 1fr);
+        gap: 0;
+        margin-top: 16px;
       }
 
-      .doc-block {
+      /* TOC */
+      .doc-toc {
+        position: sticky;
+        top: 64px;
+        align-self: start;
+        padding: 20px 12px;
+        border-right: 1px solid var(--line);
+        background: #fafbff;
+      }
+
+      .doc-toc-label {
+        margin: 0 0 10px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--text-soft);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding-left: 8px;
+      }
+
+      .doc-toc-item {
+        display: block;
+        padding: 5px 8px;
+        border-radius: 8px;
+        font-size: 12px;
+        color: var(--text-muted);
+        text-decoration: none;
+        line-height: 1.45;
+        transition: background 0.1s, color 0.1s;
+      }
+
+      .doc-toc-item:hover { background: var(--line); color: var(--text); }
+      .doc-toc-item.active { background: var(--brand-soft); color: var(--brand); font-weight: 700; }
+
+      /* Body */
+      .doc-body { display: grid; gap: 0; min-width: 0; }
+
+      .doc-card {
+        padding: 20px 22px;
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 12px;
+      }
+
+      .doc-card:last-child { border-bottom: 0; }
+      .doc-card--alt  { background: #fafbff; }
+      .doc-card--warn { background: #fffbeb; border-left: 3px solid #f59e0b; }
+
+      .doc-card-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+      }
+
+      .doc-card-icon { font-size: 16px; line-height: 1; }
+
+      .doc-card p  { margin: 0; font-size: 14px; line-height: 1.7; color: #344054; }
+      .doc-card ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+      .doc-card li { font-size: 14px; line-height: 1.7; color: #344054; }
+
+      /* 기능 테이블 */
+      .doc-table { width: 100%; border-collapse: collapse; }
+
+      .doc-table th {
+        background: #f3f4f6;
+        padding: 8px 12px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 700;
+        color: #374151;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .doc-table td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+        color: #111827;
+        vertical-align: top;
+        line-height: 1.5;
+      }
+
+      .doc-table tr:last-child td { border-bottom: 0; }
+
+      .doc-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 8px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .doc-badge--high { background: #fef2f2; color: #dc2626; }
+      .doc-badge--mid  { background: #eff6ff; color: #2563eb; }
+      .doc-badge--low  { background: #f3f4f6; color: #6b7280; }
+
+      /* 사용자 흐름 */
+      .doc-flow { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+
+      .doc-flow-step {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        background: #f8fafc;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+
+      .doc-flow-num {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 999px;
+        background: var(--brand);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      .doc-flow-text { font-size: 14px; color: var(--text); line-height: 1.5; }
+
+      .doc-flow-arrow {
+        list-style: none;
+        padding: 3px 0 3px 38px;
+        font-size: 14px;
+        color: var(--text-soft);
+      }
+
+      /* 로드맵 */
+      .doc-roadmap {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        align-items: center;
+        gap: 0;
+      }
+
+      .doc-stage {
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        display: grid;
+        gap: 5px;
+        align-self: start;
+      }
+
+      .doc-stage-num {
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--brand);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+
+      .doc-stage-label { font-size: 13px; font-weight: 700; color: var(--text); }
+      .doc-stage-done  { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+      .doc-roadmap-arrow {
+        padding: 0 10px;
+        font-size: 18px;
+        color: var(--text-soft);
+        align-self: center;
+      }
+
+      /* 기획 목표 + 변화 강도 */
+      .doc-objective {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+
+      .doc-objective p { flex: 1; min-width: 0; margin: 0; font-size: 14px; line-height: 1.7; color: #344054; }
+
+      .doc-change-level {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .doc-change-level--low    { background: #ecfdf5; color: #166534; }
+      .doc-change-level--medium { background: #eff6ff; color: #1d4ed8; }
+      .doc-change-level--high   { background: #fef2f2; color: #dc2626; }
+
+      /* 유지·변경 원칙 2컬럼 */
+      .doc-constraint {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .doc-constraint-col {
+        padding: 14px;
+        border-radius: 10px;
         display: grid;
         gap: 8px;
       }
 
-      .doc-block h4 {
+      .doc-constraint-col--keep   { background: #ecfdf5; border: 1px solid #bbf7d0; }
+      .doc-constraint-col--change { background: #fef2f2; border: 1px solid #fecaca; }
+
+      .doc-constraint-col h5 {
         margin: 0;
-        font-size: 15px;
-        line-height: 1.4;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
       }
 
-      .doc-block p,
-      .doc-block li {
-        margin: 0;
+      .doc-constraint-col--keep   h5 { color: #166534; }
+      .doc-constraint-col--change h5 { color: #991b1b; }
+
+      .doc-constraint-col ul { margin: 0; padding-left: 16px; display: grid; gap: 5px; }
+      .doc-constraint-col li { font-size: 13px; line-height: 1.6; color: #374151; }
+
+      /* 기획·디자인 방향 */
+      .doc-direction-list { display: grid; gap: 8px; }
+
+      .doc-direction-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 12px;
+        background: #f8fafc;
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--brand);
+        border-radius: 8px;
         font-size: 14px;
-        line-height: 1.7;
-        color: #344054;
+        line-height: 1.6;
+        color: #374151;
       }
 
-      .doc-block ul {
-        margin: 0;
-        padding-left: 18px;
+      /* 화면별 제안 */
+      .doc-screen-grid {
         display: grid;
-        gap: 6px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
       }
+
+      .doc-screen-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+        background: #fff;
+        display: grid;
+        gap: 10px;
+      }
+
+      .doc-screen-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .doc-screen-card-head strong { font-size: 13px; color: var(--text); }
+
+      .doc-screen-slot {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 7px;
+        border-radius: 999px;
+        background: #f3f4f6;
+        color: #6b7280;
+        font-family: 'Menlo', monospace;
+      }
+
+      .doc-screen-fields { display: grid; gap: 7px; }
+
+      .doc-screen-field { display: grid; gap: 3px; }
+      .doc-screen-field-label { font-size: 10px; font-weight: 700; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+      .doc-screen-field-value { font-size: 13px; color: #374151; line-height: 1.55; }
+
+      .doc-screen-field-value--keep   { color: #166534; }
+      .doc-screen-field-value--change { color: #b45309; }
+
+      /* 와이어프레임 목업 */
+      .doc-wireframe-list { display: grid; gap: 16px; }
+
+      .doc-wireframe {
+        border: 1.5px solid var(--line-strong);
+        border-radius: 8px;
+        overflow: hidden;
+        font-family: "Consolas", "Courier New", "D2Coding", monospace;
+        font-size: 12.5px;
+        background: #fafbff;
+      }
+
+      .doc-wireframe-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        background: #e9ecf5;
+        border-bottom: 1.5px solid var(--line-strong);
+      }
+
+      .doc-wireframe-head strong {
+        font-size: 12.5px;
+        font-family: inherit;
+        color: #1e293b;
+        letter-spacing: 0.01em;
+      }
+
+      .doc-wireframe-viewport {
+        font-size: 10.5px;
+        font-family: inherit;
+        font-weight: 700;
+        color: var(--text-soft);
+        background: var(--surface);
+        border: 1px solid var(--line-strong);
+        border-radius: 4px;
+        padding: 2px 7px;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+      }
+
+      .doc-wireframe-body { padding: 0; }
+
+      .doc-wireframe-row {
+        display: grid;
+        grid-template-columns: 76px 1fr;
+        border-bottom: 1px solid var(--line);
+        min-height: 32px;
+      }
+
+      .doc-wireframe-row:last-child { border-bottom: 0; }
+
+      .doc-wireframe-key {
+        padding: 7px 10px 7px 14px;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-soft);
+        background: #f4f6fb;
+        border-right: 1px solid var(--line);
+        display: flex;
+        align-items: flex-start;
+        letter-spacing: 0.02em;
+      }
+
+      .doc-wireframe-val {
+        padding: 7px 14px;
+        font-size: 12px;
+        color: #1e293b;
+        line-height: 1.55;
+        font-family: inherit;
+      }
+
+      .doc-wireframe-val--keep   { color: #166534; }
+      .doc-wireframe-val--change { color: #92400e; }
+
+      .doc-wireframe-zones {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        padding: 7px 14px;
+        font-family: inherit;
+        font-size: 11px;
+      }
+
+      .doc-wireframe-zone-chip {
+        background: var(--surface);
+        border: 1px solid var(--line-strong);
+        border-radius: 4px;
+        padding: 2px 7px;
+        font-size: 11px;
+        color: var(--text-muted);
+        font-family: inherit;
+      }
+
+      /* 가드레일 체크리스트 */
+      .doc-guardrail-list { display: grid; gap: 8px; }
+
+      .doc-guardrail-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #374151;
+      }
+
+      .doc-guardrail-icon {
+        flex-shrink: 0;
+        margin-top: 2px;
+        font-size: 14px;
+      }
+
+      /* 빈 상태 */
+      .doc-empty {
+        padding: 40px 24px;
+        text-align: center;
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+      }
+
+      .doc-empty p { margin: 0; font-size: 14px; color: var(--text-muted); line-height: 1.7; }
+
+      @media (max-width: 900px) {
+        .doc-constraint       { grid-template-columns: 1fr; }
+        .doc-screen-grid      { grid-template-columns: 1fr; }
+      }
+
+      /* fallback: 기존 doc-block 유지 */
+      .doc-block { display: grid; gap: 8px; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+      .doc-block:last-child { border-bottom: 0; }
+      .doc-block h4 { margin: 0; font-size: 15px; line-height: 1.4; }
+      .doc-block p, .doc-block li { margin: 0; font-size: 14px; line-height: 1.7; color: #344054; }
+      .doc-block ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
 
       .aside-note {
         font-size: 13px;
@@ -511,26 +986,206 @@
         line-height: 1.6;
       }
 
-      .mini-status {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 13px;
-        color: var(--text-muted);
+      .link-list,
+      .support-list {
+        display: grid;
+        gap: 10px;
       }
 
-      .ops-card {
+      .link-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface-soft);
+      }
+
+      .link-item strong {
+        font-size: 13px;
+        line-height: 1.4;
+      }
+
+      .details-card {
         border: 1px dashed #d0d5dd;
         border-radius: 14px;
         background: #fcfcfd;
-        padding: 16px 18px;
+        overflow: hidden;
+      }
+
+      .details-card summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 14px 16px;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .details-card summary::-webkit-details-marker { display: none; }
+      .details-card[open] summary { border-bottom: 1px dashed #d0d5dd; }
+      .details-body { padding: 16px; display: grid; gap: 12px; }
+
+      [hidden] { display: none !important; }
+
+      .builder-summary {
+        display: grid;
+        gap: 12px;
+      }
+
+      .builder-preview-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: 1fr;
+      }
+
+      .builder-preview-card {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--surface);
+        overflow: hidden;
+      }
+
+      .builder-preview-visual {
+        min-height: 152px;
+        padding: 14px;
+        background:
+          linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 10px;
+        align-content: start;
+      }
+
+      .preview-chip {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 56px;
+        width: fit-content;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: var(--brand-soft);
+        color: #1d4ed8;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .preview-wire {
+        display: grid;
+        gap: 8px;
+      }
+
+      .wire-bar {
+        height: 10px;
+        border-radius: 999px;
+        background: #cfe0ff;
+      }
+
+      .wire-bar.title {
+        width: 68%;
+        height: 14px;
+        background: #9fc2ff;
+      }
+
+      .wire-bar.sub {
+        width: 44%;
+      }
+
+      .wire-grid {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .wire-card {
+        min-height: 48px;
+        border-radius: 10px;
+        background: #eef4ff;
+        border: 1px solid #d8e5ff;
+      }
+
+      .builder-preview-body {
+        padding: 14px 16px 16px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .builder-preview-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .builder-preview-head strong {
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      .builder-preview-head span {
+        font-size: 12px;
+        color: var(--text-soft);
+      }
+
+      .builder-preview-meta p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.65;
+        color: #344054;
+      }
+
+      .builder-preview-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .version-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .version-item {
+        display: grid;
+        gap: 8px;
+        padding: 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface-soft);
+      }
+
+      .version-item-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .version-item-head strong {
+        font-size: 14px;
+      }
+
+      .version-item-head span,
+      .version-item p {
+        font-size: 12px;
         color: var(--text-muted);
+      }
+
+      .version-item p {
+        margin: 0;
+        line-height: 1.6;
       }
 
       @media (max-width: 1180px) {
         .doc-layout { grid-template-columns: 1fr; }
         .aside-column { position: static; }
         .status-summary { grid-template-columns: 1fr; }
+        .builder-preview-grid { grid-template-columns: 1fr; }
       }
 
       @media (max-width: 900px) {
@@ -539,6 +1194,10 @@
         .topbar-inner { flex-direction: column; align-items: flex-start; }
         .field-grid, .kv-grid { grid-template-columns: 1fr; }
         .anchor-bar { top: 0; border-radius: 0; margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
+        .doc-preview { grid-template-columns: 1fr; }
+        .doc-toc { display: none; }
+        .doc-roadmap { grid-template-columns: 1fr; }
+        .doc-roadmap-arrow { transform: rotate(90deg); justify-self: center; }
       }
     </style>
   </head>
@@ -548,174 +1207,130 @@
         <div class="sidebar-head">
           <div class="eyebrow">연구용 프로토타입</div>
           <h1>페이지 문서 관리</h1>
-          <p>정체성, 요구사항, 기획서 중심으로 재구성한 관리자 화면 실험안입니다.</p>
+          <p>메인 유지 기능만 전면에 두고, 미리보기/비교/운영 도구는 분리한 관리자 구조 실험안입니다.</p>
         </div>
         <div class="sidebar-tools">
-          <input class="search" type="text" placeholder="페이지 검색" />
-          <div class="chips">
-            <button class="chip active" type="button">전체</button>
-            <button class="chip" type="button">작업 중</button>
-            <button class="chip" type="button">기획서 없음</button>
+          <input id="searchInput" class="search" type="text" placeholder="페이지 검색" />
+          <div class="chips" id="filterChips">
+            <button class="chip active" type="button" data-filter="all">전체</button>
+            <button class="chip" type="button" data-filter="working">작업 중</button>
+            <button class="chip" type="button" data-filter="briefed">기획서 있음</button>
           </div>
         </div>
-        <div class="sidebar-list">
-          <button class="page-item active" type="button">
-            <div class="page-title-row">
-              <strong>홈</strong>
-              <div class="status-dots">
-                <span class="dot ready" title="정체성 완료"></span>
-                <span class="dot draft" title="요구사항 작성 중"></span>
-                <span class="dot stale" title="기획서 업데이트 필요"></span>
-              </div>
-            </div>
-            <div class="page-meta">브랜드 홈 / 최근 수정 12분 전</div>
-          </button>
-          <button class="page-item" type="button">
-            <div class="page-title-row">
-              <strong>케어솔루션</strong>
-              <div class="status-dots">
-                <span class="dot ready"></span>
-                <span class="dot ready"></span>
-                <span class="dot ready"></span>
-              </div>
-            </div>
-            <div class="page-meta">서비스 페이지 / 기획서 완료</div>
-          </button>
-          <button class="page-item" type="button">
-            <div class="page-title-row">
-              <strong>상품상세</strong>
-              <div class="status-dots">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
-              </div>
-            </div>
-            <div class="page-meta">PDP / 아직 시작 전</div>
-          </button>
-        </div>
+        <div class="sidebar-list" id="pageList"></div>
       </aside>
 
       <div class="content">
         <div class="topbar">
           <div class="topbar-inner">
             <div class="topbar-title">
-              <h2>홈</h2>
-              <p>브랜드 홈 페이지의 기준 문서와 이번 작업 요청을 정리하는 화면</p>
+              <div class="title-line">
+                <h2 id="pageTitle">홈</h2>
+                <div class="title-help">
+                  <button class="title-help-btn" type="button" aria-label="페이지 설명">i</button>
+                  <div class="title-help-tip" id="pageDescription">브랜드 홈 페이지의 기준 문서와 이번 작업 요청을 정리하는 화면</div>
+                </div>
+              </div>
             </div>
             <div class="topbar-meta">
-              <span class="pill">브랜드 홈</span>
-              <span class="pill">PC 기준</span>
-              <span class="pill">최근 편집자 김담당</span>
+              <span class="pill" id="pageTypePill">브랜드 홈</span>
+              <span class="pill" id="pageOwnerPill">최근 편집자 김담당</span>
             </div>
           </div>
         </div>
 
         <main class="main">
-          <section class="status-summary">
-            <article class="summary-card">
-              <span class="summary-card-label">페이지 정체성</span>
-              <strong>완료</strong>
-              <p>이 페이지의 역할과 유지 원칙이 기준 문서로 저장되어 있습니다.</p>
-            </article>
-            <article class="summary-card">
-              <span class="summary-card-label">요구사항</span>
-              <strong>작성 중</strong>
-              <p>이번 요청 입력은 저장돼 있지만, 아직 최종 기획서 생성 전입니다.</p>
-            </article>
-            <article class="summary-card">
-              <span class="summary-card-label">기획서</span>
-              <strong>업데이트 필요</strong>
-              <p>요구사항이 수정되어 기존 기획서를 다시 생성해야 하는 상태입니다.</p>
-            </article>
-          </section>
+          <section class="status-summary" id="statusSummary"></section>
 
           <nav class="anchor-bar">
-            <a class="anchor-link active" href="#identity">
-              <span class="dot ready"></span>
-              페이지 정체성
-            </a>
-            <a class="anchor-link" href="#requirements">
-              <span class="dot draft"></span>
-              요구사항
-            </a>
-            <a class="anchor-link" href="#prd">
-              <span class="dot stale"></span>
-              기획서
-            </a>
+            <a class="anchor-link active" href="#identity"><span id="anchorIdentityDot" class="dot"></span>페이지 정체성</a>
+            <a class="anchor-link" href="#requirements"><span id="anchorRequirementsDot" class="dot"></span>요구사항</a>
+            <a class="anchor-link" href="#prd"><span id="anchorPrdDot" class="dot"></span>기획서</a>
+            <a class="anchor-link" id="anchorBuildLink" href="#builder" hidden><span id="anchorBuildDot" class="dot draft"></span>디자인 빌더</a>
           </nav>
 
           <div class="doc-layout">
             <div class="doc-column">
               <section id="identity" class="section-card">
                 <div class="section-head">
-                  <h3>페이지 정체성</h3>
-                  <p>이 페이지가 원래 어떤 목적을 가지는지 정의하는 기준 문서입니다.</p>
+                  <div class="title-line">
+                    <h3>페이지 정체성</h3>
+                    <div class="title-help">
+                      <button class="title-help-btn" type="button" aria-label="페이지 정체성 설명">i</button>
+                      <div class="title-help-tip">이 페이지가 원래 어떤 목적을 가지는지 정의하는 기준 문서입니다.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="section-body">
                   <div class="actions">
                     <button class="btn secondary" type="button">편집</button>
                     <button class="btn quiet" type="button">최근 변경 보기</button>
                   </div>
-                  <div class="kv-grid">
-                    <div class="kv-card">
-                      <span class="label">페이지 역할</span>
-                      <div class="value">브랜드 첫 인상을 전달하고 주요 서비스와 프로모션으로 연결하는 메인 허브</div>
-                    </div>
-                    <div class="kv-card">
-                      <span class="label">디자인 의도</span>
-                      <div class="value">신뢰감과 탐색 리듬을 유지하면서, 과도한 판촉 느낌 없이 브랜드 중심으로 구성</div>
-                    </div>
-                    <div class="kv-card">
-                      <span class="label">반드시 유지할 것</span>
-                      <div class="value">브랜드 메시지 우선, 메인 내비의 안정감, 주요 카테고리 접근성</div>
-                    </div>
-                    <div class="kv-card">
-                      <span class="label">피해야 할 것</span>
-                      <div class="value">과한 할인몰 톤, 과도한 배너 밀도, 갑작스러운 다크 블록 삽입</div>
-                    </div>
-                  </div>
+                  <div class="kv-grid" id="identityGrid"></div>
                   <div class="kv-card">
                     <span class="label">페이지 목적</span>
-                    <div class="value">홈 방문자가 브랜드 성격을 빠르게 이해하고, 현재 주요 프로모션과 핵심 카테고리로 자연스럽게 이동하도록 돕는다.</div>
+                    <div class="value" id="identityPurpose"></div>
                   </div>
                 </div>
               </section>
 
               <section id="requirements" class="section-card">
                 <div class="section-head">
-                  <h3>요구사항</h3>
-                  <p>이번 작업에서 원하는 방향과 범위를 입력하는 영역입니다.</p>
+                  <div class="title-line">
+                    <h3>요구사항</h3>
+                    <div class="title-help">
+                      <button class="title-help-btn" type="button" aria-label="요구사항 설명">i</button>
+                      <div class="title-help-tip">이번 작업에서 원하는 방향과 범위를 입력하는 영역입니다.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="section-body">
                   <div class="field-grid">
                     <div class="field">
-                      <label>요청 제목</label>
-                      <input type="text" value="홈 첫 화면 메시지 재정렬" />
+                      <label>입력 방식</label>
+                      <select id="reqMode">
+                        <option value="hybrid">직접 작성 + 레퍼런스</option>
+                        <option value="direct">직접 작성</option>
+                        <option value="reference">레퍼런스 사이트 입력</option>
+                      </select>
                     </div>
                     <div class="field">
-                      <label>핵심 메시지</label>
-                      <input type="text" value="브랜드 신뢰감과 현재 주력 혜택을 더 분명하게" />
+                      <label>디자인 변화율</label>
+                      <select id="reqChangeLevel">
+                        <option value="low">하 · 현재 화면을 거의 유지</option>
+                        <option value="medium" selected>중 · 구조를 유지하며 체감 개선</option>
+                        <option value="high">상 · 브랜드를 벗어나지 않는 선에서 변화 확대</option>
+                      </select>
                     </div>
-                    <div class="field full">
-                      <label>요청 배경</label>
-                      <textarea>현재 홈 첫 화면은 배너와 섹션이 많은데, 첫 인상에서 브랜드 메시지보다 프로모션이 먼저 보인다는 의견이 있음. 고객이 LG다운 인상을 먼저 받고 주요 혜택으로 이어지도록 정리 필요.</textarea>
+                  </div>
+                  <div class="field-grid">
+                    <div class="field full" data-req-field="reference">
+                      <label>레퍼런스 URL</label>
+                      <textarea id="reqRefs" placeholder="한 줄에 하나씩 입력"></textarea>
                     </div>
-                    <div class="field">
+                    <div class="field" data-req-field="preferred">
                       <label>원하는 방향</label>
-                      <textarea>첫 화면 문구 위계 정리
-히어로 카피 명확화
-브랜드 중심 톤 유지</textarea>
+                      <textarea id="reqDirection"></textarea>
                     </div>
-                    <div class="field">
+                    <div class="field" data-req-field="tone">
+                      <label>톤앤매너</label>
+                      <input id="reqTone" type="text" />
+                    </div>
+                    <div class="field" data-req-field="key">
+                      <label>요청 제목</label>
+                      <input id="reqTitle" type="text" />
+                    </div>
+                    <div class="field" data-req-field="message">
+                      <label>핵심 메시지</label>
+                      <input id="reqMessage" type="text" />
+                    </div>
+                    <div class="field full" data-req-field="request">
+                      <label>요청 배경</label>
+                      <textarea id="reqBackground"></textarea>
+                    </div>
+                    <div class="field" data-req-field="avoid">
                       <label>피해야 할 방향</label>
-                      <textarea>이커머스 할인몰 같은 분위기
-과한 판촉 문구
-과도한 색상 실험</textarea>
-                    </div>
-                    <div class="field full">
-                      <label>참고 레퍼런스</label>
-                      <textarea>https://www.apple.com/
-https://www.nothing.tech/</textarea>
+                      <textarea id="reqAvoid"></textarea>
                     </div>
                   </div>
                   <div class="helper">이 단계에서는 기획서를 직접 고치지 않고, 이번 요청만 명확하게 입력합니다.</div>
@@ -728,57 +1343,58 @@ https://www.nothing.tech/</textarea>
 
               <section id="prd" class="section-card">
                 <div class="section-head">
-                  <h3>기획서</h3>
-                  <p>정체성과 요구사항을 바탕으로 생성된 고객용 PRD 문서입니다.</p>
+                  <div class="title-line">
+                    <h3>기획서</h3>
+                    <div class="title-help">
+                      <button class="title-help-btn" type="button" aria-label="기획서 설명">i</button>
+                      <div class="title-help-tip">정체성과 요구사항을 바탕으로 생성된 고객용 PRD 문서입니다.</div>
+                    </div>
+                  </div>
                 </div>
                 <div class="section-body">
                   <div class="actions">
+                    <button class="btn primary" id="launchBuilderBtn" type="button">빌더 승인 및 실행</button>
                     <button class="btn secondary" type="button">직접 편집</button>
                     <button class="btn secondary" type="button">PDF 내보내기</button>
                     <button class="btn quiet" type="button">마크다운 복사</button>
                   </div>
-                  <article class="doc-preview">
-                    <section class="doc-block">
-                      <h4>1. 한 줄 요약</h4>
-                      <p>홈 첫 화면에서 브랜드 신뢰감을 먼저 전달하고, 현재 주요 혜택과 탐색 동선을 더 명확하게 정리한다.</p>
-                    </section>
-                    <section class="doc-block">
-                      <h4>2. 배경 / 문제 정의</h4>
-                      <p>현재 홈은 프로모션 요소가 먼저 강하게 보이면서 브랜드 첫 인상이 약해진다. 방문자는 LG다운 메시지를 먼저 이해하기보다 배너와 혜택을 따로 읽게 된다.</p>
-                    </section>
-                    <section class="doc-block">
-                      <h4>3. 목표 범위</h4>
-                      <ul>
-                        <li>히어로와 상단 주요 섹션의 카피 위계 정리</li>
-                        <li>브랜드 톤을 유지하면서 주요 혜택 전달 구조 개선</li>
-                        <li>전체 재설계가 아니라 첫 화면 메시지 흐름 개선에 집중</li>
-                      </ul>
-                    </section>
-                    <section class="doc-block">
-                      <h4>4. 핵심 기능</h4>
-                      <ul>
-                        <li>히어로 문구 재구성</li>
-                        <li>주요 혜택 섹션 진입 순서 정리</li>
-                        <li>퀵메뉴와 탐색 리듬 보강</li>
-                      </ul>
-                    </section>
-                    <section class="doc-block">
-                      <h4>5. 사용자 흐름</h4>
-                      <p>사용자가 홈에 진입하면 브랜드 메시지를 먼저 이해하고, 이어서 현재 주요 혜택과 카테고리로 이동한다.</p>
-                    </section>
-                    <section class="doc-block">
-                      <h4>6. 단계별 로드맵</h4>
-                      <ul>
-                        <li>1단계: 기준 문서와 요구사항 정리</li>
-                        <li>2단계: 첫 화면 메시지 흐름 시안 생성</li>
-                        <li>3단계: 비교 후 반영안 확정</li>
-                      </ul>
-                    </section>
-                    <section class="doc-block">
-                      <h4>7. 미결 사항 / 제외 판단 이유</h4>
-                      <p>이번 단계에서는 하단 장문 섹션이나 전체 홈 구조 재편은 포함하지 않는다. 첫 인상과 메시지 위계 문제를 우선 해결하는 데 집중한다.</p>
-                    </section>
-                  </article>
+                  <article class="doc-preview" id="prdPreview"></article>
+                </div>
+              </section>
+
+              <section id="builder" class="section-card" hidden>
+                <div class="section-head">
+                  <div class="title-line">
+                    <h3>디자인 빌더</h3>
+                    <div class="title-help">
+                      <button class="title-help-btn" type="button" aria-label="디자인 빌더 설명">i</button>
+                      <div class="title-help-tip">기획서 승인 이후 디자인 변경을 실행하고, 결과 확인 화면으로 이어지는 단계입니다.</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="section-body">
+                  <div class="builder-summary">
+                    <div class="kv-grid">
+                      <div class="kv-card">
+                        <span class="label">실행 기준</span>
+                        <div class="value">현재 페이지 정체성 + 저장된 요구사항 + 최신 기획서</div>
+                      </div>
+                      <div class="kv-card">
+                        <span class="label">실행 상태</span>
+                        <div class="value" id="builderStatusText">실행 대기</div>
+                      </div>
+                    </div>
+                    <div class="support-item">
+                      <span class="label">결과 확인 방식</span>
+                      <div class="value">여기서는 섹션별 결과를 요약해서 보고, 전체 미리보기와 비교는 별도 화면으로 여는 흐름을 가정합니다.</div>
+                    </div>
+                  </div>
+                  <div class="builder-preview-grid" id="builderPreviewGrid"></div>
+                  <div class="actions">
+                    <button class="btn primary" type="button">디자인 빌더 열기</button>
+                    <button class="btn secondary" type="button">비교 화면 열기</button>
+                    <button class="btn secondary" type="button">미리보기 열기</button>
+                  </div>
                 </div>
               </section>
             </div>
@@ -786,33 +1402,46 @@ https://www.nothing.tech/</textarea>
             <aside class="aside-column">
               <section class="aside-card">
                 <div class="aside-head">
-                  <h4>현재 상태</h4>
-                  <p>긴 본문을 보기 전에 확인하는 간단한 문서 상태 요약</p>
-                </div>
-                <div class="aside-body">
-                  <div class="mini-status"><span class="dot ready"></span>정체성은 현재 기준 문서로 사용 가능</div>
-                  <div class="mini-status"><span class="dot draft"></span>요구사항은 수정 후 아직 재생성 전</div>
-                  <div class="mini-status"><span class="dot stale"></span>기획서는 최신 요구사항 반영 필요</div>
-                </div>
-              </section>
-
-              <section class="aside-card">
-                <div class="aside-head">
-                  <h4>다음 액션</h4>
-                  <p>이 화면에서 바로 취해야 할 행동만 최소로 제시</p>
-                </div>
-                <div class="aside-body">
-                  <div class="aside-note">요구사항 저장 후 기획서를 다시 생성하는 것이 현재 가장 우선입니다.</div>
-                  <div class="actions">
-                    <button class="btn primary" type="button">기획서 재생성</button>
+                  <div class="title-line">
+                    <h4>관련 화면</h4>
+                    <div class="title-help">
+                      <button class="title-help-btn" type="button" aria-label="관련 화면 설명">i</button>
+                      <div class="title-help-tip">본문에서 크게 유지하지 않고, 필요할 때 별도 화면으로 열어 확인하는 영역입니다.</div>
+                    </div>
                   </div>
                 </div>
+                <div class="aside-body link-list" id="relatedScreenList"></div>
               </section>
 
-              <div class="ops-card">
-                <strong>운영 도구 영역</strong>
-                <p class="aside-note">디자인 빌더, 비교, 버전 관리, runtime/debug는 메인 문서 흐름과 분리해 별도 하단 영역이나 드로어로 두는 방향을 가정합니다.</p>
-              </div>
+              <details class="details-card">
+                <summary>버전 확인 <span>▾</span></summary>
+                <div class="details-body">
+                  <div class="support-item">
+                    <span class="label">최근 저장 버전</span>
+                    <div class="value">디자인 결과는 버전 단위로 누적되므로 별도 접힘 영역에서 다시 확인합니다.</div>
+                  </div>
+                  <div class="version-list" id="versionList"></div>
+                </div>
+              </details>
+
+              <details class="details-card">
+                <summary>접어두는 보조 기능 <span>▾</span></summary>
+                <div class="details-body support-list" id="supportList"></div>
+              </details>
+
+              <details class="details-card">
+                <summary>운영 전용 도구 <span>▾</span></summary>
+                <div class="details-body">
+                  <div class="support-item">
+                    <span class="label">직접 AI 적용</span>
+                    <div class="value">자연어 직접 적용, slot source 변경, component patch는 일반 문서 흐름과 분리합니다.</div>
+                  </div>
+                  <div class="support-item">
+                    <span class="label">debug / artifact / runtime</span>
+                    <div class="value">artifact path, coverage, acceptance, runtime 메타는 운영자 전용 영역으로 격리합니다.</div>
+                  </div>
+                </div>
+              </details>
             </aside>
           </div>
         </main>
@@ -820,22 +1449,1221 @@ https://www.nothing.tech/</textarea>
     </div>
 
     <script>
-      const anchorLinks = Array.from(document.querySelectorAll(".anchor-link"));
-      const sections = anchorLinks
-        .map((link) => document.querySelector(link.getAttribute("href")))
-        .filter(Boolean);
+      const stateLabels = {
+        empty: "없음",
+        draft: "작성 중",
+        ready: "완료",
+        stale: "업데이트 필요",
+      };
 
+      const pages = [
+        {
+          id: "home-pc",
+          group: "홈",
+          title: "홈 - PC",
+          type: "브랜드 홈",
+          owner: "최근 편집자 김담당",
+          description: "브랜드 홈 페이지의 기준 문서와 이번 작업 요청을 정리하는 화면",
+          meta: "홈 / PC / 최근 수정 12분 전",
+          statuses: { identity: "ready", requirements: "draft", prd: "stale" },
+          builder: { activated: false, statusText: "기획서 승인 후 실행 가능" },
+          identity: {
+            role: "브랜드 첫 인상을 전달하고 주요 서비스와 프로모션으로 연결하는 메인 허브",
+            designIntent: "신뢰감과 탐색 리듬을 유지하면서, 과도한 판촉 느낌 없이 브랜드 중심으로 구성",
+            mustKeep: "브랜드 메시지 우선, 메인 내비의 안정감, 주요 카테고리 접근성",
+            avoid: "과한 할인몰 톤, 과도한 배너 밀도, 갑작스러운 다크 블록 삽입",
+            purpose: "홈 방문자가 브랜드 성격을 빠르게 이해하고, 현재 주요 프로모션과 핵심 카테고리로 자연스럽게 이동하도록 돕는다.",
+          },
+          requirements: {
+            mode: "hybrid",
+            changeLevel: "medium",
+            title: "홈 첫 화면 메시지 재정렬",
+            message: "브랜드 신뢰감과 현재 주력 혜택을 더 분명하게",
+            background: "현재 홈 첫 화면은 배너와 섹션이 많은데, 첫 인상에서 브랜드 메시지보다 프로모션이 먼저 보인다는 의견이 있음. 고객이 LG다운 인상을 먼저 받고 주요 혜택으로 이어지도록 정리 필요.",
+            direction: "첫 화면 문구 위계 정리\n히어로 카피 명확화\n브랜드 중심 톤 유지",
+            tone: "정제된 프리미엄, 브랜드 중심",
+            avoid: "이커머스 할인몰 같은 분위기\n과한 판촉 문구\n과도한 색상 실험",
+            refs: "https://www.apple.com/\nhttps://www.nothing.tech/",
+          },
+          versions: [
+            { label: "v0.3 홈 메시지 재정렬안", date: "오늘 10:24", summary: "히어로와 혜택 섹션 중심으로 변경안 저장" },
+            { label: "v0.2 브랜드 우선안", date: "어제 18:10", summary: "브랜드 선언 섹션 우선 노출 버전" },
+          ],
+          prd: {
+            summary: "홈 첫 화면에서 브랜드 신뢰감을 먼저 전달하고, 현재 주요 혜택과 탐색 동선을 더 명확하게 정리한다.",
+            problem: "현재 홈은 프로모션 요소가 먼저 강하게 보이면서 브랜드 첫 인상이 약해진다. 방문자는 LG다운 메시지를 먼저 이해하기보다 배너와 혜택을 따로 읽게 된다.",
+            objective: "히어로 메시지 위계 재편으로 브랜드 첫 인상을 명확하게 하고, 탐색 전환율을 높인다.",
+            changeLevel: "medium",
+            scope: ["히어로와 상단 주요 섹션의 카피 위계 정리", "브랜드 톤을 유지하면서 주요 혜택 전달 구조 개선", "전체 재설계가 아니라 첫 화면 메시지 흐름 개선에 집중"],
+            mustKeep: [
+              "브랜드 컬러 시스템과 전체 내비게이션 구조",
+              "주요 카테고리 접근 동선과 퀵메뉴 위치",
+              "메인 CTA 버튼 위치 및 텍스트 톤",
+              "하단 풋터 구성 및 고객지원 링크",
+            ],
+            mustChange: [
+              "히어로 배너의 카피 위계와 강조 포인트",
+              "상단 섹션 순서 — 브랜드 선언을 프로모션보다 앞으로",
+              "배경 이미지와 텍스트 간 대비 개선",
+              "혜택 섹션 도입부 문구 밀도 축소",
+            ],
+            direction: [
+              "브랜드 신뢰감을 위한 여백과 타이포 계층 강화",
+              "혜택 정보는 3줄 이내로 요약해 스캔 가능하게 구성",
+              "모바일에서도 첫 화면에서 브랜드 메시지가 완성되어야 함",
+              "다크 배경 블록 사용은 브랜드 섹션에 한정",
+            ],
+            features: ["히어로 문구 재구성", "주요 혜택 섹션 진입 순서 정리", "퀵메뉴와 탐색 리듬 보강"],
+            featuresDetail: [
+              { name: "히어로 카피 재구성", description: "첫 화면 브랜드 선언 문구 위계 재편. 헤드라인 1줄 + 서브 1줄 구조 적용", priority: "high" },
+              { name: "섹션 순서 변경", description: "브랜드 섹션을 프로모션 배너보다 앞으로 이동. 탐색 리듬 기준 재배치", priority: "high" },
+              { name: "퀵메뉴 탐색 리듬 보강", description: "상단 카테고리 퀵링크 아이콘+텍스트 조합으로 가독성 향상", priority: "mid" },
+              { name: "혜택 섹션 밀도 축소", description: "혜택 카드 3열 그리드로 재편, 각 항목 1줄 요약 강제", priority: "low" },
+            ],
+            screenProposals: [
+              {
+                label: "히어로 배너",
+                slotId: "hero",
+                why: "첫 화면 브랜드 메시지가 배너 이미지와 섞여 위계가 불분명하다",
+                visual: "배경 단순화, 대형 헤드라인, 서브카피 1줄로 제한",
+                keep: "CTA 버튼 위치 및 브랜드 로고 노출",
+                change: "헤드카피 재작성, 이미지-텍스트 대비 강화",
+              },
+              {
+                label: "카테고리 탭",
+                slotId: "category-nav",
+                why: "탐색 진입이 배너 다음 단계로 밀려 있어 초기 리듬이 끊긴다",
+                visual: "수평 스크롤 탭, 아이콘+텍스트 조합, 활성 상태 강조",
+                keep: "기존 카테고리 URL 구조 및 명칭",
+                change: "노출 순서 변경 — 브랜드 배너 바로 다음 첫 행동 유도",
+              },
+              {
+                label: "주요 혜택 섹션",
+                slotId: "benefit-highlight",
+                why: "혜택 항목이 많고 설명이 길어 핵심 내용이 흐릿하게 전달된다",
+                visual: "3열 카드 그리드, 아이콘 + 타이틀 + 1줄 설명 구조",
+                keep: "현재 혜택 항목의 종류와 순서",
+                change: "각 혜택을 1줄 요약으로 압축, 전체 높이 감축",
+              },
+              {
+                label: "프로모션 배너",
+                slotId: "promo-banner",
+                why: "현재는 첫 화면에서 브랜드보다 프로모션이 먼저 보인다",
+                visual: "배너 위치를 히어로와 혜택 섹션 아래로 이동",
+                keep: "배너 내용과 링크 구조",
+                change: "노출 우선순위 조정 — 브랜드/탐색 섹션 이후로",
+              },
+            ],
+            flow: [
+              "홈 진입 — 히어로에서 브랜드 핵심 메시지 첫 인식",
+              "카테고리 탭으로 탐색 시작 또는 혜택 섹션 스크롤",
+              "주요 혜택 카드에서 관심 항목 확인",
+              "프로모션 배너 또는 CTA로 세부 페이지 이동",
+            ],
+            roadmap: ["1단계: 기준 문서와 요구사항 정리", "2단계: 첫 화면 메시지 흐름 시안 생성", "3단계: 비교 후 반영안 확정"],
+            guardrails: [
+              "이번 작업은 첫 화면 메시지 흐름에 한정하며 전체 홈 구조 재편을 포함하지 않는다",
+              "새로운 기능 추가나 콘텐츠 신규 제작은 이번 범위 밖이다",
+              "브랜드 가이드라인(색상, 서체)은 변경하지 않는다",
+              "A/B 테스트 설계는 이번 단계에 포함하지 않으며 추후 별도 검토한다",
+            ],
+            open: "이번 단계에서는 하단 장문 섹션이나 전체 홈 구조 재편은 포함하지 않는다. 첫 인상과 메시지 위계 문제를 우선 해결하는 데 집중한다.",
+          },
+        },
+        {
+          id: "home-ta",
+          group: "홈",
+          title: "홈 - 테블릿",
+          type: "브랜드 홈",
+          owner: "최근 편집자 김담당",
+          description: "태블릿 홈 화면 기준 문서와 요구사항을 정리하는 화면",
+          meta: "홈 / 태블릿 / 기획서 완료",
+          statuses: { identity: "ready", requirements: "ready", prd: "ready" },
+          builder: { activated: true, statusText: "최근 실행 완료 · 비교 가능" },
+          identity: {
+            role: "태블릿 홈 방문자에게 브랜드 첫 인상을 전달하고 핵심 진입 동선을 정리하는 메인 허브",
+            designIntent: "PC 구조를 유지하되 태블릿 밀도에 맞게 정보량과 리듬을 조정",
+            mustKeep: "브랜드 메시지 우선, 핵심 카테고리 접근성, 메인 내비의 안정감",
+            avoid: "PC 레이아웃을 그대로 축소하는 방식, 배너 과밀 배치",
+            purpose: "태블릿 사용자가 첫 화면에서 브랜드 메시지와 핵심 혜택을 자연스럽게 이해하도록 돕는다.",
+          },
+          requirements: {
+            mode: "reference",
+            changeLevel: "low",
+            title: "태블릿 홈 주요 메시지 정리",
+            message: "태블릿 해상도에서도 첫 메시지와 혜택 흐름이 끊기지 않게",
+            background: "태블릿에서 히어로와 주요 혜택의 리듬이 다소 어색하게 보인다는 의견이 있어 정보 밀도 조정이 필요함.",
+            direction: "히어로 중심 정리\n주요 혜택 노출 간격 보정",
+            tone: "",
+            avoid: "모바일처럼 과도한 압축\n불필요한 보조 배너 추가",
+            refs: "https://www.apple.com/\nhttps://www.samsung.com/",
+          },
+          versions: [
+            { label: "v0.2 태블릿 최적화안", date: "오늘 09:42", summary: "태블릿 간격과 2열 카드 레이아웃 반영" },
+          ],
+          prd: {
+            summary: "태블릿 홈에서 브랜드 첫 인상과 주요 혜택 흐름이 끊기지 않도록 정보 밀도를 조정한다.",
+            problem: "태블릿 구간에서 일부 섹션 간격과 위계가 어색해 첫 메시지와 혜택 전달이 분산되어 보인다.",
+            objective: "PC 구조를 유지하면서 태블릿 밀도에 맞게 첫 메시지 흐름을 정리한다.",
+            changeLevel: "low",
+            scope: ["히어로와 상단 주요 섹션 간격 조정", "혜택 섹션 정보 위계 보정", "태블릿 전용 밀도 최적화"],
+            mustKeep: ["PC와 동일한 브랜드 메시지 우선순위", "핵심 카테고리 접근 동선"],
+            mustChange: ["섹션 간격 및 패딩 태블릿 최적화", "히어로 타이포 사이즈 조정"],
+            direction: ["PC 레이아웃을 그대로 축소하지 않고 태블릿 뷰포트 기준으로 재조정", "혜택 섹션은 2열 그리드로 전환"],
+            features: ["태블릿 히어로 재정렬", "혜택 섹션 간격 조정", "카테고리 진입 흐름 개선"],
+            featuresDetail: [
+              { name: "히어로 타이포 사이즈 조정", description: "태블릿 뷰포트 기준 헤드라인 크기 재설정", priority: "high" },
+              { name: "혜택 섹션 2열 전환", description: "PC 3열 → 태블릿 2열 그리드로 밀도 조정", priority: "mid" },
+              { name: "카테고리 탭 간격 보정", description: "탭 아이템 간격을 태블릿 터치 영역 기준으로 확장", priority: "low" },
+            ],
+            screenProposals: [
+              { label: "히어로 배너", slotId: "hero", why: "PC 비율 그대로 태블릿에서 잘려 보인다", visual: "헤드라인 크기 줄이고 여백 보정", keep: "CTA 위치 및 이미지 구성", change: "폰트 사이즈와 상하 여백 조정" },
+              { label: "혜택 섹션", slotId: "benefit-highlight", why: "3열 카드가 태블릿에서 너무 좁게 보임", visual: "2열 그리드로 전환, 카드 높이 증가", keep: "혜택 항목 종류와 순서", change: "레이아웃 컬럼 수 조정" },
+            ],
+            flow: ["홈 진입 — 히어로 메시지 확인", "카테고리 탭 또는 혜택 섹션으로 이동", "관심 제품군 탐색 시작"],
+            roadmap: ["1단계: 기준 문서 정리", "2단계: 태블릿 위계 시안 생성", "3단계: 비교 후 반영안 확정"],
+            guardrails: ["PC 레이아웃 전체를 다시 짜는 것은 이번 범위 밖", "모바일 브레이크포인트는 별도 작업으로 분리"],
+            open: "PC 전체 재설계는 이번 범위에 포함하지 않는다.",
+          },
+        },
+        {
+          id: "support",
+          group: "서비스",
+          title: "고객지원",
+          type: "서비스 페이지",
+          owner: "최근 편집자 이담당",
+          description: "고객지원 페이지의 기준 문서를 정리하는 화면",
+          meta: "서비스 / 고객지원 / 요구사항 저장됨",
+          statuses: { identity: "ready", requirements: "ready", prd: "draft" },
+          builder: { activated: false, statusText: "기획서 승인 후 실행 가능" },
+          identity: {
+            role: "고객이 필요한 지원 경로를 빠르게 찾도록 돕는 서비스 허브",
+            designIntent: "정보 탐색이 우선이며, 문의·자가진단·센터 찾기 동선을 분명하게 유지",
+            mustKeep: "지원 카테고리 분류, 검색 진입, 고객센터 연결 동선",
+            avoid: "브랜드 캠페인성 요소 과다 삽입, 장식용 배너 반복",
+            purpose: "고객이 문제 해결 경로를 빠르게 찾고 필요한 지원 채널로 이동하도록 돕는다.",
+          },
+          requirements: {
+            mode: "direct",
+            changeLevel: "medium",
+            title: "고객지원 첫 화면 진입 정리",
+            message: "지원 유형별 진입을 더 빠르게",
+            background: "지원 페이지가 정보는 많지만 첫 선택이 어렵다는 의견이 있어 진입 구조 점검이 필요함.",
+            direction: "검색과 주요 지원 카테고리 우선\n문의/센터 찾기 강조",
+            tone: "",
+            avoid: "브랜드 소개성 문구 증가\n불필요한 프로모션 블록 추가",
+            refs: "https://support.apple.com/\nhttps://support.google.com/",
+          },
+          versions: [],
+          prd: {
+            summary: "고객지원 페이지에서 문제 해결 경로를 빠르게 선택할 수 있도록 첫 진입 구조를 정리한다.",
+            problem: "지원 정보가 많지만 첫 단계에서 어떤 경로를 눌러야 하는지 직관성이 떨어진다.",
+            scope: ["주요 지원 진입 구조 정리", "검색/자가진단/문의 위계 조정", "센터 찾기 CTA 강조"],
+            features: ["지원 허브 재구성", "주요 지원 카드 정리", "문의 CTA 보강"],
+            flow: "사용자는 유형을 선택하고, 적절한 지원 경로로 이동한다.",
+            roadmap: ["1단계: 지원 유형 정리", "2단계: 진입 구조 시안 생성", "3단계: 검토 후 반영안 확정"],
+            open: "세부 FAQ 전체 재정비는 이번 범위에 포함하지 않는다.",
+          },
+        },
+        {
+          id: "bestshop",
+          group: "서비스",
+          title: "베스트샵",
+          type: "서비스 페이지",
+          owner: "최근 편집자 최담당",
+          description: "오프라인 매장 관련 페이지 문서 작업 상태를 확인하는 화면",
+          meta: "서비스 / 베스트샵 / 아직 시작 전",
+          statuses: { identity: "empty", requirements: "empty", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 전에는 실행할 수 없음" },
+          identity: {
+            role: "아직 정리되지 않음",
+            designIntent: "아직 정리되지 않음",
+            mustKeep: "아직 정리되지 않음",
+            avoid: "아직 정리되지 않음",
+            purpose: "이 페이지의 정체성을 먼저 정리해야 한다.",
+          },
+          requirements: { mode: "hybrid", changeLevel: "medium", title: "", message: "", background: "", direction: "", tone: "", avoid: "", refs: "" },
+          versions: [],
+          prd: null,
+        },
+        {
+          id: "care-solutions",
+          group: "서비스",
+          title: "가전 구독 메인",
+          type: "서비스 페이지",
+          owner: "최근 편집자 박담당",
+          description: "서비스 페이지의 기준 문서와 완료된 기획서를 확인하는 화면",
+          meta: "서비스 / 가전 구독 메인 / 기획서 완료",
+          statuses: { identity: "ready", requirements: "ready", prd: "ready" },
+          builder: { activated: true, statusText: "최근 실행 완료 · 결과 검토 가능" },
+          identity: {
+            role: "서비스 혜택과 가입 장점을 정리해 신청으로 연결하는 전환 페이지",
+            designIntent: "복잡한 설명보다 서비스 이해와 비교를 빠르게 돕는 안내 중심 구성",
+            mustKeep: "혜택 비교표, 신청 CTA, 신뢰 요소",
+            avoid: "과도한 브랜드 선언, 산만한 배너 반복",
+            purpose: "서비스 가입을 고민하는 사용자가 혜택을 빠르게 이해하고 신청 버튼까지 자연스럽게 이동하도록 돕는다.",
+          },
+          requirements: {
+            mode: "hybrid",
+            changeLevel: "medium",
+            title: "서비스 혜택 비교 정리",
+            message: "비교와 신청 동선을 더 빠르게",
+            background: "서비스 설명이 길어 핵심 혜택과 신청 흐름이 분산된다는 의견이 있음.",
+            direction: "요약 우선\n비교 정보 단순화",
+            tone: "안내형, 신뢰 중심",
+            avoid: "장문 카피 증가\n새로운 프로모션 블록 추가",
+            refs: "https://www.notion.so/\nhttps://linear.app/",
+          },
+          versions: [
+            { label: "v0.4 비교 구조 개선안", date: "오늘 11:08", summary: "혜택 비교와 신청 CTA를 전면 재배치" },
+            { label: "v0.3 혜택 요약안", date: "어제 16:20", summary: "요약 모듈과 CTA 위치 조정" },
+          ],
+          prd: {
+            summary: "서비스 가입을 고민하는 사용자가 주요 혜택을 빠르게 이해하고 신청 흐름으로 이동할 수 있게 정리한다.",
+            problem: "현재 서비스 소개는 설명량이 많아 핵심 혜택과 신청 유도가 분산되어 보인다.",
+            objective: "혜택 비교 구조를 단순화하여 첫 화면에서 신청 결정까지의 경로를 줄인다.",
+            changeLevel: "medium",
+            scope: ["혜택 비교 요약 강화", "신청 CTA 위치 재정리", "FAQ 이전 핵심 정보 강조"],
+            mustKeep: ["혜택 비교표 존재", "신뢰 요소(수상 내역, 고객 수)", "신청 CTA 버튼"],
+            mustChange: ["혜택 설명 길이 축소 — 항목당 2줄 이내", "CTA 위치 스크롤 절반 지점으로 앞당기기"],
+            direction: ["요약 우선 — 긴 설명 대신 핵심 3가지를 먼저 보여줌", "비교는 스캔 가능한 테이블 형태로"],
+            features: ["비교 카드 재배치", "혜택 요약 모듈", "신청 CTA 리듬 조정"],
+            featuresDetail: [
+              { name: "혜택 요약 모듈", description: "상단에 핵심 혜택 3개를 아이콘+1줄 구조로 표시", priority: "high" },
+              { name: "비교 카드 재배치", description: "요금/혜택 비교를 스크롤 전 가시 영역 안으로 이동", priority: "high" },
+              { name: "신청 CTA 리듬 조정", description: "중간 스크롤 지점에 CTA 추가 배치", priority: "mid" },
+            ],
+            screenProposals: [
+              { label: "서비스 소개 상단", slotId: "service-intro", why: "첫 화면에서 혜택보다 브랜드 선언이 길게 나온다", visual: "3개 핵심 혜택 아이콘 카드 먼저 노출", keep: "브랜드 로고 및 전체 서비스명", change: "첫 섹션에서 혜택 요약 우선 노출" },
+              { label: "비교 섹션", slotId: "plan-compare", why: "비교표가 스크롤 아래 숨어 도달 전에 이탈한다", visual: "2컬럼 비교 카드, 핵심 항목 5개 이내", keep: "현재 비교 항목 구성", change: "표 위치를 스크롤 50% 지점 이내로 이동" },
+            ],
+            flow: ["서비스 페이지 진입 — 핵심 혜택 3개 확인", "비교 섹션에서 요금 및 혜택 비교", "신청 CTA 클릭 — 신청 폼으로 이동"],
+            roadmap: ["1단계: 혜택 문구 정리", "2단계: 비교 시안 생성", "3단계: 신청 전환 검토"],
+            guardrails: ["FAQ 전체 개편은 이번 범위에 포함하지 않는다", "요금 구조 자체는 변경하지 않는다"],
+            open: "FAQ 전체 개편은 이번 범위에 포함하지 않는다.",
+          },
+        },
+        {
+          id: "care-solutions-pdp",
+          group: "서비스",
+          title: "가전 구독 PDP",
+          type: "서비스 페이지",
+          owner: "최근 편집자 박담당",
+          description: "구독 PDP 페이지의 기준 문서와 요구사항을 확인하는 화면",
+          meta: "서비스 / 가전 구독 PDP / 작성 중",
+          statuses: { identity: "ready", requirements: "draft", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 후 실행 가능" },
+          identity: {
+            role: "구독 상품 상세 이해와 신청으로 이어지는 전환 페이지",
+            designIntent: "제품 장점보다 구독 가치와 혜택 구조가 먼저 이해되도록 구성",
+            mustKeep: "구독 혜택 요약, 가격 구조, 신청 동선",
+            avoid: "일반 PDP와 동일한 정보 우선순위",
+            purpose: "사용자가 구독 가치와 혜택을 이해한 뒤 신청으로 이동하도록 돕는다.",
+          },
+          requirements: {
+            mode: "direct",
+            changeLevel: "high",
+            title: "구독 PDP 혜택 요약 정리",
+            message: "구독 가치와 혜택을 더 먼저 보이게",
+            background: "구독 PDP에서 제품 정보보다 구독 가치 전달이 약해 보인다는 의견이 있음.",
+            direction: "혜택/요금 구조 선명화\n신청 CTA 집중",
+            tone: "",
+            avoid: "일반 상품 PDP와 같은 흐름 유지",
+            refs: "https://www.spotify.com/\nhttps://www.netflix.com/",
+          },
+          versions: [],
+          prd: null,
+        },
+        {
+          id: "homestyle-home",
+          group: "서비스",
+          title: "홈스타일 메인",
+          type: "서비스 페이지",
+          owner: "최근 편집자 없음",
+          description: "홈스타일 메인 페이지의 작업 상태를 확인하는 화면",
+          meta: "서비스 / 홈스타일 메인 / 아직 시작 전",
+          statuses: { identity: "empty", requirements: "empty", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 전에는 실행할 수 없음" },
+          identity: {
+            role: "아직 정리되지 않음",
+            designIntent: "아직 정리되지 않음",
+            mustKeep: "아직 정리되지 않음",
+            avoid: "아직 정리되지 않음",
+            purpose: "이 페이지의 정체성을 먼저 정리해야 한다.",
+          },
+          requirements: { mode: "hybrid", changeLevel: "medium", title: "", message: "", background: "", direction: "", tone: "", avoid: "", refs: "" },
+          versions: [],
+          prd: null,
+        },
+        {
+          id: "homestyle-pdp",
+          group: "서비스",
+          title: "홈스타일 PDP",
+          type: "서비스 페이지",
+          owner: "최근 편집자 없음",
+          description: "홈스타일 PDP 작업 전 상태를 확인하는 화면",
+          meta: "서비스 / 홈스타일 PDP / 아직 시작 전",
+          statuses: { identity: "empty", requirements: "empty", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 전에는 실행할 수 없음" },
+          identity: {
+            role: "아직 정리되지 않음",
+            designIntent: "아직 정리되지 않음",
+            mustKeep: "아직 정리되지 않음",
+            avoid: "아직 정리되지 않음",
+            purpose: "이 페이지의 정체성을 먼저 정리해야 한다.",
+          },
+          requirements: { mode: "hybrid", changeLevel: "medium", title: "", message: "", background: "", direction: "", tone: "", avoid: "", refs: "" },
+          versions: [],
+          prd: null,
+        },
+        {
+          id: "category-tvs",
+          group: "PLP",
+          title: "PLP - TV 카테고리",
+          type: "PLP",
+          owner: "최근 편집자 정담당",
+          description: "TV 카테고리 리스트 페이지의 기준 문서를 정리하는 화면",
+          meta: "PLP / TV 카테고리 / 요구사항 저장됨",
+          statuses: { identity: "ready", requirements: "ready", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 후 실행 가능" },
+          identity: {
+            role: "카테고리 탐색과 필터링을 통해 적합한 상품군으로 이어주는 목록 페이지",
+            designIntent: "탐색 효율과 비교 가능성을 우선하는 구조 유지",
+            mustKeep: "필터, 정렬, 주요 카테고리 진입",
+            avoid: "브랜드 스토리성 블록 과다 삽입",
+            purpose: "사용자가 TV 상품군을 비교하고 적합한 상세 페이지로 이동하도록 돕는다.",
+          },
+          requirements: {
+            mode: "reference",
+            changeLevel: "medium",
+            title: "TV 카테고리 탐색 정리",
+            message: "필터와 추천 흐름을 더 분명하게",
+            background: "카테고리 페이지에서 리스트 탐색과 추천 메시지 간 위계가 모호하다는 의견이 있음.",
+            direction: "탐색 우선\n추천 흐름은 보조",
+            tone: "",
+            avoid: "프로모션 과밀\n상품 리스트보다 배너 우선",
+            refs: "https://www.amazon.com/\nhttps://www.apple.com/shop/",
+          },
+          versions: [],
+          prd: null,
+        },
+        {
+          id: "category-refrigerators",
+          group: "PLP",
+          title: "PLP - 냉장고 카테고리",
+          type: "PLP",
+          owner: "최근 편집자 없음",
+          description: "냉장고 카테고리 페이지의 문서 작업 전 상태",
+          meta: "PLP / 냉장고 카테고리 / 아직 시작 전",
+          statuses: { identity: "empty", requirements: "empty", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 전에는 실행할 수 없음" },
+          identity: {
+            role: "아직 정리되지 않음",
+            designIntent: "아직 정리되지 않음",
+            mustKeep: "아직 정리되지 않음",
+            avoid: "아직 정리되지 않음",
+            purpose: "이 페이지의 정체성을 먼저 정리해야 한다.",
+          },
+          requirements: { mode: "hybrid", changeLevel: "medium", title: "", message: "", background: "", direction: "", tone: "", avoid: "", refs: "" },
+          versions: [],
+          prd: null,
+        },
+        {
+          id: "pdp-tv-general",
+          group: "PDP",
+          title: "PDP - TV 일반형",
+          type: "PDP",
+          owner: "최근 편집자 오담당",
+          description: "TV 일반형 상품 상세의 기준 문서를 정리하는 화면",
+          meta: "PDP / TV 일반형 / 작성 중",
+          statuses: { identity: "draft", requirements: "draft", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 후 실행 가능" },
+          identity: {
+            role: "상품 핵심 가치와 구매 결정을 돕는 기본형 TV 상품 상세 페이지",
+            designIntent: "정보와 구매 동선의 균형을 유지하되 과도한 브랜드 서사는 줄인다",
+            mustKeep: "갤러리, 요약, 가격, 옵션, 구매 동선",
+            avoid: "장문 브랜드 스토리 우선 구성",
+            purpose: "사용자가 제품 정보를 빠르게 이해하고 구매 옵션을 확인하도록 돕는다.",
+          },
+          requirements: {
+            mode: "direct",
+            changeLevel: "medium",
+            title: "TV 일반형 PDP 요약 강화",
+            message: "핵심 혜택과 구매 결정을 더 빠르게",
+            background: "일반형 PDP에서 요약 영역의 구매 설득력이 약하다는 의견이 있어 상단 정보 위계 조정이 필요함.",
+            direction: "요약/가격/옵션 우선\n불필요한 설명 축소",
+            tone: "",
+            avoid: "장문 카피 확장\n브랜드 소개 위주 재배치",
+            refs: "https://www.samsung.com/\nhttps://www.sony.com/",
+          },
+          versions: [],
+          prd: null,
+        },
+        {
+          id: "pdp-tv-premium",
+          group: "PDP",
+          title: "PDP - TV 프리미엄형",
+          type: "PDP",
+          owner: "최근 편집자 오담당",
+          description: "프리미엄 TV 상품 상세의 문서 상태를 확인하는 화면",
+          meta: "PDP / TV 프리미엄형 / 기획서 완료",
+          statuses: { identity: "ready", requirements: "ready", prd: "ready" },
+          builder: { activated: true, statusText: "최근 실행 완료 · 결과 검토 가능" },
+          identity: {
+            role: "프리미엄 TV의 차별 가치를 전달하고 구매 결정을 돕는 상품 상세 페이지",
+            designIntent: "프리미엄 메시지와 핵심 스펙을 균형 있게 전달",
+            mustKeep: "대표 가치 제안, 갤러리, 구매 동선, 비교 요소",
+            avoid: "일반형 PDP와 동일한 설명 구조",
+            purpose: "사용자가 프리미엄 가치와 차별점을 이해하고 구매로 이동하도록 돕는다.",
+          },
+          requirements: {
+            mode: "hybrid",
+            changeLevel: "medium",
+            title: "프리미엄 TV 가치 전달 강화",
+            message: "차별 포인트와 구매 확신을 더 빠르게",
+            background: "프리미엄형에서 차별 가치와 대표 기능 전달 순서를 정리할 필요가 있음.",
+            direction: "가치 제안 우선\n핵심 스펙은 압축",
+            tone: "프리미엄, 절제된 하이엔드",
+            avoid: "일반형 정보 구조 복제",
+            refs: "https://www.samsung.com/\nhttps://www.apple.com/",
+          },
+          versions: [
+            { label: "v0.5 프리미엄 메시지 강화안", date: "오늘 08:55", summary: "차별 가치와 요약 모듈 재정렬 완료" },
+          ],
+          prd: {
+            summary: "프리미엄 TV의 대표 가치와 차별 포인트를 빠르게 이해시키고 구매 결정으로 이어지게 한다.",
+            problem: "현재는 프리미엄 메시지와 기능 설명의 위계가 섞여 차별 가치가 즉시 보이지 않는다.",
+            scope: ["대표 가치 제안 재정렬", "핵심 기능 압축 전달", "구매 동선 정리"],
+            features: ["프리미엄 가치 요약 모듈", "핵심 스펙 모듈 재구성", "구매 CTA 집중"],
+            flow: "사용자는 대표 가치와 핵심 스펙을 보고, 옵션 확인 후 구매로 이동한다.",
+            roadmap: ["1단계: 가치 메시지 정리", "2단계: 프리미엄 요약 시안", "3단계: 비교 후 반영"],
+            open: "리뷰/Q&A 전체 구조 변경은 이번 범위에 포함하지 않는다.",
+          },
+        },
+        {
+          id: "pdp-refrigerator-general",
+          group: "PDP",
+          title: "PDP - 냉장고 일반형",
+          type: "PDP",
+          owner: "최근 편집자 없음",
+          description: "냉장고 일반형 PDP의 작업 전 상태",
+          meta: "PDP / 냉장고 일반형 / 아직 시작 전",
+          statuses: { identity: "empty", requirements: "empty", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 전에는 실행할 수 없음" },
+          identity: {
+            role: "아직 정리되지 않음",
+            designIntent: "아직 정리되지 않음",
+            mustKeep: "아직 정리되지 않음",
+            avoid: "아직 정리되지 않음",
+            purpose: "이 페이지의 정체성을 먼저 정리해야 한다.",
+          },
+          requirements: { mode: "hybrid", changeLevel: "medium", title: "", message: "", background: "", direction: "", tone: "", avoid: "", refs: "" },
+          versions: [],
+          prd: null,
+        },
+        {
+          id: "pdp-refrigerator-knockon",
+          group: "PDP",
+          title: "PDP - 냉장고 노크온형",
+          type: "PDP",
+          owner: "최근 편집자 없음",
+          description: "냉장고 노크온형 PDP의 작업 전 상태",
+          meta: "PDP / 냉장고 노크온형 / 아직 시작 전",
+          statuses: { identity: "empty", requirements: "empty", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 전에는 실행할 수 없음" },
+          identity: {
+            role: "아직 정리되지 않음",
+            designIntent: "아직 정리되지 않음",
+            mustKeep: "아직 정리되지 않음",
+            avoid: "아직 정리되지 않음",
+            purpose: "이 페이지의 정체성을 먼저 정리해야 한다.",
+          },
+          requirements: { mode: "hybrid", changeLevel: "medium", title: "", message: "", background: "", direction: "", tone: "", avoid: "", refs: "" },
+          versions: [],
+          prd: null,
+        },
+        {
+          id: "pdp-refrigerator-glass",
+          group: "PDP",
+          title: "PDP - 냉장고 글라스형",
+          type: "PDP",
+          owner: "최근 편집자 없음",
+          description: "냉장고 글라스형 PDP의 작업 전 상태",
+          meta: "PDP / 냉장고 글라스형 / 아직 시작 전",
+          statuses: { identity: "empty", requirements: "empty", prd: "empty" },
+          builder: { activated: false, statusText: "기획서 생성 전에는 실행할 수 없음" },
+          identity: {
+            role: "아직 정리되지 않음",
+            designIntent: "아직 정리되지 않음",
+            mustKeep: "아직 정리되지 않음",
+            avoid: "아직 정리되지 않음",
+            purpose: "이 페이지의 정체성을 먼저 정리해야 한다.",
+          },
+          requirements: {
+            mode: "hybrid",
+            changeLevel: "medium",
+            title: "",
+            message: "",
+            background: "",
+            direction: "",
+            tone: "",
+            avoid: "",
+            refs: "",
+          },
+          versions: [],
+          prd: null,
+        },
+      ];
+
+      const supportItems = [
+        { label: "레퍼런스 분석 결과", value: "slot 매칭, reference analysis 결과, design-md 메타는 기본 화면에서 접어 둡니다." },
+        { label: "디자인 레퍼런스 라이브러리", value: "레퍼런스와 디자인 규칙은 필요할 때만 여는 보조 섹션으로 둡니다." },
+        { label: "저장 버전 / 현재 View", value: "version 저장, 현재 view 고정, 저장 버전 목록은 문서 3섹션 뒤로 내립니다." },
+        { label: "작업 이력", value: "사이드 기록과 작업 로그는 보조 목록 또는 별도 패널로 둡니다." },
+      ];
+
+      let currentPageId = "home-pc";
+      let currentFilter = "all";
+      let searchQuery = "";
+
+      const pageListEl = document.getElementById("pageList");
+      const pageTitleEl = document.getElementById("pageTitle");
+      const pageDescriptionEl = document.getElementById("pageDescription");
+      const pageTypePillEl = document.getElementById("pageTypePill");
+      const pageOwnerPillEl = document.getElementById("pageOwnerPill");
+      const statusSummaryEl = document.getElementById("statusSummary");
+      const identityGridEl = document.getElementById("identityGrid");
+      const identityPurposeEl = document.getElementById("identityPurpose");
+      const reqTitleEl = document.getElementById("reqTitle");
+      const reqModeEl = document.getElementById("reqMode");
+      const reqChangeLevelEl = document.getElementById("reqChangeLevel");
+      const reqMessageEl = document.getElementById("reqMessage");
+      const reqBackgroundEl = document.getElementById("reqBackground");
+      const reqDirectionEl = document.getElementById("reqDirection");
+      const reqToneEl = document.getElementById("reqTone");
+      const reqAvoidEl = document.getElementById("reqAvoid");
+      const reqRefsEl = document.getElementById("reqRefs");
+      const prdPreviewEl = document.getElementById("prdPreview");
+      const launchBuilderBtnEl = document.getElementById("launchBuilderBtn");
+      const anchorBuildLinkEl = document.getElementById("anchorBuildLink");
+      const builderSectionEl = document.getElementById("builder");
+      const builderStatusTextEl = document.getElementById("builderStatusText");
+      const builderPreviewGridEl = document.getElementById("builderPreviewGrid");
+      const versionListEl = document.getElementById("versionList");
+      const relatedScreenListEl = document.getElementById("relatedScreenList");
+      const supportListEl = document.getElementById("supportList");
+      const searchInputEl = document.getElementById("searchInput");
+      const filterChipEls = Array.from(document.querySelectorAll("#filterChips .chip"));
+
+      function dotClass(status) {
+        return status && status !== "empty" ? `dot ${status}` : "dot";
+      }
+
+      function renderPageList() {
+        const filtered = pages.filter((page) => {
+          const matchesSearch = !searchQuery || page.title.toLowerCase().includes(searchQuery) || page.type.toLowerCase().includes(searchQuery);
+          const matchesFilter =
+            currentFilter === "all" ||
+            (currentFilter === "working" && Object.values(page.statuses).some((status) => status === "draft" || status === "stale")) ||
+            (currentFilter === "briefed" && page.statuses.prd !== "empty");
+          return matchesSearch && matchesFilter;
+        });
+        if (!filtered.length) {
+          pageListEl.innerHTML = `<div class="page-meta" style="padding: 12px;">조건에 맞는 페이지가 없습니다.</div>`;
+          return;
+        }
+        const groups = ["홈", "서비스", "PLP", "PDP"];
+        pageListEl.innerHTML = groups
+          .map((group) => {
+            const groupPages = filtered.filter((page) => page.group === group);
+            if (!groupPages.length) return "";
+            return `
+              <section class="group-block">
+                <div class="group-label">${group}</div>
+                ${groupPages
+                  .map(
+                    (page) => `
+                      <button class="page-item ${page.id === currentPageId ? "active" : ""}" type="button" data-page-id="${page.id}">
+                        <div class="page-title-row">
+                          <strong>${page.title}</strong>
+                          <div class="status-dots">
+                            <span class="${dotClass(page.statuses.identity)}" title="정체성 ${stateLabels[page.statuses.identity]}"></span>
+                            <span class="${dotClass(page.statuses.requirements)}" title="요구사항 ${stateLabels[page.statuses.requirements]}"></span>
+                            <span class="${dotClass(page.statuses.prd)}" title="기획서 ${stateLabels[page.statuses.prd]}"></span>
+                          </div>
+                        </div>
+                        <div class="page-meta">${page.meta}</div>
+                      </button>
+                    `
+                  )
+                  .join("")}
+              </section>
+            `;
+          })
+          .join("");
+      }
+
+      function renderStatusSummary(page) {
+        const cards = [
+          { key: "identity", label: "페이지 정체성", desc: {
+            empty: "이 페이지의 역할과 기준을 아직 작성하지 않았습니다.",
+            draft: "정체성 초안이 있지만 아직 기준 문서로 확정되진 않았습니다.",
+            ready: "이 페이지의 역할과 유지 원칙이 기준 문서로 저장되어 있습니다.",
+            stale: "정체성 문서가 최신 컨텍스트와 어긋날 가능성이 있습니다.",
+          }},
+          { key: "requirements", label: "요구사항", desc: {
+            empty: "이번 요청 입력이 아직 없습니다.",
+            draft: "이번 요청은 작성 중이거나 저장 후 다시 검토가 필요합니다.",
+            ready: "이번 요청 입력이 저장되어 기획서 생성 기준으로 사용할 수 있습니다.",
+            stale: "요구사항 입력이 오래되어 최신 작업 의도와 어긋날 수 있습니다.",
+          }},
+          { key: "prd", label: "기획서", desc: {
+            empty: "아직 생성된 기획서가 없습니다.",
+            draft: "기획서가 생성 중이거나 직접 편집 중입니다.",
+            ready: "기획서가 최신 상태로 준비되어 있습니다.",
+            stale: "요구사항 또는 정체성이 바뀌어 기획서를 다시 생성해야 합니다.",
+          }},
+        ];
+        statusSummaryEl.innerHTML = cards.map((card) => `
+          <article class="summary-card">
+            <span class="summary-card-label">${card.label}</span>
+            <strong>${stateLabels[page.statuses[card.key]]}</strong>
+            <p>${card.desc[page.statuses[card.key]]}</p>
+          </article>
+        `).join("");
+      }
+
+      function renderIdentity(page) {
+        const items = [
+          { label: "페이지 역할", value: page.identity.role },
+          { label: "디자인 의도", value: page.identity.designIntent },
+          { label: "반드시 유지할 것", value: page.identity.mustKeep },
+          { label: "피해야 할 것", value: page.identity.avoid },
+        ];
+        identityGridEl.innerHTML = items.map((item) => `
+          <div class="kv-card">
+            <span class="label">${item.label}</span>
+            <div class="value">${item.value || "아직 정리되지 않음"}</div>
+          </div>
+        `).join("");
+        identityPurposeEl.textContent = page.identity.purpose;
+      }
+
+      function renderRequirements(page) {
+        reqModeEl.value = page.requirements.mode || "hybrid";
+        reqChangeLevelEl.value = page.requirements.changeLevel || "medium";
+        reqTitleEl.value = page.requirements.title;
+        reqMessageEl.value = page.requirements.message;
+        reqBackgroundEl.value = page.requirements.background;
+        reqDirectionEl.value = page.requirements.direction;
+        reqToneEl.value = page.requirements.tone || "";
+        reqAvoidEl.value = page.requirements.avoid;
+        reqRefsEl.value = page.requirements.refs;
+        updateRequirementModeUi();
+      }
+
+      function renderPrd(page) {
+        if (!page.prd) {
+          prdPreviewEl.innerHTML = `
+            <div class="doc-empty">
+              <p>아직 기획서가 없습니다.<br>위 요구사항을 입력한 뒤 <strong>기획서 생성</strong>을 눌러 주세요.</p>
+              <button class="btn secondary" type="button" onclick="document.getElementById('requirements').scrollIntoView({behavior:'smooth'})">↑ 요구사항 섹션으로 이동</button>
+            </div>
+          `;
+          return;
+        }
+
+        const p = page.prd;
+
+        /* ── 헬퍼 ──────────────────────────────── */
+        const toArr = v => Array.isArray(v) ? v : (v ? [v] : []);
+
+        /* 핵심 기능 테이블 */
+        const priorityMeta = { high: ["high", "높음"], mid: ["mid", "보통"], low: ["low", "낮음"] };
+        const featureRows = p.featuresDetail
+          ? p.featuresDetail.map((f, i) => {
+              const [cls, txt] = priorityMeta[f.priority] || priorityMeta.low;
+              return `<tr>
+                <td>${i + 1}</td>
+                <td><strong style="font-size:13px">${f.name}</strong></td>
+                <td>${f.description || "—"}</td>
+                <td><span class="doc-badge doc-badge--${cls}">${txt}</span></td>
+              </tr>`;
+            })
+          : toArr(p.features).map((feat, i) => {
+              const cls = i === 0 ? "high" : i === 1 ? "mid" : "low";
+              const [c, t] = priorityMeta[cls];
+              return `<tr><td>${i+1}</td><td>${feat}</td><td style="color:#9ca3af">—</td><td><span class="doc-badge doc-badge--${c}">${t}</span></td></tr>`;
+            });
+        const featuresHtml = `
+          <table class="doc-table">
+            <thead><tr><th style="width:32px">#</th><th style="width:35%">기능명</th><th>설명</th><th style="width:60px">우선순위</th></tr></thead>
+            <tbody>${featureRows.join("")}</tbody>
+          </table>`;
+
+        /* 사용자 흐름 */
+        const flowLines = Array.isArray(p.flow) ? p.flow
+          : String(p.flow || "").split(/[.\n]/).map(s => s.trim()).filter(Boolean);
+        const flowHtml = flowLines.length > 1
+          ? `<ol class="doc-flow">${flowLines.map((line, i) =>
+              `${i > 0 ? `<li class="doc-flow-arrow">↓</li>` : ""}
+               <li class="doc-flow-step"><span class="doc-flow-num">${i+1}</span><span class="doc-flow-text">${line}</span></li>`
+            ).join("")}</ol>`
+          : `<p>${p.flow || ""}</p>`;
+
+        /* 로드맵 */
+        const roadmapItems = toArr(p.roadmap).slice(0, 3).map(item => {
+          const m = String(item).match(/^(\d+단계)\s*[:：]\s*(.+)/);
+          return m ? { num: m[1], label: m[2] } : { num: "", label: item };
+        });
+        const roadmapHtml = roadmapItems.length >= 2
+          ? `<div class="doc-roadmap">${roadmapItems.map((item, i) =>
+              `${i > 0 ? `<div class="doc-roadmap-arrow">→</div>` : ""}
+               <div class="doc-stage">${item.num ? `<div class="doc-stage-num">${item.num}</div>` : ""}<div class="doc-stage-label">${item.label}</div></div>`
+            ).join("")}</div>`
+          : `<ul>${roadmapItems.map(r => `<li>${r.label}</li>`).join("")}</ul>`;
+
+        /* 섹션 ID 목록 — 선택적 섹션 포함 */
+        const hasObjective = p.objective;
+        const hasConstraint = toArr(p.mustKeep).length || toArr(p.mustChange).length;
+        const hasDirection = toArr(p.direction).length;
+        const hasScreens = toArr(p.screenProposals).length;
+        const hasGuardrails = toArr(p.guardrails).length;
+
+        /* 뷰포트 — 페이지 제목에서 추론 */
+        const pageViewport = (page.title || "").match(/(태블릿|모바일)/)?.[1] || "PC";
+
+        const tocItems = [
+          ["prd-summary",    "1. 요약"],
+          ["prd-background", "2. 배경 / 문제"],
+          hasObjective  && ["prd-objective",  "3. 기획 목표"],
+          hasConstraint && ["prd-constraint", "4. 유지·변경 원칙"],
+          hasDirection  && ["prd-direction",  "5. 기획 방향"],
+          ["prd-scope",      "6. 목표 범위"],
+          ["prd-features",   "7. 핵심 기능"],
+          hasScreens    && ["prd-screens",    "8. 화면별 제안"],
+          hasScreens    && ["prd-mockup",     "9. 와이어프레임"],
+          ["prd-flow",       "10. 사용자 흐름"],
+          ["prd-roadmap",    "11. 로드맵"],
+          hasGuardrails && ["prd-guardrails", "12. 가드레일"],
+          ["prd-issues",     "13. 미결 사항"],
+        ].filter(Boolean);
+
+        /* ── 렌더링 ────────────────────────────── */
+        prdPreviewEl.innerHTML = `
+          <nav class="doc-toc">
+            <p class="doc-toc-label">목차</p>
+            ${tocItems.map(([id, label]) =>
+              `<a class="doc-toc-item" href="#${id}">${label}</a>`
+            ).join("")}
+          </nav>
+          <div class="doc-body">
+
+            <section id="prd-summary" class="doc-card">
+              <h4 class="doc-card-title"><span class="doc-card-icon">📋</span>1. 요약</h4>
+              <p>${p.summary}</p>
+            </section>
+
+            <section id="prd-background" class="doc-card doc-card--alt">
+              <h4 class="doc-card-title"><span class="doc-card-icon">🔍</span>2. 배경 / 문제 정의</h4>
+              <p>${p.problem}</p>
+            </section>
+
+            ${hasObjective ? `
+            <section id="prd-objective" class="doc-card">
+              <h4 class="doc-card-title"><span class="doc-card-icon">🎯</span>3. 기획 목표</h4>
+              <div class="doc-objective">
+                <p>${p.objective}</p>
+                ${p.changeLevel ? (() => {
+                  const lvlMap = { low: ["low","낮음 — 세부 조정"], medium: ["medium","보통 — 주요 섹션 재편"], high: ["high","높음 — 전체 흐름 재설계"] };
+                  const [cls, txt] = lvlMap[p.changeLevel] || lvlMap.medium;
+                  return `<span class="doc-change-level doc-change-level--${cls}">변화 강도: ${txt}</span>`;
+                })() : ""}
+              </div>
+            </section>` : ""}
+
+            ${hasConstraint ? `
+            <section id="prd-constraint" class="doc-card doc-card--alt">
+              <h4 class="doc-card-title"><span class="doc-card-icon">⚖️</span>4. 유지·변경 원칙</h4>
+              <div class="doc-constraint">
+                <div class="doc-constraint-col doc-constraint-col--keep">
+                  <h5>✅ 반드시 유지할 것</h5>
+                  <ul>${toArr(p.mustKeep).map(l => `<li>${l}</li>`).join("")}</ul>
+                </div>
+                <div class="doc-constraint-col doc-constraint-col--change">
+                  <h5>🔄 반드시 바꿀 것</h5>
+                  <ul>${toArr(p.mustChange).map(l => `<li>${l}</li>`).join("")}</ul>
+                </div>
+              </div>
+            </section>` : ""}
+
+            ${hasDirection ? `
+            <section id="prd-direction" class="doc-card">
+              <h4 class="doc-card-title"><span class="doc-card-icon">🧭</span>5. 기획·디자인 방향</h4>
+              <div class="doc-direction-list">
+                ${toArr(p.direction).map(line =>
+                  `<div class="doc-direction-item">${line}</div>`
+                ).join("")}
+              </div>
+            </section>` : ""}
+
+            <section id="prd-scope" class="doc-card doc-card--alt">
+              <h4 class="doc-card-title"><span class="doc-card-icon">📐</span>6. 목표 범위</h4>
+              <ul>${toArr(p.scope).map(item => `<li>${item}</li>`).join("")}</ul>
+            </section>
+
+            <section id="prd-features" class="doc-card">
+              <h4 class="doc-card-title"><span class="doc-card-icon">⚡</span>7. 핵심 기능</h4>
+              ${featuresHtml}
+            </section>
+
+            ${hasScreens ? `
+            <section id="prd-screens" class="doc-card doc-card--alt">
+              <h4 class="doc-card-title"><span class="doc-card-icon">🖥️</span>8. 화면별 제안</h4>
+              <div class="doc-screen-grid">
+                ${toArr(p.screenProposals).map(s => `
+                  <div class="doc-screen-card">
+                    <div class="doc-screen-card-head">
+                      <strong>${s.label}</strong>
+                      ${s.slotId ? `<span class="doc-screen-slot">${s.slotId}</span>` : ""}
+                    </div>
+                    <div class="doc-screen-fields">
+                      <div class="doc-screen-field">
+                        <span class="doc-screen-field-label">해결 문제</span>
+                        <span class="doc-screen-field-value">${s.why}</span>
+                      </div>
+                      <div class="doc-screen-field">
+                        <span class="doc-screen-field-label">시각 해법</span>
+                        <span class="doc-screen-field-value">${s.visual}</span>
+                      </div>
+                      <div class="doc-screen-field">
+                        <span class="doc-screen-field-label">유지</span>
+                        <span class="doc-screen-field-value doc-screen-field-value--keep">${s.keep}</span>
+                      </div>
+                      <div class="doc-screen-field">
+                        <span class="doc-screen-field-label">변경</span>
+                        <span class="doc-screen-field-value doc-screen-field-value--change">${s.change}</span>
+                      </div>
+                    </div>
+                  </div>`).join("")}
+              </div>
+            </section>` : ""}
+
+            ${hasScreens ? `
+            <section id="prd-mockup" class="doc-card">
+              <h4 class="doc-card-title"><span class="doc-card-icon">📐</span>9. 와이어프레임 목업</h4>
+              <div class="doc-wireframe-list">
+                ${toArr(p.screenProposals).map(s => {
+                  const vp = s.viewport || pageViewport;
+                  const zones = toArr(s.zones).length
+                    ? s.zones
+                    : ["badge", "title", "summary", "action", "support cue"];
+                  return `
+                  <div class="doc-wireframe">
+                    <div class="doc-wireframe-head">
+                      <strong>${s.label}${s.slotId ? ` · ${s.slotId}` : ""}</strong>
+                      <span class="doc-wireframe-viewport">${vp}</span>
+                    </div>
+                    <div class="doc-wireframe-body">
+                      <div class="doc-wireframe-row">
+                        <span class="doc-wireframe-key">message</span>
+                        <span class="doc-wireframe-val">${s.why}</span>
+                      </div>
+                      <div class="doc-wireframe-row">
+                        <span class="doc-wireframe-key">visual</span>
+                        <span class="doc-wireframe-val">${s.visual}</span>
+                      </div>
+                      <div class="doc-wireframe-row">
+                        <span class="doc-wireframe-key">keep</span>
+                        <span class="doc-wireframe-val doc-wireframe-val--keep">${s.keep}</span>
+                      </div>
+                      <div class="doc-wireframe-row">
+                        <span class="doc-wireframe-key">change</span>
+                        <span class="doc-wireframe-val doc-wireframe-val--change">${s.change}</span>
+                      </div>
+                      <div class="doc-wireframe-row">
+                        <span class="doc-wireframe-key">zones</span>
+                        <div class="doc-wireframe-zones">
+                          ${zones.map(z => `<span class="doc-wireframe-zone-chip">${z}</span>`).join("")}
+                        </div>
+                      </div>
+                    </div>
+                  </div>`;
+                }).join("")}
+              </div>
+            </section>` : ""}
+
+            <section id="prd-flow" class="doc-card doc-card--alt">
+              <h4 class="doc-card-title"><span class="doc-card-icon">🔄</span>10. 사용자 흐름</h4>
+              ${flowHtml}
+            </section>
+
+            <section id="prd-roadmap" class="doc-card">
+              <h4 class="doc-card-title"><span class="doc-card-icon">📅</span>11. 단계별 로드맵</h4>
+              ${roadmapHtml}
+            </section>
+
+            ${hasGuardrails ? `
+            <section id="prd-guardrails" class="doc-card doc-card--alt">
+              <h4 class="doc-card-title"><span class="doc-card-icon">🛡️</span>12. 가드레일</h4>
+              <div class="doc-guardrail-list">
+                ${toArr(p.guardrails).map(line =>
+                  `<div class="doc-guardrail-item"><span class="doc-guardrail-icon">🚫</span>${line}</div>`
+                ).join("")}
+              </div>
+            </section>` : ""}
+
+            <section id="prd-issues" class="doc-card doc-card--warn">
+              <h4 class="doc-card-title"><span class="doc-card-icon">⚠️</span>13. 미결 사항 / 제외 판단 이유</h4>
+              <p>${p.open}</p>
+            </section>
+
+          </div>
+        `;
+
+        /* TOC active 동기화 */
+        const tocLinks = prdPreviewEl.querySelectorAll(".doc-toc-item");
+        const sectionIds = tocItems.map(([id]) => id);
+        if (tocLinks.length) tocLinks[0].classList.add("active");
+        function syncToc() {
+          let active = sectionIds[0];
+          for (const id of sectionIds) {
+            const el = document.getElementById(id);
+            if (el && el.getBoundingClientRect().top < 140) active = id;
+          }
+          tocLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === `#${active}`));
+        }
+        window.removeEventListener("scroll", window._prdTocScroll);
+        window._prdTocScroll = syncToc;
+        window.addEventListener("scroll", syncToc, { passive: true });
+      }
+
+      function renderSupportItems() {
+        supportListEl.innerHTML = supportItems.map((item) => `
+          <div class="support-item">
+            <span class="label">${item.label}</span>
+            <div class="value">${item.value}</div>
+          </div>
+        `).join("");
+      }
+
+      function renderRelatedScreens(page) {
+        const baseDesignLabel = page.group === "홈" ? "원본 홈페이지 디자인" : "원본 기준 화면";
+        const items = [
+          {
+            title: "작업 미리보기",
+            cta: "열기",
+          },
+          {
+            title: "전후 비교",
+            cta: "열기",
+          },
+          {
+            title: baseDesignLabel,
+            cta: "열기",
+          },
+        ];
+        relatedScreenListEl.innerHTML = items.map((item) => `
+          <div class="link-item">
+            <strong>${item.title}</strong>
+            <button class="btn secondary" type="button" ${item.disabled ? "disabled" : ""}>${item.cta}</button>
+          </div>
+        `).join("");
+      }
+
+      function renderAnchorDots(page) {
+        document.getElementById("anchorIdentityDot").className = dotClass(page.statuses.identity);
+        document.getElementById("anchorRequirementsDot").className = dotClass(page.statuses.requirements);
+        document.getElementById("anchorPrdDot").className = dotClass(page.statuses.prd);
+        document.getElementById("anchorBuildDot").className = page.builder?.activated ? "dot draft" : "dot";
+      }
+
+      function buildBuilderPreviewItems(page) {
+        const proposals = Array.isArray(page.prd?.screenProposals) ? page.prd.screenProposals : [];
+        if (proposals.length) {
+          return proposals.map((item) => ({
+            label: item.label || "섹션 결과",
+            slotId: item.slotId || "-",
+            change: item.change || "변경 항목 없음",
+          }));
+        }
+        const fallbackFeatures = Array.isArray(page.prd?.featuresDetail) && page.prd.featuresDetail.length
+          ? page.prd.featuresDetail
+          : Array.isArray(page.prd?.features)
+            ? page.prd.features.map((feature) => ({ name: feature, description: "섹션 변화 요약이 아직 정리되지 않았습니다.", priority: "mid" }))
+            : [];
+        if (!fallbackFeatures.length) {
+          return [
+            {
+              label: "섹션 결과 준비 전",
+              slotId: "-",
+              change: "빌더 실행 후 섹션별 결과가 이 영역에 표시됩니다.",
+            },
+          ];
+        }
+        return fallbackFeatures.slice(0, 4).map((item, index) => ({
+          label: item.name || `핵심 기능 ${index + 1}`,
+          slotId: item.slotId || `section-${index + 1}`,
+          change: item.description || "기획서 방향에 맞는 조정 예정",
+        }));
+      }
+
+      function renderBuilderPreview(page) {
+        const items = buildBuilderPreviewItems(page);
+        builderPreviewGridEl.innerHTML = items.map((item, index) => `
+          <article class="builder-preview-card">
+            <div class="builder-preview-visual">
+              <span class="preview-chip">${item.slotId}</span>
+              <div class="preview-wire">
+                <div class="wire-bar title"></div>
+                <div class="wire-bar"></div>
+                <div class="wire-bar sub"></div>
+              </div>
+              <div class="wire-grid">
+                <div class="wire-card"></div>
+                <div class="wire-card"></div>
+                <div class="wire-card"></div>
+              </div>
+            </div>
+            <div class="builder-preview-body">
+              <div class="builder-preview-head">
+                <div>
+                  <strong>${item.label}</strong>
+                  <span>${index + 1}번째 결과 섹션</span>
+                </div>
+                <span class="preview-chip">미리보기</span>
+              </div>
+              <div class="builder-preview-meta">
+                <p><strong>변경:</strong> ${item.change}</p>
+              </div>
+              <div class="builder-preview-actions">
+                <button class="btn secondary" type="button">비교 열기</button>
+                <button class="btn secondary" type="button">자세히 보기</button>
+              </div>
+            </div>
+          </article>
+        `).join("");
+      }
+
+      function renderVersions(page) {
+        const versions = Array.isArray(page.versions) ? page.versions : [];
+        if (!versions.length) {
+          versionListEl.innerHTML = `
+            <div class="version-item">
+              <div class="version-item-head">
+                <strong>저장된 버전 없음</strong>
+                <span>버전 미생성</span>
+              </div>
+              <p>빌더 실행 후 저장된 결과가 생기면 이 영역에서 버전별로 다시 확인할 수 있습니다.</p>
+            </div>
+          `;
+          return;
+        }
+        versionListEl.innerHTML = versions.map((item) => `
+          <div class="version-item">
+            <div class="version-item-head">
+              <strong>${item.label}</strong>
+              <span>${item.date}</span>
+            </div>
+            <p>${item.summary}</p>
+            <div class="builder-preview-actions">
+              <button class="btn primary" type="button">클론에 적용</button>
+              <button class="btn secondary" type="button">이 버전 보기</button>
+              <button class="btn secondary" type="button">비교 열기</button>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      function renderBuilder(page) {
+        const activated = Boolean(page.builder?.activated);
+        anchorBuildLinkEl.hidden = !activated;
+        builderSectionEl.hidden = !activated;
+        builderStatusTextEl.textContent = page.builder?.statusText || "실행 대기";
+        launchBuilderBtnEl.textContent = activated ? "디자인 빌더 다시 열기" : "빌더 승인 및 실행";
+        renderBuilderPreview(page);
+        renderVersions(page);
+      }
+
+      function updateRequirementModeUi() {
+        const mode = reqModeEl.value || "hybrid";
+        const fieldConfig = {
+          hybrid: ["reference", "preferred", "tone", "key", "message", "avoid", "request"],
+          direct: ["key", "message", "avoid", "request"],
+          reference: ["preferred", "avoid", "reference"],
+        };
+        const visibleFields = fieldConfig[mode] || fieldConfig.hybrid;
+        document.querySelectorAll("[data-req-field]").forEach((fieldEl) => {
+          const fieldId = fieldEl.getAttribute("data-req-field") || "";
+          const order = visibleFields.indexOf(fieldId);
+          fieldEl.hidden = order < 0;
+          fieldEl.style.order = order >= 0 ? String(order + 1) : "";
+        });
+      }
+
+      function renderPage(pageId) {
+        currentPageId = pageId;
+        const page = pages.find((item) => item.id === pageId) || pages[0];
+        pageTitleEl.textContent = page.title;
+        pageDescriptionEl.textContent = page.description;
+        pageTypePillEl.textContent = page.type;
+        pageOwnerPillEl.textContent = page.owner;
+        renderStatusSummary(page);
+        renderIdentity(page);
+        renderRequirements(page);
+        renderPrd(page);
+        renderSupportItems();
+        renderRelatedScreens(page);
+        renderAnchorDots(page);
+        renderBuilder(page);
+        renderPageList();
+      }
+
+      document.addEventListener("click", (event) => {
+        const pageItem = event.target.closest(".page-item");
+        if (pageItem) {
+          renderPage(pageItem.dataset.pageId);
+          return;
+        }
+        const filterChip = event.target.closest("#filterChips .chip");
+        if (filterChip) {
+          currentFilter = filterChip.dataset.filter;
+          filterChipEls.forEach((chip) => chip.classList.toggle("active", chip === filterChip));
+          renderPageList();
+        }
+      });
+
+      searchInputEl.addEventListener("input", (event) => {
+        searchQuery = event.target.value.trim().toLowerCase();
+        renderPageList();
+      });
+
+      reqModeEl.addEventListener("change", updateRequirementModeUi);
+
+      launchBuilderBtnEl.addEventListener("click", () => {
+        const page = pages.find((item) => item.id === currentPageId);
+        if (!page) return;
+        page.builder = {
+          ...(page.builder || {}),
+          activated: true,
+          statusText: "승인 완료 · 디자인 빌더 실행 가능",
+        };
+        renderPage(currentPageId);
+        builderSectionEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      const anchorLinks = Array.from(document.querySelectorAll(".anchor-link"));
+      const sections = anchorLinks.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
       const observer = new IntersectionObserver((entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (!visible) return;
         anchorLinks.forEach((link) => {
           link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
         });
       }, { rootMargin: "-25% 0px -55% 0px", threshold: [0.1, 0.3, 0.6] });
-
       sections.forEach((section) => observer.observe(section));
+
+      renderPage(currentPageId);
     </script>
   </body>
-  </html>
+</html>
