@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>관리자 화면 연구용 프로토타입</title>
+    <style>
+      :root {
+        --bg: #f6f7fb;
+        --surface: #ffffff;
+        --surface-soft: #fafbff;
+        --line: #e7eaf2;
+        --line-strong: #d9deea;
+        --text: #111827;
+        --text-muted: #667085;
+        --text-soft: #98a2b3;
+        --brand: #2563eb;
+        --brand-soft: #eff6ff;
+        --success: #16a34a;
+        --success-soft: #ecfdf3;
+        --warning: #d97706;
+        --warning-soft: #fff7ed;
+        --danger: #dc2626;
+        --danger-soft: #fef2f2;
+        --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+        --radius-lg: 16px;
+        --radius-md: 12px;
+        --radius-sm: 10px;
+        --sidebar-w: 328px;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: Inter, Pretendard, "Noto Sans KR", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .app {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+      }
+
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .sidebar-head {
+        padding: 18px 18px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .eyebrow {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-soft);
+        letter-spacing: -0.02em;
+      }
+
+      .sidebar-head h1 {
+        margin: 6px 0 0;
+        font-size: 20px;
+        line-height: 1.25;
+        letter-spacing: -0.04em;
+      }
+
+      .sidebar-head p {
+        margin: 8px 0 0;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text-muted);
+      }
+
+      .sidebar-tools {
+        padding: 14px 18px 12px;
+        border-bottom: 1px solid var(--line);
+        display: grid;
+        gap: 10px;
+      }
+
+      .search {
+        width: 100%;
+        height: 42px;
+        border: 1px solid var(--line-strong);
+        border-radius: 12px;
+        background: var(--surface-soft);
+        padding: 0 14px;
+        font: inherit;
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .chip {
+        border: 1px solid var(--line-strong);
+        background: var(--surface);
+        color: var(--text-muted);
+        border-radius: 999px;
+        padding: 7px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .chip.active {
+        background: var(--brand-soft);
+        border-color: #bfdbfe;
+        color: #1d4ed8;
+      }
+
+      .sidebar-list {
+        padding: 10px 12px 18px;
+        display: grid;
+        gap: 8px;
+        overflow: auto;
+      }
+
+      .page-item {
+        width: 100%;
+        border: 1px solid transparent;
+        background: transparent;
+        border-radius: 14px;
+        padding: 12px;
+        display: grid;
+        gap: 8px;
+        cursor: pointer;
+        text-align: left;
+      }
+
+      .page-item:hover {
+        background: #f8fbff;
+        border-color: #e6edf9;
+      }
+
+      .page-item.active {
+        background: var(--brand-soft);
+        border-color: #bfdbfe;
+      }
+
+      .page-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .page-title-row strong {
+        font-size: 14px;
+        line-height: 1.35;
+      }
+
+      .page-meta {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.55;
+      }
+
+      .status-dots {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #d0d5dd;
+      }
+      .dot.draft { background: var(--brand); }
+      .dot.ready { background: var(--success); }
+      .dot.stale { background: var(--warning); }
+
+      .content {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: rgba(246, 247, 251, 0.92);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .topbar-inner {
+        padding: 18px 24px 16px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .topbar-title h2 {
+        margin: 0;
+        font-size: 26px;
+        line-height: 1.2;
+        letter-spacing: -0.04em;
+      }
+
+      .topbar-title p {
+        margin: 8px 0 0;
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      .topbar-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 8px 10px;
+        font-size: 12px;
+        font-weight: 700;
+        border: 1px solid var(--line-strong);
+        background: var(--surface);
+        color: var(--text-muted);
+      }
+
+      .main {
+        padding: 24px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .status-summary {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .summary-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+        padding: 16px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .summary-card-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-soft);
+      }
+
+      .summary-card strong {
+        font-size: 16px;
+        line-height: 1.35;
+      }
+
+      .summary-card p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--text-muted);
+      }
+
+      .anchor-bar {
+        position: sticky;
+        top: 86px;
+        z-index: 15;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(10px);
+      }
+
+      .anchor-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 12px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .anchor-link.active {
+        background: var(--brand-soft);
+        color: #1d4ed8;
+        border-color: #bfdbfe;
+      }
+
+      .doc-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        gap: 18px;
+        align-items: start;
+      }
+
+      .doc-column {
+        display: grid;
+        gap: 18px;
+      }
+
+      .aside-column {
+        position: sticky;
+        top: 156px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .section-card,
+      .aside-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        box-shadow: var(--shadow);
+      }
+
+      .section-head,
+      .aside-head {
+        padding: 18px 20px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .section-head h3,
+      .aside-head h4 {
+        margin: 0;
+        font-size: 19px;
+        line-height: 1.3;
+        letter-spacing: -0.03em;
+      }
+
+      .section-head p,
+      .aside-head p {
+        margin: 8px 0 0;
+        color: var(--text-muted);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .section-body,
+      .aside-body {
+        padding: 18px 20px 20px;
+        display: grid;
+        gap: 16px;
+      }
+
+      .kv-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .kv-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+        background: var(--surface-soft);
+      }
+
+      .kv-card .label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-soft);
+        margin-bottom: 8px;
+      }
+
+      .kv-card .value {
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .field-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .field,
+      .field.full {
+        display: grid;
+        gap: 8px;
+      }
+
+      .field.full {
+        grid-column: 1 / -1;
+      }
+
+      .field label {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-soft);
+      }
+
+      input[type="text"],
+      textarea {
+        width: 100%;
+        border: 1px solid var(--line-strong);
+        border-radius: 12px;
+        padding: 12px 14px;
+        font: inherit;
+        background: var(--surface);
+        color: var(--text);
+      }
+
+      textarea {
+        min-height: 104px;
+        resize: vertical;
+      }
+
+      .helper {
+        font-size: 12px;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .btn {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .btn.primary {
+        background: var(--brand);
+        color: #fff;
+      }
+
+      .btn.secondary {
+        background: var(--surface);
+        color: var(--text);
+        border-color: var(--line-strong);
+      }
+
+      .btn.quiet {
+        background: transparent;
+        color: var(--text-muted);
+        padding-left: 0;
+        padding-right: 0;
+      }
+
+      .doc-preview {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: #fff;
+        padding: 20px 22px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .doc-block {
+        display: grid;
+        gap: 8px;
+      }
+
+      .doc-block h4 {
+        margin: 0;
+        font-size: 15px;
+        line-height: 1.4;
+      }
+
+      .doc-block p,
+      .doc-block li {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.7;
+        color: #344054;
+      }
+
+      .doc-block ul {
+        margin: 0;
+        padding-left: 18px;
+        display: grid;
+        gap: 6px;
+      }
+
+      .aside-note {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .mini-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      .ops-card {
+        border: 1px dashed #d0d5dd;
+        border-radius: 14px;
+        background: #fcfcfd;
+        padding: 16px 18px;
+        color: var(--text-muted);
+      }
+
+      @media (max-width: 1180px) {
+        .doc-layout { grid-template-columns: 1fr; }
+        .aside-column { position: static; }
+        .status-summary { grid-template-columns: 1fr; }
+      }
+
+      @media (max-width: 900px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar { border-right: 0; border-bottom: 1px solid var(--line); }
+        .topbar-inner { flex-direction: column; align-items: flex-start; }
+        .field-grid, .kv-grid { grid-template-columns: 1fr; }
+        .anchor-bar { top: 0; border-radius: 0; margin: 0 -24px; padding-left: 24px; padding-right: 24px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <div class="eyebrow">연구용 프로토타입</div>
+          <h1>페이지 문서 관리</h1>
+          <p>정체성, 요구사항, 기획서 중심으로 재구성한 관리자 화면 실험안입니다.</p>
+        </div>
+        <div class="sidebar-tools">
+          <input class="search" type="text" placeholder="페이지 검색" />
+          <div class="chips">
+            <button class="chip active" type="button">전체</button>
+            <button class="chip" type="button">작업 중</button>
+            <button class="chip" type="button">기획서 없음</button>
+          </div>
+        </div>
+        <div class="sidebar-list">
+          <button class="page-item active" type="button">
+            <div class="page-title-row">
+              <strong>홈</strong>
+              <div class="status-dots">
+                <span class="dot ready" title="정체성 완료"></span>
+                <span class="dot draft" title="요구사항 작성 중"></span>
+                <span class="dot stale" title="기획서 업데이트 필요"></span>
+              </div>
+            </div>
+            <div class="page-meta">브랜드 홈 / 최근 수정 12분 전</div>
+          </button>
+          <button class="page-item" type="button">
+            <div class="page-title-row">
+              <strong>케어솔루션</strong>
+              <div class="status-dots">
+                <span class="dot ready"></span>
+                <span class="dot ready"></span>
+                <span class="dot ready"></span>
+              </div>
+            </div>
+            <div class="page-meta">서비스 페이지 / 기획서 완료</div>
+          </button>
+          <button class="page-item" type="button">
+            <div class="page-title-row">
+              <strong>상품상세</strong>
+              <div class="status-dots">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+            </div>
+            <div class="page-meta">PDP / 아직 시작 전</div>
+          </button>
+        </div>
+      </aside>
+
+      <div class="content">
+        <div class="topbar">
+          <div class="topbar-inner">
+            <div class="topbar-title">
+              <h2>홈</h2>
+              <p>브랜드 홈 페이지의 기준 문서와 이번 작업 요청을 정리하는 화면</p>
+            </div>
+            <div class="topbar-meta">
+              <span class="pill">브랜드 홈</span>
+              <span class="pill">PC 기준</span>
+              <span class="pill">최근 편집자 김담당</span>
+            </div>
+          </div>
+        </div>
+
+        <main class="main">
+          <section class="status-summary">
+            <article class="summary-card">
+              <span class="summary-card-label">페이지 정체성</span>
+              <strong>완료</strong>
+              <p>이 페이지의 역할과 유지 원칙이 기준 문서로 저장되어 있습니다.</p>
+            </article>
+            <article class="summary-card">
+              <span class="summary-card-label">요구사항</span>
+              <strong>작성 중</strong>
+              <p>이번 요청 입력은 저장돼 있지만, 아직 최종 기획서 생성 전입니다.</p>
+            </article>
+            <article class="summary-card">
+              <span class="summary-card-label">기획서</span>
+              <strong>업데이트 필요</strong>
+              <p>요구사항이 수정되어 기존 기획서를 다시 생성해야 하는 상태입니다.</p>
+            </article>
+          </section>
+
+          <nav class="anchor-bar">
+            <a class="anchor-link active" href="#identity">
+              <span class="dot ready"></span>
+              페이지 정체성
+            </a>
+            <a class="anchor-link" href="#requirements">
+              <span class="dot draft"></span>
+              요구사항
+            </a>
+            <a class="anchor-link" href="#prd">
+              <span class="dot stale"></span>
+              기획서
+            </a>
+          </nav>
+
+          <div class="doc-layout">
+            <div class="doc-column">
+              <section id="identity" class="section-card">
+                <div class="section-head">
+                  <h3>페이지 정체성</h3>
+                  <p>이 페이지가 원래 어떤 목적을 가지는지 정의하는 기준 문서입니다.</p>
+                </div>
+                <div class="section-body">
+                  <div class="actions">
+                    <button class="btn secondary" type="button">편집</button>
+                    <button class="btn quiet" type="button">최근 변경 보기</button>
+                  </div>
+                  <div class="kv-grid">
+                    <div class="kv-card">
+                      <span class="label">페이지 역할</span>
+                      <div class="value">브랜드 첫 인상을 전달하고 주요 서비스와 프로모션으로 연결하는 메인 허브</div>
+                    </div>
+                    <div class="kv-card">
+                      <span class="label">디자인 의도</span>
+                      <div class="value">신뢰감과 탐색 리듬을 유지하면서, 과도한 판촉 느낌 없이 브랜드 중심으로 구성</div>
+                    </div>
+                    <div class="kv-card">
+                      <span class="label">반드시 유지할 것</span>
+                      <div class="value">브랜드 메시지 우선, 메인 내비의 안정감, 주요 카테고리 접근성</div>
+                    </div>
+                    <div class="kv-card">
+                      <span class="label">피해야 할 것</span>
+                      <div class="value">과한 할인몰 톤, 과도한 배너 밀도, 갑작스러운 다크 블록 삽입</div>
+                    </div>
+                  </div>
+                  <div class="kv-card">
+                    <span class="label">페이지 목적</span>
+                    <div class="value">홈 방문자가 브랜드 성격을 빠르게 이해하고, 현재 주요 프로모션과 핵심 카테고리로 자연스럽게 이동하도록 돕는다.</div>
+                  </div>
+                </div>
+              </section>
+
+              <section id="requirements" class="section-card">
+                <div class="section-head">
+                  <h3>요구사항</h3>
+                  <p>이번 작업에서 원하는 방향과 범위를 입력하는 영역입니다.</p>
+                </div>
+                <div class="section-body">
+                  <div class="field-grid">
+                    <div class="field">
+                      <label>요청 제목</label>
+                      <input type="text" value="홈 첫 화면 메시지 재정렬" />
+                    </div>
+                    <div class="field">
+                      <label>핵심 메시지</label>
+                      <input type="text" value="브랜드 신뢰감과 현재 주력 혜택을 더 분명하게" />
+                    </div>
+                    <div class="field full">
+                      <label>요청 배경</label>
+                      <textarea>현재 홈 첫 화면은 배너와 섹션이 많은데, 첫 인상에서 브랜드 메시지보다 프로모션이 먼저 보인다는 의견이 있음. 고객이 LG다운 인상을 먼저 받고 주요 혜택으로 이어지도록 정리 필요.</textarea>
+                    </div>
+                    <div class="field">
+                      <label>원하는 방향</label>
+                      <textarea>첫 화면 문구 위계 정리
+히어로 카피 명확화
+브랜드 중심 톤 유지</textarea>
+                    </div>
+                    <div class="field">
+                      <label>피해야 할 방향</label>
+                      <textarea>이커머스 할인몰 같은 분위기
+과한 판촉 문구
+과도한 색상 실험</textarea>
+                    </div>
+                    <div class="field full">
+                      <label>참고 레퍼런스</label>
+                      <textarea>https://www.apple.com/
+https://www.nothing.tech/</textarea>
+                    </div>
+                  </div>
+                  <div class="helper">이 단계에서는 기획서를 직접 고치지 않고, 이번 요청만 명확하게 입력합니다.</div>
+                  <div class="actions">
+                    <button class="btn secondary" type="button">요구사항 저장</button>
+                    <button class="btn primary" type="button">기획서 생성</button>
+                  </div>
+                </div>
+              </section>
+
+              <section id="prd" class="section-card">
+                <div class="section-head">
+                  <h3>기획서</h3>
+                  <p>정체성과 요구사항을 바탕으로 생성된 고객용 PRD 문서입니다.</p>
+                </div>
+                <div class="section-body">
+                  <div class="actions">
+                    <button class="btn secondary" type="button">직접 편집</button>
+                    <button class="btn secondary" type="button">PDF 내보내기</button>
+                    <button class="btn quiet" type="button">마크다운 복사</button>
+                  </div>
+                  <article class="doc-preview">
+                    <section class="doc-block">
+                      <h4>1. 한 줄 요약</h4>
+                      <p>홈 첫 화면에서 브랜드 신뢰감을 먼저 전달하고, 현재 주요 혜택과 탐색 동선을 더 명확하게 정리한다.</p>
+                    </section>
+                    <section class="doc-block">
+                      <h4>2. 배경 / 문제 정의</h4>
+                      <p>현재 홈은 프로모션 요소가 먼저 강하게 보이면서 브랜드 첫 인상이 약해진다. 방문자는 LG다운 메시지를 먼저 이해하기보다 배너와 혜택을 따로 읽게 된다.</p>
+                    </section>
+                    <section class="doc-block">
+                      <h4>3. 목표 범위</h4>
+                      <ul>
+                        <li>히어로와 상단 주요 섹션의 카피 위계 정리</li>
+                        <li>브랜드 톤을 유지하면서 주요 혜택 전달 구조 개선</li>
+                        <li>전체 재설계가 아니라 첫 화면 메시지 흐름 개선에 집중</li>
+                      </ul>
+                    </section>
+                    <section class="doc-block">
+                      <h4>4. 핵심 기능</h4>
+                      <ul>
+                        <li>히어로 문구 재구성</li>
+                        <li>주요 혜택 섹션 진입 순서 정리</li>
+                        <li>퀵메뉴와 탐색 리듬 보강</li>
+                      </ul>
+                    </section>
+                    <section class="doc-block">
+                      <h4>5. 사용자 흐름</h4>
+                      <p>사용자가 홈에 진입하면 브랜드 메시지를 먼저 이해하고, 이어서 현재 주요 혜택과 카테고리로 이동한다.</p>
+                    </section>
+                    <section class="doc-block">
+                      <h4>6. 단계별 로드맵</h4>
+                      <ul>
+                        <li>1단계: 기준 문서와 요구사항 정리</li>
+                        <li>2단계: 첫 화면 메시지 흐름 시안 생성</li>
+                        <li>3단계: 비교 후 반영안 확정</li>
+                      </ul>
+                    </section>
+                    <section class="doc-block">
+                      <h4>7. 미결 사항 / 제외 판단 이유</h4>
+                      <p>이번 단계에서는 하단 장문 섹션이나 전체 홈 구조 재편은 포함하지 않는다. 첫 인상과 메시지 위계 문제를 우선 해결하는 데 집중한다.</p>
+                    </section>
+                  </article>
+                </div>
+              </section>
+            </div>
+
+            <aside class="aside-column">
+              <section class="aside-card">
+                <div class="aside-head">
+                  <h4>현재 상태</h4>
+                  <p>긴 본문을 보기 전에 확인하는 간단한 문서 상태 요약</p>
+                </div>
+                <div class="aside-body">
+                  <div class="mini-status"><span class="dot ready"></span>정체성은 현재 기준 문서로 사용 가능</div>
+                  <div class="mini-status"><span class="dot draft"></span>요구사항은 수정 후 아직 재생성 전</div>
+                  <div class="mini-status"><span class="dot stale"></span>기획서는 최신 요구사항 반영 필요</div>
+                </div>
+              </section>
+
+              <section class="aside-card">
+                <div class="aside-head">
+                  <h4>다음 액션</h4>
+                  <p>이 화면에서 바로 취해야 할 행동만 최소로 제시</p>
+                </div>
+                <div class="aside-body">
+                  <div class="aside-note">요구사항 저장 후 기획서를 다시 생성하는 것이 현재 가장 우선입니다.</div>
+                  <div class="actions">
+                    <button class="btn primary" type="button">기획서 재생성</button>
+                  </div>
+                </div>
+              </section>
+
+              <div class="ops-card">
+                <strong>운영 도구 영역</strong>
+                <p class="aside-note">디자인 빌더, 비교, 버전 관리, runtime/debug는 메인 문서 흐름과 분리해 별도 하단 영역이나 드로어로 두는 방향을 가정합니다.</p>
+              </div>
+            </aside>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      const anchorLinks = Array.from(document.querySelectorAll(".anchor-link"));
+      const sections = anchorLinks
+        .map((link) => document.querySelector(link.getAttribute("href")))
+        .filter(Boolean);
+
+      const observer = new IntersectionObserver((entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        anchorLinks.forEach((link) => {
+          link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+        });
+      }, { rootMargin: "-25% 0px -55% 0px", threshold: [0.1, 0.3, 0.6] });
+
+      sections.forEach((section) => observer.observe(section));
+    </script>
+  </body>
+  </html>
