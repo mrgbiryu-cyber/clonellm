@@ -67,6 +67,18 @@ function safeArray(values, limit = 12) {
   return Array.from(new Set((Array.isArray(values) ? values : []).map((item) => String(item || "").trim()).filter(Boolean))).slice(0, limit);
 }
 
+function uniqueNonEmpty(values, limit = 12) {
+  return Array.from(new Set((Array.isArray(values) ? values : []).map((item) => String(item || "").trim()).filter(Boolean))).slice(0, limit);
+}
+
+function firstNonEmpty(...values) {
+  for (const value of values) {
+    const normalized = String(value || "").trim();
+    if (normalized) return normalized;
+  }
+  return "";
+}
+
 function buildTextCorpus(referenceSummary) {
   return [
     referenceSummary?.title,
@@ -78,6 +90,175 @@ function buildTextCorpus(referenceSummary) {
   ]
     .join(" ")
     .toLowerCase();
+}
+
+function parseDesignMdReferenceMeta(normalizedUrl) {
+  try {
+    const parsed = new URL(normalizedUrl);
+    const hostname = String(parsed.hostname || "").toLowerCase();
+    if (hostname !== "designmd.ai") return null;
+    const reservedRoots = new Set(["", "explore", "mcp", "cli", "upload", "login", "terms", "privacy", "api", "what-is-design-md"]);
+    const segments = String(parsed.pathname || "")
+      .split("/")
+      .map((item) => item.trim())
+      .filter(Boolean);
+    if (segments.length < 2) return null;
+    if (reservedRoots.has(segments[0])) return null;
+    const author = segments[0];
+    const slug = segments[1];
+    return {
+      provider: "designmd.ai",
+      author,
+      slug,
+      downloadUrl: `https://designmd.ai/api/v1/kits/${encodeURIComponent(author)}/${encodeURIComponent(slug)}/download`,
+      copyUrl: `https://designmd.ai/api/v1/kits/${encodeURIComponent(author)}/${encodeURIComponent(slug)}/copy`,
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+function parseDesignMarkdown(markdown) {
+  const source = String(markdown || "").replace(/\r\n/g, "\n");
+  const lines = source.split("\n");
+  const title = extractFirstMatch(source, /^#\s+(.+)$/m);
+  const sectionTitles = extractAllMatches(source, /^##\s+(.+)$/gm, 24);
+  const sections = [];
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    const sectionMatch = line.match(/^##\s+(.+)$/);
+    if (!sectionMatch) continue;
+    const sectionTitle = String(sectionMatch[1] || "").trim();
+    const buffer = [];
+    for (let cursor = index + 1; cursor < lines.length; cursor += 1) {
+      if (/^##\s+/.test(lines[cursor])) break;
+      buffer.push(lines[cursor]);
+    }
+    sections.push({
+      title: sectionTitle,
+      body: buffer.join("\n").trim(),
+    });
+  }
+  const sectionMap = new Map(sections.map((item) => [item.title.toLowerCase(), item.body]));
+  const overview = firstNonEmpty(
+    sectionMap.get("overview"),
+    extractFirstMatch(source, /^##\s+Overview\s+([\s\S]*?)(?=^##\s+|\Z)/m)
+  )
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join(" ")
+    .slice(0, 1200);
+
+  const colorMatches = Array.from(source.matchAll(/-\s+\*\*([^*]+)\*\*\s*\((#[0-9a-fA-F]{3,8})\)\s*:\s*(.+)$/gm)).map((match) => ({
+    name: String(match[1] || "").trim(),
+    hex: String(match[2] || "").trim(),
+    role: String(match[3] || "").trim(),
+  }));
+  const typographyMatches = Array.from(source.matchAll(/-\s+\*\*([^*]+)\*\*\s*:\s*(.+)$/gm))
+    .map((match) => ({
+      label: String(match[1] || "").trim(),
+      value: String(match[2] || "").trim(),
+    }))
+    .filter((item) => /font|type/i.test(item.label));
+  const componentMatches = Array.from(source.matchAll(/-\s+\*\*([^*]+)\*\*\s*:\s*(.+)$/gm))
+    .map((match) => ({
+      name: String(match[1] || "").trim(),
+      description: String(match[2] || "").trim(),
+    }))
+    .filter((item) =>
+      !/font|display|body|code/i.test(item.name) &&
+      /buttons|cards|inputs|chips|lists|checkboxes|tooltips|navigation|search|forms|hero|banner|grid|carousel|tabs/i.test(item.name)
+    );
+
+  const dosSection = firstNonEmpty(sectionMap.get("do's and don'ts"), sectionMap.get("dos and don'ts"), sectionMap.get("do’s and don’ts"));
+  const dos = Array.from(dosSection.matchAll(/-\s+Do\s+(.+)$/gim)).map((match) => String(match[1] || "").trim());
+  const donts = Array.from(dosSection.matchAll(/-\s+Don'?t\s+(.+)$/gim)).map((match) => String(match[1] || "").trim());
+
+  return {
+    title,
+    overview,
+    sectionTitles,
+    sections: sections.map((item) => ({
+      title: item.title,
+      preview: item.body.split("\n").map((line) => line.trim()).filter(Boolean).join(" ").slice(0, 240),
+    })),
+    colors: colorMatches.slice(0, 16),
+    typography: typographyMatches.slice(0, 12),
+    components: componentMatches.slice(0, 16),
+    dos: dos.slice(0, 8),
+    donts: donts.slice(0, 8),
+    markdownLength: source.length,
+  };
+}
+
+function buildReferenceSummaryFromMarkdown(markdownSignals) {
+  const sections = Array.isArray(markdownSignals?.sections) ? markdownSignals.sections : [];
+  const sectionCandidates = sections.slice(0, 12).map((item, index) => ({
+    index,
+    tagName: "section",
+    id: "",
+    className: `design-md-section ${slugLoose(item.title || "")}`,
+    textPreview: item.preview || "",
+    imageCount: /hero|banner|card|gallery|carousel|preview/i.test(item.title || "") ? 1 : 0,
+    buttonCount: /button|cta|navigation|search/i.test(item.preview || "") ? 1 : 0,
+    controlCount: /button|input|checkbox|tab|search|navigation|list/i.test(item.preview || "") ? 1 : 0,
+  }));
+  const textPreview = [
+    markdownSignals?.overview,
+    ...(markdownSignals?.colors || []).map((item) => `${item.name} ${item.hex} ${item.role}`),
+    ...(markdownSignals?.components || []).map((item) => `${item.name} ${item.description}`),
+    ...(markdownSignals?.dos || []).map((item) => `Do ${item}`),
+    ...(markdownSignals?.donts || []).map((item) => `Don't ${item}`),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .slice(0, 4000);
+  return {
+    title: String(markdownSignals?.title || "").trim(),
+    description: String(markdownSignals?.overview || "").trim(),
+    headings: uniqueNonEmpty([markdownSignals?.title, ...(markdownSignals?.sectionTitles || [])], 16),
+    ctaLabels: [],
+    navLabels: [],
+    sectionCandidates,
+    imageCount: (markdownSignals?.colors || []).length > 0 ? 1 : 0,
+    formControlCount: (markdownSignals?.components || []).filter((item) => /button|input|checkbox|navigation|search|list/i.test(item.name || "")).length,
+    productCardCount: (markdownSignals?.components || []).filter((item) => /card|grid|gallery|carousel/i.test(item.name || "")).length,
+    heroSectionCount: sectionCandidates.filter((item) => /hero|banner|overview/i.test(item.className || "")).length,
+    stickySignalCount: (markdownSignals?.components || []).filter((item) => /navigation|search/i.test(item.name || "")).length,
+    textPreview,
+  };
+}
+
+function deriveDesignMarkdownTakeaways(markdownSignals = {}) {
+  const takeaways = [];
+  if (markdownSignals.title) {
+    takeaways.push(`DESIGN.md 직접 다운로드 성공: ${markdownSignals.title}`);
+  }
+  if (markdownSignals.overview) {
+    takeaways.push(`핵심 무드: ${markdownSignals.overview.slice(0, 140)}`);
+  }
+  if ((markdownSignals.colors || []).length) {
+    const palette = (markdownSignals.colors || [])
+      .slice(0, 3)
+      .map((item) => `${item.name} ${item.hex}`)
+      .join(" / ");
+    takeaways.push(`색상 규칙 ${markdownSignals.colors.length}개 추출: ${palette}`);
+  }
+  if ((markdownSignals.typography || []).length) {
+    const fonts = (markdownSignals.typography || [])
+      .slice(0, 3)
+      .map((item) => `${item.label}: ${item.value}`)
+      .join(" / ");
+    takeaways.push(`타이포 규칙 확보: ${fonts}`);
+  }
+  if ((markdownSignals.components || []).length) {
+    takeaways.push(`컴포넌트 그룹 ${markdownSignals.components.length}개 추출: ${(markdownSignals.components || []).slice(0, 5).map((item) => item.name).join(", ")}`);
+  }
+  if ((markdownSignals.dos || []).length || (markdownSignals.donts || []).length) {
+    takeaways.push(`가드레일 문장 추출: Do ${Math.min((markdownSignals.dos || []).length, 8)}개 / Don't ${Math.min((markdownSignals.donts || []).length, 8)}개`);
+  }
+  return uniqueNonEmpty(takeaways, 8);
 }
 
 function deriveTakeaways(referenceSummary) {
@@ -358,7 +539,9 @@ async function analyzeReferenceUrl({
   const referenceId = `ref_${digest}`;
   const outDir = path.join(PLANNER_REFERENCE_DIR, referenceId);
   const htmlPath = path.join(outDir, `${viewport.profile}.html`);
+  const markdownPath = path.join(outDir, `${viewport.profile}.md`);
   const metadataPath = path.join(outDir, `${viewport.profile}.json`);
+  const designMdMeta = parseDesignMdReferenceMeta(normalizedUrl);
   try {
     ensureDir(outDir);
     const response = await fetch(normalizedUrl, {
@@ -372,9 +555,43 @@ async function analyzeReferenceUrl({
     }
     const html = await response.text();
     fs.writeFileSync(htmlPath, html, "utf-8");
-    const summary = collectReferenceSummaryFromHtml(html);
+    let markdownSignals = null;
+    let markdownDownload = null;
+    if (designMdMeta?.downloadUrl) {
+      try {
+        const mdResponse = await fetch(designMdMeta.downloadUrl, {
+          headers: {
+            "user-agent": viewport.userAgent,
+            "accept-language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+            accept: "text/markdown,text/plain;q=0.9,*/*;q=0.8",
+          },
+        });
+        if (mdResponse.ok) {
+          const markdown = await mdResponse.text();
+          fs.writeFileSync(markdownPath, markdown, "utf-8");
+          markdownSignals = parseDesignMarkdown(markdown);
+          markdownDownload = {
+            provider: designMdMeta.provider,
+            author: designMdMeta.author,
+            slug: designMdMeta.slug,
+            downloadUrl: designMdMeta.downloadUrl,
+            copyUrl: designMdMeta.copyUrl,
+          };
+        }
+      } catch (_) {
+        // DESIGN.md manual reference is optional; HTML analysis still succeeds without markdown.
+      }
+    }
+    const htmlSummary = collectReferenceSummaryFromHtml(html);
+    const summary = markdownSignals
+      ? buildReferenceSummaryFromMarkdown(markdownSignals)
+      : htmlSummary;
     const finalUrl = response.url || normalizedUrl;
     const slotMatches = buildSlotMatches(summary, editableSlots);
+    const takeaways = uniqueNonEmpty([
+      ...(markdownSignals ? deriveDesignMarkdownTakeaways(markdownSignals) : []),
+      ...deriveTakeaways(summary),
+    ], 8);
     const payload = {
       referenceId,
       status: "ok",
@@ -388,11 +605,33 @@ async function analyzeReferenceUrl({
         screenshotPath: null,
         screenshotUrl: null,
         htmlPath,
+        markdownPath: fs.existsSync(markdownPath) ? markdownPath : null,
         metadataPath,
       },
       summary,
-      takeaways: deriveTakeaways(summary),
+      takeaways,
       slotMatches,
+      designReference:
+        markdownSignals || markdownDownload
+          ? {
+              type: "design-md",
+              provider: designMdMeta?.provider || markdownDownload?.provider || "",
+              author: markdownDownload?.author || "",
+              slug: markdownDownload?.slug || "",
+              downloadUrl: markdownDownload?.downloadUrl || "",
+              copyUrl: markdownDownload?.copyUrl || "",
+              title: markdownSignals?.title || "",
+              overview: markdownSignals?.overview || "",
+              colorCount: (markdownSignals?.colors || []).length,
+              typographyCount: (markdownSignals?.typography || []).length,
+              componentCount: (markdownSignals?.components || []).length,
+              dosCount: (markdownSignals?.dos || []).length,
+              dontsCount: (markdownSignals?.donts || []).length,
+              palettePreview: (markdownSignals?.colors || []).slice(0, 6),
+              typographyPreview: (markdownSignals?.typography || []).slice(0, 6),
+              componentPreview: (markdownSignals?.components || []).slice(0, 8),
+            }
+          : null,
     };
     fs.writeFileSync(metadataPath, JSON.stringify(payload, null, 2), "utf-8");
     return payload;
@@ -410,6 +649,7 @@ async function analyzeReferenceUrl({
         screenshotPath: null,
         screenshotUrl: null,
         htmlPath: fs.existsSync(htmlPath) ? htmlPath : null,
+        markdownPath: fs.existsSync(markdownPath) ? markdownPath : null,
         metadataPath,
       },
       summary: null,

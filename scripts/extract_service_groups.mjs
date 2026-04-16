@@ -2,8 +2,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import WebSocket from "ws";
 
-const ROOT = "/mnt/c/Users/mrgbi/lge-site-analysis";
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = path.join(ROOT, "data", "normalized", "service-groups");
 const OUT_INDEX_PATH = path.join(OUT_DIR, "index.json");
 const LOCK_PATH = path.join(ROOT, "tmp", "extract-service-groups.lock");
@@ -36,6 +38,34 @@ const PAGE_CONFIG = {
       { groupId: "benefit", selectors: [".caresolution-benefit"], mode: "first" },
       { groupId: "tabs", selectors: [".tabs-wrap-new", ".ui_smooth_scrolltab", ".tabs"], mode: "first" },
       { groupId: "careBanner", selectors: [".care-banner-wrap"], mode: "first" },
+    ],
+  },
+  "care-solutions-pdp": {
+    sourceUrl: "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021",
+    groups: [
+      { groupId: "visual", selectors: [".pdp-visual-wrap", ".pdp-visual-area"], mode: "first" },
+      { groupId: "detailInfo", selectors: [".pdp-info-area", ".pdp-data"], mode: "first" },
+      { groupId: "noticeBanner", selectors: [".pdp-notice-banner"], mode: "first" },
+      { groupId: "reviewInfo", selectors: [".review-info", ".review-wrap"], mode: "first" },
+    ],
+  },
+  "homestyle-home": {
+    sourceUrl: "https://homestyle.lge.co.kr/home",
+    groups: [
+      { groupId: "quickMenu", selectors: [".PcQuickMenu_quickMenuSection__6lq5j", "[class*='PcQuickMenu_quickMenuSection']"], mode: "first" },
+      { groupId: "labelBanner", selectors: [".PcLabelBanner_labelBannerSection__Pwzkj", "[class*='PcLabelBanner_labelBannerSection']"], mode: "first" },
+      { groupId: "brandStory", selectors: [".PcBrandStory_brandSection__KX7A_", "[class*='PcBrandStory_brandSection']"], mode: "first" },
+    ],
+  },
+  "homestyle-pdp": {
+    sourceUrl: "https://homestyle.lge.co.kr/item?productId=G26030036505",
+    groups: [
+      { groupId: "detailInfo", selectors: [".PcProductDetailInfoV2_detailSection__D_jC3", "[class*='PcProductDetailInfoV2_detailSection']"], mode: "first" },
+      { groupId: "bestProduct", selectors: [".PcBestProduct_bestSection___UO0t", "[class*='PcBestProduct_bestSection']"], mode: "first" },
+      { groupId: "review", selectors: [".PcReviewSection_reviewContainer__Ile3G", "[class*='PcReviewSection_reviewContainer']"], mode: "first" },
+      { groupId: "qna", selectors: [".PcProductDetailQnA_container___mN4P", "[class*='PcProductDetailQnA_container']"], mode: "first" },
+      { groupId: "guides", selectors: [".PcProductDetailGuides_container__3dHy4", "[class*='PcProductDetailGuides_container']"], mode: "first" },
+      { groupId: "seller", selectors: [".PcSeller_sellerSection__aJ1Mx", "[class*='PcSeller_sellerSection']"], mode: "first" },
     ],
   },
 };

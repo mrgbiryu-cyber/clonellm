@@ -36,14 +36,26 @@ def slug_from_url(raw_url: str):
     return f"{base}-{digest}"
 
 
-def resolve_live_url(page_id: str):
+def normalize_viewport_profile(value: str, fallback: str = "pc"):
+    normalized = (value or fallback).strip().lower()
+    if normalized in ("pc", "ta", "mo"):
+        return normalized
+    return fallback
+
+
+def resolve_live_url(page_id: str, viewport_profile: str = "pc"):
     normalized = (page_id or "home").strip() or "home"
+    viewport = normalize_viewport_profile(viewport_profile, "pc")
     if normalized == "home":
-        return "https://www.lge.co.kr/m/home"
+        if viewport == "mo":
+            return "https://www.lge.co.kr/m/home"
+        return "https://www.lge.co.kr/home"
     if normalized.startswith("category-"):
         slug = normalized[len("category-"):].strip()
         if slug:
-            return f"https://www.lge.co.kr/m/category/{slug}"
+            if viewport == "mo":
+                return f"https://www.lge.co.kr/m/category/{slug}"
+            return f"https://www.lge.co.kr/category/{slug}"
     try:
         rows = json.loads(ARCHIVE_INDEX_PATH.read_text(encoding="utf-8"))
     except Exception:
@@ -122,16 +134,18 @@ def main():
     height = int(os.environ.get("VISUAL_CANVAS_HEIGHT", DEFAULT_HEIGHT))
     base_url = os.environ.get("VISUAL_BASE_URL", DEFAULT_BASE_URL).rstrip("/")
     chrome_bin = os.environ.get("CHROME_BIN", str(DEFAULT_CHROME))
+    viewport_profile = normalize_viewport_profile(os.environ.get("VISUAL_VIEWPORT_PROFILE", "pc"), "pc")
 
     output_dir = OUTPUT_ROOT / page_id
     output_dir.mkdir(parents=True, exist_ok=True)
-    live_url = resolve_live_url(page_id)
+    live_url = resolve_live_url(page_id, viewport_profile)
+    page_suffix = f"?viewportProfile={viewport_profile}" if page_id == "home" else ""
 
     targets = {
         "live-reference": live_url,
-        "reference-replay": f"{base_url}/reference-content/{page_id}",
-        "working": f"{base_url}/clone/{page_id}",
-        "compare": f"{base_url}/compare/{page_id}",
+        "reference-replay": f"{base_url}/reference-content/{page_id}{page_suffix}",
+        "working": f"{base_url}/clone/{page_id}{page_suffix}",
+        "compare": f"{base_url}/compare/{page_id}{page_suffix}",
     }
 
     screenshots = {}
@@ -148,6 +162,7 @@ def main():
 
     metadata = {
         "pageId": page_id,
+        "viewportProfile": viewport_profile,
         "liveUrl": live_url,
         "canvas": {
             "width": width,

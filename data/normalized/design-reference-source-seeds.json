@@ -1,0 +1,107 @@
+{
+  "generatedAt": "2026-04-15T00:00:00Z",
+  "entries": [
+    {
+      "id": "baymard-ecommerce-design-examples",
+      "name": "Baymard Ecommerce Design Examples",
+      "url": "https://baymard.com/ecommerce-design-examples",
+      "bucket": "practical_ux_pattern",
+      "sampleClass": "practical",
+      "priority": 1,
+      "role": "이커머스 UX 패턴 수집의 최우선 소스",
+      "collectFor": ["homepage", "category_plp", "product_pdp", "cart", "checkout", "search", "filters", "navigation"]
+    },
+    {
+      "id": "mobbin",
+      "name": "Mobbin",
+      "url": "https://mobbin.com/",
+      "bucket": "practical_ux_pattern",
+      "sampleClass": "practical",
+      "priority": 1,
+      "role": "실제 웹/앱 화면 패턴 수집",
+      "collectFor": ["homepage", "product_listing", "product_detail", "cart", "checkout", "onboarding"]
+    },
+    {
+      "id": "pageflows",
+      "name": "Page Flows",
+      "url": "https://pageflows.com/",
+      "bucket": "practical_ux_pattern",
+      "sampleClass": "practical",
+      "priority": 1,
+      "role": "유저 플로우 단위 수집",
+      "collectFor": ["browse_to_pdp", "pdp_to_cart", "cart_to_checkout", "purchase_flow"]
+    },
+    {
+      "id": "commerce-cream",
+      "name": "Commerce Cream",
+      "url": "https://commercecream.com/",
+      "bucket": "ecommerce_showcase",
+      "sampleClass": "showcase",
+      "priority": 2,
+      "role": "Shopify 기반 이커머스 사례 수집",
+      "collectFor": ["homepage", "collection_page", "product_page", "brand_tone"]
+    },
+    {
+      "id": "ecomm-design",
+      "name": "ecomm.design",
+      "url": "https://ecomm.design/",
+      "bucket": "ecommerce_showcase",
+      "sampleClass": "showcase",
+      "priority": 2,
+      "role": "대량 이커머스 사례 및 플랫폼별 수집",
+      "collectFor": ["category_pages", "product_pages", "platform_examples", "tech_stack_examples"]
+    },
+    {
+      "id": "land-book-ecommerce",
+      "name": "Land-book Ecommerce",
+      "url": "https://land-book.com/design/ecommerce",
+      "bucket": "ecommerce_showcase",
+      "sampleClass": "showcase",
+      "priority": 2,
+      "role": "이커머스 비주얼 사례 수집",
+      "collectFor": ["homepage", "product_listing", "product_page"]
+    },
+    {
+      "id": "awwwards-ecommerce",
+      "name": "Awwwards Ecommerce",
+      "url": "https://www.awwwards.com/websites/e-commerce/",
+      "bucket": "visual_showcase",
+      "sampleClass": "showcase",
+      "priority": 3,
+      "role": "고감도 비주얼/연출 사례",
+      "collectFor": ["art_direction", "premium_tone", "interaction_reference"]
+    },
+    {
+      "id": "best-website-gallery",
+      "name": "Best Website Gallery",
+      "url": "https://bestwebsite.gallery/",
+      "bucket": "visual_showcase",
+      "sampleClass": "showcase",
+      "priority": 3,
+      "role": "보조 비주얼 레퍼런스",
+      "collectFor": ["visual_style", "layout_reference"]
+    },
+    {
+      "id": "collect-ui",
+      "name": "Collect UI",
+      "url": "https://collectui.com/",
+      "bucket": "low_priority",
+      "sampleClass": "concept-shot",
+      "priority": 4,
+      "role": "Dribbble 기반 UI 샷 보조 수집",
+      "note": "실무 UX 표본보다는 컨셉 참고용",
+      "collectFor": ["ui_shot", "visual_reference"]
+    },
+    {
+      "id": "dribbble-ecommerce",
+      "name": "Dribbble Ecommerce",
+      "url": "https://dribbble.com/search/e%20commerce%20ui%20website",
+      "bucket": "low_priority",
+      "sampleClass": "concept-shot",
+      "priority": 5,
+      "role": "컨셉샷 참고용",
+      "note": "실제 운영 UX 표본과 분리 필요",
+      "collectFor": ["concept_shot", "visual_reference"]
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 {
-  "pageId": "care-solutions",
-  "url": "https://www.lge.co.kr/care-solutions",
-  "pageGroup": "care-solution",
+  "pageId": "care-solutions-pdp",
+  "url": "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021",
+  "pageGroup": "product-detail",
   "crawlStatus": "captured",
   "status": 200,
-  "title": "가전 구독 | LG전자",
+  "title": "LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) | WD523VC | 정수기 | 주방가전 | 가전 구독 | LG전자",
   "links": [
     "https://www.lge.co.kr/benefits/exhibitions/detail-PE00360001",
     "https://www.lge.co.kr",
@@ -525,65 +525,15 @@
     "https://www.lge.co.kr/my-page/membership-receipt",
     "https://www.lge.co.kr/ebook",
     "https://www.lge.co.kr/kr/business/",
-    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00897005?tab=subscribe",
-    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00895007?tab=subscribe-benefits",
+    "https://www.lge.co.kr/",
+    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00757007?tab=benefits",
+    "https://www.lge.co.kr/care-solutions/rentalService-benefits?rental-scrvice=sub-renewal",
+    "https://www.lge.co.kr/water-purifiers/wd523vc",
     "https://www.lge.co.kr/benefits/exhibitions/detail-PE00721001",
-    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00843008?tab=subscribe_benefits",
-    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00846004",
-    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00788002",
-    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00890006",
-    "https://www.lge.co.kr/story/faq/care-solutions-good-dog-ep-06?v=3",
-    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00622001",
-    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00835001?tab=purifier-purchase-benefits",
-    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00893001?tab=purchase-benefits",
-    "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021",
-    "https://www.lge.co.kr/care-solutions/water-purifiers/wd520vh?dpType=careTab&subscCategoryKeyId=246259",
-    "https://www.lge.co.kr/care-solutions/water-purifiers/wu923as?dpType=careTab&subscCategoryKeyId=234885",
-    "https://www.lge.co.kr/care-solutions/air-conditioners/fq18gv5ea2?dpType=careTab&subscCategoryKeyId=251308",
-    "https://www.lge.co.kr/care-solutions/air-conditioners/sq11ek1wes?dpType=careTab&subscCategoryKeyId=236640",
-    "https://www.lge.co.kr/care-solutions/air-conditioners/fq18gn5ba2?dpType=careTab&subscCategoryKeyId=251537",
-    "https://www.lge.co.kr/care-solutions/washing_machines/t19oz0?dpType=careTab&subscCategoryKeyId=252867",
-    "https://www.lge.co.kr/care-solutions/washing_machines/ta25gz9?dpType=careTab&subscCategoryKeyId=242637",
-    "https://www.lge.co.kr/care-solutions/washing_machines/fx25efe?dpType=careTab&subscCategoryKeyId=251602",
-    "https://www.lge.co.kr/care-solutions/refrigerators/m876gbb231?dpType=careTab&subscCategoryKeyId=246898",
-    "https://www.lge.co.kr/care-solutions/refrigerators/b502s53?dpType=careTab&subscCategoryKeyId=238631",
-    "https://www.lge.co.kr/care-solutions/refrigerators/d604mee52?dpType=careTab&subscCategoryKeyId=246405",
-    "https://www.lge.co.kr/care-solutions/tvs/oled77c6qna-wall?dpType=careTab&subscCategoryKeyId=252768",
-    "https://www.lge.co.kr/care-solutions/tvs/75qned86aga-wall?dpType=careTab&subscCategoryKeyId=250036",
-    "https://www.lge.co.kr/care-solutions/tvs/oled55b5kna-stand?dpType=careTab&subscCategoryKeyId=244065",
-    "https://www.lge.co.kr/care-solutions/notebook/16t95tp-ka5hk?dpType=careTab&subscCategoryKeyId=250976",
-    "https://www.lge.co.kr/care-solutions/notebook/15z95u-gs5sk?dpType=careTab&subscCategoryKeyId=252853",
-    "https://www.lge.co.kr/care-solutions/notebook/16z95u-gs5zk?dpType=careTab&subscCategoryKeyId=251017",
-    "https://www.lge.co.kr/care-solutions/air-purifiers/as356nsmam?dpType=careTab&subscCategoryKeyId=251509",
-    "https://www.lge.co.kr/care-solutions/air-purifiers/as206nsham?dpType=careTab&subscCategoryKeyId=251507",
-    "https://www.lge.co.kr/care-solutions/air-purifiers/as356ngmam?dpType=careTab&subscCategoryKeyId=251508",
-    "https://www.lge.co.kr/care-solutions/dishwashers/due6bge?dpType=careTab&subscCategoryKeyId=242199",
-    "https://www.lge.co.kr/care-solutions/dishwashers/dee6bge?dpType=careTab&subscCategoryKeyId=242201",
-    "https://www.lge.co.kr/care-solutions/dishwashers/due6bgle?dpType=careTab&subscCategoryKeyId=242202",
-    "https://www.lge.co.kr/care-solutions/wash-tower/wa2525ymzf?dpType=careTab&subscCategoryKeyId=244284",
-    "https://www.lge.co.kr/care-solutions/wash-tower/w2520wzm?dpType=careTab&subscCategoryKeyId=245324",
-    "https://www.lge.co.kr/care-solutions/wash-tower/wa2525myzf?dpType=careTab&subscCategoryKeyId=244283",
-    "https://www.lge.co.kr/care-solutions/dryers/rg19en?dpType=careTab&subscCategoryKeyId=242989",
-    "https://www.lge.co.kr/care-solutions/dryers/rd25ts?dpType=careTab&subscCategoryKeyId=249703",
-    "https://www.lge.co.kr/care-solutions/dryers/rg18wnw?dpType=careTab&subscCategoryKeyId=240280",
-    "https://www.lge.co.kr/care-solutions/lg-styler/sc5gmr80s?dpType=careTab&subscCategoryKeyId=250964",
-    "https://www.lge.co.kr/care-solutions/lg-styler/sc5mbr80s?dpType=careTab&subscCategoryKeyId=250966",
-    "https://www.lge.co.kr/care-solutions/lg-styler/sc5mbr60s?dpType=careTab&subscCategoryKeyId=250965",
-    "https://www.lge.co.kr/care-solutions/microwaves-and-ovens/mlj32ers?dpType=careTab&subscCategoryKeyId=238516",
-    "https://www.lge.co.kr/care-solutions/microwaves-and-ovens/mlj32hws?dpType=careTab&subscCategoryKeyId=239985",
-    "https://www.lge.co.kr/care-solutions/microwaves-and-ovens/mlj32ewso?dpType=careTab&subscCategoryKeyId=244633",
-    "https://www.lge.co.kr/care-solutions/electric-stoves/bef3amb4e?dpType=careTab&subscCategoryKeyId=246780",
-    "https://www.lge.co.kr/care-solutions/electric-stoves/bef3asmle?dpType=careTab&subscCategoryKeyId=246783",
-    "https://www.lge.co.kr/care-solutions/electric-stoves/bei3amb4e?dpType=careTab&subscCategoryKeyId=246784",
-    "https://www.lge.co.kr/care-solutions/vacuum-cleaners/as527wa?dpType=careTab&subscCategoryKeyId=246837",
-    "https://www.lge.co.kr/care-solutions/vacuum-cleaners/as520ha?dpType=careTab&subscCategoryKeyId=245567",
-    "https://www.lge.co.kr/care-solutions/vacuum-cleaners/as527ha?dpType=careTab&subscCategoryKeyId=249511",
-    "https://www.lge.co.kr/care-solutions/massage-chairs/mx91wr?dpType=careTab&subscCategoryKeyId=240706",
-    "https://www.lge.co.kr/care-solutions/massage-chairs/mh65cc?dpType=careTab&subscCategoryKeyId=231091",
-    "https://www.lge.co.kr/care-solutions/massage-chairs/mh21bby?dpType=careTab&subscCategoryKeyId=242533",
-    "https://www.lge.co.kr/care-solutions/ice-water-purifiers-refrigerator",
-    "https://www.lge.co.kr/care-solutions/humidifiers?subCateId=CT50246000",
-    "https://www.lge.co.kr/business/my-page/estimateRequest",
+    "https://www.lge.co.kr/my-page/order-status?tabFlag=CARE",
+    "https://www.lge.co.kr/support/request-call-reservation?mktModelCd=WD523VC&productCode=&rentalCare=y",
+    "https://www.lge.co.kr/benefits/exhibitions/multiple-products",
+    "https://www.lge.co.kr/benefits/exhibitions/detail-PE00897005",
     "https://www.lge.co.kr/sitemap",
     "https://account.lge.co.kr/terms/emp/usedView",
     "https://www.lge.co.kr/acceptable-use-policy",
@@ -815,472 +765,92 @@
       "alt": "LG ThinQ"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/subscribedays_hero_pc_20260409_102017.png",
-      "alt": "분홍색 배경에 '구독 Days' 타이틀과 함께 Thu Apr 9 날짜 캘린더 아이콘, 포인트 적립·배송·할인 혜택 아이콘 및 구독 가전제품 아이콘이 구성되어 있다."
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/medium-interior01.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 메인이미지 1"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/HeroBanner_1760_360PC_260330_20260331_101429_20260401_133941.png",
-      "alt": "베이지색 배경에 테이블, 의자, 조명, 침대"
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/small-interior01.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 썸네일이미지 1"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/event_hero_banner_pc_20260409_172217.png",
-      "alt": "밝은 회색 배경에 '첫구독' 타이틀과 함께 포인트 코인 이미지가 흩어져 구성되어 있다."
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/small01.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 썸네일이미지 2"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/event_hero_banner_pc_20260409_172043.png",
-      "alt": "밝은 회색 배경에 '0원 구독' 타이틀과 함께 숫자 0 형태의 오브젝트 이미지가 흩어져 구성되어 있다."
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/small02.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 썸네일이미지 3"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_hero_pc_1760x360_20260303_143905.png",
-      "alt": "밝은 베이지색 배경에 집 모양 일러스트 안에 에어컨 필터 청소, 공기청정기, 세탁기, 로봇청소기 등 LG 가전제품 정기케어 서비스 장면이 구성되어 있다."
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/small03.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 썸네일이미지 4"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/event_hero_banner_pc_20260409_172129.png",
-      "alt": "밝은 회색 배경에 '구독 선납' 타이틀과 함께 화살표 및 퍼센트 오브젝트 이미지가 흩어져 구성되어 있다."
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/small04.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 썸네일이미지 5"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/1760x360_pc_20260407_093645.png",
-      "alt": "밝은 하늘색 배경에 3D 캐릭터 서비스 기사가 TV 점검 및 세탁기 점검을 진행하는 장면과 함께 청소기, 공기청정기 등 LG 가전제품이 구성되어 있다."
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/small05.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 썸네일이미지 6"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/pc_herobanner_gooddog_20251216_132215.png",
-      "alt": "베이지색 배경에 강아지 캐릭터가 계산기 위에 누워있음, 주변에 연산 기호 장식이 있으며 NEW EPISODE 말풍선이 있음"
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/wd523vc_interior_thumbnail_mo.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 메인이미지 0"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/HeroBanner_1760x360_20260112_134326.png",
-      "alt": "밝은 회색 벽돌 배경에 LG 정수기 2대와 머그컵이 함께 구성되어 있다."
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/large-interior01.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 줌이미지 1"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/homemain_hero_subs_changeupfesta_pc_20260106_135517.png",
-      "alt": "하늘색 배경에 흰색 단상이 3개 배치되어 있으며 단상 위에 얼음 정수기가 각각 1대씩 배치되어 있음"
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/small06.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 썸네일이미지 7"
     },
     {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/hero_banner_pc_img_20260401_135149.png",
-      "alt": "밝은 파란색 배경에 LG 냉장고 2대와 얼음 이미지가 구성되어 있다."
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/small07.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 썸네일이미지 8"
     },
     {
-      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/md10597839-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597845/md10597845-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10017840/md10017840-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/air-conditioners/md10742838/md10742838-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/air-conditioners/md10269827/md10269827-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/air-conditioners/md10738852/md10738852-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/washing-machines/md10762840/md10762840-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/washing-machines/md10517831/md10517831-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/washing-machines/md10597883/md10597883-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/refrigerators/md10604870/md10604870-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/refrigerators/md08922103/md08922103-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/refrigerators/md10366864/md10366864-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/tvs/md10770860/md10770860-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/tvs/md10588835/md10588835-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/tvs/md10579833/md10579833-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/notebook/md10739829/md10739829-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/notebook/md10744829/md10744829-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/notebook/md10743827/md10743827-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/air-purifier/md10762830/md10762830-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/air-purifier/md10762834/md10762834-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/air-purifier/md10762833/md10762833-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/dishwashers/md10491826/md10491826-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/dishwashers/md10492829/md10492829-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/dishwashers/md10216831/md10216831-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/wash-tower/md10576829/md10576829-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/wash-tower/md10594826/md10594826-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/wash-tower/md10576828/md10576828-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/dryers/md09944838/md09944838-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/dryers/md10597910/md10597910-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/dryers/md10140826/md10140826-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/lg-styler/md10747827/md10747827-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/lg-styler/md10751839/md10751839-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/lg-styler/md10751842/md10751842-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/microwaves-and-ovens/md10200826/md10200826-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/microwaves-and-ovens/md10358835/md10358835-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/microwaves-and-ovens/md10560841/md10560841-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/electric-ranges/md10372836/md10372836-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/electric-ranges/md10596843/md10596843-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/electric-ranges/md10372842/md10372842-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/vacuum-cleaners/md10572834/md10572834-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/vacuum-cleaners/md10555910/md10555910-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/vacuum-cleaners/md10572835/md10572835-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/massage-chairs/md10426843/md10426843-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/massage-chairs/md09925826/md09925826-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/images/massage-chairs/md10436841/md10436841-350x350.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_puri20240319_144350.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/quick_menu_pc(88x88)_20260310_125602.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_wash20240319_145849.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_tower20240319_145755.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_washcombo2024040920240409_153837.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_dry20240319_145942.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_styler20240319_150032.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_refriger20240319_144801.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_icerefriger20240319_144701.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_kimchi20240319_144854.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_TV20240319_144532.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_PC20240319_144439.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_airpuri20240319_145046.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_dishwash20240319_145709.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_airo20240319_145134.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_humidi20240319_145532.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_dehumidifier20240610_172223.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_cook20240319_145621.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_cleaner20240319_150158.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_chair20240319_150243.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/kr/upload/admin/display/displayObject/img_rental_category_shoes20240319_150118.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_01_01.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/pc_benefits_01_01.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/mo_benefits_01_01.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_01_02.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/pc_benefits_01_02.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/benefits_01_02.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2025/icon_benefits_73428_06.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2025/pc_benefits_73428_06.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2025/mo_benefits_73428_06.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_73428_02.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/img-2_pc.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/img-2_mo.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_73428_03.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/img-3_pc.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/img-3_mo.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_73428_04.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/pc_benefits_73428_04.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/mo_benefits_73428_04.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_73428_05.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/pc_benefits_73428_05.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/mo_benefits_73428_05.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_73428_06.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/pc_benefits_73428_06.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/mo_benefits_73428_06.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/iconbenefits_83434_01.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/pc_benefits_83434_01.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/mo_benefits_83434_01.jpg",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2025/icon_benefits_01_04.png",
-      "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2025/pc_benefits_01_04.png",
-      "alt": ""
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/gallery/small08.jpg",
+      "alt": "정수기 LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) (WD523VC.AKOR) 썸네일이미지 9"
     },
     {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2025/benefits_01_04.png",
+      "src": "https://www.lge.co.kr/lg5-common/images/KRP0008/icon_tomorrow_delivery_new.svg",
       "alt": ""
     },
     {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_03_01.png",
-      "alt": ""
+      "src": "https://www.lge.co.kr/kr/home-main-pdp/2026/APR/subdays/pdp_banner_1380x180.png",
+      "alt": "구독 할인과 네이버페이 포인트 추첨 이벤트를 알리는 배너. '단 7일 기간 한정, 지금이 구독 타이밍!'이라는 문구와 함께 행사 기간은 2026년 4월 9일부터 4월 15일까지로 표시되어 있으며, '구독 Days'라는 제목과 혜택 아이콘들이 포함되어 있다."
     },
     {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/pc_benefits_03_01.png",
-      "alt": ""
+      "src": "https://www.lge.co.kr/kr/home-main-pdp/2026/APR/subdays/pdp_banner_656x220.png",
+      "alt": "구독 할인과 네이버페이 포인트 추첨 이벤트를 알리는 배너. '단 7일 기간 한정, 지금이 구독 타이밍!'이라는 문구와 함께 행사 기간은 2026년 4월 9일부터 4월 15일까지로 표시되어 있으며, '구독 Days'라는 제목과 혜택 아이콘들이 포함되어 있다."
     },
     {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/benefits_03_01.png",
-      "alt": ""
+      "src": "https://www.lge.co.kr/kr/home-main-pdp/2026/Mar/subscribe/pdp_banner_pc_1380x180.jpg",
+      "alt": "베이지색 배경의 왼쪽에 '첫 구독 시 멤버십 10만P 전원증정, 처음이라 더 특별한 구독, 자세히 보기 >' 문구가 배치되어 있고,  오른쪽에 리본이 달린 선물 상자에서 '첫 구독 멤버십 10만P' 라고 적힌 빨간 쿠폰이 펼쳐져 나오고 있다."
     },
     {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_03_02.png",
-      "alt": ""
+      "src": "https://www.lge.co.kr/kr/home-main-pdp/2026/Mar/subscribe/pdp_banner_mo_656x220.jpg",
+      "alt": "베이지색 배경의 왼쪽에 '첫 구독 시 멤버십 10만P 전원증정, 처음이라 더 특별한 구독, 자세히 보기 >' 문구가 배치되어 있고,  오른쪽에 리본이 달린 선물 상자에서 '첫 구독 멤버십 10만P' 라고 적힌 빨간 쿠폰이 펼쳐져 나오고 있다."
     },
     {
-      "src": "https://www.lge.co.kr/kr/images/SLS/pc_benefits_kb.jpg",
+      "src": "https://www.lge.co.kr/lg5-common/images/KRP0008/icon_ar_logo.png",
       "alt": ""
     },
     {
-      "src": "https://www.lge.co.kr/kr/images/SLS/benefits_kb.jpg",
-      "alt": ""
+      "src": "https://www.lge.co.kr/lg5-common/images/icons/qr-ar-google-play.jpg",
+      "alt": "구글플레이 다운로드 QR코드"
     },
     {
-      "src": "https://www.lge.co.kr/lg5-common/images/SLS/2024/icon_benefits_03_03.png",
-      "alt": ""
+      "src": "https://www.lge.co.kr/lg5-common/images/icons/qr-ar-app-store.jpg",
+      "alt": "앱스토어 다운로드 QR코드"
     },
     {
-      "src": "https://www.lge.co.kr/kr/images/SLS/pc_benefits_sh.jpg",
-      "alt": ""
+      "src": "https://www.lge.co.kr/lg5-common/images/KRP0008/img_tomorrow_delivery_pc.jpg",
+      "alt": "하단 참조"
     },
     {
-      "src": "https://www.lge.co.kr/kr/images/SLS/benefits_sh.jpg",
+      "src": "https://www.lge.co.kr/kr/images/water-purifiers/md10597839/md10597839-280x280.jpg",
       "alt": ""
-    },
-    {
-      "src": "https://www.lge.co.kr/lg5-common/images/KRP0032/img-lately-96x96.jpg",
-      "alt": "최대 텍스트 2줄까지 공백포함 25자까지 권장합니다."
     },
     {
       "src": "https://www.lge.co.kr/kr/common/footer/lge-logo.svg",
@@ -1324,48 +894,92 @@
     }
   ],
   "assetSummary": {
-    "imageCount": 164,
-    "iconCount": 16,
+    "imageCount": 68,
+    "iconCount": 17,
     "otherCount": 1
   },
   "stylesheets": [
+    "/lg5-common/bootstrap/4.1.3/css/bootstrap-grid.min.css",
+    "/lg5-common/bootstrap/4.1.3/css/bootstrap.min.css",
     "/lg5-common/css/reset.min.css",
-    "/lg5-common/css/app.min.css?v=20210908",
-    "/lg5-common/css/pages/PRS/PRS.min.css",
-    "/lg5-common/css/pages/STS/STS.min.css",
-    "/lg5-common/css/pages/SLS/SLS.min.css"
+    "/lg5-common/css/app.min.css?v=20210930",
+    "/lg5-common/css/components/KRP0009-2.0.0.min.css?v=20210930",
+    "/lg5-common/css/components/KRP0008-2.0.0.min.css?v=20210930",
+    "/lg5-common/css/components/KRP0008-coupon.min.css?v=20210930",
+    "/lg5-common/css/components/KRP0008-lsc.min.css?v=20210930",
+    "/lg5-common/css/components/KRP0015-2.0.0.min.css?v=20210930",
+    "/lg5-common/css/components/KRC0040.min.css?v=20210930",
+    "/lg5-common/css/pages/modules/slick.min.css",
+    "/lg5-common/front/pages/UTS/css/swiper-8.2.4.min.css"
   ],
   "scripts": [
     "/lg5-common/js/libs/datadog-rum-v6.min.js",
     "/lg5-common/js/libs/jquery-2.2.4.min.js",
-    "/lg5-common/js/common/googleHeader.js",
-    "//dynamic.criteo.com/js/ld/ld.js?a=76661",
-    "//dynamic.criteo.com/js/ld/ld.js?a=114760",
-    "/lg5-common/js/libs/across_adn_1.0.1.min.js",
-    "https://karrot-pixel.business.daangn.com/0.4/karrot-pixel.umd.js",
-    "/lg5-common/js/search/integratedSearch.min.js",
-    "/lg5-common/js/app.common.min.js",
-    "/lg5-common/js/components/KRP0005.min.js",
-    "/lg5-common/js/libs/lottie.min.js",
-    "//cdnet.nasmob.com/adpacker/js/ap_pv_v2.0.js",
     "/lg5-common/js/libs/jquery.transit-0.9.12.min.js",
     "/lg5-common/js/libs/jquery.event.move-1.3.6.min.js",
     "/lg5-common/js/libs/jquery.twentytwenty-0.0.0.min.js",
+    "/lg5-common/js/libs/slick-1.9.0.min.js",
     "/lg5-common/js/vcui.min.js",
     "/lg5-common/js/vcui.common-ui.min.js",
     "/lg5-common/js/lg.common.min.js",
+    "/lg5-common/js/components/KRP0008-2.0.0.min.js?v=20210930",
+    "/lg5-common/js/components/KRP0008-coupon.min.js?v=20210930",
+    "/lg5-common/js/components/KRP0008-subscribe.min.js?v=20210930",
+    "/lg5-common/js/components/KRP0008-LSC.min.js?v=20210930",
+    "/lg5-common/js/components/KRP0005.min.js?v=20210930",
+    "/lg5-common/js/components/KRP0003.min.js?v=20210930",
+    "/lg5-common/js/components/KRP0001.min.js?v=20210930",
+    "/lg5-common/js/components/KRP0015-2.0.0.min.js?v=20210930",
+    "/lg5-common/js/smartHome/smartHome.min.js?v=20210930",
+    "/lg5-common/js/common/googleHeader.js",
+    "//fin.rainbownine.net/js/across_adn_1.0.1.js",
+    "https://karrot-pixel.business.daangn.com/0.4/karrot-pixel.umd.js",
+    "https://www.googletagmanager.com/gtag/js?id=AW-362582935",
+    "/lg5-common/js/search/integratedSearch.min.js",
     "/lg5-common/js/app.common.min.js",
-    "/lg5-common/js/home/caresolutionHome.min.js",
-    "/lg5-common/js/libs/jquery.mCustomScrollbar-3.1.5.min.js",
-    "//wcs.naver.net/wcslog.js",
-    "/lg5-common/js/caresolution/MKTF2024.min.js",
     "//t1.daumcdn.net/kas/static/kp.js",
-    "//wcs.naver.net/wcslog.js"
+    "//wcs.naver.net/wcslog.js",
+    "//dynamic.criteo.com/js/ld/ld.js?a=114760",
+    "/lg5-common/js/libs/swiper-8.2.4.min.js",
+    "/lg5-common/js/libs/lottie.min.js",
+    "//cdnet.nasmob.com/adpacker/js/ap_pv_v2.0.js"
   ],
   "headings": [
     {
       "tag": "h1",
-      "text": "차원이 다른 케어솔루션을 만나보세요."
+      "text": "LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정)"
+    },
+    {
+      "tag": "h1",
+      "text": "최대혜택가"
+    },
+    {
+      "tag": "h1",
+      "text": "최대혜택가"
+    },
+    {
+      "tag": "h1",
+      "text": "저장내역 알림"
+    },
+    {
+      "tag": "h1",
+      "text": "약관 동의"
+    },
+    {
+      "tag": "h1",
+      "text": "(필수) 개인정보 수집 · 이용 동의"
+    },
+    {
+      "tag": "h1",
+      "text": "(필수) 비밀유지 서약 동의"
+    },
+    {
+      "tag": "h1",
+      "text": "(필수) 개인정보 처리방침 동의 (음식물처리기 임직원 사전판매 기획전)"
+    },
+    {
+      "tag": "h1",
+      "text": "(필수) 온라인 설문조사 참여 동의"
     },
     {
       "tag": "h3",

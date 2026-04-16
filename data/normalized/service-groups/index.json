@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-04-10T01:34:52.209Z",
-  "entryCount": 12,
+  "generatedAt": "2026-04-15T11:00:39.829Z",
+  "entryCount": 24,
   "entries": [
     {
       "pageId": "bestshop",
@@ -8,7 +8,7 @@
       "sourceType": "reference",
       "sourceUrl": "https://www.lge.co.kr/bestshop",
       "capturedUrl": "http://localhost:3000/reference-content/bestshop?viewportProfile=mo",
-      "extractedAt": "2026-04-10T01:26:15.014Z",
+      "extractedAt": "2026-04-15T10:51:25.340Z",
       "title": "베스트샵 | LG전자",
       "groups": {
         "hero": {
@@ -63,7 +63,7 @@
       "sourceType": "working",
       "sourceUrl": "https://www.lge.co.kr/bestshop",
       "capturedUrl": "http://localhost:3000/clone-content/bestshop?viewportProfile=mo",
-      "extractedAt": "2026-04-10T01:34:51.734Z",
+      "extractedAt": "2026-04-15T10:53:15.600Z",
       "title": "베스트샵 | LG전자",
       "groups": {
         "hero": {
@@ -118,7 +118,7 @@
       "sourceType": "reference",
       "sourceUrl": "https://www.lge.co.kr/bestshop",
       "capturedUrl": "http://localhost:3000/reference-content/bestshop?viewportProfile=pc",
-      "extractedAt": "2026-04-10T01:25:53.029Z",
+      "extractedAt": "2026-04-15T10:51:16.265Z",
       "title": "베스트샵 | LG전자",
       "groups": {
         "hero": {
@@ -168,7 +168,7 @@
       "sourceType": "working",
       "sourceUrl": "https://www.lge.co.kr/bestshop",
       "capturedUrl": "http://localhost:3000/clone-content/bestshop?viewportProfile=pc",
-      "extractedAt": "2026-04-10T01:35:42.985Z",
+      "extractedAt": "2026-04-15T10:53:06.451Z",
       "title": "베스트샵 | LG전자",
       "groups": {
         "hero": {
@@ -213,12 +213,232 @@
       }
     },
     {
+      "pageId": "care-solutions-pdp",
+      "viewportProfile": "mo",
+      "sourceType": "reference",
+      "sourceUrl": "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021",
+      "capturedUrl": "http://localhost:3000/reference-content/care-solutions-pdp?viewportProfile=mo",
+      "extractedAt": "2026-04-15T10:52:01.629Z",
+      "title": "LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) | WD523VC | 정수기 | 주방가전 | 가전 구독 | LG전자",
+      "groups": {
+        "visual": {
+          "groupId": "visual",
+          "selector": ".pdp-visual-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516
+          }
+        },
+        "detailInfo": {
+          "groupId": "detailInfo",
+          "selector": ".pdp-info-area",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 356
+          }
+        },
+        "noticeBanner": {
+          "groupId": "noticeBanner",
+          "selector": ".pdp-notice-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 830,
+            "width": 430,
+            "height": 141
+          }
+        },
+        "reviewInfo": {
+          "groupId": "reviewInfo",
+          "selector": ".review-info",
+          "matchCount": 1,
+          "rect": {
+            "x": 92,
+            "y": 578,
+            "width": 98,
+            "height": 17
+          }
+        }
+      }
+    },
+    {
+      "pageId": "care-solutions-pdp",
+      "viewportProfile": "mo",
+      "sourceType": "working",
+      "sourceUrl": "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021",
+      "capturedUrl": "http://localhost:3000/clone-content/care-solutions-pdp?viewportProfile=mo",
+      "extractedAt": "2026-04-15T10:53:52.419Z",
+      "title": "LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) | WD523VC | 정수기 | 주방가전 | 가전 구독 | LG전자",
+      "groups": {
+        "visual": {
+          "groupId": "visual",
+          "selector": ".pdp-visual-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": -42,
+            "width": 430,
+            "height": 516
+          }
+        },
+        "detailInfo": {
+          "groupId": "detailInfo",
+          "selector": ".pdp-info-area",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 474,
+            "width": 430,
+            "height": 356
+          }
+        },
+        "noticeBanner": {
+          "groupId": "noticeBanner",
+          "selector": ".pdp-notice-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 830,
+            "width": 430,
+            "height": 141
+          }
+        },
+        "reviewInfo": {
+          "groupId": "reviewInfo",
+          "selector": ".review-info",
+          "matchCount": 1,
+          "rect": {
+            "x": 92,
+            "y": 578,
+            "width": 98,
+            "height": 17
+          }
+        }
+      }
+    },
+    {
+      "pageId": "care-solutions-pdp",
+      "viewportProfile": "pc",
+      "sourceType": "reference",
+      "sourceUrl": "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021",
+      "capturedUrl": "http://localhost:3000/reference-content/care-solutions-pdp?viewportProfile=pc",
+      "extractedAt": "2026-04-15T10:51:52.565Z",
+      "title": "LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) | WD523VC | 정수기 | 주방가전 | 가전 구독 | LG전자",
+      "groups": {
+        "visual": {
+          "groupId": "visual",
+          "selector": ".pdp-visual-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779
+          }
+        },
+        "detailInfo": {
+          "groupId": "detailInfo",
+          "selector": ".pdp-info-area",
+          "matchCount": 1,
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 710
+          }
+        },
+        "noticeBanner": {
+          "groupId": "noticeBanner",
+          "selector": ".pdp-notice-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1098,
+            "width": 1445,
+            "height": 178
+          }
+        },
+        "reviewInfo": {
+          "groupId": "reviewInfo",
+          "selector": ".review-info",
+          "matchCount": 1,
+          "rect": {
+            "x": 948,
+            "y": 325,
+            "width": 132,
+            "height": 24
+          }
+        }
+      }
+    },
+    {
+      "pageId": "care-solutions-pdp",
+      "viewportProfile": "pc",
+      "sourceType": "working",
+      "sourceUrl": "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021",
+      "capturedUrl": "http://localhost:3000/clone-content/care-solutions-pdp?viewportProfile=pc",
+      "extractedAt": "2026-04-15T10:53:43.210Z",
+      "title": "LG 퓨리케어 오브제컬렉션 정수기(맞춤 출수, 냉온정) | WD523VC | 정수기 | 주방가전 | 가전 구독 | LG전자",
+      "groups": {
+        "visual": {
+          "groupId": "visual",
+          "selector": ".pdp-visual-wrap",
+          "matchCount": 1,
+          "rect": {
+            "x": 40,
+            "y": 219,
+            "width": 660,
+            "height": 779
+          }
+        },
+        "detailInfo": {
+          "groupId": "detailInfo",
+          "selector": ".pdp-info-area",
+          "matchCount": 1,
+          "rect": {
+            "x": 845,
+            "y": 219,
+            "width": 560,
+            "height": 710
+          }
+        },
+        "noticeBanner": {
+          "groupId": "noticeBanner",
+          "selector": ".pdp-notice-banner",
+          "matchCount": 1,
+          "rect": {
+            "x": 0,
+            "y": 1098,
+            "width": 1445,
+            "height": 178
+          }
+        },
+        "reviewInfo": {
+          "groupId": "reviewInfo",
+          "selector": ".review-info",
+          "matchCount": 1,
+          "rect": {
+            "x": 948,
+            "y": 325,
+            "width": 132,
+            "height": 24
+          }
+        }
+      }
+    },
+    {
       "pageId": "care-solutions",
       "viewportProfile": "mo",
       "sourceType": "reference",
       "sourceUrl": "https://www.lge.co.kr/care-solutions",
       "capturedUrl": "http://localhost:3000/reference-content/care-solutions?viewportProfile=mo",
-      "extractedAt": "2026-04-10T01:27:05.750Z",
+      "extractedAt": "2026-04-15T10:51:43.611Z",
       "title": "가전 구독 | LG전자",
       "groups": {
         "hero": {
@@ -284,7 +504,7 @@
       "sourceType": "working",
       "sourceUrl": "https://www.lge.co.kr/care-solutions",
       "capturedUrl": "http://localhost:3000/clone-content/care-solutions?viewportProfile=mo",
-      "extractedAt": "2026-04-10T01:29:14.139Z",
+      "extractedAt": "2026-04-15T10:53:34.410Z",
       "title": "가전 구독 | LG전자",
       "groups": {
         "hero": {
@@ -350,7 +570,7 @@
       "sourceType": "reference",
       "sourceUrl": "https://www.lge.co.kr/care-solutions",
       "capturedUrl": "http://localhost:3000/reference-content/care-solutions?viewportProfile=pc",
-      "extractedAt": "2026-04-10T01:26:37.051Z",
+      "extractedAt": "2026-04-15T10:51:34.438Z",
       "title": "가전 구독 | LG전자",
       "groups": {
         "hero": {
@@ -416,7 +636,7 @@
       "sourceType": "working",
       "sourceUrl": "https://www.lge.co.kr/care-solutions",
       "capturedUrl": "http://localhost:3000/clone-content/care-solutions?viewportProfile=pc",
-      "extractedAt": "2026-04-10T01:28:52.294Z",
+      "extractedAt": "2026-04-15T10:53:24.841Z",
       "title": "가전 구독 | LG전자",
       "groups": {
         "hero": {
@@ -425,7 +645,7 @@
           "matchCount": 1,
           "rect": {
             "x": 0,
-            "y": 1,
+            "y": 121,
             "width": 1445,
             "height": 377
           }
@@ -436,7 +656,7 @@
           "matchCount": 1,
           "rect": {
             "x": 0,
-            "y": 633,
+            "y": 753,
             "width": 1445,
             "height": 804
           }
@@ -447,7 +667,7 @@
           "matchCount": 1,
           "rect": {
             "x": 0,
-            "y": 1743,
+            "y": 1863,
             "width": 1445,
             "height": 384
           }
@@ -458,7 +678,7 @@
           "matchCount": 1,
           "rect": {
             "x": 36,
-            "y": 767,
+            "y": 887,
             "width": 1369,
             "height": 52
           }
@@ -469,9 +689,463 @@
           "matchCount": 1,
           "rect": {
             "x": 0,
-            "y": 2207,
+            "y": 2327,
             "width": 1445,
             "height": 128
+          }
+        }
+      }
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewportProfile": "mo",
+      "sourceType": "reference",
+      "sourceUrl": "https://homestyle.lge.co.kr/home",
+      "capturedUrl": "http://localhost:3000/reference-content/homestyle-home?viewportProfile=mo",
+      "extractedAt": "2026-04-15T10:52:19.029Z",
+      "title": "LG전자 홈스타일",
+      "groups": {
+        "quickMenu": {
+          "groupId": "quickMenu",
+          "selector": ".PcQuickMenu_quickMenuSection__6lq5j",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8008,
+            "width": 844,
+            "height": 10320
+          }
+        },
+        "labelBanner": {
+          "groupId": "labelBanner",
+          "selector": ".PcLabelBanner_labelBannerSection__Pwzkj",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 18348,
+            "width": 844,
+            "height": 120
+          }
+        },
+        "brandStory": {
+          "groupId": "brandStory",
+          "selector": ".PcBrandStory_brandSection__KX7A_",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 24051,
+            "width": 844,
+            "height": 974
+          }
+        }
+      }
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewportProfile": "mo",
+      "sourceType": "working",
+      "sourceUrl": "https://homestyle.lge.co.kr/home",
+      "capturedUrl": "http://localhost:3000/clone-content/homestyle-home?viewportProfile=mo",
+      "extractedAt": "2026-04-15T11:00:39.511Z",
+      "title": "LG전자 홈스타일",
+      "groups": {
+        "quickMenu": {
+          "groupId": "quickMenu",
+          "selector": null,
+          "matchCount": 0,
+          "rect": null
+        },
+        "labelBanner": {
+          "groupId": "labelBanner",
+          "selector": null,
+          "matchCount": 0,
+          "rect": null
+        },
+        "brandStory": {
+          "groupId": "brandStory",
+          "selector": null,
+          "matchCount": 0,
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewportProfile": "pc",
+      "sourceType": "reference",
+      "sourceUrl": "https://homestyle.lge.co.kr/home",
+      "capturedUrl": "http://localhost:3000/reference-content/homestyle-home?viewportProfile=pc",
+      "extractedAt": "2026-04-15T10:52:10.301Z",
+      "title": "LG전자 홈스타일",
+      "groups": {
+        "quickMenu": {
+          "groupId": "quickMenu",
+          "selector": ".PcQuickMenu_quickMenuSection__6lq5j",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8004,
+            "width": 1429,
+            "height": 17340
+          }
+        },
+        "labelBanner": {
+          "groupId": "labelBanner",
+          "selector": ".PcLabelBanner_labelBannerSection__Pwzkj",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 25364,
+            "width": 1429,
+            "height": 120
+          }
+        },
+        "brandStory": {
+          "groupId": "brandStory",
+          "selector": ".PcBrandStory_brandSection__KX7A_",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 31067,
+            "width": 1429,
+            "height": 1412
+          }
+        }
+      }
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewportProfile": "pc",
+      "sourceType": "working",
+      "sourceUrl": "https://homestyle.lge.co.kr/home",
+      "capturedUrl": "http://localhost:3000/clone-content/homestyle-home?viewportProfile=pc",
+      "extractedAt": "2026-04-15T11:00:30.790Z",
+      "title": "LG전자 홈스타일",
+      "groups": {
+        "quickMenu": {
+          "groupId": "quickMenu",
+          "selector": null,
+          "matchCount": 0,
+          "rect": null
+        },
+        "labelBanner": {
+          "groupId": "labelBanner",
+          "selector": null,
+          "matchCount": 0,
+          "rect": null
+        },
+        "brandStory": {
+          "groupId": "brandStory",
+          "selector": null,
+          "matchCount": 0,
+          "rect": null
+        }
+      }
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewportProfile": "mo",
+      "sourceType": "reference",
+      "sourceUrl": "https://homestyle.lge.co.kr/item?productId=G26030036505",
+      "capturedUrl": "http://localhost:3000/reference-content/homestyle-pdp?viewportProfile=mo",
+      "extractedAt": "2026-04-15T10:52:35.843Z",
+      "title": "한샘 샘키즈 보나 하부수납 데이베드SS 4면형+샘키즈 알러지케어 매트리스 SS | 한샘 | LG전자 홈스타일",
+      "groups": {
+        "detailInfo": {
+          "groupId": "detailInfo",
+          "selector": ".PcProductDetailInfoV2_detailSection__D_jC3",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7585,
+            "width": 844,
+            "height": 32
+          }
+        },
+        "bestProduct": {
+          "groupId": "bestProduct",
+          "selector": ".PcBestProduct_bestSection___UO0t",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7637,
+            "width": 844,
+            "height": 52
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "selector": ".PcReviewSection_reviewContainer__Ile3G",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7709,
+            "width": 844,
+            "height": 187
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "selector": ".PcProductDetailQnA_container___mN4P",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7915,
+            "width": 844,
+            "height": 163
+          }
+        },
+        "guides": {
+          "groupId": "guides",
+          "selector": ".PcProductDetailGuides_container__3dHy4",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8098,
+            "width": 844,
+            "height": 142
+          }
+        },
+        "seller": {
+          "groupId": "seller",
+          "selector": ".PcSeller_sellerSection__aJ1Mx",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8240,
+            "width": 844,
+            "height": 98
+          }
+        }
+      }
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewportProfile": "mo",
+      "sourceType": "working",
+      "sourceUrl": "https://homestyle.lge.co.kr/item?productId=G26030036505",
+      "capturedUrl": "http://localhost:3000/clone-content/homestyle-pdp?viewportProfile=mo",
+      "extractedAt": "2026-04-15T10:54:25.952Z",
+      "title": "한샘 샘키즈 보나 하부수납 데이베드SS 4면형+샘키즈 알러지케어 매트리스 SS | 한샘 | LG전자 홈스타일",
+      "groups": {
+        "detailInfo": {
+          "groupId": "detailInfo",
+          "selector": ".PcProductDetailInfoV2_detailSection__D_jC3",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7585,
+            "width": 844,
+            "height": 32
+          }
+        },
+        "bestProduct": {
+          "groupId": "bestProduct",
+          "selector": ".PcBestProduct_bestSection___UO0t",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7637,
+            "width": 844,
+            "height": 52
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "selector": ".PcReviewSection_reviewContainer__Ile3G",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7709,
+            "width": 844,
+            "height": 187
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "selector": ".PcProductDetailQnA_container___mN4P",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7915,
+            "width": 844,
+            "height": 163
+          }
+        },
+        "guides": {
+          "groupId": "guides",
+          "selector": ".PcProductDetailGuides_container__3dHy4",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8098,
+            "width": 844,
+            "height": 142
+          }
+        },
+        "seller": {
+          "groupId": "seller",
+          "selector": ".PcSeller_sellerSection__aJ1Mx",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8240,
+            "width": 844,
+            "height": 98
+          }
+        }
+      }
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewportProfile": "pc",
+      "sourceType": "reference",
+      "sourceUrl": "https://homestyle.lge.co.kr/item?productId=G26030036505",
+      "capturedUrl": "http://localhost:3000/reference-content/homestyle-pdp?viewportProfile=pc",
+      "extractedAt": "2026-04-15T10:52:27.191Z",
+      "title": "한샘 샘키즈 보나 하부수납 데이베드SS 4면형+샘키즈 알러지케어 매트리스 SS | 한샘 | LG전자 홈스타일",
+      "groups": {
+        "detailInfo": {
+          "groupId": "detailInfo",
+          "selector": ".PcProductDetailInfoV2_detailSection__D_jC3",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7581,
+            "width": 1429,
+            "height": 32
+          }
+        },
+        "bestProduct": {
+          "groupId": "bestProduct",
+          "selector": ".PcBestProduct_bestSection___UO0t",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7633,
+            "width": 1429,
+            "height": 51
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "selector": ".PcReviewSection_reviewContainer__Ile3G",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7704,
+            "width": 1429,
+            "height": 186
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "selector": ".PcProductDetailQnA_container___mN4P",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7909,
+            "width": 1429,
+            "height": 163
+          }
+        },
+        "guides": {
+          "groupId": "guides",
+          "selector": ".PcProductDetailGuides_container__3dHy4",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8092,
+            "width": 1429,
+            "height": 142
+          }
+        },
+        "seller": {
+          "groupId": "seller",
+          "selector": ".PcSeller_sellerSection__aJ1Mx",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8234,
+            "width": 1429,
+            "height": 98
+          }
+        }
+      }
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewportProfile": "pc",
+      "sourceType": "working",
+      "sourceUrl": "https://homestyle.lge.co.kr/item?productId=G26030036505",
+      "capturedUrl": "http://localhost:3000/clone-content/homestyle-pdp?viewportProfile=pc",
+      "extractedAt": "2026-04-15T10:54:17.227Z",
+      "title": "한샘 샘키즈 보나 하부수납 데이베드SS 4면형+샘키즈 알러지케어 매트리스 SS | 한샘 | LG전자 홈스타일",
+      "groups": {
+        "detailInfo": {
+          "groupId": "detailInfo",
+          "selector": ".PcProductDetailInfoV2_detailSection__D_jC3",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7581,
+            "width": 1429,
+            "height": 32
+          }
+        },
+        "bestProduct": {
+          "groupId": "bestProduct",
+          "selector": ".PcBestProduct_bestSection___UO0t",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7633,
+            "width": 1429,
+            "height": 51
+          }
+        },
+        "review": {
+          "groupId": "review",
+          "selector": ".PcReviewSection_reviewContainer__Ile3G",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7704,
+            "width": 1429,
+            "height": 186
+          }
+        },
+        "qna": {
+          "groupId": "qna",
+          "selector": ".PcProductDetailQnA_container___mN4P",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 7909,
+            "width": 1429,
+            "height": 163
+          }
+        },
+        "guides": {
+          "groupId": "guides",
+          "selector": ".PcProductDetailGuides_container__3dHy4",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8092,
+            "width": 1429,
+            "height": 142
+          }
+        },
+        "seller": {
+          "groupId": "seller",
+          "selector": ".PcSeller_sellerSection__aJ1Mx",
+          "matchCount": 1,
+          "rect": {
+            "x": 8,
+            "y": 8234,
+            "width": 1429,
+            "height": 98
           }
         }
       }
@@ -482,7 +1156,7 @@
       "sourceType": "reference",
       "sourceUrl": "https://www.lge.co.kr/support",
       "capturedUrl": "http://localhost:3000/reference-content/support?viewportProfile=mo",
-      "extractedAt": "2026-04-10T01:25:31.349Z",
+      "extractedAt": "2026-04-15T10:51:07.440Z",
       "title": "고객지원 | LG전자",
       "groups": {
         "mainService": {
@@ -537,7 +1211,7 @@
       "sourceType": "working",
       "sourceUrl": "https://www.lge.co.kr/support",
       "capturedUrl": "http://localhost:3000/clone-content/support?viewportProfile=mo",
-      "extractedAt": "2026-04-10T01:33:03.083Z",
+      "extractedAt": "2026-04-15T10:52:57.297Z",
       "title": "고객지원 | LG전자",
       "groups": {
         "mainService": {
@@ -592,7 +1266,7 @@
       "sourceType": "reference",
       "sourceUrl": "https://www.lge.co.kr/support",
       "capturedUrl": "http://localhost:3000/reference-content/support?viewportProfile=pc",
-      "extractedAt": "2026-04-10T01:25:11.865Z",
+      "extractedAt": "2026-04-15T10:50:58.337Z",
       "title": "고객지원 | LG전자",
       "groups": {
         "mainService": {
@@ -647,7 +1321,7 @@
       "sourceType": "working",
       "sourceUrl": "https://www.lge.co.kr/support",
       "capturedUrl": "http://localhost:3000/clone-content/support?viewportProfile=pc",
-      "extractedAt": "2026-04-10T01:32:46.603Z",
+      "extractedAt": "2026-04-15T10:52:48.265Z",
       "title": "고객지원 | LG전자",
       "groups": {
         "mainService": {

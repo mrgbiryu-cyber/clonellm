@@ -9,6 +9,9 @@ const WORKSPACE_DEFAULT_PAGE_IDS = [
   "support",
   "bestshop",
   "care-solutions",
+  "care-solutions-pdp",
+  "homestyle-home",
+  "homestyle-pdp",
   "category-tvs",
   "category-refrigerators",
   "pdp-tv-general",
@@ -38,6 +41,21 @@ const WORKSPACE_DEFAULT_PAGE_META = {
     url: "https://www.lge.co.kr/care-solutions",
     title: "가전 구독 | LG전자",
     pageGroup: "care-solution",
+  },
+  "care-solutions-pdp": {
+    url: "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021",
+    title: "가전 구독 PDP - 정수기",
+    pageGroup: "product-detail",
+  },
+  "homestyle-home": {
+    url: "https://homestyle.lge.co.kr/home",
+    title: "LG 홈스타일",
+    pageGroup: "homestyle",
+  },
+  "homestyle-pdp": {
+    url: "https://homestyle.lge.co.kr/item?productId=G26030036505",
+    title: "LG 홈스타일 PDP",
+    pageGroup: "product-detail",
   },
   "category-tvs": {
     url: "https://www.lge.co.kr/category/tvs",
@@ -104,6 +122,16 @@ const DEFAULT_SECTION_NAME_MAP = {
   benefit: "혜택",
   tabs: "탭",
   careBanner: "구독 배너",
+  visual: "상품 비주얼",
+  detailInfo: "상세 정보",
+  noticeBanner: "공지 배너",
+  reviewInfo: "리뷰 정보",
+  quickMenu: "퀵 메뉴",
+  labelBanner: "라벨 배너",
+  brandStory: "브랜드 스토리",
+  bestProduct: "추천 상품",
+  guides: "가이드",
+  seller: "판매 정보",
   banner: "상단 배너",
   filter: "필터",
   sort: "정렬",
@@ -147,12 +175,27 @@ function readRawPageMetaMap() {
 function rawPageIdFromUrl(url) {
   const normalized = String(url || "").trim();
   if (!normalized) return "";
-  if (normalized === "https://www.lge.co.kr/home") return "home";
-  if (normalized === "https://www.lge.co.kr/support") return "support";
-  if (normalized === "https://www.lge.co.kr/bestshop") return "bestshop";
-  if (normalized === "https://www.lge.co.kr/care-solutions") return "care-solutions";
-  if (normalized === "https://www.lge.co.kr/category/tvs") return "category-tvs";
-  if (normalized === "https://www.lge.co.kr/category/refrigerators") return "category-refrigerators";
+  try {
+    const parsed = new URL(normalized);
+    const hostname = String(parsed.hostname || "").toLowerCase();
+    const pathname = String(parsed.pathname || "").replace(/\/+$/g, "") || "/";
+    const productId = String(parsed.searchParams.get("productId") || "").trim();
+    if (hostname === "www.lge.co.kr") {
+      if (pathname === "/home") return "home";
+      if (pathname === "/support") return "support";
+      if (pathname === "/bestshop") return "bestshop";
+      if (pathname === "/care-solutions") return "care-solutions";
+      if (pathname === "/care-solutions/water-purifiers/wd523vc") return "care-solutions-pdp";
+      if (pathname === "/category/tvs") return "category-tvs";
+      if (pathname === "/category/refrigerators") return "category-refrigerators";
+    }
+    if (hostname === "homestyle.lge.co.kr") {
+      if (pathname === "/home" || pathname === "/") return "homestyle-home";
+      if (pathname === "/item" && productId === "G26030036505") return "homestyle-pdp";
+    }
+  } catch {
+    return "";
+  }
   return "";
 }
 
@@ -367,6 +410,25 @@ function buildDefaultServiceSlotRegistry(pageId) {
       ["tabs", "controls"],
       ["careBanner", "banner"],
     ],
+    "care-solutions-pdp": [
+      ["visual", "gallery"],
+      ["detailInfo", "content"],
+      ["noticeBanner", "banner"],
+      ["reviewInfo", "content"],
+    ],
+    "homestyle-home": [
+      ["quickMenu", "navigation"],
+      ["labelBanner", "banner"],
+      ["brandStory", "section"],
+    ],
+    "homestyle-pdp": [
+      ["detailInfo", "content"],
+      ["bestProduct", "product-list"],
+      ["review", "content"],
+      ["qna", "content"],
+      ["guides", "content"],
+      ["seller", "content"],
+    ],
   };
   const slots = (slotIdsByPage[pageId] || []).map(([slotId, componentType]) =>
     buildDefaultSlotEntry(pageId, slotId, componentType)
@@ -412,7 +474,7 @@ function buildDefaultPdpSlotRegistry(pageId) {
 
 function buildDefaultSlotRegistry(pageId) {
   if (pageId === "home") return buildDefaultHomeSlotRegistry();
-  if (["support", "bestshop", "care-solutions"].includes(pageId)) {
+  if (["support", "bestshop", "care-solutions", "care-solutions-pdp", "homestyle-home", "homestyle-pdp"].includes(pageId)) {
     return buildDefaultServiceSlotRegistry(pageId);
   }
   if (isPdpCasePageId(pageId)) {
@@ -549,18 +611,35 @@ function findSlotConfig(data, pageId, slotId) {
   return (registry?.slots || []).find((slot) => slot.slotId === slotId) || null;
 }
 
-function listComponentPatches(data, pageId = "") {
+function normalizeViewportProfile(value, fallback = "pc") {
+  const normalized = String(value || fallback).trim().toLowerCase();
+  if (normalized === "pc" || normalized === "mo" || normalized === "ta") return normalized;
+  return fallback;
+}
+
+function normalizeHomeViewportProfile(value, fallback = "pc") {
+  return normalizeViewportProfile(value, fallback);
+}
+
+function listComponentPatches(data, pageId = "", viewportProfile = "") {
   const patches = Array.isArray(data?.componentPatches) ? data.componentPatches : [];
   const normalizedPageId = String(pageId || "").trim();
   if (!normalizedPageId) return patches;
-  return patches.filter((entry) => String(entry.pageId || "").trim() === normalizedPageId);
+  const normalizedViewportProfile = normalizedPageId === "home" && viewportProfile
+    ? normalizeHomeViewportProfile(viewportProfile, "pc")
+    : "";
+  return patches.filter((entry) => {
+    if (String(entry.pageId || "").trim() !== normalizedPageId) return false;
+    if (normalizedPageId !== "home" || !normalizedViewportProfile) return true;
+    return normalizeHomeViewportProfile(entry.viewportProfile, "pc") === normalizedViewportProfile;
+  });
 }
 
-function findComponentPatch(data, pageId, componentId, sourceId = "") {
+function findComponentPatch(data, pageId, componentId, sourceId = "", viewportProfile = "") {
   const normalizedPageId = String(pageId || "").trim();
   const normalizedComponentId = String(componentId || "").trim();
   const normalizedSourceId = String(sourceId || "").trim();
-  const patches = listComponentPatches(data, normalizedPageId);
+  const patches = listComponentPatches(data, normalizedPageId, viewportProfile);
   if (!normalizedComponentId) return null;
   const exact =
     patches.find(
@@ -578,23 +657,31 @@ function findComponentPatch(data, pageId, componentId, sourceId = "") {
   );
 }
 
-function upsertComponentPatch(data, pageId, componentId, sourceId, patch) {
+function upsertComponentPatch(data, pageId, componentId, sourceId, patch, viewportProfile = "") {
   const nextData = JSON.parse(JSON.stringify(data || {}));
   nextData.componentPatches = Array.isArray(nextData.componentPatches) ? nextData.componentPatches : [];
   const normalizedPageId = String(pageId || "").trim();
   const normalizedComponentId = String(componentId || "").trim();
   const normalizedSourceId = String(sourceId || "").trim();
+  const normalizedViewportProfile = normalizedPageId === "home"
+    ? normalizeHomeViewportProfile(viewportProfile, "pc")
+    : "";
   const nextPatch = patch && typeof patch === "object" ? JSON.parse(JSON.stringify(patch)) : {};
   const existingIndex = nextData.componentPatches.findIndex(
     (entry) =>
       String(entry.pageId || "").trim() === normalizedPageId &&
       String(entry.componentId || "").trim() === normalizedComponentId &&
-      String(entry.sourceId || "").trim() === normalizedSourceId
+      String(entry.sourceId || "").trim() === normalizedSourceId &&
+      (
+        normalizedPageId !== "home" ||
+        normalizeHomeViewportProfile(entry.viewportProfile, "pc") === normalizedViewportProfile
+      )
   );
   const record = {
     pageId: normalizedPageId,
     componentId: normalizedComponentId,
     sourceId: normalizedSourceId,
+    ...(normalizedPageId === "home" ? { viewportProfile: normalizedViewportProfile } : {}),
     patch: nextPatch,
     updatedAt: new Date().toISOString(),
   };
@@ -620,11 +707,154 @@ function resolveComponentId(pageId, slotId) {
   return `${String(pageId || "").trim()}.${String(slotId || "").trim()}`;
 }
 
-function setSlotComponentPatch(data, pageId, slotId, sourceId, partialPatch) {
+function clampNumber(value, min, max) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return null;
+  return Math.max(min, Math.min(max, num));
+}
+
+function clampCssPx(value, min, max) {
+  if (value == null) return "";
+  const raw = String(value).trim();
+  if (!raw) return "";
+  if (/^-?\d+(?:\.\d+)?$/.test(raw)) {
+    const clamped = clampNumber(raw, min, max);
+    return clamped == null ? "" : `${clamped}px`;
+  }
+  const match = raw.match(/^(-?\d+(?:\.\d+)?)px$/i);
+  if (!match) return raw;
+  const clamped = clampNumber(match[1], min, max);
+  return clamped == null ? "" : `${clamped}px`;
+}
+
+function clampPaddingValue(value, min, max, fallback = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return fallback;
+  const parts = raw.split(/\s+/).filter(Boolean);
+  if (!parts.length || parts.some((part) => !/^-?\d+(?:\.\d+)?(?:px)?$/i.test(part))) {
+    return raw;
+  }
+  return parts.map((part) => clampCssPx(part, min, max)).filter(Boolean).join(" ");
+}
+
+function isDarkBackgroundValue(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return false;
+  if (normalized.includes("#000") || normalized.includes("#111") || normalized.includes("#1f2937") || normalized.includes("#0f172a")) {
+    return true;
+  }
+  return /linear-gradient\([^)]*(#000|#111|#1f2937|#0f172a)/i.test(normalized);
+}
+
+function buildHomePatchRule(slotId = "") {
+  const normalized = String(slotId || "").trim();
+  const base = {
+    allowDarkBackground: normalized === "hero",
+    defaultBackground: "#ffffff",
+    padding: "40px 32px",
+    titleSize: { min: 28, max: 34 },
+    subtitleSize: { min: 14, max: 18 },
+    minHeight: { min: 220, max: 420 },
+    radius: "24px",
+  };
+  if (normalized === "hero") {
+    return {
+      ...base,
+      allowDarkBackground: true,
+      defaultBackground: "linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%)",
+      padding: "56px 40px",
+      titleSize: { min: 44, max: 56 },
+      subtitleSize: { min: 18, max: 24 },
+      minHeight: { min: 480, max: 640 },
+      radius: "0px",
+    };
+  }
+  if (normalized === "quickmenu") {
+    return {
+      ...base,
+      defaultBackground: "#ffffff",
+      padding: "24px 24px 16px",
+      titleSize: { min: 24, max: 30 },
+      subtitleSize: { min: 14, max: 16 },
+      minHeight: { min: 120, max: 220 },
+    };
+  }
+  if (normalized === "summary-banner-2") {
+    return {
+      ...base,
+      defaultBackground: "linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%)",
+      padding: "40px 32px",
+      titleSize: { min: 30, max: 36 },
+      subtitleSize: { min: 14, max: 18 },
+      minHeight: { min: 220, max: 320 },
+      radius: "28px",
+    };
+  }
+  if (["subscription", "missed-benefits", "lg-best-care", "bestshop-guide"].includes(normalized)) {
+    return {
+      ...base,
+      defaultBackground: "#f8fafc",
+      minHeight: { min: 220, max: 360 },
+    };
+  }
+  return base;
+}
+
+function normalizeHomeBuilderPatch(slotId = "", patch = {}) {
+  const normalized = String(slotId || "").trim();
+  const next = patch && typeof patch === "object" ? JSON.parse(JSON.stringify(patch)) : {};
+  const styles = next.styles && typeof next.styles === "object" ? { ...next.styles } : {};
+  const rule = buildHomePatchRule(normalized);
+  if (styles.titleSize !== undefined) {
+    styles.titleSize = clampCssPx(styles.titleSize, rule.titleSize.min, rule.titleSize.max) || undefined;
+    if (styles.titleSize === undefined) delete styles.titleSize;
+  }
+  if (styles.subtitleSize !== undefined) {
+    styles.subtitleSize = clampCssPx(styles.subtitleSize, rule.subtitleSize.min, rule.subtitleSize.max) || undefined;
+    if (styles.subtitleSize === undefined) delete styles.subtitleSize;
+  }
+  if (styles.minHeight !== undefined) {
+    styles.minHeight = clampCssPx(styles.minHeight, rule.minHeight.min, rule.minHeight.max) || undefined;
+    if (styles.minHeight === undefined) delete styles.minHeight;
+  }
+  if (styles.height !== undefined) {
+    styles.height = clampCssPx(styles.height, rule.minHeight.min, rule.minHeight.max) || undefined;
+    if (styles.height === undefined) delete styles.height;
+  }
+  if (styles.padding !== undefined) {
+    styles.padding = clampPaddingValue(styles.padding, 16, 64, rule.padding) || rule.padding;
+  }
+  if (styles.radius !== undefined) {
+    styles.radius = clampCssPx(styles.radius, 0, 32) || rule.radius;
+  }
+  if (styles.background !== undefined) {
+    const normalizedBackground = String(styles.background || "").trim();
+    if (!normalizedBackground || (!rule.allowDarkBackground && isDarkBackgroundValue(normalizedBackground))) {
+      styles.background = rule.defaultBackground;
+    }
+  }
+  if (!styles.background && normalized !== "header-top" && normalized !== "header-bottom") {
+    styles.background = rule.defaultBackground;
+  }
+  if (!styles.padding && normalized !== "header-top" && normalized !== "header-bottom") {
+    styles.padding = rule.padding;
+  }
+  if (!styles.radius && normalized !== "hero" && normalized !== "header-top" && normalized !== "header-bottom") {
+    styles.radius = rule.radius;
+  }
+  next.styles = styles;
+  return next;
+}
+
+function setSlotComponentPatch(data, pageId, slotId, sourceId, partialPatch, viewportProfile = "") {
   const componentId = resolveComponentId(pageId, slotId);
-  const existing = findComponentPatch(data, pageId, componentId, sourceId)?.patch || {};
-  const merged = mergeComponentPatch(existing, partialPatch);
-  return upsertComponentPatch(data, pageId, componentId, sourceId, merged);
+  const existing = findComponentPatch(data, pageId, componentId, sourceId, viewportProfile)?.patch || {};
+  const normalizedPartial =
+    String(pageId || "").trim() === "home"
+      ? normalizeHomeBuilderPatch(slotId, partialPatch)
+      : partialPatch;
+  const merged = mergeComponentPatch(existing, normalizedPartial);
+  return upsertComponentPatch(data, pageId, componentId, sourceId, merged, viewportProfile);
 }
 
 function buildLlmSlotContext(data) {
@@ -1036,33 +1266,321 @@ async function callOpenRouterJson({ model, messages, temperature = 0.1, demoFall
   const siteUrl = process.env.OPENROUTER_SITE_URL || "http://localhost:3000";
   const siteName = process.env.OPENROUTER_SITE_NAME || "lge-site-analysis";
   const resolvedModel = model || resolveOpenRouterModel("OPENROUTER_MODEL");
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": siteUrl,
-      "X-Title": siteName,
-    },
-    body: JSON.stringify({
-      model: resolvedModel,
-      temperature,
-      response_format: { type: "json_object" },
-      messages,
-    }),
-  });
-  if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`OpenRouter request failed: ${response.status} ${text}`);
+  const timeoutMs = Math.max(15_000, Number(process.env.OPENROUTER_TIMEOUT_MS || 45_000));
+  const maxAttempts = Math.max(1, Number(process.env.OPENROUTER_MAX_ATTEMPTS || 1));
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const controller = new AbortController();
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, timeoutMs);
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": siteUrl,
+          "X-Title": siteName,
+        },
+        body: JSON.stringify({
+          model: resolvedModel,
+          temperature,
+          response_format: { type: "json_object" },
+          messages,
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`OpenRouter request failed: ${response.status} ${text}`);
+      }
+      const payload = await response.json();
+      const content = payload?.choices?.[0]?.message?.content;
+      return parseJsonResponseContent(content);
+    } catch (error) {
+      clearTimeout(timer);
+      lastError = error;
+      const message = String(error?.message || error || "").toLowerCase();
+      const isTimeout = timedOut || error?.name === "AbortError" || message.includes("timed out");
+      const isTransient =
+        isTimeout ||
+        message.includes("terminated") ||
+        message.includes("fetch failed") ||
+        message.includes("socket") ||
+        message.includes("econnreset") ||
+        message.includes("network");
+      if (attempt >= maxAttempts || !isTransient) {
+        if (isTimeout) {
+          lastError = new Error(`OpenRouter request timed out after ${timeoutMs}ms`);
+        }
+        break;
+      }
+    }
   }
-  const payload = await response.json();
-  const content = payload?.choices?.[0]?.message?.content;
-  return parseJsonResponseContent(content);
+
+  throw lastError || new Error("OpenRouter request failed");
+}
+
+function withLlmTimeout(promise, label = "LLM request", timeoutMs = Math.max(20_000, Number(process.env.LLM_REQUEST_TIMEOUT_MS || 60_000))) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`${label} timed out after ${timeoutMs}ms`)), timeoutMs);
+    Promise.resolve(promise)
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((error) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+  });
 }
 
 function toStringArray(value, fallback = []) {
   if (!Array.isArray(value)) return [...fallback];
   return value.map((item) => String(item || "").trim()).filter(Boolean);
+}
+
+function formatSlotLabel(slotId = "") {
+  const map = {
+    "header-top": "상단 헤더",
+    "header-bottom": "주 메뉴",
+    hero: "히어로",
+    quickmenu: "퀵메뉴",
+    timedeal: "타임딜",
+    "md-choice": "MD 추천",
+    "best-ranking": "베스트 랭킹",
+    "marketing-area": "마케팅 영역",
+    subscription: "구독 섹션",
+    "space-renewal": "공간 리뉴얼",
+    "brand-showroom": "브랜드 쇼룸",
+    "latest-product-news": "신제품 소식",
+    "smart-life": "스마트 라이프",
+    "summary-banner-2": "하단 배너",
+    "missed-benefits": "혜택 모음",
+    "lg-best-care": "LG 베스트 케어",
+    "bestshop-guide": "베스트샵 안내",
+    banner: "배너",
+    filter: "필터",
+    sort: "정렬",
+    productGrid: "상품 그리드",
+    gallery: "갤러리",
+    summary: "요약",
+    price: "가격",
+    option: "옵션",
+    sticky: "고정 구매 영역",
+    review: "리뷰",
+    qna: "문의",
+  };
+  const normalized = String(slotId || "").trim();
+  return map[normalized] || normalized || "section";
+}
+
+function toMarkdownBulletLines(values = []) {
+  return toStringArray(values).map((line) => `- ${line}`);
+}
+
+function buildWireframeBlockLines(label = "", viewportLabel = "PC", details = {}) {
+  const title = String(label || "섹션").trim() || "섹션";
+  const emphasis = String(details.emphasis || "").trim();
+  const visualCue = String(details.visualCue || "").trim();
+  const keepNote = String(details.keepNote || "").trim();
+  const lines = [
+    "+----------------------------------------------------------------+",
+    `| ${title.slice(0, 60).padEnd(60, " ")} |`,
+    "+----------------------------------------------------------------+",
+    `| viewport : ${viewportLabel.slice(0, 49).padEnd(49, " ")} |`,
+    `| message  : ${(emphasis || "핵심 메시지와 시각 위계를 재정렬").slice(0, 49).padEnd(49, " ")} |`,
+    `| visual   : ${(visualCue || "배경, 타이포, CTA, 여백 리듬을 재설계").slice(0, 49).padEnd(49, " ")} |`,
+    `| keep     : ${(keepNote || "기존 역할과 핵심 사용자 흐름은 유지").slice(0, 49).padEnd(49, " ")} |`,
+    "| zones    : badge / title / summary / action / support cue      |",
+    "+----------------------------------------------------------------+",
+  ];
+  return lines;
+}
+
+function buildProposalSectionSpecs(requirementPlan = {}, pageContext = {}) {
+  const builderBrief = requirementPlan?.builderBrief && typeof requirementPlan.builderBrief === "object" ? requirementPlan.builderBrief : {};
+  const orderedSlotIds = uniqueNonEmptyLines([
+    ...toStringArray(builderBrief?.suggestedFocusSlots),
+    ...((Array.isArray(requirementPlan?.priority) ? requirementPlan.priority : []).map((item) => String(item?.target || "").trim())),
+  ]).slice(0, 8);
+  const requestSummary = toStringArray(requirementPlan?.requestSummary);
+  const planningDirection = toStringArray(requirementPlan?.planningDirection);
+  const designDirection = toStringArray(requirementPlan?.designDirection);
+  const mustKeep = toStringArray(builderBrief?.mustKeep);
+  const mustChange = toStringArray(builderBrief?.mustChange);
+  const pageLabel = String(pageContext?.pageLabel || pageContext?.workspacePageId || "페이지").trim();
+  const fallbackLabels = ["상단 진입 영역", "주요 탐색 영역", "핵심 설득 영역", "보강 정보 영역"];
+  const targetSlots = orderedSlotIds.length ? orderedSlotIds : fallbackLabels.map((item, index) => `fallback-${index + 1}:${item}`);
+  return targetSlots.map((slotId, index) => {
+    const isFallback = slotId.startsWith("fallback-");
+    const fallbackLabel = isFallback ? slotId.split(":").slice(1).join(":").trim() : "";
+    const label = isFallback ? fallbackLabel : formatSlotLabel(slotId);
+    const why = planningDirection[index] || planningDirection[index % Math.max(planningDirection.length, 1)] || requestSummary[0] || `${pageLabel}의 변화 이유를 더 분명하게 설명해야 합니다.`;
+    const visual = designDirection[index] || designDirection[index % Math.max(designDirection.length, 1)] || designDirection[0] || "타이포, 여백, 강조 포인트, CTA 밀도를 재정리합니다.";
+    const keep = mustKeep[index] || mustKeep[index % Math.max(mustKeep.length, 1)] || "현재 페이지의 역할과 핵심 사용자 흐름은 유지합니다.";
+    const change = mustChange[index] || mustChange[index % Math.max(mustChange.length, 1)] || "이 구간의 메시지와 시각 위계를 명확하게 다시 설계합니다.";
+    const priorityReason = (Array.isArray(requirementPlan?.priority) ? requirementPlan.priority : [])[index]?.reason || why;
+    return {
+      slotId: isFallback ? "" : slotId,
+      label,
+      why,
+      visual,
+      keep,
+      change,
+      priorityReason,
+      order: index + 1,
+    };
+  });
+}
+
+function buildLayoutMockupLines(viewportLabel = "PC", sectionSpecs = []) {
+  const specs = Array.isArray(sectionSpecs) && sectionSpecs.length
+    ? sectionSpecs
+    : [
+        { label: "상단 진입 영역" },
+        { label: "주요 탐색/프로모션 영역" },
+        { label: "주요 설득 영역" },
+        { label: "보강 정보 영역" },
+      ];
+  return [
+    `Viewport: ${viewportLabel}`,
+    "",
+    ...specs.flatMap((item) =>
+      buildWireframeBlockLines(item.label, viewportLabel, {
+        emphasis: item.change,
+        visualCue: item.visual,
+        keepNote: item.keep,
+      }).concat([""])
+    ),
+  ].slice(0, -1);
+}
+
+function buildRequirementPlanMarkdownDocs(requirementPlan = {}, plannerInput = {}) {
+  const pageContext = plannerInput?.pageContext || {};
+  const pageIdentity = pageContext?.pageIdentity || {};
+  const pageLabel = String(pageContext?.pageLabel || pageContext?.workspacePageId || "페이지").trim();
+  const viewportLabel = String(pageContext?.viewportLabel || pageContext?.viewportProfile || "PC").trim();
+  const title = String(requirementPlan?.title || `${pageLabel} 시안 기획안`).trim();
+  const builderBrief = requirementPlan?.builderBrief && typeof requirementPlan?.builderBrief === "object" ? requirementPlan.builderBrief : {};
+  const focusSlots = uniqueNonEmptyLines([
+    ...toStringArray(builderBrief.suggestedFocusSlots),
+    ...((Array.isArray(requirementPlan?.priority) ? requirementPlan.priority : []).map((item) => String(item?.target || "").trim())),
+  ]).slice(0, 6);
+  const proposalSectionSpecs = buildProposalSectionSpecs(requirementPlan, pageContext);
+  const allChangeLines = uniqueNonEmptyLines([
+    ...toStringArray(requirementPlan?.requestSummary),
+    ...toStringArray(requirementPlan?.planningDirection),
+    ...toStringArray(requirementPlan?.designDirection),
+    ...toStringArray(builderBrief?.mustChange),
+  ]).slice(0, 8);
+  const builderMarkdown = [
+    `# ${title}`,
+    "",
+    `> 본 문서는 ${pageLabel} ${viewportLabel} 화면에 대한 고객 제안용 기획서 초안입니다. 변경 배경, 목표, 유지 원칙, 변경 원칙, 예상 화면 구성을 한 번에 읽을 수 있도록 정리합니다.`,
+    "",
+    "## 1. 프로젝트 배경",
+    "### 1-1. 페이지의 현재 역할",
+    ...toMarkdownBulletLines([
+      pageIdentity?.role ? `원래 역할: ${pageIdentity.role}` : "",
+      pageIdentity?.purpose ? `원래 목적: ${pageIdentity.purpose}` : "",
+      pageIdentity?.designIntent ? `기본 디자인 의도: ${pageIdentity.designIntent}` : "",
+    ]),
+    "",
+    "### 1-2. 이번 변경 요청의 배경",
+    ...toMarkdownBulletLines(requirementPlan?.requestSummary),
+    "",
+    "## 2. 기획 목표",
+    ...toMarkdownBulletLines([
+      String(builderBrief.objective || "").trim(),
+      `변화 강도: ${normalizeDesignChangeLevel(requirementPlan?.designChangeLevel, "medium")} — 이번 제안이 어느 정도 체감 변화를 목표로 하는지 명시합니다.`,
+    ]),
+    "",
+    "## 3. 유지해야 할 기준",
+    ...toMarkdownBulletLines(builderBrief?.mustKeep),
+    "",
+    "## 4. 반드시 바뀌어야 할 방향",
+    ...toMarkdownBulletLines(builderBrief?.mustChange),
+    "",
+    "## 5. 상세 기획 방향",
+    ...toMarkdownBulletLines(requirementPlan?.planningDirection),
+    "",
+    "## 6. 상세 디자인 방향",
+    ...toMarkdownBulletLines(requirementPlan?.designDirection),
+    "",
+    "## 7. 우선순위 및 적용 순서",
+    ...(Array.isArray(requirementPlan?.priority) ? requirementPlan.priority : []).map((item) => {
+      const target = String(item?.target || "").trim();
+      const reason = String(item?.reason || "").trim();
+      if (!target) return "";
+      return `- ${formatSlotLabel(target)} (\`${target}\`): ${reason || "우선 적용 대상"}`;
+    }).filter(Boolean),
+    "",
+    "## 8. 예상 화면 제안",
+    ...proposalSectionSpecs.slice(0, 6).flatMap((item) => ([
+      `### ${item.order}. ${item.label}${item.slotId ? ` (\`${item.slotId}\`)` : ""}`,
+      `- 이 화면을 우선 다뤄야 하는 이유: ${item.priorityReason}`,
+      `- 이번 구간에서 반드시 해결해야 할 문제: ${item.why}`,
+      `- 제안하는 시각 해법: ${item.visual}`,
+      `- 유지해야 할 기준: ${item.keep}`,
+      `- 반드시 반영해야 할 변화: ${item.change}`,
+      "",
+    ])),
+    "## 9. 포커스 섹션 목록",
+    ...focusSlots.map((slotId) => `- ${formatSlotLabel(slotId)} (\`${slotId}\`)`),
+    "",
+    "## 10. 가드레일",
+    ...toMarkdownBulletLines(requirementPlan?.guardrails),
+  ].join("\n").trim();
+
+  const layoutMockupMarkdown = [
+    `# ${title} Mockup`,
+    "",
+    `> 아래 와이어프레임은 기획안이 제안한 변경 화면을 섹션 단위로 모두 정리한 초안입니다. 각 화면은 왜 바뀌는지와 어떤 형태로 보여야 하는지를 함께 설명합니다.`,
+    "",
+    "## 1. 전체 화면 흐름",
+    "```text",
+    ...buildLayoutMockupLines(viewportLabel, proposalSectionSpecs),
+    "```",
+    "",
+    "## 2. 변경 체크리스트",
+    ...toMarkdownBulletLines(allChangeLines),
+    "",
+    "## 3. 화면별 와이어프레임 상세",
+    ...proposalSectionSpecs.slice(0, 6).flatMap((item) => ([
+      `### Screen ${item.order}. ${item.label}${item.slotId ? ` (\`${item.slotId}\`)` : ""}`,
+      `- 화면 목적: ${item.why}`,
+      `- 제안 메시지: ${item.change}`,
+      `- 시각적 처리: ${item.visual}`,
+      `- 유지 조건: ${item.keep}`,
+      "```text",
+      ...buildWireframeBlockLines(item.label, viewportLabel, {
+        emphasis: item.change,
+        visualCue: item.visual,
+        keepNote: item.keep,
+      }),
+      "```",
+      "",
+    ])),
+    "## 4. 공통 적용 메모",
+    ...toMarkdownBulletLines(
+      uniqueNonEmptyLines([
+        ...toStringArray(requirementPlan?.designDirection),
+        ...toStringArray(builderBrief?.mustChange),
+      ]).slice(0, 6)
+    ),
+  ].join("\n").trim();
+
+  return {
+    builderMarkdown,
+    layoutMockupMarkdown,
+  };
 }
 
 function normalizePlannerPriority(value, fallbackTargets = []) {
@@ -1102,8 +1620,55 @@ function normalizeDesignChangeLevel(value, fallback = "medium") {
   return fallback;
 }
 
+function containsBrokenNarrativeText(value = "") {
+  return String(value || "").includes("�");
+}
+
+function normalizeNarrativeLine(value = "") {
+  const text = String(value || "")
+    .replace(/�+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return "";
+  if (containsBrokenNarrativeText(text)) return "";
+  return text;
+}
+
+function tokenizeNarrativeLine(value = "") {
+  return normalizeNarrativeLine(value)
+    .toLowerCase()
+    .replace(/[`"'“”‘’.,:;!?()[\]{}<>|/\\_-]+/g, " ")
+    .split(/\s+/)
+    .map((item) => item.trim())
+    .filter((item) => item.length >= 2);
+}
+
+function narrativeLineSimilarity(left = "", right = "") {
+  const leftTokens = tokenizeNarrativeLine(left);
+  const rightTokens = tokenizeNarrativeLine(right);
+  if (!leftTokens.length || !rightTokens.length) return 0;
+  const leftSet = new Set(leftTokens);
+  const rightSet = new Set(rightTokens);
+  let intersection = 0;
+  leftSet.forEach((token) => {
+    if (rightSet.has(token)) intersection += 1;
+  });
+  const union = new Set([...leftSet, ...rightSet]).size;
+  return union ? intersection / union : 0;
+}
+
 function uniqueNonEmptyLines(values = []) {
-  return Array.from(new Set((Array.isArray(values) ? values : []).map((item) => String(item || "").trim()).filter(Boolean)));
+  const lines = Array.isArray(values) ? values : [];
+  const next = [];
+  for (const item of lines) {
+    const normalized = normalizeNarrativeLine(item);
+    if (!normalized) continue;
+    if (next.some((existing) => existing === normalized || narrativeLineSimilarity(existing, normalized) >= 0.82)) {
+      continue;
+    }
+    next.push(normalized);
+  }
+  return next;
 }
 
 function ensureNarrativeDepth(values = [], fallback = [], minCount = 5) {
@@ -1163,7 +1728,7 @@ function buildPlannerNarrativeFallbacks(plannerInput = {}) {
   const toneAndMood = String(plannerInput?.userInput?.toneAndMood || "").trim();
   const designChangeLevel = normalizeDesignChangeLevel(plannerInput?.userInput?.designChangeLevel, "medium");
   const editableSlots = toStringArray(plannerInput?.pageSummary?.editableSlots);
-  const focusSlots = editableSlots.slice(0, 4);
+  const focusSlots = editableSlots.slice(0, 6);
   const customerScope = describeEditableScopeForCustomer(editableSlots, pageLabel);
   const referenceTakeaways = ((plannerInput?.referenceSummary?.analyses || []) || [])
     .flatMap((item) => toStringArray(item?.takeaways))
@@ -1228,17 +1793,22 @@ function buildPlannerSystemPrompt() {
     "Your non-responsibilities are: writing patch operations, choosing unsupported tools, saving versions, or performing implementation commands.",
     "Respect the provided target scope. If the planner input is limited to selected components, concentrate only on those slots/components and do not expand the plan to unrelated areas.",
     "Treat pageContext.pageIdentity as a hard brief. The page's original role, purpose, must-preserve qualities, and should-avoid patterns must be reflected in the plan before you discuss change ideas.",
+    "Treat pageContext.viewportProfile and pageContext.viewportLabel as hard brief context. The plan must speak only to the target viewport and must not mix mobile, tablet, and desktop assumptions.",
     "Treat reference URLs as inspiration and signal extraction only. Never ask to copy layouts or text verbatim.",
+    "If referenceSummary.designReferenceLibrary is provided, treat it as a curated indexed DESIGN.md-style reference library. Use it to borrow mood, hierarchy logic, component density, and section rhythm language, but never copy a source literally.",
     "The user input includes designChangeLevel. Interpret it as the desired exploration width for visual change while still prioritizing the brand design baseline.",
     "Preserve facts about products, prices, and specs.",
     "Return JSON only.",
     "Required top-level keys: summary, requirementPlan.",
-    "Required requirementPlan keys: title, designChangeLevel, requestSummary, planningDirection, designDirection, priority, guardrails, referenceNotes, builderBrief.",
+    "Required requirementPlan keys: title, designChangeLevel, requestSummary, planningDirection, designDirection, priority, guardrails, referenceNotes, builderBrief, builderMarkdown, layoutMockupMarkdown.",
     "builderBrief must include objective, mustKeep, mustChange, suggestedFocusSlots.",
+    "builderMarkdown must read like a customer-facing proposal document with a clear beginning-middle-end structure: background, objective, must-keep rules, must-change rules, planning direction, design direction, priority, and expected screens.",
+    "layoutMockupMarkdown must contain a markdown wireframe/mockup representation. Use fenced text blocks and create a detailed wireframe section for every proposed screen/section, not just a short overall sketch.",
     "This output should read like customer-facing planning material, not a short internal memo.",
     "requestSummary must contain 4 to 7 detailed bullets covering background, reason for change, objective, allowed scope, and expected change profile.",
     "planningDirection must contain 5 to 8 detailed bullets covering problem definition, strategic direction, hierarchy changes, scope control, customer persuasion logic, and the rationale behind each major recommendation.",
     "designDirection must contain 5 to 8 detailed bullets covering concrete visual direction such as hierarchy, tone, density, contrast, CTA presence, visual anti-patterns to avoid, and the rationale behind each design move.",
+    "suggestedFocusSlots should include every section that the proposal expects to change materially, usually 4 to 8 slots when the page supports that many.",
     "For priority, every item must explain not only what is prioritized but why that target should come first in customer impact terms.",
     "For builderBrief.objective, write a sentence-level objective that explains what success should look like and why that outcome matters to the customer.",
     "For builderBrief.mustKeep and builderBrief.mustChange, each bullet must include both the directive and the reason. Do not write bare nouns or short fragments.",
@@ -1256,6 +1826,8 @@ function buildPlannerUserPrompt(plannerInput) {
     "Spend more detail on why the design should change, what customer problem it solves, and what visual direction should be approved before build.",
     "Write in a customer-facing proposal tone. The customer should be able to read each section and understand the rationale behind priority, what must remain, what must change, and what goal the proposal is trying to achieve.",
     "In planningDirection and designDirection, explicitly explain the reasons behind priority, mustKeep, mustChange, and objective. These sections should read like the narrative explanation of the plan, not separate disconnected bullets.",
+    "Also create a builder-friendly markdown brief inspired by DESIGN.md-style design docs so the next model can interpret structure, hierarchy, and intent more reliably.",
+    "Also create a markdown mockup/wireframe that sketches the page in section order for the current viewport. This mockup should help the builder visualize placement and rhythm without inventing unsupported structure.",
     JSON.stringify(plannerInput, null, 2),
   ].join("\n\n");
 }
@@ -1268,7 +1840,7 @@ function buildDemoPlannerResult(plannerInput = {}) {
   const avoidDirection = String(plannerInput?.userInput?.avoidDirection || "").trim();
   const designChangeLevel = normalizeDesignChangeLevel(plannerInput?.userInput?.designChangeLevel, "medium");
   const editableSlots = toStringArray(plannerInput?.pageSummary?.editableSlots);
-  const focusSlots = editableSlots.slice(0, 4);
+  const focusSlots = editableSlots.slice(0, 6);
   const fallbackNarrative = buildPlannerNarrativeFallbacks(plannerInput);
   const referenceNotes = ((plannerInput?.referenceSummary?.analyses || []) || [])
     .filter((item) => item?.requestedUrl)
@@ -1277,47 +1849,51 @@ function buildDemoPlannerResult(plannerInput = {}) {
       takeaways: toStringArray(item?.takeaways),
     }))
     .slice(0, 5);
+  const requirementPlan = {
+    title: `${pageLabel} 시안 기획안`,
+    designChangeLevel,
+    requestSummary: ensureNarrativeDepth(
+      [
+        requestText || `${pageLabel} 방향 정리`,
+        keyMessage ? `핵심 메시지: ${keyMessage}` : "",
+      ].filter(Boolean),
+      fallbackNarrative.requestSummary,
+      5
+    ).map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
+    planningDirection: ensureNarrativeDepth(
+      [
+        focusSlots[0] ? `${focusSlots[0]} 영역을 우선적으로 재정리한다.` : "",
+        focusSlots[1] ? `${focusSlots[1]} 영역을 보조 시안 포인트로 사용한다.` : "",
+      ].filter(Boolean),
+      fallbackNarrative.planningDirection,
+      6
+    ).map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
+    designDirection: ensureNarrativeDepth(
+      [
+        preferredDirection ? preferredDirection : "",
+        avoidDirection ? `${avoidDirection} 방향은 피한다.` : "",
+      ].filter(Boolean),
+      fallbackNarrative.designDirection,
+      6
+    ).map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
+    priority: normalizePlannerPriority([], focusSlots),
+    guardrails: toStringArray(
+      plannerInput?.guardrailBundle?.rules,
+      ["사실 기반 가격/스펙/상품 정보는 임의 변경 금지"]
+    ),
+    referenceNotes,
+    builderBrief: {
+      objective: fallbackNarrative.objectiveNarrative[0] || keyMessage || requestText || `${pageLabel} 방향 정리`,
+      mustKeep: fallbackNarrative.mustKeepNarrative.slice(0, 4).map((line) => convertLineToProposalTone(line, pageLabel)),
+      mustChange: fallbackNarrative.mustChangeNarrative.slice(0, 4).map((line) => convertLineToProposalTone(line, pageLabel)),
+      suggestedFocusSlots: focusSlots.slice(0, 8),
+    },
+  };
   return {
     summary: `${pageLabel} 요구사항 정리 완료`,
     requirementPlan: {
-      title: `${pageLabel} 시안 기획안`,
-      designChangeLevel,
-      requestSummary: ensureNarrativeDepth(
-        [
-          requestText || `${pageLabel} 방향 정리`,
-          keyMessage ? `핵심 메시지: ${keyMessage}` : "",
-        ].filter(Boolean),
-        fallbackNarrative.requestSummary,
-        5
-      ).map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
-      planningDirection: ensureNarrativeDepth(
-        [
-          focusSlots[0] ? `${focusSlots[0]} 영역을 우선적으로 재정리한다.` : "",
-          focusSlots[1] ? `${focusSlots[1]} 영역을 보조 시안 포인트로 사용한다.` : "",
-        ].filter(Boolean),
-        fallbackNarrative.planningDirection,
-        6
-      ).map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
-      designDirection: ensureNarrativeDepth(
-        [
-          preferredDirection ? preferredDirection : "",
-          avoidDirection ? `${avoidDirection} 방향은 피한다.` : "",
-        ].filter(Boolean),
-        fallbackNarrative.designDirection,
-        6
-      ).map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
-      priority: normalizePlannerPriority([], focusSlots),
-      guardrails: toStringArray(
-        plannerInput?.guardrailBundle?.rules,
-        ["사실 기반 가격/스펙/상품 정보는 임의 변경 금지"]
-      ),
-      referenceNotes,
-      builderBrief: {
-        objective: fallbackNarrative.objectiveNarrative[0] || keyMessage || requestText || `${pageLabel} 방향 정리`,
-        mustKeep: fallbackNarrative.mustKeepNarrative.slice(0, 4).map((line) => convertLineToProposalTone(line, pageLabel)),
-        mustChange: fallbackNarrative.mustChangeNarrative.slice(0, 4).map((line) => convertLineToProposalTone(line, pageLabel)),
-        suggestedFocusSlots: focusSlots,
-      },
+      ...requirementPlan,
+      ...buildRequirementPlanMarkdownDocs(requirementPlan, plannerInput),
     },
   };
 }
@@ -1337,55 +1913,84 @@ function normalizePlannerResult(result, plannerInput = {}) {
     .slice(0, 5);
   const requirementPlan = source.requirementPlan && typeof source.requirementPlan === "object" ? source.requirementPlan : {};
   const builderBrief = requirementPlan.builderBrief && typeof requirementPlan.builderBrief === "object" ? requirementPlan.builderBrief : {};
+  const normalizedRequirementPlan = {
+    title: String(requirementPlan.title || `${pageLabel} 시안 기획안`).trim(),
+    designChangeLevel: normalizeDesignChangeLevel(
+      requirementPlan.designChangeLevel,
+      plannerInput?.userInput?.designChangeLevel || "medium"
+    ),
+    requestSummary: ensureNarrativeDepth(requirementPlan.requestSummary, fallbackNarrative.requestSummary, 5)
+      .map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
+    planningDirection: ensureNarrativeDepth(requirementPlan.planningDirection, fallbackNarrative.planningDirection, 6)
+      .map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
+    designDirection: ensureNarrativeDepth(requirementPlan.designDirection, fallbackNarrative.designDirection, 6)
+      .map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
+    priority: normalizePlannerPriority(requirementPlan.priority, editableSlots),
+    guardrails: toStringArray(
+      requirementPlan.guardrails,
+      toStringArray(plannerInput?.guardrailBundle?.rules, ["사실 기반 가격/스펙/상품 정보는 임의 변경 금지"])
+    ),
+    referenceNotes: normalizePlannerReferenceNotes(requirementPlan.referenceNotes, fallbackRefNotes),
+    builderBrief: {
+      objective: String(
+        builderBrief.objective ||
+        fallbackNarrative.objectiveNarrative[0] ||
+        source.summary ||
+        `${pageLabel} 방향 정리`
+      ).trim(),
+      mustKeep: ensureNarrativeDepth(builderBrief.mustKeep, fallbackNarrative.mustKeepNarrative, 3)
+        .map((line) => convertLineToProposalTone(line, pageLabel)),
+      mustChange: ensureNarrativeDepth(builderBrief.mustChange, fallbackNarrative.mustChangeNarrative, 3)
+        .map((line) => convertLineToProposalTone(line, pageLabel)),
+      suggestedFocusSlots: toStringArray(builderBrief.suggestedFocusSlots, editableSlots.slice(0, 6))
+        .filter((slotId) => !editableSlotSet.size || editableSlotSet.has(slotId))
+        .slice(0, 8),
+    },
+  };
   return {
     summary: String(source.summary || `${pageLabel} 요구사항 정리 완료`).trim(),
     requirementPlan: {
-      title: String(requirementPlan.title || `${pageLabel} 시안 기획안`).trim(),
-      designChangeLevel: normalizeDesignChangeLevel(
-        requirementPlan.designChangeLevel,
-        plannerInput?.userInput?.designChangeLevel || "medium"
-      ),
-      requestSummary: ensureNarrativeDepth(requirementPlan.requestSummary, fallbackNarrative.requestSummary, 5)
-        .map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
-      planningDirection: ensureNarrativeDepth(requirementPlan.planningDirection, fallbackNarrative.planningDirection, 6)
-        .map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
-      designDirection: ensureNarrativeDepth(requirementPlan.designDirection, fallbackNarrative.designDirection, 6)
-        .map((line) => convertLineToProposalTone(sanitizeCustomerFacingPlanLine(line, plannerInput), pageLabel)),
-      priority: normalizePlannerPriority(requirementPlan.priority, editableSlots),
-      guardrails: toStringArray(
-        requirementPlan.guardrails,
-        toStringArray(plannerInput?.guardrailBundle?.rules, ["사실 기반 가격/스펙/상품 정보는 임의 변경 금지"])
-      ),
-      referenceNotes: normalizePlannerReferenceNotes(requirementPlan.referenceNotes, fallbackRefNotes),
-      builderBrief: {
-        objective: String(
-          builderBrief.objective ||
-          fallbackNarrative.objectiveNarrative[0] ||
-          source.summary ||
-          `${pageLabel} 방향 정리`
-        ).trim(),
-        mustKeep: ensureNarrativeDepth(builderBrief.mustKeep, fallbackNarrative.mustKeepNarrative, 3)
-          .map((line) => convertLineToProposalTone(line, pageLabel)),
-        mustChange: ensureNarrativeDepth(builderBrief.mustChange, fallbackNarrative.mustChangeNarrative, 3)
-          .map((line) => convertLineToProposalTone(line, pageLabel)),
-        suggestedFocusSlots: toStringArray(builderBrief.suggestedFocusSlots, editableSlots.slice(0, 4))
-          .filter((slotId) => !editableSlotSet.size || editableSlotSet.has(slotId))
-          .slice(0, 4),
-      },
+      ...normalizedRequirementPlan,
+      ...buildRequirementPlanMarkdownDocs(normalizedRequirementPlan, plannerInput),
     },
   };
 }
 
 async function handleLlmPlan(plannerInput) {
-  const result = await callOpenRouterJson({
-    model: resolveOpenRouterModel("PLANNER_MODEL", "OPENROUTER_MODEL"),
-    temperature: 0.2,
-    demoFallback: () => buildDemoPlannerResult(plannerInput),
-    messages: [
-      { role: "system", content: buildPlannerSystemPrompt() },
-      { role: "user", content: buildPlannerUserPrompt(plannerInput) },
-    ],
-  });
+  const primaryModel = resolveOpenRouterModel("PLANNER_MODEL", "OPENROUTER_MODEL");
+  const fallbackModel = resolveOpenRouterModel("PLANNER_FALLBACK_MODEL", "OPENROUTER_MODEL");
+  const requestMessages = [
+    { role: "system", content: buildPlannerSystemPrompt() },
+    { role: "user", content: buildPlannerUserPrompt(plannerInput) },
+  ];
+  let result;
+  try {
+    result = await withLlmTimeout(
+      callOpenRouterJson({
+        model: primaryModel,
+        temperature: 0.2,
+        demoFallback: () => buildDemoPlannerResult(plannerInput),
+        messages: requestMessages,
+      }),
+      "Planner request"
+    );
+  } catch (error) {
+    const message = String(error?.message || error || "").toLowerCase();
+    const shouldRetryWithFallback =
+      fallbackModel &&
+      fallbackModel !== primaryModel &&
+      (message.includes("timed out") || message.includes("terminated") || message.includes("fetch failed"));
+    if (!shouldRetryWithFallback) throw error;
+    result = await withLlmTimeout(
+      callOpenRouterJson({
+        model: fallbackModel,
+        temperature: 0.2,
+        demoFallback: () => buildDemoPlannerResult(plannerInput),
+        messages: requestMessages,
+      }),
+      "Planner fallback request"
+    );
+  }
   return normalizePlannerResult(result, plannerInput);
 }
 
@@ -1399,6 +2004,10 @@ function buildBuilderSystemPrompt() {
     "Use only allowed slots and supported operation formats.",
     "Respect the provided target scope. If the system context is limited to selected components, do not create operations for anything outside that scope.",
     "Treat pageContext.pageIdentity and designToolContext.visualPrinciples.pageIdentity as hard constraints. The result must still feel like the same type of page with the same brand role, not a random campaign landing page.",
+    "Treat pageContext.viewportProfile and pageContext.viewportLabel as hard constraints. Operations must be appropriate for the target viewport only.",
+    "Treat designToolContext.visualPrinciples.layoutTokens and patchRules as hard constraints when they are provided.",
+    "Treat approvedPlan.builderMarkdown as the primary machine-readable DESIGN.md-style brief and approvedPlan.layoutMockupMarkdown as the primary section-level mockup/wireframe whenever they are present.",
+    "If systemContext.designReferenceLibrary or designToolContext.designReferenceLibrary is provided, treat it as a curated indexed design reference shelf. Use it to amplify design character, component rhythm, contrast strategy, and section mood with stronger intent than generic safe output.",
     "Prioritize brand design first. Do not flatten the result into overly conservative output if the approved designChangeLevel calls for stronger visual exploration.",
     "Respect the approved designChangeLevel and its profile. Low means light refinement, medium means controlled but noticeable improvement, high means strong visual exploration inside the brand/system baseline.",
     "Prefer high-signal supported changes over arbitrary generation. Use update_component_patch and targeted text/image updates for visual changes.",
@@ -1409,7 +2018,11 @@ function buildBuilderSystemPrompt() {
     "If a change is described in whatChanged, there should usually be at least one matching operation unless the patch schema truly blocks it.",
     "Use only update_component_patch, update_slot_text, update_hero_field, update_slot_image, and update_page_title.",
     "Every operation must reference an allowed slotId from editableComponents and must use only patch keys listed in that component's patchSchema.",
+    "Treat each component's patchBridge as implementation guidance for which root fields and style fields should be touched first.",
     "Respect each component's mediaSpec and layout. Do not propose image treatment that would make visuals look shrunken, over-cropped, or mismatched to the slot's intended fit.",
+    "When mediaSpec.measuredScale or patchBridge.measuredScale is provided, keep the slot's usable width, image presence, and text scale close to that measured baseline unless the approved plan explicitly requires a stronger deviation.",
+    "If artifactSectionRegistry is provided, treat it as the primary evidence for which sections come directly from lge.co.kr reference structure and which sections still need custom blocks.",
+    "If shareSectionRegistry is provided, use it as section-level evidence for section width, content width, image zones, and replacement feasibility. Do not contradict that geometry in your build logic.",
     "Preserve facts about products, prices, and specs.",
     "Return JSON only.",
     "Required top-level keys: summary, buildResult.",
@@ -1424,10 +2037,17 @@ function buildBuilderUserPrompt(builderInput) {
     "Use the provided designToolContext as the only allowed tool surface and follow its workflow order, patch strategy, and change profile.",
     "Before making any change, align to the page's original identity and avoid visual ideas that would make this page feel like a different product, campaign, or channel.",
     "Avoid isolated dark-theme blocks or isolated dramatic tone shifts unless the page identity explicitly supports that direction across the whole page.",
+    "On home, keep section rhythm, background cadence, padding, and title scale aligned to the provided layout tokens. Do not create one-off dark blocks on narrow sections like quickmenu, product lists, banner lists, or service cards.",
     "Prefer 3 to 8 concrete operations when safe changes are possible.",
     "If you claim sections were refined, strengthened, restructured, or clarified, you must express that through executable operations.",
     "When using update_component_patch, keep the patch minimal and only use keys allowed by each component's patchSchema.",
+    "Use patchBridge.rootPatchPriority and patchBridge.stylePatchPriority to decide which patch fields fit each slot archetype.",
     "Use mediaSpec, containerMode, and layout as real constraints. Quickmenu icons should still feel icon-sized, product/gallery images should usually remain contain-oriented, and banner/hero visuals should not become visibly undersized inside their frames.",
+    "Use measuredScale as a visual baseline for shell width, image frame size, and title scale before exploring stylistic variation.",
+    "Read the approved markdown brief as if it were a DESIGN.md file: extract layout intent, hierarchy, component emphasis, and guardrails before deciding operations.",
+    "Read the indexed design reference library before deciding visual tone. Use those references to strengthen color attitude, surface treatment, card density, hero drama, and information hierarchy without copying exact layouts.",
+    "If artifactSectionRegistry exists, prefer sections where referenceSection.available=true and avoid inventing a new structure when the lge.co.kr reference section already exists.",
+    "If shareSectionRegistry exists, align your visual decisions to each section's sectionRect, contentRect, imageZones, and replacementMode before writing operations.",
     "If no operation is possible, explain the exact blocked slot and exact missing patch capability in report.assumptions.",
     "Expected schema example:",
     JSON.stringify({
@@ -1521,11 +2141,15 @@ function normalizeBuilderOperation(item, pageId = "") {
       normalizedPatch.styles = { ...styleSource };
     }
     if (!resolvedPageId || !slotId || !Object.keys(normalizedPatch).length) return null;
+    const finalPatch =
+      resolvedPageId === "home"
+        ? normalizeHomeBuilderPatch(slotId, normalizedPatch)
+        : normalizedPatch;
     return {
       action: "update_component_patch",
       pageId: resolvedPageId,
       slotId,
-      patch: normalizedPatch,
+      patch: finalPatch,
     };
   }
 
@@ -1656,18 +2280,34 @@ function buildDemoBuilderResult(builderInput = {}) {
 
   for (const item of patchableSlots.slice(0, slotLimit)) {
     const { slotId, rootKeys, styleKeys } = item;
+    const homeRule = pageId === "home" ? buildHomePatchRule(slotId) : null;
     const stylePatch = {};
     if (styleKeys.has("titleWeight")) stylePatch.titleWeight = designChangeLevel === "high" ? "700" : "600";
-    if (styleKeys.has("titleSize")) stylePatch.titleSize = designChangeLevel === "high" ? "30" : "26";
-    if (styleKeys.has("subtitleSize")) stylePatch.subtitleSize = designChangeLevel === "high" ? "17" : "15";
-    if (styleKeys.has("padding")) stylePatch.padding = designChangeLevel === "high" ? "48px 40px" : "40px 32px";
-    if (styleKeys.has("radius")) stylePatch.radius = "24px";
+    if (styleKeys.has("titleSize")) {
+      stylePatch.titleSize = homeRule
+        ? String(homeRule.titleSize.max)
+        : designChangeLevel === "high"
+          ? "30"
+          : "26";
+    }
+    if (styleKeys.has("subtitleSize")) {
+      stylePatch.subtitleSize = homeRule
+        ? String(homeRule.subtitleSize.max)
+        : designChangeLevel === "high"
+          ? "17"
+          : "15";
+    }
+    if (styleKeys.has("padding")) stylePatch.padding = homeRule ? homeRule.padding : (designChangeLevel === "high" ? "48px 40px" : "40px 32px");
+    if (styleKeys.has("radius")) stylePatch.radius = homeRule ? homeRule.radius : "24px";
+    if (styleKeys.has("minHeight") && homeRule) stylePatch.minHeight = String(homeRule.minHeight.min);
     if (styleKeys.has("background")) {
-      stylePatch.background = slotId === "hero"
-        ? "linear-gradient(135deg, #1f2937 0%, #111827 100%)"
-        : slotId === "quickmenu" || slotId === "summary-banner-2"
-          ? "#f8fafc"
-          : "#ffffff";
+      stylePatch.background = homeRule
+        ? homeRule.defaultBackground
+        : slotId === "hero"
+          ? "linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%)"
+          : slotId === "quickmenu" || slotId === "summary-banner-2"
+            ? "#f8fafc"
+            : "#ffffff";
     }
 
     const patch = {};
@@ -1788,18 +2428,23 @@ function normalizeBuilderResult(result, builderInput = {}) {
 }
 
 async function handleLlmBuildOnData(builderInput, currentData) {
-  const result = await callOpenRouterJson({
-    model: resolveOpenRouterModel("BUILDER_MODEL", "OPENROUTER_MODEL"),
-    temperature: 0.15,
-    demoFallback: () => buildDemoBuilderResult(builderInput),
-    messages: [
-      { role: "system", content: buildBuilderSystemPrompt() },
-      { role: "user", content: buildBuilderUserPrompt(builderInput) },
-    ],
-  });
+  const result = await withLlmTimeout(
+    callOpenRouterJson({
+      model: resolveOpenRouterModel("BUILDER_MODEL", "OPENROUTER_MODEL"),
+      temperature: 0.15,
+      demoFallback: () => buildDemoBuilderResult(builderInput),
+      messages: [
+        { role: "system", content: buildBuilderSystemPrompt() },
+        { role: "user", content: buildBuilderUserPrompt(builderInput) },
+      ],
+    }),
+    "Builder request"
+  );
   const normalizedResult = normalizeBuilderResult(result, builderInput);
   const current = normalizeEditableData(currentData || {});
-  const next = applyOperations(current, normalizedResult.buildResult.operations || []);
+  const next = applyOperations(current, normalizedResult.buildResult.operations || [], {
+    viewportProfile: builderInput?.pageContext?.viewportProfile || "pc",
+  });
   return {
     summary: normalizedResult.summary,
     buildResult: normalizedResult.buildResult,
@@ -1808,8 +2453,9 @@ async function handleLlmBuildOnData(builderInput, currentData) {
   };
 }
 
-function applyOperations(data, operations) {
+function applyOperations(data, operations, options = {}) {
   let next = JSON.parse(JSON.stringify(data));
+  const viewportProfile = normalizeViewportProfile(options.viewportProfile || "pc", "pc");
 
   for (const op of operations || []) {
     if (op.action === "toggle_slot_source") {
@@ -1842,7 +2488,7 @@ function applyOperations(data, operations) {
       const sourceId = String(slot.activeSourceId || "").trim();
       const patchValue = field === "visibility" ? Boolean(op.visible ?? op.value) : op.value;
       if (typeof patchValue === "undefined") continue;
-      next = setSlotComponentPatch(next, op.pageId, slotId, sourceId, { [field]: patchValue });
+      next = setSlotComponentPatch(next, op.pageId, slotId, sourceId, { [field]: patchValue }, viewportProfile);
       continue;
     }
 
@@ -1852,7 +2498,7 @@ function applyOperations(data, operations) {
       const field = String(op.field || "title").trim();
       const sourceId = String(slot.activeSourceId || "").trim();
       if (slot.slotId === "hero" && ["badge", "headline", "description", "ctaHref"].includes(field)) {
-        next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, { [field]: op.value });
+        next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, { [field]: op.value }, viewportProfile);
         continue;
       }
       const patchField =
@@ -1864,7 +2510,7 @@ function applyOperations(data, operations) {
               ? field
               : null;
       if (!patchField) continue;
-      next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, { [patchField]: op.value });
+      next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, { [patchField]: op.value }, viewportProfile);
       continue;
     }
 
@@ -1872,7 +2518,7 @@ function applyOperations(data, operations) {
       const slot = findSlotConfig(next, op.pageId, op.slotId);
       if (!slot || !op.patch || typeof op.patch !== "object") continue;
       const sourceId = String(slot.activeSourceId || "").trim();
-      next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, op.patch);
+      next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, op.patch, viewportProfile);
       continue;
     }
 
@@ -1884,7 +2530,7 @@ function applyOperations(data, operations) {
       if (typeof op.imageSrc === "string" && op.imageSrc.trim()) imagePatch.imageSrc = op.imageSrc.trim();
       if (typeof op.imageAlt === "string") imagePatch.imageAlt = op.imageAlt;
       if (!Object.keys(imagePatch).length) continue;
-      next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, imagePatch);
+      next = setSlotComponentPatch(next, op.pageId, slot.slotId, sourceId, imagePatch, viewportProfile);
       continue;
     }
 

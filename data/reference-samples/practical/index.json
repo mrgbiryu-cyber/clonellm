@@ -1,0 +1,438 @@
+{
+  "generatedAt": "2026-04-16T00:06:15.569Z",
+  "entries": [
+    {
+      "id": "baymard-ecommerce-design-examples",
+      "title": "18,000+ Ecommerce Design Examples Organized Across 67 Page Types – Baymard",
+      "provider": "Baymard Ecommerce Design Examples",
+      "url": "https://baymard.com/ecommerce-design-examples",
+      "referenceType": "practical-sample-source",
+      "sampleClass": "practical",
+      "bucket": "practical_ux_pattern",
+      "priority": 1,
+      "role": "이커머스 UX 패턴 수집의 최우선 소스",
+      "note": "",
+      "collectFor": [
+        "homepage",
+        "category_plp",
+        "product_pdp",
+        "cart",
+        "checkout",
+        "search",
+        "filters",
+        "navigation"
+      ],
+      "tags": [
+        "homepage",
+        "plp",
+        "pdp",
+        "cart",
+        "checkout",
+        "search",
+        "filter",
+        "navigation"
+      ],
+      "pageTypes": [
+        "home",
+        "plp",
+        "pdp",
+        "cart",
+        "checkout"
+      ],
+      "viewportProfiles": [
+        "pc"
+      ],
+      "recommendedFor": [
+        "homepage",
+        "plp",
+        "pdp",
+        "cart",
+        "checkout",
+        "search",
+        "filter",
+        "navigation"
+      ],
+      "usageNotes": [
+        "Every single one of the 18,000+ screenshots is annotated with highlights of UX “violations” and “adherences” (i.e. what the page design does well from a UX perspective, and what it does poorly).",
+        "이커머스 UX 패턴 수집의 최우선 소스"
+      ],
+      "collectedAt": "2026-04-16T00:06:14.481Z",
+      "fetchStatus": "ok",
+      "sampleUrls": [
+        {
+          "url": "https://baymard.com/checkout-usability/benchmark/step-type/cart",
+          "label": "Cart Shopping Cart, Shopping Basket, Shopping Bag 1134 Desktop and Mobile Designs",
+          "score": 26,
+          "tags": [
+            "cart",
+            "checkout"
+          ],
+          "pageTypes": [
+            "cart",
+            "checkout"
+          ]
+        },
+        {
+          "url": "https://baymard.com/research/checkout-usability",
+          "label": "Cart &amp; Checkout",
+          "score": 26,
+          "tags": [
+            "cart",
+            "checkout"
+          ],
+          "pageTypes": [
+            "cart",
+            "checkout"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/27-drop-down-menu",
+          "label": "Main Navigation Drop-Down Menu, Mega Drop-Down, Navigation Menu 1664 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "navigation"
+          ],
+          "pageTypes": [
+            "home"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/30-sub-category-page",
+          "label": "Intermediary Category Page Product Category Page 954 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "plp"
+          ],
+          "pageTypes": [
+            "plp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/32-search-field",
+          "label": "Search Field Site Search, Search Bar 1148 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "search"
+          ],
+          "pageTypes": [
+            "plp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/33-search-results-page",
+          "label": "Search Results Page Search Filters, Faceted Search 1343 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "search",
+            "filter"
+          ],
+          "pageTypes": [
+            "plp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/34-autocomplete-suggestions",
+          "label": "Autocomplete Suggestions Query Suggestions, Predictive Search, Typeahead Search 1075 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "search"
+          ],
+          "pageTypes": [
+            "plp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/35-no-search-results-page",
+          "label": "No Results Page No Results Found, No Search Results 655 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "search"
+          ],
+          "pageTypes": [
+            "plp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/37-product-list-category",
+          "label": "Product List Product Listings Page, PLP 1263 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "plp"
+          ],
+          "pageTypes": [
+            "plp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/41-product-page",
+          "label": "Product Page Product Details Page, PDP 1547 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "pdp"
+          ],
+          "pageTypes": [
+            "pdp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/42-image-gallery-overlay",
+          "label": "Image Gallery Overlay Product Image Overlay 516 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "pdp"
+          ],
+          "pageTypes": [
+            "pdp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/44-user-reviews-section",
+          "label": "User Reviews Section User Ratings, Customer Reviews, Product Reviews 729 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "pdp"
+          ],
+          "pageTypes": [
+            "pdp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/45-product-spec-sheet",
+          "label": "Spec Sheet Specifications Sheet, Product Specs 383 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "pdp"
+          ],
+          "pageTypes": [
+            "pdp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/60-stored-credit-cards",
+          "label": "Stored Credit Cards Stored Payment Cards 493 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "checkout"
+          ],
+          "pageTypes": [
+            "checkout"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/62-orders-overview",
+          "label": "Orders Overview Purchase Overview, Order History, Purchase History 131 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "homepage",
+            "plp",
+            "pdp",
+            "cart",
+            "checkout",
+            "search",
+            "filter",
+            "navigation"
+          ],
+          "pageTypes": [
+            "home",
+            "plp",
+            "pdp",
+            "cart",
+            "checkout"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/64-order-returns",
+          "label": "Order Returns Return Flow, Returns, Product Returns 130 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "homepage",
+            "plp",
+            "pdp",
+            "cart",
+            "checkout",
+            "search",
+            "filter",
+            "navigation"
+          ],
+          "pageTypes": [
+            "home",
+            "plp",
+            "pdp",
+            "cart",
+            "checkout"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/added-to-cart-confirmation",
+          "label": "Added To Cart Confirmation Added To Basket, Added to Bag 326 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "cart"
+          ],
+          "pageTypes": [
+            "cart"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/filtering-options",
+          "label": "Filtering Options Filter Facets, Product Filtering 967 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "filter"
+          ],
+          "pageTypes": [
+            "plp"
+          ]
+        },
+        {
+          "url": "https://baymard.com/ecommerce-design-examples/video-and-360-views",
+          "label": "Video &amp; 360-Views Product Video, 360 Product Viewer 440 Desktop and Mobile Designs",
+          "score": 20,
+          "tags": [
+            "homepage",
+            "plp",
+            "pdp",
+            "cart",
+            "checkout",
+            "search",
+            "filter",
+            "navigation"
+          ],
+          "pageTypes": [
+            "home",
+            "plp",
+            "pdp",
+            "cart",
+            "checkout"
+          ]
+        },
+        {
+          "url": "https://baymard.com/checkout-usability/benchmark/step-type/address-validator",
+          "label": "Address Validator Address Validation 328 Desktop and Mobile Designs",
+          "score": 16,
+          "tags": [
+            "checkout"
+          ],
+          "pageTypes": [
+            "checkout"
+          ]
+        }
+      ],
+      "htmlPath": "data/reference-samples/practical/baymard-ecommerce-design-examples/source.html"
+    },
+    {
+      "id": "mobbin",
+      "title": "Mobbin — UI &amp; UX design inspiration for mobile &amp; web apps",
+      "provider": "Mobbin",
+      "url": "https://mobbin.com/",
+      "referenceType": "practical-sample-source",
+      "sampleClass": "practical",
+      "bucket": "practical_ux_pattern",
+      "priority": 1,
+      "role": "실제 웹/앱 화면 패턴 수집",
+      "note": "",
+      "collectFor": [
+        "homepage",
+        "product_listing",
+        "product_detail",
+        "cart",
+        "checkout",
+        "onboarding"
+      ],
+      "tags": [
+        "homepage",
+        "plp",
+        "pdp",
+        "cart",
+        "checkout",
+        "navigation"
+      ],
+      "pageTypes": [
+        "home",
+        "plp",
+        "pdp",
+        "cart",
+        "checkout"
+      ],
+      "viewportProfiles": [
+        "pc"
+      ],
+      "recommendedFor": [
+        "homepage",
+        "plp",
+        "pdp",
+        "cart",
+        "checkout",
+        "navigation"
+      ],
+      "usageNotes": [
+        "Save hours of UI &amp; UX research with our library of 400,000+ fully searchable mobile &amp; web app screenshots.",
+        "실제 웹/앱 화면 패턴 수집"
+      ],
+      "collectedAt": "2026-04-16T00:06:15.004Z",
+      "fetchStatus": "ok",
+      "sampleUrls": [
+        {
+          "url": "https://mobbin.com/explore",
+          "label": "Explore",
+          "score": 8,
+          "tags": [
+            "homepage",
+            "plp",
+            "pdp",
+            "navigation"
+          ],
+          "pageTypes": [
+            "home",
+            "plp",
+            "pdp"
+          ]
+        }
+      ],
+      "htmlPath": "data/reference-samples/practical/mobbin/source.html"
+    },
+    {
+      "id": "pageflows",
+      "title": "Just a moment...",
+      "provider": "Page Flows",
+      "url": "https://pageflows.com/",
+      "referenceType": "practical-sample-source",
+      "sampleClass": "practical",
+      "bucket": "practical_ux_pattern",
+      "priority": 1,
+      "role": "유저 플로우 단위 수집",
+      "note": "",
+      "collectFor": [
+        "browse_to_pdp",
+        "pdp_to_cart",
+        "cart_to_checkout",
+        "purchase_flow"
+      ],
+      "tags": [
+        "navigation",
+        "cart",
+        "checkout"
+      ],
+      "pageTypes": [
+        "home",
+        "cart",
+        "checkout"
+      ],
+      "viewportProfiles": [
+        "pc"
+      ],
+      "recommendedFor": [
+        "navigation",
+        "cart",
+        "checkout"
+      ],
+      "usageNotes": [
+        "유저 플로우 단위 수집"
+      ],
+      "collectedAt": "2026-04-16T00:06:15.460Z",
+      "fetchStatus": "http_403",
+      "sampleUrls": [],
+      "htmlPath": "data/reference-samples/practical/pageflows/source.html"
+    }
+  ]
+}

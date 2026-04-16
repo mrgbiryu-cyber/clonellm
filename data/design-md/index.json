@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-04-15T10:45:45.251Z",
+  "entries": [
+    {
+      "id": "designmd-ai-chef-genesis",
+      "title": "Genesis",
+      "provider": "designmd.ai",
+      "url": "https://designmd.ai/chef/genesis",
+      "downloadUrl": "https://designmd.ai/api/v1/kits/chef/genesis/download",
+      "referenceType": "design-md",
+      "pageTypes": [
+        "generic"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "ta",
+        "mo"
+      ],
+      "styleSignals": [
+        "dark",
+        "premium",
+        "editorial",
+        "minimal",
+        "bold",
+        "warm",
+        "high-contrast",
+        "section-rhythm",
+        "card-system"
+      ],
+      "recommendedFor": [
+        "Display Font",
+        "Body Font",
+        "Code Font",
+        "Buttons",
+        "Cards",
+        "Inputs",
+        "Chips",
+        "Lists"
+      ],
+      "usageNotes": [
+        "Overview An editorial precision interface for a community platform where developers discover, share, and download design system files. The aesthetic is quietly confident — bold display typography, generous spacing, and gallery-frame card su"
+      ],
+      "markdownPath": "data/design-md/chef/genesis.md",
+      "sectionTitles": [
+        "Overview",
+        "Colors",
+        "Typography",
+        "Elevation",
+        "Components",
+        "Spacing",
+        "Border Radius",
+        "Do's and Don'ts"
+      ],
+      "colorCount": 13,
+      "componentCount": 12,
+      "collectedAt": "2026-04-15T10:45:45.247Z"
+    }
+  ]
+}

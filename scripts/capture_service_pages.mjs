@@ -2,8 +2,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
+import { fileURLToPath } from "node:url";
+import WebSocket from "ws";
 
-const ROOT = "/mnt/c/Users/mrgbi/lge-site-analysis";
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const OUT_DIR = path.join(ROOT, "data", "visual", "service-pages");
 const OUT_INDEX_PATH = path.join(OUT_DIR, "index.json");
 const LOCK_PATH = path.join(ROOT, "tmp", "capture-service-pages.lock");
@@ -12,6 +14,9 @@ const PAGE_TARGETS = [
   { pageId: "support", sourceUrl: "https://www.lge.co.kr/support" },
   { pageId: "bestshop", sourceUrl: "https://www.lge.co.kr/bestshop" },
   { pageId: "care-solutions", sourceUrl: "https://www.lge.co.kr/care-solutions" },
+  { pageId: "care-solutions-pdp", sourceUrl: "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021" },
+  { pageId: "homestyle-home", sourceUrl: "https://homestyle.lge.co.kr/home" },
+  { pageId: "homestyle-pdp", sourceUrl: "https://homestyle.lge.co.kr/item?productId=G26030036505" },
 ];
 
 function ensureDir(dir) {

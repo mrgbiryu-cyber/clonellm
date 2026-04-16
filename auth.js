@@ -32,6 +32,19 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+function normalizeViewportProfile(value, fallback = "pc") {
+  const normalized = String(value || fallback).trim().toLowerCase();
+  if (normalized === "pc" || normalized === "mo" || normalized === "ta") return normalized;
+  return fallback;
+}
+
+function resolveWorkspaceViewportKey(pageId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return "";
+  if (normalizedPageId !== "home") return normalizedPageId;
+  return `${normalizedPageId}@${normalizeViewportProfile(viewportProfile, "pc")}`;
+}
+
 function toPlainObject(value) {
   return value && typeof value === "object" && !Array.isArray(value) ? JSON.parse(JSON.stringify(value)) : {};
 }
@@ -178,7 +191,7 @@ function normalizeRequirementPlan(plan) {
   return {
     id: String(plan?.id || crypto.randomUUID()),
     pageId: String(plan?.pageId || "").trim(),
-    viewportProfile: String(plan?.viewportProfile || "pc").trim() || "pc",
+    viewportProfile: normalizeViewportProfile(plan?.viewportProfile, "pc"),
     mode: String(plan?.mode || "direct").trim() || "direct",
     status: String(plan?.status || "draft").trim() || "draft",
     title: String(plan?.title || plan?.output?.title || "").trim(),
@@ -194,7 +207,7 @@ function normalizeDraftBuild(build) {
   return {
     id: String(build?.id || crypto.randomUUID()),
     pageId: String(build?.pageId || "").trim(),
-    viewportProfile: String(build?.viewportProfile || "pc").trim() || "pc",
+    viewportProfile: normalizeViewportProfile(build?.viewportProfile, "pc"),
     planId: String(build?.planId || "").trim(),
     status: String(build?.status || "draft").trim() || "draft",
     summary: String(build?.summary || "").trim(),
@@ -211,7 +224,7 @@ function normalizeSavedVersion(version) {
   return {
     id: String(version?.id || crypto.randomUUID()),
     pageId: String(version?.pageId || "").trim(),
-    viewportProfile: String(version?.viewportProfile || "pc").trim() || "pc",
+    viewportProfile: normalizeViewportProfile(version?.viewportProfile, "pc"),
     versionLabel: String(version?.versionLabel || "").trim(),
     planId: String(version?.planId || "").trim(),
     buildId: String(version?.buildId || "").trim(),
@@ -230,6 +243,7 @@ function normalizePinnedViewsByPage(value) {
     if (!normalizedPageId) return;
     next[normalizedPageId] = {
       versionId: String(entry?.versionId || "").trim(),
+      viewportProfile: normalizeViewportProfile(entry?.viewportProfile, "pc"),
       pinnedAt: String(entry?.pinnedAt || nowIso()),
     };
   });
@@ -386,11 +400,16 @@ function updateWorkspaceMeta(userId, mutator, { logType = "", logDetail = {}, hi
   return { workspace, result };
 }
 
-function listRequirementPlans(userId, { pageId = "", limit = 50 } = {}) {
+function listRequirementPlans(userId, { pageId = "", viewportProfile = "", limit = 50 } = {}) {
   const workspace = getWorkspace(userId);
   const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile = String(viewportProfile || "").trim();
   const items = (workspace.requirementPlans || [])
-    .filter((item) => !normalizedPageId || item.pageId === normalizedPageId)
+    .filter(
+      (item) =>
+        (!normalizedPageId || item.pageId === normalizedPageId) &&
+        (!normalizedViewportProfile || normalizeViewportProfile(item.viewportProfile, "pc") === normalizeViewportProfile(normalizedViewportProfile, "pc"))
+    )
     .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")))
     .slice(0, Math.max(0, Number(limit) || 0));
   return items;
@@ -424,11 +443,16 @@ function saveRequirementPlan(userId, planInput = {}) {
   return result || (workspace.requirementPlans || [])[0] || null;
 }
 
-function listDraftBuilds(userId, { pageId = "", limit = 50 } = {}) {
+function listDraftBuilds(userId, { pageId = "", viewportProfile = "", limit = 50 } = {}) {
   const workspace = getWorkspace(userId);
   const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile = String(viewportProfile || "").trim();
   return (workspace.draftBuilds || [])
-    .filter((item) => !normalizedPageId || item.pageId === normalizedPageId)
+    .filter(
+      (item) =>
+        (!normalizedPageId || item.pageId === normalizedPageId) &&
+        (!normalizedViewportProfile || normalizeViewportProfile(item.viewportProfile, "pc") === normalizeViewportProfile(normalizedViewportProfile, "pc"))
+    )
     .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")))
     .slice(0, Math.max(0, Number(limit) || 0));
 }
@@ -461,11 +485,16 @@ function saveDraftBuild(userId, buildInput = {}) {
   return result || (workspace.draftBuilds || [])[0] || null;
 }
 
-function listSavedVersions(userId, { pageId = "", limit = 50 } = {}) {
+function listSavedVersions(userId, { pageId = "", viewportProfile = "", limit = 50 } = {}) {
   const workspace = getWorkspace(userId);
   const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile = String(viewportProfile || "").trim();
   return (workspace.savedVersions || [])
-    .filter((item) => !normalizedPageId || item.pageId === normalizedPageId)
+    .filter(
+      (item) =>
+        (!normalizedPageId || item.pageId === normalizedPageId) &&
+        (!normalizedViewportProfile || normalizeViewportProfile(item.viewportProfile, "pc") === normalizeViewportProfile(normalizedViewportProfile, "pc"))
+    )
     .sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")))
     .slice(0, Math.max(0, Number(limit) || 0));
 }
@@ -497,15 +526,19 @@ function saveSavedVersion(userId, versionInput = {}) {
   return result || (workspace.savedVersions || [])[0] || null;
 }
 
-function pinSavedVersion(userId, pageId, versionId) {
+function pinSavedVersion(userId, pageId, versionId, viewportProfile = "") {
   const normalizedPageId = String(pageId || "").trim();
   const normalizedVersionId = String(versionId || "").trim();
+  const normalizedViewportProfile = normalizeViewportProfile(viewportProfile, "pc");
   if (!normalizedPageId || !normalizedVersionId) {
     throw new Error("page_id_and_version_id_required");
   }
   const workspace = getWorkspace(userId);
   const version = (workspace.savedVersions || []).find(
-    (item) => item.pageId === normalizedPageId && item.id === normalizedVersionId
+    (item) =>
+      item.pageId === normalizedPageId &&
+      item.id === normalizedVersionId &&
+      (!viewportProfile || normalizeViewportProfile(item.viewportProfile, "pc") === normalizedViewportProfile)
   );
   if (!version) {
     throw new Error("saved_version_not_found");
@@ -520,37 +553,47 @@ function pinSavedVersion(userId, pageId, versionId) {
     userId,
     (draft) => {
       draft.pinnedViewsByPage = normalizePinnedViewsByPage(draft.pinnedViewsByPage);
-      draft.pinnedViewsByPage[normalizedPageId] = {
+      draft.pinnedViewsByPage[resolveWorkspaceViewportKey(normalizedPageId, normalizedViewportProfile)] = {
         versionId: normalizedVersionId,
+        viewportProfile: normalizedViewportProfile,
         pinnedAt: nowIso(),
       };
       return {
         pageId: normalizedPageId,
         versionId: normalizedVersionId,
-        pinnedAt: draft.pinnedViewsByPage[normalizedPageId].pinnedAt,
+        viewportProfile: normalizedViewportProfile,
+        pinnedAt: draft.pinnedViewsByPage[resolveWorkspaceViewportKey(normalizedPageId, normalizedViewportProfile)].pinnedAt,
       };
     },
     {
       logType: "workspace_view_pinned",
-      logDetail: { pageId: normalizedPageId, versionId: normalizedVersionId },
-      historySummary: `view_pin:${normalizedPageId}:${normalizedVersionId}`,
+      logDetail: { pageId: normalizedPageId, versionId: normalizedVersionId, viewportProfile: normalizedViewportProfile },
+      historySummary: `view_pin:${normalizedPageId}:${normalizedViewportProfile}:${normalizedVersionId}`,
     }
   );
   return result;
 }
 
-function getPinnedView(userId, pageId) {
+function getPinnedView(userId, pageId, viewportProfile = "") {
   const workspace = getWorkspace(userId);
   const normalizedPageId = String(pageId || "").trim();
   if (!normalizedPageId) return null;
-  const pin = workspace.pinnedViewsByPage?.[normalizedPageId] || null;
+  const normalizedViewportProfile = normalizeViewportProfile(viewportProfile, "pc");
+  const pin =
+    workspace.pinnedViewsByPage?.[resolveWorkspaceViewportKey(normalizedPageId, normalizedViewportProfile)] ||
+    workspace.pinnedViewsByPage?.[normalizedPageId] ||
+    null;
   if (!pin?.versionId) return null;
   const version = (workspace.savedVersions || []).find(
-    (item) => item.pageId === normalizedPageId && item.id === pin.versionId
+    (item) =>
+      item.pageId === normalizedPageId &&
+      item.id === pin.versionId &&
+      (!pin.viewportProfile || normalizeViewportProfile(item.viewportProfile, "pc") === normalizeViewportProfile(pin.viewportProfile, "pc"))
   ) || null;
   return {
     pageId: normalizedPageId,
     versionId: pin.versionId,
+    viewportProfile: normalizeViewportProfile(pin.viewportProfile || version?.viewportProfile, normalizedViewportProfile),
     pinnedAt: pin.pinnedAt || null,
     version,
   };

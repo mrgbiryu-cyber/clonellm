@@ -62,6 +62,10 @@ const SERVICE_PAGE_VISUAL_INDEX_PATH = path.join(VISUAL_DIR, "service-pages", "i
 const SERVICE_GROUPS_INDEX_PATH = path.join(ROOT, "data", "normalized", "service-groups", "index.json");
 const PLP_GROUPS_INDEX_PATH = path.join(ROOT, "data", "normalized", "plp-groups", "index.json");
 const PDP_GROUPS_INDEX_PATH = path.join(ROOT, "data", "normalized", "pdp-groups", "index.json");
+const DESIGN_REFERENCE_LIBRARY_PATH = path.join(ROOT, "data", "normalized", "design-reference-library.json");
+const DESIGN_REFERENCE_SOURCE_SEEDS_PATH = path.join(ROOT, "data", "normalized", "design-reference-source-seeds.json");
+const DESIGN_REFERENCE_COLLECTOR_INDEX_PATH = path.join(ROOT, "data", "design-md", "index.json");
+const PRACTICAL_REFERENCE_SAMPLES_INDEX_PATH = path.join(ROOT, "data", "reference-samples", "practical", "index.json");
 const HOME_LINK_COVERAGE_REPORT_PATH = path.join(ROOT, "data", "reports", "home-link-coverage.json");
 const REFERENCE_LIVE_DIR = path.join(ROOT, "data", "raw", "reference-live");
 const REFERENCE_LIVE_FALLBACK_DIR = path.join(ROOT, "data", "reference-live");
@@ -73,9 +77,245 @@ const LIVE_MEASUREMENTS = new Map();
 const PAGE_COMPUTE_CACHE_TTL_MS = 15000;
 const WORKING_COMPONENT_INVENTORY_CACHE = new Map();
 const WORKING_EDITABILITY_CACHE = new Map();
+const WORKING_SHARE_SECTION_REGISTRY_CACHE = new Map();
 const PRE_LLM_GAP_CACHE = new Map();
 const ACCEPTANCE_RESULTS_CACHE = new Map();
 const LLM_PROGRESS_CACHE = new Map();
+const DESIGN_REFERENCE_LIBRARY_CACHE = new Map();
+const HOME_LAYOUT_TOKENS = {
+  desktopCanvasWidth: 1460,
+  shellNarrowWidth: 1380,
+  shellWideWidth: 1460,
+  sectionGap: {
+    major: "80px",
+    regular: "56px",
+    compact: "40px",
+  },
+  sectionPadding: {
+    fullBleed: "0",
+    shell: "0 40px",
+    compact: "0 24px",
+  },
+  titleScale: {
+    hero: "44-56px",
+    section: "30-34px",
+    support: "24-28px",
+  },
+  backgroundModes: ["plain-white", "soft-gray", "brand-tint", "dark-accent"],
+};
+const SERVICE_LIKE_PAGE_IDS = [
+  "support",
+  "bestshop",
+  "care-solutions",
+  "care-solutions-pdp",
+  "homestyle-home",
+  "homestyle-pdp",
+];
+const HOME_COMPONENT_SCALE_TOKENS = {
+  pc: {
+    quickmenu: {
+      slotWidth: 1460,
+      contentWidth: 1460,
+      usableBandLeft: 144,
+      usableBandRight: 1290,
+      itemWidth: 91,
+      itemHeight: 82,
+      titleFontSize: 15,
+      titleLineHeight: 22,
+      imageWidth: 52,
+      imageHeight: 52,
+    },
+    timedeal: {
+      slotWidth: 1460,
+      contentWidth: 1396,
+      contentInsetLeft: 32,
+      contentInsetRight: 32,
+      cardWidth: 678,
+      cardHeight: 343,
+      imageWidth: 327,
+      imageHeight: 327,
+      titleFontSize: 16,
+      titleLineHeight: 22,
+    },
+    subscription: {
+      slotWidth: 1460,
+      contentWidth: 1380,
+      contentInsetLeft: 40,
+      contentInsetRight: 40,
+      cardWidth: 327,
+      cardHeight: 479,
+      imageWidth: 327,
+      imageHeight: 479,
+      titleFontSize: 16,
+      titleLineHeight: 22,
+    },
+    "summary-banner-2": {
+      slotWidth: 1460,
+      contentWidth: 1380,
+      contentInsetLeft: 40,
+      contentInsetRight: 40,
+      cardWidth: 1380,
+      cardHeight: 224,
+      imageWidth: 1380,
+      imageHeight: 180,
+      titleFontSize: 22,
+      titleLineHeight: 30,
+    },
+  },
+  ta: {
+    quickmenu: {
+      inheritFrom: "pc",
+    },
+    timedeal: {
+      inheritFrom: "pc",
+    },
+    subscription: {
+      inheritFrom: "pc",
+    },
+    "summary-banner-2": {
+      inheritFrom: "pc",
+    },
+  },
+  mo: {
+    quickmenu: {
+      slotWidth: 390,
+      contentWidth: 390,
+      titleFontSize: 12,
+      titleLineHeight: 16,
+      imageWidth: 48,
+      imageHeight: 48,
+    },
+    subscription: {
+      slotWidth: 390,
+      contentWidth: 390,
+      contentInsetLeft: 20,
+      contentInsetRight: 20,
+      cardWidth: 350,
+      cardHeight: 90,
+      imageWidth: 350,
+      imageHeight: 90,
+      titleFontSize: 14,
+      titleLineHeight: 20,
+    },
+    "summary-banner-2": {
+      slotWidth: 205,
+      contentWidth: 205,
+      imageWidth: 135,
+      imageHeight: 110,
+      titleFontSize: 16,
+      titleLineHeight: 22,
+      imageFit: "contain",
+    },
+  },
+};
+const HOME_DESKTOP_RENDER_MATRIX = {
+  quickmenu: {
+    desktopPriority: "pc-first",
+    archetype: "icon-grid",
+    liveClassFragments: ["HomePcQuickmenu_quickmenu__"],
+    containerMode: "narrow",
+    notes: ["PC quickmenu source를 우선 사용하고 아이콘 체감 크기를 유지한다."],
+  },
+  "md-choice": {
+    desktopPriority: "pc-first",
+    archetype: "product-list",
+    liveClassFragments: ["HomePcListHorizontype_list_horizontype__", "HomePcListHorizontypeSkeleton_skeleton__"],
+    containerMode: "narrow",
+  },
+  timedeal: {
+    desktopPriority: "pc-first",
+    archetype: "product-list",
+    liveClassFragments: ["HomePcTimedeal_timedeal__", "HomePcTimedealSkeleton_timedeal__"],
+    containerMode: "narrow",
+  },
+  "best-ranking": {
+    desktopPriority: "pc-first",
+    archetype: "product-list",
+    liveClassFragments: ["HomePcListTabstypeBestranking_list_tab_bestranking__"],
+    containerMode: "narrow",
+    dataArea: "메인 베스트 랭킹 영역",
+  },
+  subscription: {
+    desktopPriority: "pc-first",
+    archetype: "banner-list",
+    liveClassFragments: ["HomePcListTabsBannertype_list_tabs_bannertype__"],
+    containerMode: "narrow",
+  },
+  "space-renewal": {
+    desktopPriority: "pc-first",
+    archetype: "editorial-product",
+    liveClassFragments: ["HomePcListBannertype_list_bannertype__"],
+    containerMode: "narrow",
+  },
+  "summary-banner-2": {
+    desktopPriority: "pc-first",
+    archetype: "banner",
+    liveClassFragments: ["HomePcBannerPromotion_banner_promotion__"],
+    containerMode: "full",
+    dataArea: "메인 하단 배너 영역",
+  },
+  "missed-benefits": {
+    desktopPriority: "pc-first",
+    archetype: "banner-grid",
+    liveClassFragments: ["HomePcListRectangletype_list_rectangle__"],
+    containerMode: "narrow",
+  },
+  "brand-showroom": {
+    desktopPriority: "pc-first",
+    archetype: "editorial",
+    liveClassFragments: ["HomePcListSquaretype_list_squaretype__"],
+    containerMode: "narrow",
+    dataArea: "메인 브랜드 쇼룸 영역",
+  },
+  "latest-product-news": {
+    desktopPriority: "pc-first",
+    archetype: "editorial",
+    liveClassFragments: ["HomePcListSquaretypeScroll_list_squaretype_scroll__"],
+    containerMode: "narrow",
+    dataArea: "메인 최신 제품 소식 영역",
+  },
+  "smart-life": {
+    desktopPriority: "pc-first",
+    archetype: "editorial-list",
+    liveClassFragments: ["HomePcListSquaretype_list_squaretype__"],
+    containerMode: "narrow",
+    dataArea: "메인 슬기로운 가전생활 영역",
+  },
+  "lg-best-care": {
+    desktopPriority: "pc-first",
+    archetype: "service-card",
+    liveClassFragments: ["HomePcListBannerRectangletype_list_banner_rectangle__"],
+    containerMode: "narrow",
+    dataArea: "메인 베스트 케어 영역",
+  },
+  "bestshop-guide": {
+    desktopPriority: "pc-first",
+    archetype: "service-card",
+    liveClassFragments: ["HomePcListBannerHorizontype_list_banner_horizon__"],
+    containerMode: "narrow",
+    dataArea: "메인 베스트샵 이용안내 영역",
+  },
+  "marketing-area": {
+    desktopPriority: "pc-first",
+    archetype: "editorial-grid",
+    liveClassFragments: ["HomePcListMarketingArea_list_marketing_area__"],
+    containerMode: "narrow",
+  },
+};
+
+function getHomeDesktopRenderProfile(slotId) {
+  return HOME_DESKTOP_RENDER_MATRIX[String(slotId || "").trim()] || null;
+}
+
+function getHomeComponentScaleToken(slotId, viewportProfile = "pc") {
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedViewport = normalizeHomeViewportProfile(viewportProfile, "pc");
+  const current = HOME_COMPONENT_SCALE_TOKENS[normalizedViewport]?.[normalizedSlotId] || null;
+  if (current && current.inheritFrom) {
+    return HOME_COMPONENT_SCALE_TOKENS[current.inheritFrom]?.[normalizedSlotId] || null;
+  }
+  return current;
+}
 
 function buildLlmProgressKey(userId, pageId, kind) {
   return [String(userId || "").trim(), String(pageId || "").trim(), String(kind || "").trim()].join("::");
@@ -133,10 +373,10 @@ function readCachedValue(cache, key, compute, ttlMs = PAGE_COMPUTE_CACHE_TTL_MS)
   return value;
 }
 
-function buildWorkspacePageCacheKey(editableData, pageId, scope = "") {
+function buildWorkspacePageCacheKey(editableData, pageId, scope = "", viewportProfile = "") {
   const registry = findSlotRegistry(editableData || {}, pageId);
   const slotState = (registry?.slots || []).map((slot) => `${slot.slotId}:${slot.activeSourceId || ""}`).join("|");
-  const patchState = listComponentPatches(editableData || {}, pageId)
+  const patchState = listComponentPatches(editableData || {}, pageId, viewportProfile)
     .map((item) => `${item.componentId}:${item.sourceId || ""}:${item.updatedAt || ""}`)
     .join("|");
   const acceptanceState = Array.isArray(editableData?.acceptanceResults)
@@ -145,7 +385,7 @@ function buildWorkspacePageCacheKey(editableData, pageId, scope = "") {
         .map((item) => `${item.bundleId}:${item.status}:${item.updatedAt || ""}`)
         .join("|")
     : "";
-  return [scope, pageId, slotState, patchState, acceptanceState].join("::");
+  return [scope, pageId, viewportProfile || "", slotState, patchState, acceptanceState].join("::");
 }
 
 function sendJson(res, status, payload) {
@@ -217,14 +457,37 @@ function clonePlain(value, fallback) {
   }
 }
 
-function extractPageScopedSnapshot(editableData, pageId) {
+function normalizeViewportProfile(value, fallback = "pc") {
+  const normalized = String(value || fallback).trim().toLowerCase();
+  if (normalized === "pc" || normalized === "mo" || normalized === "ta") return normalized;
+  return fallback;
+}
+
+function normalizeHomeViewportProfile(value, fallback = "ta") {
+  return normalizeViewportProfile(value, fallback);
+}
+
+function resolveWorkspaceViewportKey(pageId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return "";
+  if (normalizedPageId !== "home") return normalizedPageId;
+  return `${normalizedPageId}@${normalizeHomeViewportProfile(viewportProfile, "pc")}`;
+}
+
+function extractPageScopedSnapshot(editableData, pageId, viewportProfile = "") {
   const normalizedPageId = String(pageId || "").trim();
   if (!normalizedPageId) return null;
+  const normalizedViewportProfile = normalizedPageId === "home" ? normalizeHomeViewportProfile(viewportProfile, "pc") : "";
   const page = (editableData?.pages || []).find((item) => item.id === normalizedPageId) || null;
   const slotRegistry = (editableData?.slotRegistries || []).find((item) => item.pageId === normalizedPageId) || null;
-  const componentPatches = (editableData?.componentPatches || []).filter((item) => String(item.pageId || "").trim() === normalizedPageId);
+  const componentPatches = (editableData?.componentPatches || []).filter((item) => {
+    if (String(item.pageId || "").trim() !== normalizedPageId) return false;
+    if (normalizedPageId !== "home") return true;
+    return normalizeHomeViewportProfile(item.viewportProfile, "pc") === normalizedViewportProfile;
+  });
   return {
     pageId: normalizedPageId,
+    viewportProfile: normalizedViewportProfile || null,
     page: clonePlain(page, null),
     slotRegistry: clonePlain(slotRegistry, null),
     componentPatches: clonePlain(componentPatches, []),
@@ -236,6 +499,8 @@ function applyPageScopedSnapshot(editableData, snapshot, pageId) {
   if (!normalizedPageId || !snapshot || typeof snapshot !== "object") {
     return normalizeEditableData(clonePlain(editableData, {}));
   }
+  const normalizedViewportProfile =
+    normalizedPageId === "home" ? normalizeHomeViewportProfile(snapshot?.viewportProfile, "pc") : "";
   const next = normalizeEditableData(clonePlain(editableData, {}));
   if (snapshot.page && typeof snapshot.page === "object") {
     const pageIndex = (next.pages || []).findIndex((item) => item.id === normalizedPageId);
@@ -248,17 +513,112 @@ function applyPageScopedSnapshot(editableData, snapshot, pageId) {
     else next.slotRegistries.push(clonePlain(snapshot.slotRegistry, null));
   }
   if (Array.isArray(snapshot.componentPatches)) {
-    next.componentPatches = (next.componentPatches || []).filter((item) => String(item.pageId || "").trim() !== normalizedPageId);
+    next.componentPatches = (next.componentPatches || []).filter((item) => {
+      if (String(item.pageId || "").trim() !== normalizedPageId) return true;
+      if (normalizedPageId !== "home") return false;
+      return normalizeHomeViewportProfile(item.viewportProfile, "pc") !== normalizedViewportProfile;
+    });
     next.componentPatches.push(...clonePlain(snapshot.componentPatches, []));
   }
   return normalizeEditableData(next);
 }
 
-function resolvePinnedDataForPage(req, pageId) {
+function resolveDraftSnapshotOverrideForPage(req, payload, pageId, viewportProfile = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  const draftBuildId = String(new URL(req.url, `http://${req.headers.host || "localhost"}`).searchParams.get("draftBuildId") || "").trim();
+  const snapshotState = String(
+    new URL(req.url, `http://${req.headers.host || "localhost"}`).searchParams.get("snapshotState") || "after"
+  )
+    .trim()
+    .toLowerCase();
+  if (!draftBuildId || !payload?.user || !payload?.workspace || !normalizedPageId) return null;
+  const normalizedViewportProfile =
+    normalizedPageId === "home" ? normalizeHomeViewportProfile(viewportProfile, "pc") : normalizeViewportProfile(viewportProfile, "pc");
+  const siblingDraftBuilds = (payload.workspace.draftBuilds || [])
+    .filter((item) => {
+      if (String(item?.pageId || "").trim() !== normalizedPageId) return false;
+      if (normalizeViewportProfile(item?.viewportProfile, "pc") !== normalizedViewportProfile) return false;
+      return true;
+    })
+    .sort((a, b) => String(b?.updatedAt || "").localeCompare(String(a?.updatedAt || "")));
+  const draftBuild = siblingDraftBuilds.find((item) => String(item?.id || "").trim() === draftBuildId) || null;
+  if (!draftBuild) return null;
+  const currentDraftIndex = siblingDraftBuilds.findIndex((item) => String(item?.id || "").trim() === draftBuildId);
+  const previousDraftBuild = currentDraftIndex >= 0 ? siblingDraftBuilds[currentDraftIndex + 1] || null : null;
+  const requestedSnapshot =
+    snapshotState === "before"
+      ? draftBuild?.snapshotData?.beforePageSnapshot ||
+        previousDraftBuild?.snapshotData?.pageSnapshot ||
+        previousDraftBuild?.snapshotData?.beforePageSnapshot ||
+        null
+      : draftBuild?.snapshotData?.pageSnapshot || null;
+  const fallbackSnapshot =
+    draftBuild?.snapshotData?.pageSnapshot ||
+    draftBuild?.snapshotData?.beforePageSnapshot ||
+    null;
+  const snapshot = requestedSnapshot || fallbackSnapshot;
+  if (!snapshot) {
+    return {
+      draftBuild,
+      snapshotState,
+      data: payload.data,
+    };
+  }
+  return {
+    draftBuild,
+    snapshotState,
+    data: applyPageScopedSnapshot(payload.data, snapshot, normalizedPageId),
+  };
+}
+
+function resolveDraftBuildContextForRequest(req, pageId, viewportProfile = "") {
+  const payload = readDataForRequest(req);
+  const normalizedPageId = String(pageId || "").trim();
+  const draftBuildId = String(new URL(req.url, `http://${req.headers.host || "localhost"}`).searchParams.get("draftBuildId") || "").trim();
+  if (!payload?.user || !payload?.workspace || !normalizedPageId || !draftBuildId) return null;
+  const normalizedViewportProfile =
+    normalizedPageId === "home" ? normalizeHomeViewportProfile(viewportProfile, "pc") : normalizeViewportProfile(viewportProfile, "pc");
+  const siblingDraftBuilds = (payload.workspace.draftBuilds || [])
+    .filter((item) => {
+      if (String(item?.pageId || "").trim() !== normalizedPageId) return false;
+      if (normalizeViewportProfile(item?.viewportProfile, "pc") !== normalizedViewportProfile) return false;
+      return true;
+    })
+    .sort((a, b) => String(b?.updatedAt || "").localeCompare(String(a?.updatedAt || "")));
+  const draftBuild = siblingDraftBuilds.find((item) => String(item?.id || "").trim() === draftBuildId) || null;
+  if (!draftBuild) return null;
+  const currentDraftIndex = siblingDraftBuilds.findIndex((item) => String(item?.id || "").trim() === draftBuildId);
+  const previousDraftBuild = currentDraftIndex >= 0 ? siblingDraftBuilds[currentDraftIndex + 1] || null : null;
+  const beforePageSnapshot =
+    draftBuild?.snapshotData?.beforePageSnapshot ||
+    previousDraftBuild?.snapshotData?.pageSnapshot ||
+    previousDraftBuild?.snapshotData?.beforePageSnapshot ||
+    null;
+  return {
+    payload,
+    draftBuild,
+    previousDraftBuild,
+    beforePageSnapshot,
+    normalizedViewportProfile,
+  };
+}
+
+function resolvePinnedDataForPage(req, pageId, viewportProfile = "") {
   const payload = readDataForRequest(req);
   const normalizedPageId = String(pageId || "").trim();
   if (!payload.user || !normalizedPageId) return payload;
-  const pinned = getPinnedView(payload.user.userId, normalizedPageId);
+  const draftSnapshotOverride = resolveDraftSnapshotOverrideForPage(req, payload, normalizedPageId, viewportProfile);
+  if (draftSnapshotOverride?.data) {
+    return {
+      ...payload,
+      data: draftSnapshotOverride.data,
+      draftBuild: draftSnapshotOverride.draftBuild || null,
+      effectiveSource: `${payload.source}:draft-${draftSnapshotOverride.snapshotState || "after"}`,
+    };
+  }
+  const normalizedViewportProfile =
+    normalizedPageId === "home" ? normalizeHomeViewportProfile(viewportProfile, "pc") : normalizeViewportProfile(viewportProfile, "pc");
+  const pinned = getPinnedView(payload.user.userId, normalizedPageId, normalizedViewportProfile);
   const pageSnapshot = pinned?.version?.snapshotData?.pageSnapshot || null;
   if (!pageSnapshot) {
     return {
@@ -273,6 +633,156 @@ function resolvePinnedDataForPage(req, pageId) {
     pinnedView: pinned,
     effectiveSource: `${payload.source}:pinned-view`,
   };
+}
+
+function extractSlotImageSourcesFromHtml(html, slotId) {
+  let slotBlock = "";
+  transformFirstSelectorBlock(String(html || ""), `[data-codex-slot="${String(slotId || "").trim()}"]`, (block) => {
+    slotBlock = String(block || "");
+    return block;
+  });
+  if (!slotBlock) return [];
+  return Array.from(slotBlock.matchAll(/<img\b[^>]*src="([^"]+)"/gi))
+    .map((match) => String(match?.[1] || "").trim())
+    .filter(Boolean);
+}
+
+function buildSectionPreviewImageDiffMeta({
+  req,
+  pageId,
+  viewportProfile = "pc",
+  slotId = "",
+  rawHtml = "",
+  currentHtml = "",
+  homeSandbox = "",
+  homeVariant = "",
+  editorEnabled = false,
+  href = "",
+} = {}) {
+  const imageDiffEnabled = String(new URL(req.url, `http://${req.headers.host || "localhost"}`).searchParams.get("imageDiff") || "").trim() === "1";
+  if (!imageDiffEnabled || !slotId) return { enabled: false, changedImageIndexes: [] };
+  const context = resolveDraftBuildContextForRequest(req, pageId, viewportProfile);
+  if (!context?.beforePageSnapshot) return { enabled: true, changedImageIndexes: [] };
+  const beforeEditableData = applyPageScopedSnapshot(context.payload.data, context.beforePageSnapshot, pageId);
+  const beforeHtml = href
+    ? rewriteProductCapturedHtml(rawHtml, pageId, viewportProfile, href, beforeEditableData)
+    : rewriteCloneHtml(rawHtml, pageId, viewportProfile, {
+        homeSandbox,
+        homeVariant,
+        editableData: beforeEditableData,
+        editorEnabled,
+      });
+  const beforeSources = extractSlotImageSourcesFromHtml(beforeHtml, slotId);
+  const afterSources = extractSlotImageSourcesFromHtml(currentHtml, slotId);
+  const maxLength = Math.max(beforeSources.length, afterSources.length);
+  const changedImageIndexes = [];
+  for (let index = 0; index < maxLength; index += 1) {
+    if (String(beforeSources[index] || "") !== String(afterSources[index] || "")) {
+      changedImageIndexes.push(index);
+    }
+  }
+  return {
+    enabled: true,
+    changedImageIndexes,
+  };
+}
+
+function applySectionPreviewMode(html, slotId, options = {}) {
+  const normalizedSlotId = String(slotId || "").trim();
+  if (!normalizedSlotId) return String(html || "");
+  const imageDiffEnabled = options?.imageDiff?.enabled === true;
+  const changedImageIndexes = Array.isArray(options?.imageDiff?.changedImageIndexes) ? options.imageDiff.changedImageIndexes : [];
+  let next = String(html || "");
+  next = next.replace(
+    /<\/head>/i,
+    `<style>
+      html, body {
+        margin: 0 !important;
+        min-height: auto !important;
+        height: auto !important;
+        background: transparent !important;
+        overflow: auto !important;
+      }
+      body.codex-section-preview-body {
+        padding: 0 !important;
+      }
+      .codex-section-preview-root {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0;
+        background: #fff;
+      }
+      .codex-section-preview-root > [data-codex-slot] {
+        margin: 0 !important;
+      }
+      .codex-section-preview-image-changed {
+        outline: 3px solid #ef4444 !important;
+        outline-offset: 3px !important;
+        box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.18) !important;
+      }
+      .codex-section-preview-note {
+        margin: 0 0 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: #fff7ed;
+        color: #9a3412;
+        font: 700 12px/1.4 Arial, sans-serif;
+      }
+      .codex-section-preview-empty {
+        padding: 24px;
+        font: 600 13px/1.5 Arial, sans-serif;
+        color: #334155;
+        background: #fff;
+      }
+    </style></head>`
+  );
+  next = next.replace(
+    /<\/body>/i,
+    `<script>
+      (() => {
+        const targetSlotId = ${JSON.stringify(normalizedSlotId)};
+        const imageDiffEnabled = ${imageDiffEnabled ? "true" : "false"};
+        const changedImageIndexes = ${JSON.stringify(changedImageIndexes)};
+        const run = () => {
+          const slot = document.querySelector('[data-codex-slot="' + targetSlotId + '"]');
+          const root = document.createElement('div');
+          root.className = 'codex-section-preview-root';
+          document.body.classList.add('codex-section-preview-body');
+          if (!slot) {
+            root.innerHTML = '<div class="codex-section-preview-empty">선택한 섹션을 찾을 수 없습니다.</div>';
+            document.body.innerHTML = '';
+            document.body.appendChild(root);
+            return;
+          }
+          root.appendChild(slot.cloneNode(true));
+          if (imageDiffEnabled) {
+            const images = Array.from(root.querySelectorAll('img[src]'));
+            let changedCount = 0;
+            images.forEach((img, index) => {
+              if (changedImageIndexes.includes(index)) {
+                img.classList.add('codex-section-preview-image-changed');
+                changedCount += 1;
+              }
+            });
+            const note = document.createElement('div');
+            note.className = 'codex-section-preview-note';
+            note.textContent = changedCount
+              ? '이미지가 변경된 영역이 강조 표시되었습니다.'
+              : '이번 생성에서 감지된 이미지 변경 영역이 없습니다.';
+            root.prepend(note);
+          }
+          document.body.innerHTML = '';
+          document.body.appendChild(root);
+        };
+        if (document.readyState === 'loading') {
+          document.addEventListener('DOMContentLoaded', run, { once: true });
+        } else {
+          run();
+        }
+      })();
+    </script></body>`
+  );
+  return next;
 }
 
 function readWorkspaceData(userId) {
@@ -337,6 +847,37 @@ function slugFromUrl(rawUrl) {
   return `${base}-${digest}`;
 }
 
+function isServiceLikePageId(pageId) {
+  return SERVICE_LIKE_PAGE_IDS.includes(String(pageId || "").trim());
+}
+
+function resolveWorkspacePageIdFromUrl(rawUrl) {
+  const normalized = String(rawUrl || "").trim();
+  if (!normalized) return "";
+  try {
+    const parsed = new URL(normalized);
+    const hostname = String(parsed.hostname || "").toLowerCase();
+    const pathname = String(parsed.pathname || "").replace(/\/+$/g, "") || "/";
+    const productId = String(parsed.searchParams.get("productId") || "").trim();
+    if (hostname === "www.lge.co.kr") {
+      if (pathname === "/home") return "home";
+      if (pathname === "/support") return "support";
+      if (pathname === "/bestshop") return "bestshop";
+      if (pathname === "/care-solutions") return "care-solutions";
+      if (pathname === "/care-solutions/water-purifiers/wd523vc") return "care-solutions-pdp";
+      if (pathname === "/category/tvs") return "category-tvs";
+      if (pathname === "/category/refrigerators") return "category-refrigerators";
+    }
+    if (hostname === "homestyle.lge.co.kr") {
+      if (pathname === "/home" || pathname === "/") return "homestyle-home";
+      if (pathname === "/item" && productId === "G26030036505") return "homestyle-pdp";
+    }
+  } catch {
+    return "";
+  }
+  return "";
+}
+
 function slugLoose(input) {
   return String(input || "")
     .replace(/^https?:\/\//, "")
@@ -376,6 +917,237 @@ function readBody(req) {
 
 function readJsonFile(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf-8"));
+}
+
+function readDesignReferenceLibrary() {
+  return readCachedValue(DESIGN_REFERENCE_LIBRARY_CACHE, "design-reference-library", () => {
+    const basePayload = (() => {
+      try {
+        return readJsonFile(DESIGN_REFERENCE_LIBRARY_PATH);
+      } catch {
+        return { generatedAt: null, entries: [] };
+      }
+    })();
+    const collectedPayload = (() => {
+      try {
+        return readJsonFile(DESIGN_REFERENCE_COLLECTOR_INDEX_PATH);
+      } catch {
+        return { generatedAt: null, entries: [] };
+      }
+    })();
+    const practicalPayload = (() => {
+      try {
+        return readJsonFile(PRACTICAL_REFERENCE_SAMPLES_INDEX_PATH);
+      } catch {
+        return { generatedAt: null, entries: [] };
+      }
+    })();
+    const mergedEntries = [];
+    const seen = new Set();
+    const appendEntries = (entries = []) => {
+      for (const entry of Array.isArray(entries) ? entries : []) {
+        const id = String(entry?.id || "").trim();
+        const url = String(entry?.url || "").trim();
+        const key = id || url;
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        mergedEntries.push(entry);
+      }
+    };
+    appendEntries(basePayload?.entries);
+    appendEntries(collectedPayload?.entries);
+    appendEntries(practicalPayload?.entries);
+    try {
+      return {
+        generatedAt: practicalPayload?.generatedAt || collectedPayload?.generatedAt || basePayload?.generatedAt || null,
+        entries: mergedEntries,
+      };
+    } catch {
+      return {
+        generatedAt: null,
+        entries: [],
+      };
+    }
+  }, 60000);
+}
+
+function readDesignReferenceSourceSeeds() {
+  return readCachedValue(DESIGN_REFERENCE_LIBRARY_CACHE, "design-reference-source-seeds", () => {
+    try {
+      const payload = readJsonFile(DESIGN_REFERENCE_SOURCE_SEEDS_PATH);
+      return {
+        generatedAt: payload?.generatedAt || null,
+        entries: Array.isArray(payload?.entries) ? payload.entries : [],
+      };
+    } catch {
+      return {
+        generatedAt: null,
+        entries: [],
+      };
+    }
+  }, 60000);
+}
+
+function normalizeReferenceCollectTags(values = []) {
+  const map = {
+    homepage: "homepage",
+    home: "homepage",
+    category_plp: "plp",
+    collection_page: "plp",
+    category_pages: "plp",
+    product_listing: "plp",
+    product_page: "pdp",
+    product_pages: "pdp",
+    product_detail: "pdp",
+    product_pdp: "pdp",
+    cart: "cart",
+    checkout: "checkout",
+    promo: "promo",
+    brand: "brand",
+    brand_tone: "brand",
+    navigation: "navigation",
+    search: "search",
+    filters: "filter",
+    filter: "filter",
+    browse_to_pdp: "navigation",
+    pdp_to_cart: "cart",
+    cart_to_checkout: "checkout",
+    purchase_flow: "checkout",
+    onboarding: "navigation",
+    art_direction: "brand",
+    premium_tone: "brand",
+    interaction_reference: "navigation",
+    visual_style: "brand",
+    layout_reference: "homepage",
+    platform_examples: "homepage",
+    tech_stack_examples: "brand",
+    ui_shot: "brand",
+    concept_shot: "brand",
+    visual_reference: "brand",
+  };
+  return Array.from(
+    new Set(
+      (Array.isArray(values) ? values : [])
+        .map((item) => map[String(item || "").trim()] || "")
+        .filter(Boolean)
+    )
+  );
+}
+
+function buildDesignReferenceSourceSeedContext(pageId = "", options = {}) {
+  const pageType = classifyPageTypeForDesignRefs(pageId, options.pageGroup || "");
+  const tagMap = {
+    home: ["homepage", "promo", "brand", "navigation"],
+    plp: ["plp", "navigation", "search", "filter", "promo"],
+    pdp: ["pdp", "brand", "promo", "navigation"],
+    support: ["navigation", "search", "brand"],
+    bestshop: ["homepage", "brand", "navigation"],
+    "care-solution": ["homepage", "pdp", "promo", "brand", "navigation"],
+    generic: ["homepage", "brand", "navigation"],
+  };
+  const targetTags = tagMap[pageType] || tagMap.generic;
+  const payload = readDesignReferenceSourceSeeds();
+  const entries = (payload.entries || [])
+    .map((entry) => {
+      const tags = normalizeReferenceCollectTags(entry?.collectFor);
+      let score = 0;
+      if (tags.some((tag) => targetTags.includes(tag))) score += 100;
+      if (String(entry?.sampleClass || "") === "practical") score += 40;
+      else if (String(entry?.sampleClass || "") === "showcase") score += 20;
+      else if (String(entry?.sampleClass || "") === "concept-shot") score -= 10;
+      score += Math.max(0, 10 - Number(entry?.priority || 10));
+      return {
+        id: String(entry?.id || "").trim(),
+        name: String(entry?.name || "").trim(),
+        url: String(entry?.url || "").trim(),
+        bucket: String(entry?.bucket || "").trim(),
+        sampleClass: String(entry?.sampleClass || "").trim() || "showcase",
+        priority: Number(entry?.priority || 99),
+        role: String(entry?.role || "").trim(),
+        note: String(entry?.note || "").trim(),
+        collectFor: Array.isArray(entry?.collectFor) ? entry.collectFor.map((item) => String(item || "").trim()).filter(Boolean) : [],
+        normalizedTags: tags,
+        score,
+      };
+    })
+    .filter((entry) => entry.id && entry.url && entry.score > 0)
+    .sort((a, b) => a.priority - b.priority || b.score - a.score || a.name.localeCompare(b.name, "en"));
+  return {
+    generatedAt: payload.generatedAt || null,
+    pageType,
+    targetTags,
+    count: entries.length,
+    entries,
+  };
+}
+
+function classifyPageTypeForDesignRefs(pageId = "", pageGroup = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedPageGroup = String(pageGroup || "").trim();
+  if (normalizedPageId === "home" || normalizedPageId === "homestyle-home" || normalizedPageGroup === "home") return "home";
+  if (normalizedPageId.startsWith("category-") || normalizedPageGroup === "category") return "plp";
+  if (isPdpCasePageId(normalizedPageId) || normalizedPageId === "homestyle-pdp" || normalizedPageGroup === "product-detail") return "pdp";
+  if (normalizedPageId === "support") return "support";
+  if (normalizedPageId === "bestshop") return "bestshop";
+  if (normalizedPageId === "care-solutions" || normalizedPageId === "care-solutions-pdp" || normalizedPageGroup === "care-solution") return "care-solution";
+  if (normalizedPageId.startsWith("homestyle-") || normalizedPageGroup === "homestyle") return "generic";
+  return "generic";
+}
+
+function buildDesignReferenceLibraryContext(pageId = "", options = {}) {
+  const pageType = classifyPageTypeForDesignRefs(pageId, options.pageGroup || "");
+  const viewportProfile = String(options.viewportProfile || "pc").trim() || "pc";
+  const limit = Math.max(1, Math.min(Number(options.limit || 8) || 8, 20));
+  const library = readDesignReferenceLibrary();
+  const scoredEntries = (library.entries || [])
+    .map((entry) => {
+      const pageTypes = Array.isArray(entry?.pageTypes) ? entry.pageTypes.map((item) => String(item || "").trim()) : [];
+      const viewportProfiles = Array.isArray(entry?.viewportProfiles) ? entry.viewportProfiles.map((item) => String(item || "").trim()) : [];
+      const fetchStatus = String(entry?.fetchStatus || "").trim();
+      const sampleClass = String(entry?.sampleClass || "").trim();
+      const referenceType = String(entry?.referenceType || "").trim();
+      const sampleCount = Array.isArray(entry?.sampleUrls) ? entry.sampleUrls.length : 0;
+      let score = 0;
+      if (pageTypes.includes(pageType)) score += 100;
+      else if (pageTypes.includes("generic")) score += 30;
+      if (viewportProfiles.includes(viewportProfile)) score += 30;
+      else if (!viewportProfiles.length) score += 10;
+      if (sampleClass === "practical") score += 40;
+      else if (sampleClass === "showcase") score += 20;
+      else if (sampleClass === "concept-shot") score -= 10;
+      if (fetchStatus && fetchStatus !== "ok") score -= 120;
+      const excluded =
+        (referenceType === "practical-sample-source" && fetchStatus && fetchStatus !== "ok") ||
+        (referenceType === "practical-sample-source" && sampleClass === "practical" && sampleCount <= 0);
+      return { entry, score, excluded };
+    })
+    .filter((item) => item.score > 0 && !item.excluded)
+    .sort((a, b) => b.score - a.score || String(a.entry?.title || "").localeCompare(String(b.entry?.title || ""), "en"));
+  const entries = scoredEntries.slice(0, limit).map((item) => ({
+    id: String(item.entry?.id || "").trim(),
+    title: String(item.entry?.title || "").trim(),
+    provider: String(item.entry?.provider || "").trim(),
+    url: String(item.entry?.url || "").trim(),
+    referenceType: String(item.entry?.referenceType || "design-md").trim(),
+    sampleClass: String(item.entry?.sampleClass || "system-reference").trim(),
+    bucket: String(item.entry?.bucket || "design_md").trim(),
+    tags: normalizeReferenceCollectTags(item.entry?.collectFor || item.entry?.recommendedFor || []),
+    fetchStatus: String(item.entry?.fetchStatus || "").trim() || null,
+    sampleCount: Array.isArray(item.entry?.sampleUrls) ? item.entry.sampleUrls.length : 0,
+    styleSignals: Array.isArray(item.entry?.styleSignals) ? item.entry.styleSignals.map((signal) => String(signal || "").trim()).filter(Boolean) : [],
+    recommendedFor: Array.isArray(item.entry?.recommendedFor) ? item.entry.recommendedFor.map((signal) => String(signal || "").trim()).filter(Boolean) : [],
+    usageNotes: Array.isArray(item.entry?.usageNotes) ? item.entry.usageNotes.map((note) => String(note || "").trim()).filter(Boolean) : [],
+    score: item.score,
+  }));
+  const sourceSeeds = buildDesignReferenceSourceSeedContext(pageId, options);
+  return {
+    generatedAt: library.generatedAt || null,
+    pageType,
+    viewportProfile,
+    count: entries.length,
+    entries,
+    sourceSeeds,
+  };
 }
 
 function readHomeVisualMetadata() {
@@ -923,18 +1695,24 @@ function buildServicePageWorkbench(pageId, viewportProfile) {
     support: "https://www.lge.co.kr/support",
     bestshop: "https://www.lge.co.kr/bestshop",
     "care-solutions": "https://www.lge.co.kr/care-solutions",
+    "care-solutions-pdp": "https://www.lge.co.kr/care-solutions/water-purifiers/wd523vc?dpType=careTab&subscCategoryKeyId=246021",
+    "homestyle-home": "https://homestyle.lge.co.kr/home",
+    "homestyle-pdp": "https://homestyle.lge.co.kr/item?productId=G26030036505",
   };
   const sourceUrl = sourceUrlMap[normalizedPageId] || null;
   const referenceCapture = findServicePageVisualCapture(normalizedPageId, normalizedViewportProfile, "reference");
   const workingCapture = findServicePageVisualCapture(normalizedPageId, normalizedViewportProfile, "working");
-  const referenceGroups = findServiceGroupEntry(normalizedPageId, normalizedViewportProfile, "reference");
-  const workingGroups = findServiceGroupEntry(normalizedPageId, normalizedViewportProfile, "working");
+  const referenceGroups = resolveServiceGroupEntry(normalizedPageId, normalizedViewportProfile, "reference");
+  const workingGroups = resolveServiceGroupEntry(normalizedPageId, normalizedViewportProfile, "working");
   const normalizedReferenceGroups = normalizeGroupMap(referenceGroups?.groups);
   const normalizedWorkingGroups = normalizeGroupMap(workingGroups?.groups);
   const groupIdsByPage = {
     support: ["mainService", "notice", "tipsBanner", "bestcare"],
     bestshop: ["hero", "shortcut", "review", "brandBanner"],
     "care-solutions": ["hero", "ranking", "benefit", "tabs", "careBanner"],
+    "care-solutions-pdp": ["visual", "detailInfo", "noticeBanner", "reviewInfo"],
+    "homestyle-home": ["quickMenu", "labelBanner", "brandStory"],
+    "homestyle-pdp": ["detailInfo", "bestProduct", "review", "qna", "guides", "seller"],
   };
   const groupChecks = buildGroupChecks(normalizedReferenceGroups, normalizedWorkingGroups, groupIdsByPage[normalizedPageId] || []);
   const checks = [
@@ -2023,18 +2801,28 @@ function findSlotConfig(data, pageId, slotId) {
   return (registry?.slots || []).find((slot) => slot.slotId === slotId) || null;
 }
 
-function listComponentPatches(data, pageId = "") {
+function listComponentPatches(data, pageId = "", viewportProfile = "") {
   const patches = Array.isArray(data?.componentPatches) ? data.componentPatches : [];
   const normalizedPageId = String(pageId || "").trim();
   if (!normalizedPageId) return patches;
-  return patches.filter((entry) => String(entry.pageId || "").trim() === normalizedPageId);
+  const normalizedViewportProfile = normalizedPageId === "home" && viewportProfile
+    ? normalizeHomeViewportProfile(viewportProfile, "pc")
+    : "";
+  return patches.filter((entry) => {
+    if (String(entry.pageId || "").trim() !== normalizedPageId) return false;
+    if (normalizedPageId !== "home" || !normalizedViewportProfile) return true;
+    return normalizeHomeViewportProfile(entry.viewportProfile, "pc") === normalizedViewportProfile;
+  });
 }
 
-function findComponentPatch(data, pageId, componentId, sourceId = "") {
+function findComponentPatch(data, pageId, componentId, sourceId = "", viewportProfile = "") {
   const normalizedPageId = String(pageId || "").trim();
   const normalizedComponentId = String(componentId || "").trim();
   const normalizedSourceId = String(sourceId || "").trim();
-  const patches = listComponentPatches(data, normalizedPageId);
+  const normalizedViewportProfile = normalizedPageId === "home" && viewportProfile
+    ? normalizeHomeViewportProfile(viewportProfile, "pc")
+    : "";
+  const patches = listComponentPatches(data, normalizedPageId, normalizedViewportProfile);
   if (!normalizedComponentId) return null;
   const exact =
     patches.find(
@@ -2052,23 +2840,82 @@ function findComponentPatch(data, pageId, componentId, sourceId = "") {
   );
 }
 
-function upsertComponentPatch(data, pageId, componentId, sourceId, patch) {
+function findComponentPatchByCandidateSources(data, pageId, componentId, sourceIds = [], viewportProfile = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedComponentId = String(componentId || "").trim();
+  const normalizedViewportProfile = normalizedPageId === "home" && viewportProfile
+    ? normalizeHomeViewportProfile(viewportProfile, "pc")
+    : "";
+  if (!normalizedPageId || !normalizedComponentId) return null;
+  const patches = listComponentPatches(data, normalizedPageId, normalizedViewportProfile).filter(
+    (entry) => String(entry.componentId || "").trim() === normalizedComponentId
+  );
+  if (!patches.length) return null;
+  const normalizedSourceIds = Array.from(
+    new Set(
+      (Array.isArray(sourceIds) ? sourceIds : [sourceIds])
+        .map((item) => String(item || "").trim())
+        .filter(Boolean)
+    )
+  );
+  for (const sourceId of normalizedSourceIds) {
+    const exact = patches.find((entry) => String(entry.sourceId || "").trim() === sourceId);
+    if (exact) return exact;
+  }
+  const aliasPriority = [];
+  if (normalizedSourceIds.some((item) => item === "custom-live-current" || item === "custom-renderer")) {
+    aliasPriority.push("custom-live-current", "custom-renderer", "mobile-derived");
+  }
+  if (normalizedSourceIds.includes("mobile-derived")) {
+    aliasPriority.push("mobile-derived", "custom-live-current", "custom-renderer");
+  }
+  if (normalizedSourceIds.some((item) => item.startsWith("captured-home-"))) {
+    aliasPriority.push(...normalizedSourceIds.filter((item) => item.startsWith("captured-home-")));
+  }
+  for (const sourceId of aliasPriority) {
+    const match = patches.find((entry) => String(entry.sourceId || "").trim() === sourceId);
+    if (match) return match;
+  }
+  const withoutSource = patches.find((entry) => !String(entry.sourceId || "").trim());
+  if (withoutSource) return withoutSource;
+  if (patches.length === 1) return patches[0];
+  const scoreSourceId = (sourceId) => {
+    const normalized = String(sourceId || "").trim();
+    if (!normalized) return 100;
+    if (normalized === "custom-live-current") return 1;
+    if (normalized === "custom-renderer") return 2;
+    if (normalized === "mobile-derived") return 3;
+    if (normalized.startsWith("captured-home-")) return 4;
+    return 10;
+  };
+  return patches.slice().sort((a, b) => scoreSourceId(a.sourceId) - scoreSourceId(b.sourceId))[0] || null;
+}
+
+function upsertComponentPatch(data, pageId, componentId, sourceId, patch, viewportProfile = "") {
   const nextData = JSON.parse(JSON.stringify(data || {}));
   nextData.componentPatches = Array.isArray(nextData.componentPatches) ? nextData.componentPatches : [];
   const normalizedPageId = String(pageId || "").trim();
   const normalizedComponentId = String(componentId || "").trim();
   const normalizedSourceId = String(sourceId || "").trim();
+  const normalizedViewportProfile = normalizedPageId === "home"
+    ? normalizeHomeViewportProfile(viewportProfile, "pc")
+    : "";
   const nextPatch = patch && typeof patch === "object" ? JSON.parse(JSON.stringify(patch)) : {};
   const existingIndex = nextData.componentPatches.findIndex(
     (entry) =>
       String(entry.pageId || "").trim() === normalizedPageId &&
       String(entry.componentId || "").trim() === normalizedComponentId &&
-      String(entry.sourceId || "").trim() === normalizedSourceId
+      String(entry.sourceId || "").trim() === normalizedSourceId &&
+      (
+        normalizedPageId !== "home" ||
+        normalizeHomeViewportProfile(entry.viewportProfile, "pc") === normalizedViewportProfile
+      )
   );
   const record = {
     pageId: normalizedPageId,
     componentId: normalizedComponentId,
     sourceId: normalizedSourceId,
+    ...(normalizedPageId === "home" ? { viewportProfile: normalizedViewportProfile } : {}),
     patch: nextPatch,
     updatedAt: new Date().toISOString(),
   };
@@ -2138,6 +2985,12 @@ function resolveComponentSourceResolution(pageId, slotId, activeSourceId = "", d
   const normalizedPageId = String(pageId || "").trim();
   const normalizedSlotId = String(slotId || "").trim();
   const normalizedSourceId = String(activeSourceId || "").trim();
+  const desktopRenderProfile = normalizedPageId === "home" ? getHomeDesktopRenderProfile(normalizedSlotId) : null;
+  const canRenderDesktopCurrent =
+    normalizedPageId === "home" &&
+    normalizedSourceId === "custom-live-current" &&
+    Boolean(desktopRenderProfile) &&
+    Boolean(extractCurrentLiveHomeSectionByProfile(normalizedSlotId));
   const activeSourceConfig =
     data && normalizedPageId && normalizedSlotId
       ? getActiveSourceConfig(data, normalizedPageId, normalizedSlotId)
@@ -2188,6 +3041,9 @@ function resolveComponentSourceResolution(pageId, slotId, activeSourceId = "", d
   }
 
   if (normalizedSlotId === "brand-showroom") {
+    if (canRenderDesktopCurrent) {
+      return direct(normalizedSourceId, "desktop current renderer is active");
+    }
     if (normalizedSourceId === "custom-home-brand-showroom-v1") {
       return direct(normalizedSourceId, "custom renderer is implemented");
     }
@@ -2198,6 +3054,9 @@ function resolveComponentSourceResolution(pageId, slotId, activeSourceId = "", d
   }
 
   if (normalizedSlotId === "latest-product-news") {
+    if (canRenderDesktopCurrent) {
+      return direct(normalizedSourceId, "desktop current renderer is active");
+    }
     if (normalizedSourceId === "custom-home-latest-product-news-v1") {
       return direct(normalizedSourceId, "custom renderer is implemented");
     }
@@ -2208,6 +3067,9 @@ function resolveComponentSourceResolution(pageId, slotId, activeSourceId = "", d
   }
 
   if (["space-renewal", "subscription", "smart-life", "summary-banner-2", "missed-benefits", "lg-best-care", "bestshop-guide"].includes(normalizedSlotId)) {
+    if (canRenderDesktopCurrent) {
+      return direct(normalizedSourceId, "desktop current renderer is active");
+    }
     if (normalizedSourceId === "mobile-derived") {
       return direct(normalizedSourceId, "mobile-derived renderer is active");
     }
@@ -2215,6 +3077,9 @@ function resolveComponentSourceResolution(pageId, slotId, activeSourceId = "", d
   }
 
   if (normalizedSlotId === "quickmenu") {
+    if (canRenderDesktopCurrent) {
+      return direct(normalizedSourceId, "desktop current renderer is active");
+    }
     if (normalizedSourceId === "captured-home-quickmenu") {
       return direct(normalizedSourceId, "captured quickmenu renderer is active");
     }
@@ -2222,6 +3087,9 @@ function resolveComponentSourceResolution(pageId, slotId, activeSourceId = "", d
   }
 
   if (normalizedSlotId === "md-choice" || normalizedSlotId === "timedeal") {
+    if (canRenderDesktopCurrent) {
+      return direct(normalizedSourceId, "desktop current renderer is active");
+    }
     if (normalizedSourceId.startsWith("captured-home-")) {
       return direct(normalizedSourceId, "captured product section renderer is active");
     }
@@ -2265,7 +3133,8 @@ function buildArchivePageMap() {
   const map = {};
   for (const row of archive) {
     try {
-      map[slugFromUrl(row.url)] = row;
+      const resolvedPageId = resolveWorkspacePageIdFromUrl(row.url) || slugFromUrl(row.url);
+      map[resolvedPageId] = row;
     } catch {
       // ignore malformed urls
     }
@@ -2314,10 +3183,19 @@ function readHomeDesktopHtml() {
   return readReferenceLiveHtml("home.desktop.html") || readArchiveHtmlByPageId("home");
 }
 
+function readHomeTabletHtml() {
+  return (
+    readReferenceLiveHtml("home.tablet.html") ||
+    readReferenceLiveFallbackHtml("home.tablet.html") ||
+    readReferenceLiveHtml("home.desktop.html") ||
+    readArchiveHtmlByPageId("home")
+  );
+}
+
 function readHomeMobileHtml() {
   return (
-    readReferenceLiveFallbackHtml("home.mobile.html") ||
     readReferenceLiveHtml("home.mobile.html") ||
+    readReferenceLiveFallbackHtml("home.mobile.html") ||
     readArchiveHtmlByPageId("home")
   );
 }
@@ -2345,7 +3223,7 @@ function injectExtraHeadLinks(html, links) {
 function readReferenceSourceHtmlByPageId(pageId) {
   const baseline = resolveBaselineInfo(pageId);
   if (baseline.mode === "hybrid" && pageId === "home") {
-    return readHomeDesktopHtml();
+    return readHomeTabletHtml();
   }
   return readArchiveHtmlByPageId(pageId);
 }
@@ -2359,6 +3237,9 @@ function readPlpReferenceHtml(pageId, viewportProfile = "pc") {
 
 function readCloneSourceHtmlByPageId(pageId, viewportProfile = "pc") {
   if (pageId === "home") {
+    const normalizedViewportProfile = normalizeHomeViewportProfile(viewportProfile, "ta");
+    if (normalizedViewportProfile === "mo") return readHomeMobileHtml();
+    if (normalizedViewportProfile === "ta") return readHomeTabletHtml();
     return readHomeDesktopHtml();
   }
   if (String(pageId || "").startsWith("category-")) {
@@ -2711,6 +3592,35 @@ function findServiceGroupEntry(pageId, viewportProfile, sourceType = "reference"
         String(entry.sourceType || "reference") === sourceType
     ) || null
   );
+}
+
+function hasRenderableServiceGroups(groups) {
+  const normalized = normalizeGroupMap(groups);
+  return Object.values(normalized || {}).some((group) => group?.found);
+}
+
+function resolveServiceGroupEntry(pageId, viewportProfile, sourceType = "reference") {
+  const requested = findServiceGroupEntry(pageId, viewportProfile, sourceType);
+  if (sourceType !== "working") {
+    return requested ? { ...requested, groups: normalizeGroupMap(requested.groups) } : null;
+  }
+  const normalizedRequested = normalizeGroupMap(requested?.groups);
+  if (hasRenderableServiceGroups(normalizedRequested)) {
+    return requested ? { ...requested, groups: normalizedRequested } : null;
+  }
+  const referenceEntry = findServiceGroupEntry(pageId, viewportProfile, "reference");
+  const normalizedReference = normalizeGroupMap(referenceEntry?.groups);
+  if (!hasRenderableServiceGroups(normalizedReference)) {
+    return requested ? { ...requested, groups: normalizedRequested } : null;
+  }
+  return {
+    ...(requested || {}),
+    pageId: String(pageId || "").trim(),
+    viewportProfile: String(viewportProfile || "pc").trim() || "pc",
+    sourceType: "working",
+    groups: normalizedReference,
+    fallbackFromReference: true,
+  };
 }
 
 function normalizeGroupMap(groups) {
@@ -3261,7 +4171,7 @@ function buildWorkingInteractionSnapshot(pageId) {
     };
   }
 
-  if (["support", "bestshop", "care-solutions"].includes(String(pageId || ""))) {
+  if (isServiceLikePageId(pageId)) {
     const interactions = [];
     if (pageId === "support") {
       interactions.push(
@@ -3290,6 +4200,15 @@ function buildWorkingInteractionSnapshot(pageId) {
         result: { section: "tabs" },
       });
     }
+    if (pageId === "care-solutions-pdp") {
+      interactions.push({
+        interactionId: "care-solutions-pdp.notice.open",
+        kind: "banner-expand",
+        slotId: "noticeBanner",
+        trigger: { type: "click", target: "notice-banner" },
+        result: { section: "noticeBanner" },
+      });
+    }
     if (pageId === "bestshop") {
       interactions.push({
         interactionId: "bestshop.shortcut.nav",
@@ -3297,6 +4216,15 @@ function buildWorkingInteractionSnapshot(pageId) {
         slotId: "shortcut",
         trigger: { type: "click", target: "shortcut-item" },
         result: { section: "shortcut" },
+      });
+    }
+    if (pageId === "homestyle-home") {
+      interactions.push({
+        interactionId: "homestyle-home.quickmenu.nav",
+        kind: "navigation-grid",
+        slotId: "quickMenu",
+        trigger: { type: "click", target: "quick-menu-item" },
+        result: { section: "quickMenu" },
       });
     }
     return {
@@ -3319,7 +4247,8 @@ function buildWorkingInteractionSnapshot(pageId) {
 
 function buildWorkingComponentInventory(pageId, options = {}) {
   const editableData = options.editableData || null;
-  const cacheKey = buildWorkspacePageCacheKey(editableData || {}, pageId, "component-inventory");
+  const viewportProfile = String(options.viewportProfile || "").trim();
+  const cacheKey = buildWorkspacePageCacheKey(editableData || {}, pageId, "component-inventory", viewportProfile);
   return readCachedValue(WORKING_COMPONENT_INVENTORY_CACHE, cacheKey, () => {
     const slotsSnapshot = buildWorkingSlotSnapshot(pageId);
     const interactionsSnapshot = buildWorkingInteractionSnapshot(pageId);
@@ -3347,7 +4276,7 @@ function buildWorkingComponentInventory(pageId, options = {}) {
       const componentId = pageId === "home" ? `home.${slotId}` : `${pageId}.${slotId}`;
       const activeSourceId = slot.sourceId || slot.layout?.sourceId || null;
       const sourceResolution = resolveComponentSourceResolution(pageId, slotId, activeSourceId, editableData || {});
-      const componentPatch = findComponentPatch(editableData || {}, pageId, componentId, activeSourceId)?.patch || null;
+      const componentPatch = findComponentPatch(editableData || {}, pageId, componentId, activeSourceId, viewportProfile)?.patch || null;
       return {
         componentId,
         pageId,
@@ -3435,19 +4364,21 @@ function buildDerivedWorkingSlots(pageId, interactions = []) {
               : "controls",
       });
     }
-  } else if (["support", "bestshop", "care-solutions"].includes(String(pageId || ""))) {
+  } else if (isServiceLikePageId(pageId)) {
     const viewportProfile = baseline.mode === "mobile" ? "mo" : "pc";
     const workbench = buildServicePageWorkbench(pageId, viewportProfile);
     const groups = workbench?.workingGroups?.groups || {};
     for (const [groupId, group] of Object.entries(groups)) {
       if (!group?.found && groupId !== "brandBanner") continue;
       addSlot(groupId, {
-        containerMode: groupId === "hero" || groupId === "mainService" || groupId === "notice" ? "full" : "narrow",
+        containerMode: ["hero", "mainService", "notice", "visual", "quickMenu"].includes(groupId) ? "full" : "narrow",
         kind:
           groupId === "hero"
             ? "hero"
-            : groupId === "shortcut" || groupId === "mainService"
+            : groupId === "shortcut" || groupId === "mainService" || groupId === "quickMenu"
               ? "navigation"
+              : groupId === "visual"
+                ? "gallery"
               : "section",
       });
     }
@@ -3469,7 +4400,8 @@ function buildDerivedWorkingSlots(pageId, interactions = []) {
 
 function buildWorkingEditableComponentCatalog(pageId, options = {}) {
   const editableData = options.editableData || null;
-  const cacheKey = buildWorkspacePageCacheKey(editableData || {}, pageId, "component-editability");
+  const viewportProfile = String(options.viewportProfile || "").trim();
+  const cacheKey = buildWorkspacePageCacheKey(editableData || {}, pageId, "component-editability", viewportProfile);
   return readCachedValue(WORKING_EDITABILITY_CACHE, cacheKey, () => {
     const componentInventory = buildWorkingComponentInventory(pageId, options);
     const catalog = (componentInventory.components || []).map((component) => {
@@ -3483,6 +4415,7 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
       editableStyles: [],
       editableInteractions: component.interactionIds || [],
       patchSchema: getGenericPatchSchema(pageId, slotId),
+      patchBridge: null,
     };
     if (pageId === "home") {
       if (slotId === "header-top") {
@@ -3574,18 +4507,25 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
         base.editableProps = ["items", "badges", "href", "visibility"];
         base.editableStyles = ["gridColumns", "cardStyle", "spacing"];
       }
-    } else if (["support", "bestshop", "care-solutions"].includes(String(pageId || ""))) {
+    } else if (isServiceLikePageId(pageId)) {
       if (slotId === "hero") {
         base.editableProps = ["headline", "image", "href", "visibility"];
         base.editableStyles = ["height", "copyPosition", "background"];
-      } else if (slotId === "shortcut" || slotId === "mainService" || slotId === "tabs") {
+      } else if (slotId === "shortcut" || slotId === "mainService" || slotId === "tabs" || slotId === "quickMenu") {
         base.editableProps = ["items", "href", "visibility"];
         base.editableStyles = ["gridColumns", "iconStyle", "spacing"];
+      } else if (pageId === "care-solutions-pdp" && (slotId === "noticeBanner" || slotId === "reviewInfo")) {
+        base.editableProps = ["visibility"];
+        base.editableStyles = ["background", "spacing", "cardStyle"];
+      } else if (slotId === "visual" || slotId === "detailInfo") {
+        base.editableProps = ["items", "image", "headline", "description", "href", "visibility"];
+        base.editableStyles = ["background", "spacing", "titleStyle", "aspectRatio"];
       } else {
         base.editableProps = ["items", "title", "subtitle", "href", "visibility"];
         base.editableStyles = ["cardStyle", "spacing", "titleStyle"];
       }
-    }
+      }
+      base.patchBridge = buildComponentPatchBridge(pageId, slotId, component);
       return base;
     });
     return {
@@ -3596,12 +4536,159 @@ function buildWorkingEditableComponentCatalog(pageId, options = {}) {
   });
 }
 
-function sanitizeComponentPatch(inputPatch, patchSchema = {}) {
+function buildComponentPatchBridge(pageId, slotId, inventoryItem = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedViewportProfile =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(inventoryItem.viewportProfile || "pc", "pc")
+      : normalizeViewportProfile(inventoryItem.viewportProfile || "pc", "pc");
+  const renderProfile = normalizedPageId === "home" ? getHomeDesktopRenderProfile(normalizedSlotId) : null;
+  const archetype = String(
+    renderProfile?.archetype ||
+    inventoryItem?.kind ||
+    (normalizedSlotId === "banner" ? "banner" : "section")
+  ).trim();
+  const measuredScale = normalizedPageId === "home" ? getHomeComponentScaleToken(normalizedSlotId, normalizedViewportProfile) : null;
+  const bridge = {
+    archetype,
+    viewportProfile: normalizedViewportProfile,
+    measuredScale,
+    rootPatchPriority: [],
+    stylePatchPriority: [],
+    imageHandling: "",
+    structureNotes: [],
+  };
+
+  if (normalizedPageId === "home") {
+    if (archetype === "icon-grid" || normalizedSlotId === "quickmenu") {
+      return {
+        ...bridge,
+        rootPatchPriority: ["items", "title", "subtitle", "visibility"],
+        stylePatchPriority: ["gridColumns", "gap", "iconSize", "titleSize", "subtitleSize", "padding", "background", "radius"],
+        imageHandling: "아이콘형 이미지는 contain 기준이며 카드 대비 60~75% 체감 크기를 유지한다.",
+        structureNotes: [
+          "items 배열 순서와 href가 실제 탐색 구조를 만든다.",
+          "한 항목만 과하게 크거나 어두운 카드가 되면 안 된다.",
+        ],
+      };
+    }
+    if (archetype === "product-list" || archetype === "editorial-product") {
+      return {
+        ...bridge,
+        rootPatchPriority: ["title", "subtitle", "items", "ctaLabel", "visibility"],
+        stylePatchPriority: ["titleSize", "subtitleSize", "padding", "gap", "background", "radius", "minHeight"],
+        imageHandling: "상품 이미지는 contain 우선이며 프레임 안에서 작아 보이지 않도록 중앙 정렬과 안정적 여백을 유지한다.",
+        structureNotes: [
+          "카드 간 간격과 타이틀 위계가 먼저 읽혀야 한다.",
+          "상품 정보와 혜택 정보는 왜곡 없이 유지한다.",
+        ],
+      };
+    }
+    if (archetype === "banner" || archetype === "banner-list" || archetype === "banner-grid") {
+      return {
+        ...bridge,
+        rootPatchPriority: ["title", "subtitle", "description", "items", "ctaLabel", "visibility"],
+        stylePatchPriority: ["background", "padding", "radius", "titleSize", "subtitleSize", "minHeight", "textAlign"],
+        imageHandling: "배너 이미지는 텍스트 옆에서 존재감이 유지돼야 하며 과도한 축소나 어색한 여백을 만들면 안 된다.",
+        structureNotes: [
+          "배너는 section rhythm 안에서 강조되지만 단독으로 과장되지 않아야 한다.",
+          "full-bleed가 아닌 narrow shell 슬롯은 내부 패딩으로만 밀도를 조절한다.",
+        ],
+      };
+    }
+    if (archetype === "service-card" || archetype === "editorial" || archetype === "editorial-list" || archetype === "editorial-grid") {
+      return {
+        ...bridge,
+        rootPatchPriority: ["title", "subtitle", "description", "items", "visibility"],
+        stylePatchPriority: ["background", "padding", "radius", "titleSize", "subtitleSize", "gap", "minHeight"],
+        imageHandling: "서비스/에디토리얼 이미지는 카드 목적을 해치지 않는 범위에서 cover 또는 contain을 선택하되, 슬롯 전체 톤과 맞아야 한다.",
+        structureNotes: [
+          "카드형 정보 섹션은 목적 문장이 먼저 읽혀야 한다.",
+          "하나의 카드만 과도하게 무겁거나 다크 톤이 되면 안 된다.",
+        ],
+      };
+    }
+  }
+
+  if (normalizedPageId.startsWith("category-")) {
+    if (normalizedSlotId === "productGrid" || normalizedSlotId === "firstRow" || normalizedSlotId === "firstProduct") {
+      return {
+        ...bridge,
+        rootPatchPriority: ["title", "subtitle", "items", "badges", "visibility"],
+        stylePatchPriority: ["gridColumns", "gap", "background", "radius", "titleSize", "subtitleSize"],
+        imageHandling: "PLP 상품 이미지는 동일 행에서 비율과 체감 크기가 흔들리지 않도록 contain 기준으로 유지한다.",
+        structureNotes: [
+          "그리드 전체 밀도와 카드 정렬이 우선이다.",
+          "첫 행/첫 상품 강조는 전체 카드 규칙을 깨지 않는 범위에서만 허용한다.",
+        ],
+      };
+    }
+    if (normalizedSlotId === "banner") {
+      return {
+        ...bridge,
+        rootPatchPriority: ["headline", "subtitle", "image", "href", "visibility"],
+        stylePatchPriority: ["height", "background", "padding", "textAlign"],
+        imageHandling: "카테고리 배너는 cover 기반이지만 탐색 UI보다 지나치게 무거워지면 안 된다.",
+        structureNotes: ["상단 배너는 필터/정렬보다 먼저 눈에 들어오되, 페이지 탐색 흐름을 방해하면 안 된다."],
+      };
+    }
+    if (normalizedSlotId === "filter" || normalizedSlotId === "sort") {
+      return {
+        ...bridge,
+        rootPatchPriority: ["filters", "sortOptions", "visibility"],
+        stylePatchPriority: ["spacing", "selectorStyle", "chipStyle", "background"],
+        imageHandling: "이미지 중심 슬롯이 아니므로 시각 장식보다 라벨 가독성과 상태 구분이 우선이다.",
+        structureNotes: ["컨트롤 슬롯은 장식보다 정보 구조가 우선이다."],
+      };
+    }
+  }
+
+  if (isPdpCasePageId(normalizedPageId)) {
+    if (normalizedSlotId === "gallery") {
+      return {
+        ...bridge,
+        rootPatchPriority: ["images", "thumbnailOrder", "visibility"],
+        stylePatchPriority: ["aspectRatio", "thumbnailStyle", "spacing", "background"],
+        imageHandling: "PDP 갤러리는 메인 이미지와 썸네일의 비율 체감이 어긋나지 않게 contain 중심으로 유지한다.",
+        structureNotes: [
+          "메인 이미지 프레임과 썸네일 배열은 같이 읽혀야 한다.",
+          "과도한 crop이나 작은 썸네일은 피한다.",
+        ],
+      };
+    }
+    if (normalizedSlotId === "summary" || normalizedSlotId === "price" || normalizedSlotId === "sticky") {
+      return {
+        ...bridge,
+        rootPatchPriority: ["title", "subtitle", "badges", "visibility"],
+        stylePatchPriority: ["background", "radius", "spacing", "titleSize", "subtitleSize"],
+        imageHandling: "텍스트/가격 정보 중심 슬롯이다. 이미지보다 정보 위계와 구매 흐름이 우선이다.",
+        structureNotes: ["PDP 핵심 구매 정보는 시각적 과장보다 신뢰감과 정렬이 중요하다."],
+      };
+    }
+  }
+
+  return {
+    ...bridge,
+    rootPatchPriority: ["title", "subtitle", "description", "items", "visibility"],
+    stylePatchPriority: ["background", "padding", "gap", "radius", "titleSize", "subtitleSize"],
+    imageHandling: "slot layout과 mediaSpec에 맞춰 contain/cover를 판단한다.",
+    structureNotes: ["slot별 patchSchema를 우선 지키고, 구조를 바꾸기보다 허용된 patch로 해결한다."],
+  };
+}
+
+function sanitizeComponentPatch(inputPatch, patchSchema = {}, options = {}) {
   const source = inputPatch && typeof inputPatch === "object" ? inputPatch : {};
+  const normalizedPageId = String(options.pageId || "").trim();
+  const normalizedSlotId = String(options.slotId || "").trim();
+  const preparedSource =
+    normalizedPageId === "home" && normalizedSlotId
+      ? normalizeHomeBuilderPatch(normalizedSlotId, source)
+      : source;
   const rootKeys = new Set(Array.isArray(patchSchema.rootKeys) ? patchSchema.rootKeys : []);
   const styleKeys = new Set(Array.isArray(patchSchema.styleKeys) ? patchSchema.styleKeys : []);
   const next = {};
-  for (const [key, value] of Object.entries(source)) {
+  for (const [key, value] of Object.entries(preparedSource)) {
     if (key === "styles" && value && typeof value === "object" && styleKeys.size) {
       const stylePatch = {};
       for (const [styleKey, styleValue] of Object.entries(value)) {
@@ -3614,6 +4701,162 @@ function sanitizeComponentPatch(inputPatch, patchSchema = {}) {
     if (!rootKeys.has(key)) continue;
     next[key] = value;
   }
+  return next;
+}
+
+function clampNumber(value, min, max) {
+  const num = Number(value);
+  if (!Number.isFinite(num)) return null;
+  return Math.max(min, Math.min(max, num));
+}
+
+function clampCssPx(value, min, max) {
+  if (value == null) return "";
+  const raw = String(value).trim();
+  if (!raw) return "";
+  if (/^-?\d+(?:\.\d+)?$/.test(raw)) {
+    const clamped = clampNumber(raw, min, max);
+    return clamped == null ? "" : `${clamped}px`;
+  }
+  const match = raw.match(/^(-?\d+(?:\.\d+)?)px$/i);
+  if (!match) return raw;
+  const clamped = clampNumber(match[1], min, max);
+  return clamped == null ? "" : `${clamped}px`;
+}
+
+function clampPaddingValue(value, min, max, fallback = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return fallback;
+  const parts = raw.split(/\s+/).filter(Boolean);
+  if (!parts.length || parts.some((part) => !/^-?\d+(?:\.\d+)?(?:px)?$/i.test(part))) {
+    return raw;
+  }
+  return parts
+    .map((part) => clampCssPx(part, min, max))
+    .filter(Boolean)
+    .join(" ");
+}
+
+function isDarkBackgroundValue(value = "") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return false;
+  if (normalized.includes("#000") || normalized.includes("#111") || normalized.includes("#1f2937") || normalized.includes("#0f172a")) {
+    return true;
+  }
+  return /linear-gradient\([^)]*(#000|#111|#1f2937|#0f172a)/i.test(normalized);
+}
+
+function buildHomePatchRule(slotId = "") {
+  const profile = getHomeDesktopRenderProfile(slotId) || {};
+  const archetype = String(profile.archetype || "").trim();
+  const rule = {
+    allowDarkBackground: slotId === "hero",
+    defaultBackground: "#ffffff",
+    padding: "40px 32px",
+    titleSize: { min: 28, max: 34 },
+    subtitleSize: { min: 14, max: 18 },
+    minHeight: { min: 220, max: 420 },
+    radius: "24px",
+  };
+  if (slotId === "hero") {
+    return {
+      ...rule,
+      allowDarkBackground: true,
+      defaultBackground: "linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%)",
+      padding: "56px 40px",
+      titleSize: { min: 44, max: 56 },
+      subtitleSize: { min: 18, max: 24 },
+      minHeight: { min: 480, max: 640 },
+      radius: "0px",
+    };
+  }
+  if (archetype === "icon-grid") {
+    return {
+      ...rule,
+      defaultBackground: "#ffffff",
+      padding: "24px 24px 16px",
+      titleSize: { min: 24, max: 30 },
+      subtitleSize: { min: 14, max: 16 },
+      minHeight: { min: 120, max: 220 },
+    };
+  }
+  if (archetype === "banner") {
+    return {
+      ...rule,
+      defaultBackground: "linear-gradient(135deg, #f5f7fa 0%, #eef2f7 100%)",
+      padding: "40px 32px",
+      titleSize: { min: 30, max: 36 },
+      subtitleSize: { min: 14, max: 18 },
+      minHeight: { min: 220, max: 320 },
+      radius: "28px",
+    };
+  }
+  if (archetype === "banner-list" || archetype === "banner-grid" || archetype === "service-card") {
+    return {
+      ...rule,
+      defaultBackground: "#f8fafc",
+      padding: "40px 32px",
+      minHeight: { min: 220, max: 360 },
+    };
+  }
+  if (archetype === "product-list" || archetype === "editorial-product") {
+    return {
+      ...rule,
+      defaultBackground: "#ffffff",
+      padding: "40px 32px",
+      titleSize: { min: 30, max: 34 },
+      subtitleSize: { min: 14, max: 17 },
+      minHeight: { min: 260, max: 420 },
+    };
+  }
+  return rule;
+}
+
+function normalizeHomeBuilderPatch(slotId = "", patch = {}) {
+  const next = patch && typeof patch === "object" ? JSON.parse(JSON.stringify(patch)) : {};
+  const styles = next.styles && typeof next.styles === "object" ? { ...next.styles } : {};
+  const rule = buildHomePatchRule(slotId);
+  if (!Object.keys(styles).length) {
+    next.styles = styles;
+  }
+  if (styles.titleSize !== undefined) {
+    styles.titleSize = clampCssPx(styles.titleSize, rule.titleSize.min, rule.titleSize.max) || undefined;
+    if (styles.titleSize === undefined) delete styles.titleSize;
+  }
+  if (styles.subtitleSize !== undefined) {
+    styles.subtitleSize = clampCssPx(styles.subtitleSize, rule.subtitleSize.min, rule.subtitleSize.max) || undefined;
+    if (styles.subtitleSize === undefined) delete styles.subtitleSize;
+  }
+  if (styles.minHeight !== undefined) {
+    styles.minHeight = clampCssPx(styles.minHeight, rule.minHeight.min, rule.minHeight.max) || undefined;
+    if (styles.minHeight === undefined) delete styles.minHeight;
+  }
+  if (styles.height !== undefined) {
+    styles.height = clampCssPx(styles.height, rule.minHeight.min, rule.minHeight.max) || undefined;
+    if (styles.height === undefined) delete styles.height;
+  }
+  if (styles.padding !== undefined) {
+    styles.padding = clampPaddingValue(styles.padding, 16, 64, rule.padding) || rule.padding;
+  }
+  if (styles.radius !== undefined) {
+    styles.radius = clampCssPx(styles.radius, 0, 32) || rule.radius;
+  }
+  if (styles.background !== undefined) {
+    const normalizedBackground = String(styles.background || "").trim();
+    if (!normalizedBackground || (!rule.allowDarkBackground && isDarkBackgroundValue(normalizedBackground))) {
+      styles.background = rule.defaultBackground;
+    }
+  }
+  if (!styles.background && slotId !== "header-top" && slotId !== "header-bottom") {
+    styles.background = rule.defaultBackground;
+  }
+  if (!styles.padding && slotId !== "header-top" && slotId !== "header-bottom") {
+    styles.padding = rule.padding;
+  }
+  if (!styles.radius && slotId !== "hero" && slotId !== "header-top" && slotId !== "header-bottom") {
+    styles.radius = rule.radius;
+  }
+  next.styles = styles;
   return next;
 }
 
@@ -3674,6 +4917,41 @@ function getGenericPatchSchema(pageId, slotId) {
       rootKeys: [...GENERIC_PATCH_ROOT_KEYS],
       styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
     };
+  }
+
+  if (isServiceLikePageId(normalizedPageId)) {
+    if (normalizedPageId === "care-solutions-pdp" && (normalizedSlotId === "noticeBanner" || normalizedSlotId === "reviewInfo")) {
+      return {
+        rootKeys: ["visibility"],
+        styleKeys: [...GENERIC_PATCH_STYLE_KEYS],
+      };
+    }
+    const slotSchemas = {
+      hero: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      mainService: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      notice: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      tipsBanner: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      bestcare: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      shortcut: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      review: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      brandBanner: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      ranking: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      benefit: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      tabs: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      careBanner: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      visual: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      detailInfo: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      noticeBanner: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      reviewInfo: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      quickMenu: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      labelBanner: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      brandStory: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      bestProduct: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      qna: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      guides: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+      seller: { rootKeys: [...GENERIC_PATCH_ROOT_KEYS], styleKeys: [...GENERIC_PATCH_STYLE_KEYS] },
+    };
+    return slotSchemas[normalizedSlotId] || empty;
   }
 
   if (normalizedPageId === "support") {
@@ -4069,7 +5347,7 @@ function buildVisualReviewManifest() {
     };
   });
 
-  const servicePages = ["support", "bestshop", "care-solutions"].map((pageId) => {
+  const servicePages = SERVICE_LIKE_PAGE_IDS.map((pageId) => {
     const referencePc = findServicePageVisualCapture(pageId, "pc", "reference");
     const workingPc = findServicePageVisualCapture(pageId, "pc", "working");
     const referenceMo = findServicePageVisualCapture(pageId, "mo", "reference");
@@ -4179,6 +5457,27 @@ function buildFinalAcceptanceBundles() {
         pageId: "care-solutions",
         items: ["hero", "ranking", "benefit", "tabs", "careBanner"],
         review: serviceMap.get("care-solutions") || null,
+      },
+      {
+        bundleId: "care-solutions-pdp-pcmo",
+        title: "Care Solutions PDP PC/MO",
+        pageId: "care-solutions-pdp",
+        items: ["visual", "detailInfo", "noticeBanner", "reviewInfo"],
+        review: serviceMap.get("care-solutions-pdp") || null,
+      },
+      {
+        bundleId: "homestyle-home-pcmo",
+        title: "Homestyle Home PC/MO",
+        pageId: "homestyle-home",
+        items: ["quickMenu", "labelBanner", "brandStory"],
+        review: serviceMap.get("homestyle-home") || null,
+      },
+      {
+        bundleId: "homestyle-pdp-pcmo",
+        title: "Homestyle PDP PC/MO",
+        pageId: "homestyle-pdp",
+        items: ["detailInfo", "bestProduct", "review", "qna", "guides", "seller"],
+        review: serviceMap.get("homestyle-pdp") || null,
       },
       {
         bundleId: "category-tvs-pcmo",
@@ -4342,6 +5641,7 @@ function buildLlmEditableList(pageId, options = {}) {
         containerMode: inventoryItem.containerMode || null,
         layout: inventoryItem.layout || null,
         mediaSpec: buildComponentMediaSpec(pageId, component.slotId, inventoryItem),
+        patchBridge: component.patchBridge || buildComponentPatchBridge(pageId, component.slotId, inventoryItem),
         editableProps: component.editableProps || [],
         editableStyles: component.editableStyles || [],
         patchSchema: component.patchSchema || { rootKeys: [], styleKeys: [] },
@@ -4353,6 +5653,401 @@ function buildLlmEditableList(pageId, options = {}) {
     source: "working",
     componentCount: components.length,
     components,
+  };
+}
+
+function buildShareSectionLabel(slotId = "", pageId = "") {
+  const labels = {
+    hero: "히어로",
+    quickmenu: "탐색 바로가기",
+    "header-top": "상단 헤더",
+    "header-bottom": "주 메뉴 헤더",
+    "md-choice": "MD 추천",
+    timedeal: "타임딜",
+    "best-ranking": "인기 랭킹",
+    "space-renewal": "공간 리뉴얼",
+    subscription: "구독 추천",
+    "brand-showroom": "브랜드 쇼룸",
+    "latest-product-news": "최신 제품 소식",
+    "smart-life": "스마트 라이프",
+    "summary-banner-2": "하단 프로모션 배너",
+    "missed-benefits": "놓치면 아쉬운 혜택",
+    "lg-best-care": "LG 베스트 케어",
+    "bestshop-guide": "베스트샵 가이드",
+    "marketing-area": "홈스타일 탐색",
+    mainService: "메인 서비스",
+    notice: "공지/FAQ",
+    tipsBanner: "팁 배너",
+    bestcare: "베스트케어",
+    shortcut: "바로가기",
+    review: "리뷰",
+    brandBanner: "브랜드 배너",
+    ranking: "랭킹",
+    benefit: "혜택",
+    tabs: "탭 섹션",
+    careBanner: "케어 배너",
+    filter: "필터",
+    sort: "정렬",
+    productGrid: "상품 그리드",
+    firstRow: "첫 행",
+    firstProduct: "대표 상품",
+    banner: "상단 배너",
+    gallery: "상품 갤러리",
+    summary: "상품 요약",
+    price: "가격/혜택",
+    option: "옵션 선택",
+    sticky: "고정 구매 영역",
+    qna: "Q&A",
+  };
+  const normalized = String(slotId || "").trim();
+  if (labels[normalized]) return labels[normalized];
+  return `${String(pageId || "").trim() || "page"} · ${normalized || "section"}`;
+}
+
+function getDefaultViewportCanvasWidth(pageId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewport =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(viewportProfile, "pc")
+      : normalizeViewportProfile(viewportProfile, "pc");
+  if (normalizedPageId === "home") {
+    if (normalizedViewport === "mo") return 390;
+    if (normalizedViewport === "ta") return 1024;
+    return HOME_LAYOUT_TOKENS.desktopCanvasWidth;
+  }
+  if (normalizedViewport === "mo") return 390;
+  if (normalizedViewport === "ta") return 1024;
+  return 1440;
+}
+
+function buildShareSectionRects(pageId, component = {}, mediaSpec = {}, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewport =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(viewportProfile, "pc")
+      : normalizeViewportProfile(viewportProfile, "pc");
+  const measuredScale = mediaSpec?.measuredScale && typeof mediaSpec.measuredScale === "object" ? mediaSpec.measuredScale : null;
+  const viewportWidth = getDefaultViewportCanvasWidth(normalizedPageId, normalizedViewport);
+  const fallbackContentWidth =
+    component.containerMode === "full"
+      ? viewportWidth
+      : normalizedViewport === "mo"
+        ? viewportWidth
+        : normalizedViewport === "ta"
+          ? 960
+          : 1320;
+  const sectionWidth =
+    Number(measuredScale?.slotWidth) ||
+    (normalizedPageId === "home"
+      ? (component.containerMode === "full" ? HOME_LAYOUT_TOKENS.shellWideWidth : HOME_LAYOUT_TOKENS.desktopCanvasWidth)
+      : viewportWidth);
+  const contentWidth =
+    Number(measuredScale?.contentWidth) ||
+    (normalizedPageId === "home"
+      ? (component.containerMode === "full" ? HOME_LAYOUT_TOKENS.shellWideWidth : HOME_LAYOUT_TOKENS.shellNarrowWidth)
+      : fallbackContentWidth);
+  const insetLeft =
+    Number(measuredScale?.contentInsetLeft) ||
+    Number(measuredScale?.usableBandLeft) ||
+    Math.max(0, Math.round((sectionWidth - contentWidth) / 2));
+  const insetRight =
+    Number(measuredScale?.contentInsetRight) ||
+    (Number(measuredScale?.usableBandRight)
+      ? Math.max(0, sectionWidth - Number(measuredScale?.usableBandRight))
+      : Math.max(0, Math.round((sectionWidth - contentWidth) / 2)));
+  const sectionRect = {
+    width: sectionWidth,
+    viewportWidth,
+    left: 0,
+    right: sectionWidth,
+  };
+  const contentRect = {
+    width: contentWidth,
+    left: insetLeft,
+    right: Math.max(0, sectionWidth - insetRight),
+  };
+  return { sectionRect, contentRect };
+}
+
+function getHomeSectionContract(slotId = "", viewportProfile = "pc") {
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedViewport = normalizeHomeViewportProfile(viewportProfile, "pc");
+  const renderProfile = getHomeDesktopRenderProfile(normalizedSlotId) || {};
+  const measuredScale = getHomeComponentScaleToken(normalizedSlotId, normalizedViewport) || null;
+  const sectionWidth =
+    Number(measuredScale?.slotWidth) ||
+    (normalizedViewport === "mo"
+      ? 390
+      : renderProfile.containerMode === "full"
+        ? HOME_LAYOUT_TOKENS.shellWideWidth
+        : HOME_LAYOUT_TOKENS.desktopCanvasWidth);
+  const contentWidth =
+    Number(measuredScale?.contentWidth) ||
+    (normalizedViewport === "mo"
+      ? 390
+      : renderProfile.containerMode === "full"
+        ? HOME_LAYOUT_TOKENS.shellWideWidth
+        : HOME_LAYOUT_TOKENS.shellNarrowWidth);
+  const mediaWidth = Number(measuredScale?.imageWidth) || null;
+  const mediaHeight = Number(measuredScale?.imageHeight) || null;
+  return {
+    slotId: normalizedSlotId,
+    viewportProfile: normalizedViewport,
+    sectionWidth,
+    contentWidth,
+    mediaWidth,
+    mediaHeight,
+    containerMode: renderProfile.containerMode || (normalizedSlotId === "summary-banner-2" ? "full" : "narrow"),
+    archetype: renderProfile.archetype || "section",
+  };
+}
+
+function buildHomeSectionContractStyle(slotId = "", viewportProfile = "pc") {
+  const contract = getHomeSectionContract(slotId, viewportProfile);
+  const styleParts = [];
+  if (contract.sectionWidth) styleParts.push(`--codex-section-width:${contract.sectionWidth}px`);
+  if (contract.contentWidth) styleParts.push(`--codex-content-width:${contract.contentWidth}px`);
+  if (contract.mediaWidth) styleParts.push(`--codex-media-width:${contract.mediaWidth}px`);
+  if (contract.mediaHeight) styleParts.push(`--codex-media-height:${contract.mediaHeight}px`);
+  return styleParts.join(";");
+}
+
+function buildShareImageZones(pageId, slotId, component = {}, mediaSpec = {}, viewportProfile = "pc") {
+  const measuredScale = mediaSpec?.measuredScale && typeof mediaSpec.measuredScale === "object" ? mediaSpec.measuredScale : null;
+  const imageWidth = Number(measuredScale?.imageWidth || 0);
+  const imageHeight = Number(measuredScale?.imageHeight || 0);
+  const fit = String(mediaSpec?.fit || measuredScale?.imageFit || "").trim() || "contain";
+  const zones = [];
+  if (imageWidth || imageHeight) {
+    zones.push({
+      id: `${slotId || "section"}-media-primary`,
+      kind: component.kind === "gallery" ? "gallery" : "image",
+      fit,
+      width: imageWidth || null,
+      height: imageHeight || null,
+    });
+  }
+  if (!zones.length && Array.isArray(mediaSpec?.notes) && mediaSpec.notes.length) {
+    zones.push({
+      id: `${slotId || "section"}-media-guidance`,
+      kind: "guidance",
+      fit,
+      notes: mediaSpec.notes.slice(0, 2),
+    });
+  }
+  return zones;
+}
+
+function inferShareReplacementMode(pageId, component = {}, patchBridge = {}, mediaSpec = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const kind = String(component.kind || patchBridge.archetype || "").trim();
+  if (normalizedPageId === "home" && ["hero", "quickmenu", "product-list", "banner", "banner-list", "editorial-product", "service-card"].includes(kind)) {
+    return "replace-markup";
+  }
+  if (["navigation", "controls"].includes(kind)) return "patch-or-replace";
+  if (["gallery", "product-list", "banner", "editorial", "editorial-list", "editorial-grid", "service-card"].includes(kind)) {
+    return "replace-markup";
+  }
+  if (Array.isArray(mediaSpec?.notes) && mediaSpec.notes.length) return "patch-or-replace";
+  return "patch-only";
+}
+
+function buildShareSectionRegistry(pageId, options = {}) {
+  const editableData = options.editableData || null;
+  const viewportProfile = String(options.viewportProfile || "").trim();
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewport =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(viewportProfile || "pc", "pc")
+      : normalizeViewportProfile(viewportProfile || "pc", "pc");
+  const cacheKey = buildWorkspacePageCacheKey(editableData || {}, normalizedPageId, "share-section-registry", normalizedViewport);
+  return readCachedValue(WORKING_SHARE_SECTION_REGISTRY_CACHE, cacheKey, () => {
+    const inventory = buildWorkingComponentInventory(normalizedPageId, { editableData, viewportProfile: normalizedViewport });
+    const editableCatalog = buildWorkingEditableComponentCatalog(normalizedPageId, { editableData, viewportProfile: normalizedViewport });
+    const editableMap = new Map((editableCatalog.components || []).map((item) => [String(item.componentId || "").trim(), item]));
+    const sections = (inventory.components || []).map((component) => {
+      const componentId = String(component.componentId || "").trim();
+      const slotId = String(component.slotId || "").trim();
+      const editable = editableMap.get(componentId) || {};
+      const mediaSpec = buildComponentMediaSpec(normalizedPageId, slotId, {
+        ...component,
+        viewportProfile: normalizedViewport,
+      });
+      const patchBridge = editable.patchBridge || buildComponentPatchBridge(normalizedPageId, slotId, {
+        ...component,
+        viewportProfile: normalizedViewport,
+      });
+      const patchSchema = editable.patchSchema || getGenericPatchSchema(normalizedPageId, slotId);
+      const { sectionRect, contentRect } = buildShareSectionRects(normalizedPageId, component, mediaSpec, normalizedViewport);
+      return {
+        sectionId: `${normalizedPageId}:${normalizedViewport}:${slotId}`,
+        pageId: normalizedPageId,
+        viewportProfile: normalizedViewport,
+        componentId,
+        slotId,
+        sectionLabel: buildShareSectionLabel(slotId, normalizedPageId),
+        sectionType: String(patchBridge.archetype || component.kind || "section").trim() || "section",
+        sourceKind: component.activeSourceType || component.renderMode || component.sourceResolution || "working",
+        activeSourceId: component.activeSourceId || null,
+        resolvedRenderSourceId: component.resolvedRenderSourceId || component.activeSourceId || null,
+        containerMode: component.containerMode || mediaSpec.containerMode || null,
+        sectionRect,
+        contentRect,
+        imageZones: buildShareImageZones(normalizedPageId, slotId, component, mediaSpec, normalizedViewport),
+        textScale: {
+          titleFontSize: mediaSpec?.measuredScale?.titleFontSize || null,
+          titleLineHeight: mediaSpec?.measuredScale?.titleLineHeight || null,
+        },
+        measuredScale: mediaSpec?.measuredScale || null,
+        replacementMode: inferShareReplacementMode(normalizedPageId, component, patchBridge, mediaSpec),
+        allowedFields: {
+          rootKeys: Array.isArray(patchSchema.rootKeys) ? patchSchema.rootKeys : [],
+          styleKeys: Array.isArray(patchSchema.styleKeys) ? patchSchema.styleKeys : [],
+          editableProps: Array.isArray(editable.editableProps) ? editable.editableProps : [],
+          editableStyles: Array.isArray(editable.editableStyles) ? editable.editableStyles : [],
+        },
+        patchBridge,
+        mediaSpec,
+        notes: [
+          ...(Array.isArray(patchBridge?.structureNotes) ? patchBridge.structureNotes : []),
+          ...(Array.isArray(mediaSpec?.notes) ? mediaSpec.notes : []),
+        ].slice(0, 4),
+      };
+    });
+    return {
+      pageId: normalizedPageId,
+      viewportProfile: normalizedViewport,
+      source: "working",
+      sectionCount: sections.length,
+      sections,
+    };
+  });
+}
+
+function analyzeArtifactSectionMarkup(markup = "") {
+  const source = String(markup || "");
+  if (!source) {
+    return {
+      className: "",
+      dataArea: "",
+      imageCount: 0,
+      linkCount: 0,
+      hasSwiper: false,
+      textLength: 0,
+    };
+  }
+  const classMatch = source.match(/<section[^>]*class="([^"]+)"/i);
+  const dataAreaMatch = source.match(/\sdata-area="([^"]+)"/i);
+  const textLength = stripHtml(source).replace(/\s+/g, " ").trim().length;
+  return {
+    className: classMatch ? classMatch[1] : "",
+    dataArea: dataAreaMatch ? dataAreaMatch[1] : "",
+    imageCount: (source.match(/<img\b/gi) || []).length,
+    linkCount: (source.match(/<a\b/gi) || []).length,
+    hasSwiper: /swiper/i.test(source),
+    textLength,
+  };
+}
+
+function buildArtifactSectionSelectorHints(pageId, slotId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  if (normalizedPageId === "home") {
+    const profile = getHomeDesktopRenderProfile(normalizedSlotId) || {};
+    const hints = [];
+    if (Array.isArray(profile.liveClassFragments) && profile.liveClassFragments.length) {
+      hints.push(...profile.liveClassFragments);
+    }
+    if (profile.dataArea) hints.push(`data-area=${profile.dataArea}`);
+    return hints;
+  }
+  return [];
+}
+
+function extractHomeArtifactSectionMarkup(slotId, viewportProfile = "pc") {
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedViewport = normalizeHomeViewportProfile(viewportProfile, "pc");
+  if (!normalizedSlotId) return "";
+  if (normalizedViewport === "mo") {
+    const mobileHtml = readHomeMobileHtml() || "";
+    if (normalizedSlotId === "hero") return extractMobileHeroSection(mobileHtml);
+    if (normalizedSlotId === "quickmenu") return extractMobileQuickMenuSection(mobileHtml);
+    if (normalizedSlotId === "timedeal") return extractMobileTimedealSection(mobileHtml);
+    if (normalizedSlotId === "space-renewal") return extractMobileSpaceRenewalSection(mobileHtml);
+    if (normalizedSlotId === "brand-showroom") return extractMobileBrandShowroomSection(mobileHtml);
+    if (normalizedSlotId === "latest-product-news") return extractMobileLatestProductNewsSection(mobileHtml);
+    if (normalizedSlotId === "smart-life") return extractMobileSmartLifeSection(mobileHtml);
+    if (normalizedSlotId === "missed-benefits") return extractMobileMissedBenefitsSection(mobileHtml);
+    if (normalizedSlotId === "lg-best-care") return extractMobileLgBestCareSection(mobileHtml);
+    if (normalizedSlotId === "bestshop-guide") return extractMobileBestshopGuideSection(mobileHtml);
+    if (normalizedSlotId === "promotion") return extractMobilePromotionSection(mobileHtml);
+    if (normalizedSlotId === "summary-banner-2") return extractMobileLowerPromotionSection(mobileHtml);
+    return "";
+  }
+  if (normalizedSlotId === "hero") {
+    return (
+      extractCurrentLiveHomeSectionByClass("HomePcBannerHero_banner_hero__") ||
+      extractCurrentLiveHomeSectionByClass("HomeTaBannerHero_banner_hero__") ||
+      extractHomeHeroSection(readHomeDesktopHtml() || "")
+    );
+  }
+  if (normalizedSlotId === "promotion") {
+    return extractCurrentLiveHomeSectionByClass("HomePcBannerPromotion_banner_promotion__", "메인 상단 배너 영역");
+  }
+  return extractCurrentLiveHomeSectionByProfile(normalizedSlotId);
+}
+
+function extractArtifactSectionMarkup(pageId, slotId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  if (normalizedPageId === "home") {
+    return extractHomeArtifactSectionMarkup(slotId, viewportProfile);
+  }
+  return "";
+}
+
+function buildArtifactSectionRegistry(pageId, options = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewport =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(options.viewportProfile || "pc", "pc")
+      : normalizeViewportProfile(options.viewportProfile || "pc", "pc");
+  const editableData = options.editableData || null;
+  const workingRegistry = buildShareSectionRegistry(normalizedPageId, {
+    editableData,
+    viewportProfile: normalizedViewport,
+  });
+  const sections = (workingRegistry.sections || []).map((section) => {
+    const markup = extractArtifactSectionMarkup(normalizedPageId, section.slotId, normalizedViewport);
+    const analysis = analyzeArtifactSectionMarkup(markup);
+    const extractStatus = markup
+      ? "exact-reference-section"
+      : section.replacementMode === "replace-markup"
+        ? "missing-reference-section"
+        : "reference-derived-fallback";
+    return {
+      ...section,
+      source: "reference-artifact",
+      extractStatus,
+      artifactOrigin: markup ? "lge-reference" : "working-fallback",
+      selectorHints: buildArtifactSectionSelectorHints(normalizedPageId, section.slotId, normalizedViewport),
+      referenceSection: {
+        available: Boolean(markup),
+        className: analysis.className || null,
+        dataArea: analysis.dataArea || null,
+        imageCount: analysis.imageCount,
+        linkCount: analysis.linkCount,
+        hasSwiper: analysis.hasSwiper,
+        textLength: analysis.textLength,
+        markupPreview: markup ? markup.slice(0, 1200) : "",
+      },
+    };
+  });
+  return {
+    pageId: normalizedPageId,
+    viewportProfile: normalizedViewport,
+    source: "reference-artifact",
+    sectionCount: sections.length,
+    sections,
   };
 }
 
@@ -4402,6 +6097,10 @@ function buildPlannerPageContext(pageId, viewportProfile, editableData, options 
   const normalizedPageId = String(pageId || "").trim();
   const page = findPage(editableData || {}, normalizedPageId);
   const pdpContext = resolvePdpRuntimeContext(normalizedPageId);
+  const normalizedViewportProfile =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(viewportProfile, "pc")
+      : normalizeViewportProfile(viewportProfile, "pc");
   const identity = mergePageIdentityBrief(buildPageIdentityBrief(normalizedPageId, {
     pageTitle: pdpContext?.title || page?.title || normalizedPageId,
     pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
@@ -4411,7 +6110,13 @@ function buildPlannerPageContext(pageId, viewportProfile, editableData, options 
     runtimePageId: pdpContext?.runtimePageId || normalizedPageId,
     pageLabel: pdpContext?.title || page?.title || normalizedPageId,
     pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
-    viewportProfile: String(viewportProfile || "pc").trim() || "pc",
+    viewportProfile: normalizedViewportProfile,
+    viewportLabel:
+      normalizedViewportProfile === "mo"
+        ? "mobile"
+        : normalizedViewportProfile === "ta"
+          ? "tablet"
+          : "desktop",
     pageIdentity: identity,
   };
 }
@@ -4465,6 +6170,30 @@ function buildPageIdentityBrief(pageId, options = {}) {
       shouldAvoid: ["제품 쇼케이스형 과장", "한 구간만 극단적으로 튀는 색/명암", "설명보다 분위기만 앞서는 구성"],
       visualGuardrails: ["가치 제안이 먼저", "서비스 설명이 흐려지지 않도록 대비 사용", "정보형 리듬 유지"],
     },
+    "care-solutions-pdp": {
+      role: "구독 상품 상세 소개 및 신청 전환 페이지",
+      purpose: "특정 구독 상품의 핵심 가치, 관리 혜택, 신청 판단 근거를 분명하게 전달해야 하는 상세 페이지입니다.",
+      designIntent: "일반 PDP보다 서비스 설명과 안심감이 더 중요하므로, 가격·혜택·안내 구간이 한눈에 읽히는 구조가 우선입니다.",
+      mustPreserve: ["구독 혜택 설명력", "신청 판단 정보", "서비스 신뢰감"],
+      shouldAvoid: ["일반 브랜드 쇼케이스처럼 보이는 과장", "신청 정보보다 분위기가 먼저 오는 구성", "과도한 다크 톤 전환"],
+      visualGuardrails: ["혜택/가격/신청 근거 우선", "안심감 유지", "설명 구간 가독성 최우선"],
+    },
+    "homestyle-home": {
+      role: "홈스타일 큐레이션 허브",
+      purpose: "인테리어/라이프스타일 제안과 상품 연결을 감도 있게 보여주면서도 탐색 흐름을 분명하게 만드는 허브 페이지입니다.",
+      designIntent: "일반 커머스 홈보다 에디토리얼 감도와 큐레이션 인상이 중요하지만, 섹션 목적과 탐색 이유는 분명해야 합니다.",
+      mustPreserve: ["큐레이션 감도", "브랜드 무드", "탐색 동선"],
+      shouldAvoid: ["일반 할인몰처럼 보이는 과도한 프로모션 톤", "무드만 있고 목적이 흐린 섹션", "섹션별로 전혀 다른 사이트처럼 보이는 스타일"],
+      visualGuardrails: ["에디토리얼 톤 유지", "탐색 목적이 읽히는 제목/라벨 구조", "이미지와 텍스트 리듬의 일관성 유지"],
+    },
+    "homestyle-pdp": {
+      role: "홈스타일 상품 상세 페이지",
+      purpose: "상품의 스타일 가치와 구매 판단 요소를 함께 전달해야 하는 홈스타일 전용 상세 페이지입니다.",
+      designIntent: "일반 PDP보다 무드와 스타일 제안이 중요하지만, 구매 정보와 상세 설명이 흐려지지 않도록 균형을 잡아야 합니다.",
+      mustPreserve: ["스타일 제안력", "상세 정보 위계", "구매 판단 신뢰감"],
+      shouldAvoid: ["무드 이미지가 정보 영역을 압도하는 상태", "상품 요약보다 배경 연출이 더 강한 화면", "섹션별 톤 분절"],
+      visualGuardrails: ["스타일 감도와 정보 위계를 동시에 유지", "구매 정보 영역 명료성 확보", "이미지 비율과 텍스트 밀도 균형 유지"],
+    },
     "category-tvs": {
       role: "TV 카테고리 상품 탐색 페이지",
       purpose: "여러 상품을 비교 탐색하게 하는 카테고리 페이지로, 탐색 효율과 비교 용이성이 핵심입니다.",
@@ -4508,7 +6237,7 @@ function buildBuilderAuditReport(pageId, options = {}) {
   const pageContext = buildPlannerPageContext(pageId, options.viewportProfile || "pc", editableData, {
     pageIdentityOverride: options.pageIdentityOverride,
   });
-  const editableList = buildLlmEditableList(pageId, { editableData });
+  const editableList = buildLlmEditableList(pageId, { editableData, viewportProfile: options.viewportProfile || "pc" });
   const slotRegistry = findSlotRegistry(editableData, pageId) || { pageId, slots: [] };
   const slotMap = new Map((slotRegistry.slots || []).map((slot) => [String(slot.slotId || "").trim(), slot]));
   const components = (editableList.components || []).map((component) => {
@@ -4556,9 +6285,9 @@ function buildBuilderAuditReport(pageId, options = {}) {
   };
 }
 
-function buildPlannerWorkspaceContext(userId, pageId) {
-  const pinned = getPinnedView(userId, pageId);
-  const recentVersions = listSavedVersions(userId, { pageId, limit: 10 });
+function buildPlannerWorkspaceContext(userId, pageId, viewportProfile = "") {
+  const pinned = getPinnedView(userId, pageId, viewportProfile);
+  const recentVersions = listSavedVersions(userId, { pageId, viewportProfile, limit: 10 });
   return {
     currentWorkingVersionId: recentVersions[0]?.id || null,
     currentViewVersionId: pinned?.versionId || null,
@@ -4575,6 +6304,10 @@ function normalizeDesignChangeLevel(value, fallback = "medium") {
 function buildComponentMediaSpec(pageId, slotId, inventoryItem = {}) {
   const normalizedPageId = String(pageId || "").trim();
   const normalizedSlotId = String(slotId || "").trim();
+  const normalizedViewportProfile =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(inventoryItem.viewportProfile || "pc", "pc")
+      : normalizeViewportProfile(inventoryItem.viewportProfile || "pc", "pc");
   const spec = {
     slotId: normalizedSlotId,
     containerMode: inventoryItem.containerMode || null,
@@ -4582,6 +6315,7 @@ function buildComponentMediaSpec(pageId, slotId, inventoryItem = {}) {
     imageHandling: [],
   };
   if (normalizedPageId === "home") {
+    const renderProfile = getHomeDesktopRenderProfile(normalizedSlotId);
     const homeSpecs = {
       hero: {
         aspectRatio: "hero visual varies by live source; copy and image must still feel balanced across wide desktop",
@@ -4625,7 +6359,14 @@ function buildComponentMediaSpec(pageId, slotId, inventoryItem = {}) {
         notes: ["배너 이미지는 텍스트보다 너무 축소돼 보이면 안 된다"],
       },
     };
-    return { ...spec, ...(homeSpecs[normalizedSlotId] || {}) };
+    return {
+      ...spec,
+      ...(homeSpecs[normalizedSlotId] || {}),
+      renderProfile: renderProfile || null,
+      measuredScale: getHomeComponentScaleToken(normalizedSlotId, normalizedViewportProfile),
+      viewportProfile: normalizedViewportProfile,
+      homeLayoutTokens: HOME_LAYOUT_TOKENS,
+    };
   }
   if (normalizedPageId.startsWith("category-") && normalizedSlotId === "banner") {
     return {
@@ -4650,7 +6391,7 @@ function buildComponentMediaSpec(pageId, slotId, inventoryItem = {}) {
 }
 
 function buildPlannerPageSummary(pageId, editableData, options = {}) {
-  const editableList = buildLlmEditableList(pageId, { editableData });
+  const editableList = buildLlmEditableList(pageId, { editableData, viewportProfile: options.viewportProfile || "pc" });
   const targetScope = String(options.targetScope || "page").trim() || "page";
   const targetComponents = safeArray(options.targetComponents || [], 50)
     .map((item) => String(item || "").trim())
@@ -4660,7 +6401,7 @@ function buildPlannerPageSummary(pageId, editableData, options = {}) {
     targetScope === "components" && targetComponentSet.size
       ? (editableList.components || []).filter((item) => targetComponentSet.has(String(item.componentId || "").trim()))
       : (editableList.components || []);
-  const patches = listComponentPatches(editableData || {}, pageId).map((item) => ({
+  const patches = listComponentPatches(editableData || {}, pageId, options.viewportProfile || "").map((item) => ({
     componentId: item.componentId,
     sourceId: item.sourceId || null,
     patchedKeys: item.patch && typeof item.patch === "object" ? Object.keys(item.patch) : [],
@@ -4756,21 +6497,49 @@ function buildBuilderDesignGuidance(pageId, editableComponents = [], options = {
       ],
     },
   };
+  const patchRules =
+    normalizedPageId === "home"
+      ? {
+          global: {
+            sectionRhythm: HOME_LAYOUT_TOKENS.sectionGap,
+            sectionPadding: HOME_LAYOUT_TOKENS.sectionPadding,
+            titleScale: HOME_LAYOUT_TOKENS.titleScale,
+            backgroundModes: HOME_LAYOUT_TOKENS.backgroundModes,
+            defaultPolicy: [
+              "섹션 배경은 전체 리듬 안에서 반복적으로 써야 하며, 한 슬롯만 뜬금없이 다크 톤으로 뒤집지 않는다.",
+              "containerMode가 narrow인 홈 슬롯은 과도한 좌우 padding이나 full-bleed 분위기를 만들지 않는다.",
+              "product-list, banner-list, service-card 계열은 라이트 배경과 24~28px radius를 기본으로 본다.",
+            ],
+          },
+          bySlot: Object.fromEntries(
+            slotIds.map((slotId) => [slotId, buildHomePatchRule(slotId)])
+          ),
+        }
+      : null;
   return {
     pageType,
     pageIdentity,
+    layoutTokens: normalizedPageId === "home" ? HOME_LAYOUT_TOKENS : null,
+    patchRules,
+    slotRenderProfiles:
+      normalizedPageId === "home"
+        ? Object.fromEntries(
+            slotIds.map((slotId) => [slotId, getHomeDesktopRenderProfile(slotId) || null]).filter(([, value]) => value)
+          )
+        : {},
     targetScope,
     designChangeLevel,
     designChangeProfile: changeProfiles[designChangeLevel] || changeProfiles.medium,
     targetSlotIds: slotIds,
     targetComponentCount: Array.isArray(editableComponents) ? editableComponents.length : 0,
     visualFocus: visualFocusByType[pageType] || visualFocusByType.generic,
-    visualRules: [
-      "고객 프리뷰용 시안이므로 브랜드 디자인 우선으로 설득력 있는 방향성을 만든다.",
-      "지원된 slot/source/patch 범위 안에서만 변경하되, 변화율이 허용하는 탐색 폭은 적극 활용한다.",
-      "사실 정보와 실제 상품 데이터는 왜곡하지 않는다.",
-      "현재 페이지의 원래 역할과 정체성을 해치지 않는다.",
-    ],
+      visualRules: [
+        "고객 프리뷰용 시안이므로 브랜드 디자인 우선으로 설득력 있는 방향성을 만든다.",
+        "지원된 slot/source/patch 범위 안에서만 변경하되, 변화율이 허용하는 탐색 폭은 적극 활용한다.",
+        "사실 정보와 실제 상품 데이터는 왜곡하지 않는다.",
+        "현재 페이지의 원래 역할과 정체성을 해치지 않는다.",
+        "home에서는 measuredScale이 있는 슬롯은 그 폭, 이미지 체감 크기, 타이포 스케일을 크게 벗어나지 않는다.",
+      ],
     changeLevelGuidance: Object.fromEntries(
       Object.entries(changeProfiles).map(([key, value]) => [key, value.guidance])
     ),
@@ -4781,8 +6550,21 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
   const pageContext = buildPlannerPageContext(pageId, options.viewportProfile || "pc", editableData, {
     pageIdentityOverride: options.pageIdentityOverride,
   });
+  const designReferenceLibrary = buildDesignReferenceLibraryContext(pageId, {
+    pageGroup: pageContext.pageGroup,
+    viewportProfile: options.viewportProfile || "pc",
+    limit: 8,
+  });
   const slotRegistry = findSlotRegistry(editableData || {}, pageId) || { pageId, slots: [] };
-  const editableComponentsPayload = buildLlmEditableList(pageId, { editableData });
+  const editableComponentsPayload = buildLlmEditableList(pageId, { editableData, viewportProfile: options.viewportProfile || "pc" });
+  const shareSectionRegistry = buildShareSectionRegistry(pageId, {
+    editableData,
+    viewportProfile: options.viewportProfile || "pc",
+  });
+  const artifactSectionRegistry = buildArtifactSectionRegistry(pageId, {
+    editableData,
+    viewportProfile: options.viewportProfile || "pc",
+  });
   const targetScope = String(options.targetScope || "page").trim() || "page";
   const targetComponents = safeArray(options.targetComponents || [], 50)
     .map((item) => String(item || "").trim())
@@ -4797,7 +6579,7 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
     isRenderableBuilderSlot(pageId, String(item?.slotId || "").trim())
   );
   const allowedSlotIds = new Set(renderableEditableComponents.map((item) => String(item.slotId || "").trim()).filter(Boolean));
-  const currentPatches = listComponentPatches(editableData || {}, pageId)
+  const currentPatches = listComponentPatches(editableData || {}, pageId, options.viewportProfile || "")
     .filter((item) => {
       if (targetScope !== "components" || !targetComponentSet.size) return true;
       return targetComponentSet.has(String(item.componentId || "").trim());
@@ -4820,8 +6602,11 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
           : (slotRegistry.slots || []),
     },
     editableComponents: renderableEditableComponents,
+    shareSectionRegistry,
+    artifactSectionRegistry,
     patchSchemaMap,
     currentPatches,
+    designReferenceLibrary,
     targeting: {
       scope: targetScope,
       componentIds: targetComponents,
@@ -4837,6 +6622,11 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
           id: "component_patch",
           category: "editing",
           whenToUse: "허용된 patch schema 안에서 제목/부제/설명/스타일을 미세 조정할 때",
+        },
+        {
+          id: "section_replace",
+          category: "artifact",
+          whenToUse: "공유 산출물 기준으로 섹션 단위 재구성을 설계하거나 replacement block 전략을 판단할 때",
         },
         {
           id: "preview_render",
@@ -4867,6 +6657,11 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
         "targetScope가 components이면 해당 범위 바깥 slot은 건드리지 않는다.",
         "slot별 렌더 구조에 맞는 root patch를 우선 사용하고, 서술한 변화는 반드시 실제 operation으로 연결한다.",
         "editableComponents에 포함된 mediaSpec과 layout을 보고 이미지 비율, fill 방식, 아이콘 크기 판단을 맞춘다.",
+        "editableComponents의 patchBridge를 보고 archetype별 rootPatchPriority와 imageHandling을 실제 수정 전략으로 사용한다.",
+        "artifactSectionRegistry가 있으면 referenceSection.available=true 인 섹션의 원본 구조를 우선 존중하고, extractStatus가 missing-reference-section 인 섹션만 커스텀 block 후보로 본다.",
+        "shareSectionRegistry가 있으면 섹션 단위 치환 가능 여부와 폭/콘텐츠 폭/이미지 존을 함께 참고한다.",
+        "home에서는 visualPrinciples.layoutTokens와 visualPrinciples.patchRules를 실제 제약으로 사용한다.",
+        "home narrow 슬롯은 공통 section rhythm 안에서 움직여야 하며, isolated dark block이나 과도한 full-bleed 인상을 만들지 않는다.",
       ],
       designSurfaces: [
         {
@@ -4892,6 +6687,7 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
         "브랜드 정체성을 벗어나는 과한 실험적 패턴만 금지한다.",
         "가격/스펙/상품 사실 정보는 바꾸지 않는다.",
       ],
+      designReferenceLibrary,
       visualPrinciples: buildBuilderDesignGuidance(pageId, editableComponents, {
         targetScope,
         designChangeLevel,
@@ -4937,6 +6733,10 @@ function buildBuilderInputPayload({
   return {
     pageContext,
     approvedPlan,
+    designBriefDocuments: {
+      builderMarkdown: String(approvedPlan?.builderMarkdown || "").trim(),
+      layoutMockupMarkdown: String(approvedPlan?.layoutMockupMarkdown || "").trim(),
+    },
     systemContext: buildBuilderSystemContext(pageId, editableData, {
       viewportProfile,
       pageIdentityOverride,
@@ -4979,8 +6779,14 @@ async function buildPlannerInputPayload({
     .map((item) => String(item || "").trim())
     .filter(Boolean);
   const pageSummary = buildPlannerPageSummary(pageId, editableData, {
+    viewportProfile,
     targetScope: normalizedTargetScope,
     targetComponents: normalizedTargetComponents,
+  });
+  const designReferenceLibrary = buildDesignReferenceLibraryContext(pageId, {
+    pageGroup: pageContext.pageGroup,
+    viewportProfile,
+    limit: 8,
   });
   const referenceAnalyses = await analyzeReferenceUrls(referenceUrls, {
     pageId,
@@ -4997,7 +6803,7 @@ async function buildPlannerInputPayload({
   return {
     mode: String(mode || "direct").trim() || "direct",
     pageContext,
-    workspaceContext: buildPlannerWorkspaceContext(user.userId, pageId),
+    workspaceContext: buildPlannerWorkspaceContext(user.userId, pageId, viewportProfile),
     userInput: {
       requestText: String(requestText || "").trim(),
       keyMessage: String(keyMessage || "").trim(),
@@ -5013,6 +6819,7 @@ async function buildPlannerInputPayload({
     referenceSummary: {
       analyses: referenceAnalyses,
       mergedSlotMatches: mergeReferenceSlotMatches(referenceAnalyses),
+      designReferenceLibrary,
     },
     guardrailBundle,
   };
@@ -5024,6 +6831,9 @@ function buildFinalReadinessReport(options = {}) {
     "support",
     "bestshop",
     "care-solutions",
+    "care-solutions-pdp",
+    "homestyle-home",
+    "homestyle-pdp",
     "category-tvs",
     "category-refrigerators",
   ];
@@ -5182,7 +6992,7 @@ function buildWorkingSlotSnapshot(pageId) {
       "lg-best-care": homeEnhancements.lgBestCareProducts?.length || 0,
       "bestshop-guide": homeEnhancements.bestshopGuideProducts?.length || (homeEnhancements.bestshopGuideSection ? 1 : 0),
     };
-    const lowerSlots = getHomeLowerSlotRegistry()
+    const lowerSlots = getHomeLowerSlotRegistry(null, "ta")
       .filter((entry) => entry.enabled(homeEnhancements, {}))
       .map((entry) => ({
         slotId: entry.id,
@@ -5314,6 +7124,55 @@ function buildWorkingSlotSnapshot(pageId) {
           href: slide.href || "",
         })),
       ],
+    };
+  }
+
+  if (isServiceLikePageId(pageId)) {
+    const viewportProfile = "pc";
+    const workbench = buildServicePageWorkbench(pageId, viewportProfile);
+    const groups = normalizeGroupMap(workbench?.workingGroups?.groups);
+    const slots = Object.entries(groups || {})
+      .filter(([, group]) => group?.found)
+      .map(([slotId, group]) => ({
+        slotId,
+        kind:
+          slotId === "hero"
+            ? "hero"
+            : slotId === "visual"
+              ? "gallery"
+              : slotId === "shortcut" || slotId === "mainService" || slotId === "tabs" || slotId === "quickMenu"
+                ? "navigation"
+                : slotId === "review" || slotId === "qna" || slotId === "reviewInfo" || slotId === "detailInfo"
+                  ? "content"
+                  : "section",
+        containerMode:
+          slotId === "hero" || slotId === "visual" || slotId === "quickMenu" || slotId === "mainService"
+            ? "full"
+            : "narrow",
+        sourceId: `captured-${pageId}-${slotId}`,
+        layout: {
+          selector: group.selector || "",
+          containerRule:
+            slotId === "hero" || slotId === "visual" || slotId === "quickMenu" || slotId === "mainService"
+              ? "full-bleed"
+              : "narrow",
+          rowCountDesktop: 1,
+          foundOnWorking: true,
+        },
+        itemCount: Number(group.imageCount || 0) + Number(group.linkCount || 0),
+        title: group.title || "",
+        textPreview: group.textPreview || "",
+      }));
+    return {
+      pageId,
+      source: "working",
+      url: archiveRow.url,
+      viewport: {
+        width: null,
+        height: null,
+      },
+      slots,
+      states: [],
     };
   }
 
@@ -5460,12 +7319,23 @@ function extractMobileQuickMenuSection(rawHtml) {
   return match ? match[0] : "";
 }
 
+function extractHomeQuickMenuSection(rawHtml) {
+  const match =
+    rawHtml.match(/<section class="HomePcQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/) ||
+    rawHtml.match(/<section class="HomeTaQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/) ||
+    rawHtml.match(/<section class="HomeMoQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/);
+  return match ? match[0] : "";
+}
+
 function readCurrentLiveHomeDom() {
   try {
-    return fs.readFileSync(CURRENT_LIVE_HOME_DOM_PATH, "utf-8");
+    if (fs.existsSync(CURRENT_LIVE_HOME_DOM_PATH)) {
+      return fs.readFileSync(CURRENT_LIVE_HOME_DOM_PATH, "utf-8");
+    }
   } catch (_error) {
-    return "";
+    // fall through to reference-live fallback
   }
+  return readReferenceLiveHtml("home.desktop.html") || readHomeDesktopHtml() || "";
 }
 
 function extractCurrentLiveHomeSectionByClass(classFragment, dataArea = "") {
@@ -5479,6 +7349,17 @@ function extractCurrentLiveHomeSectionByClass(classFragment, dataArea = "") {
   if (!matches.length) return "";
   if (!dataArea) return matches[0];
   return matches.find((entry) => entry.includes(`data-area="${dataArea}"`)) || "";
+}
+
+function extractCurrentLiveHomeSectionByProfile(slotId) {
+  const profile = getHomeDesktopRenderProfile(slotId);
+  const fragments = Array.isArray(profile?.liveClassFragments) ? profile.liveClassFragments : [];
+  const dataArea = String(profile?.dataArea || "").trim();
+  for (const fragment of fragments) {
+    const match = extractCurrentLiveHomeSectionByClass(fragment, dataArea);
+    if (match) return match;
+  }
+  return "";
 }
 
 function markHomeLiveCustomSection(sectionHtml, slotId = "", sourceId = "") {
@@ -5499,10 +7380,47 @@ function markHomeLiveCustomSection(sectionHtml, slotId = "", sourceId = "") {
 }
 
 function renderCurrentLiveHomeSection(slotId, activeSourceId, componentPatch, classFragment, dataArea = "") {
-  const sectionHtml = extractCurrentLiveHomeSectionByClass(classFragment, dataArea);
+  const sectionHtml =
+    extractCurrentLiveHomeSectionByProfile(slotId) ||
+    extractCurrentLiveHomeSectionByClass(classFragment, dataArea);
   if (!sectionHtml) return "";
   return applyHomeLowerSectionPatch(
     markHomeLiveCustomSection(sectionHtml, slotId, activeSourceId),
+    slotId,
+    activeSourceId,
+    componentPatch
+  );
+}
+
+function renderCurrentLiveHomeHeroSection(activeSourceId, componentPatch, viewportProfile = "pc") {
+  const normalizedViewport = normalizeHomeViewportProfile(viewportProfile || "pc", "pc");
+  if (normalizedViewport === "mo") return "";
+  const sectionHtml =
+    extractCurrentLiveHomeSectionByClass("HomePcBannerHero_banner_hero__") ||
+    extractCurrentLiveHomeSectionByClass("HomeTaBannerHero_banner_hero__");
+  if (!sectionHtml) return "";
+  return applyHomeHeroPatch(
+    markHomeLiveCustomSection(sectionHtml, "hero", activeSourceId),
+    activeSourceId,
+    componentPatch
+  );
+}
+
+function renderCurrentLiveHomeProductSection(
+  slotId,
+  activeSourceId,
+  componentPatch,
+  products = [],
+  classFragment,
+  dataArea = ""
+) {
+  const sectionHtml =
+    extractCurrentLiveHomeSectionByProfile(slotId) ||
+    extractCurrentLiveHomeSectionByClass(classFragment, dataArea);
+  if (!sectionHtml) return "";
+  const withImages = injectProductImagesIntoSection(sectionHtml, products);
+  return applyHomeLowerSectionPatch(
+    markHomeLiveCustomSection(withImages, slotId, activeSourceId),
     slotId,
     activeSourceId,
     componentPatch
@@ -5960,6 +7878,21 @@ const HOME_LG_BEST_CARE_ITEMS = [
   },
 ];
 
+const HOME_BESTSHOP_GUIDE_ITEMS = [
+  {
+    title: "가까운 매장 찾기",
+    url: "/bestshop/find-store",
+    image: "",
+    description: "내 주변 LG 베스트샵 위치와 운영 정보를 빠르게 확인하세요.",
+  },
+  {
+    title: "매장 상담 예약",
+    url: "/bestshop/visit-reservation",
+    image: "",
+    description: "가전 체험과 상담을 원하는 일정에 맞춰 미리 예약할 수 있습니다.",
+  },
+];
+
 const HOME_SUMMARY_BANNER_2_ITEMS = [
   {
     title: "쓸수록 새로워지는 LG UP 가전을 만나보세요",
@@ -5967,6 +7900,34 @@ const HOME_SUMMARY_BANNER_2_ITEMS = [
       "https://www.lge.co.kr/kr/upload/admin/display/displayObject/homemain_mo_OBJ_270x220_v2_20260402_182144.png",
   },
 ];
+
+function extractHomeServiceItems(sectionHtml, itemPattern) {
+  const items = [];
+  const source = String(sectionHtml || "");
+  let match;
+  while ((match = itemPattern.exec(source))) {
+    items.push({
+      url: match[1] || "#",
+      title: stripHtml(match[2] || ""),
+      description: stripHtml(match[3] || ""),
+    });
+  }
+  return items;
+}
+
+function extractLgBestCareItems(sectionHtml) {
+  return extractHomeServiceItems(
+    sectionHtml,
+    /<li class="HomeMoListVerticaltypeFill_list_verticaltype_fill_item__[^"]*">[\s\S]*?<a[^>]*href="([^"]+)"[\s\S]*?<strong class="HomeMoListVerticaltypeFill_title__[^"]*">([\s\S]*?)<\/strong>[\s\S]*?<div class="HomeMoListVerticaltypeFill_desc__[^"]*">([\s\S]*?)<\/div>[\s\S]*?<\/a>[\s\S]*?<\/li>/g
+  );
+}
+
+function extractBestshopGuideItems(sectionHtml) {
+  return extractHomeServiceItems(
+    sectionHtml,
+    /<li class="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype_item__[^"]*"[\s\S]*?<a[^>]*href="([^"]+)"[\s\S]*?<strong class="HomeMoListVerticaltypeBgtype_title__[^"]*">([\s\S]*?)<\/strong>[\s\S]*?<div class="HomeMoListVerticaltypeBgtype_desc__[^"]*">([\s\S]*?)<\/div>[\s\S]*?<\/a>[\s\S]*?<\/li>/g
+  );
+}
 
 function renderSpaceRenewalSection(data = {}, activeSourceId = "custom-renderer", componentPatch = {}) {
   if (!data || !Array.isArray(data.productList) || !data.productList.length) return "";
@@ -6099,6 +8060,45 @@ function renderLatestProductNewsCustomSection(items = [], activeSourceId = "cust
     </section>`;
 }
 
+function renderServiceFeatureSection(slotId, title, subtitle, items = [], activeSourceId = "custom-renderer", componentPatch = {}) {
+  if (!items.length) return "";
+  const resolution = resolveComponentSourceResolution("home", slotId, activeSourceId);
+  const styles = componentPatch.styles && typeof componentPatch.styles === "object" ? componentPatch.styles : {};
+  const resolvedTitle = String(componentPatch.title || title || "");
+  const resolvedSubtitle = String(componentPatch.subtitle || subtitle || "");
+  const titleStyle = buildTextPatchStyleText({
+    ...styles,
+    titleColor: styles.titleColor || "#111111",
+  }, "title");
+  const subtitleStyle = buildTextPatchStyleText({
+    ...styles,
+    subtitleColor: styles.subtitleColor || "#727780",
+  }, "subtitle");
+  const inlineStyle = buildSectionPatchStyleText(styles, { hidden: componentPatch.visibility === false });
+  return `
+    <section data-codex-slot="${escapeHtml(slotId)}" data-codex-source="custom-renderer" data-codex-component-id="home.${escapeHtml(slotId)}" data-codex-active-source-id="${escapeHtml(activeSourceId)}" data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}" data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId || activeSourceId)}" data-codex-render-mode="${escapeHtml(resolution.renderMode)}" class="codex-home-service-feature codex-home-service-feature--${escapeHtml(slotId)}" ${inlineStyle ? `style="${escapeHtml(inlineStyle)}"` : ""}>
+      <div class="codex-home-service-feature__inner">
+        <div class="title-home_title-home__Jw_7z codex-home-service-feature__head">
+          <h2 class="title-home_title-home_tit__tE_5M" ${titleStyle ? `style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(resolvedTitle)}</h2>
+          ${resolvedSubtitle ? `<span class="title-home_title-home_sub_tit__ivkxK" ${subtitleStyle ? `style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(resolvedSubtitle)}</span>` : ""}
+        </div>
+        <div class="codex-home-service-feature__grid">
+          ${items
+            .map(
+              (item) => `
+                <a class="codex-home-service-feature__card" href="${escapeHtml(item.url || "#")}">
+                  <div class="codex-home-service-feature__card-body">
+                    <strong class="codex-home-service-feature__card-title">${escapeHtml(item.title || "")}</strong>
+                    ${item.description ? `<span class="codex-home-service-feature__card-description">${escapeHtml(item.description)}</span>` : ""}
+                  </div>
+                </a>`
+            )
+            .join("")}
+        </div>
+      </div>
+    </section>`;
+}
+
 function injectProductImagesIntoSection(sectionHtml, products) {
   if (!sectionHtml) return "";
   let imageIndex = 0;
@@ -6156,12 +8156,13 @@ function syncHomeStoryListSection(sectionHtml, items = []) {
   );
 }
 
-function markHomeLowerReplay(sectionHtml, slotId = "", sourceId = "") {
+function markHomeLowerReplay(sectionHtml, slotId = "", sourceId = "", viewportProfile = "pc") {
   if (!sectionHtml) return "";
   const slotAttr = slotId ? ` data-codex-slot="${slotId}"` : "";
   const sourceAttr = sourceId ? ` data-codex-source="${sourceId}"` : "";
   const componentAttr = slotId ? ` data-codex-component-id="home.${slotId}"` : "";
   const activeSourceAttr = sourceId ? ` data-codex-active-source-id="${sourceId}"` : "";
+  const sectionContractStyle = buildHomeSectionContractStyle(slotId, viewportProfile);
   const resolution = resolveComponentSourceResolution("home", slotId, sourceId);
   const resolutionAttr = resolution.sourceResolution ? ` data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}"` : "";
   const resolvedSourceAttr = resolution.resolvedRenderSourceId
@@ -6170,7 +8171,7 @@ function markHomeLowerReplay(sectionHtml, slotId = "", sourceId = "") {
   const renderModeAttr = resolution.renderMode ? ` data-codex-render-mode="${escapeHtml(resolution.renderMode)}"` : "";
   return sectionHtml.replace(
     /<section class="/,
-    `<section${slotAttr}${sourceAttr}${componentAttr}${activeSourceAttr}${resolutionAttr}${resolvedSourceAttr}${renderModeAttr} class="codex-home-lower-replay `
+    `<section${slotAttr}${sourceAttr}${componentAttr}${activeSourceAttr}${resolutionAttr}${resolvedSourceAttr}${renderModeAttr}${sectionContractStyle ? ` style="${escapeHtml(sectionContractStyle)}"` : ""} class="codex-home-lower-replay `
   );
 }
 
@@ -6182,6 +8183,63 @@ function replaceFirstMatch(input, pattern, replacementFactory) {
   const end = start + match[0].length;
   const replacement = typeof replacementFactory === "function" ? replacementFactory(match) : String(replacementFactory || "");
   return `${source.slice(0, start)}${replacement}${source.slice(end)}`;
+}
+
+function injectMarkupAfterSlot(html, anchorSlotId, markup) {
+  const source = String(html || "");
+  const block = String(markup || "");
+  if (!source || !block || !anchorSlotId) return source;
+  if (source.includes(block)) return source;
+  const anchorNeedle = `data-codex-slot="${anchorSlotId}"`;
+  const anchorIndex = source.indexOf(anchorNeedle);
+  if (anchorIndex !== -1) {
+    const sectionStart = source.lastIndexOf("<section", anchorIndex);
+    if (sectionStart !== -1) {
+      const tagPattern = /<\/?section\b[^>]*>/gi;
+      tagPattern.lastIndex = sectionStart;
+      let depth = 0;
+      let match;
+      while ((match = tagPattern.exec(source))) {
+        const tag = match[0];
+        if (/^<section\b/i.test(tag)) {
+          depth += 1;
+        } else {
+          depth -= 1;
+          if (depth === 0) {
+            const insertAt = match.index + tag.length;
+            return `${source.slice(0, insertAt)}\n${block}${source.slice(insertAt)}`;
+          }
+        }
+      }
+    }
+  }
+  return source.replace(/<\/footer>/i, `${block}\n</footer>`);
+}
+
+function buildHomeMobileBottomToolbar() {
+  return `
+    <div class="CommonMoGnbToolbar_mobile_toolbar__kV1aM CommonMoGnbToolbar_living__NmK8r" data-area="하단 메뉴 바 영역">
+      <ul class="CommonMoGnbToolbar_mobile_toolbar_list__hkLI8">
+        <li class="CommonMoGnbToolbar_list_item__RqWsR CommonMoGnbToolbar_home__n4j7E">
+          <a class="CommonMoGnbToolbar_active__lAga3" href="/clone/home?viewportProfile=mo"><span class="CommonMoGnbToolbar_tit__elnE0">홈</span></a>
+        </li>
+        <li class="CommonMoGnbToolbar_list_item__RqWsR CommonMoGnbToolbar_nav_anchor__wVJaV">
+          <a href="#none"><span class="CommonMoGnbToolbar_tit__elnE0">메뉴</span></a>
+        </li>
+        <li class="CommonMoGnbToolbar_list_item__RqWsR CommonMoGnbToolbar_my_collection__ubk7k">
+          <a href="https://www.lge.co.kr/my-page/manage-products"><span class="CommonMoGnbToolbar_tit__elnE0">보유제품</span></a>
+        </li>
+        <li class="CommonMoGnbToolbar_list_item__RqWsR CommonMoGnbToolbar_mypage__lKnbQ">
+          <a href="https://www.lge.co.kr/my-page?inflow=web"><span class="CommonMoGnbToolbar_tit__elnE0">마이</span></a>
+        </li>
+        <li class="CommonMoGnbToolbar_list_item__RqWsR CommonMoGnbToolbar_living__NmK8r CommonMoGnbToolbar_ico_update__Gg7Iq">
+          <a href="https://homestyle.lge.co.kr">
+            <img alt="" src="https://www.lge.co.kr/kr/images/nextjs/icons/banner/ico_homestyle_img02.png"/>
+            <span class="CommonMoGnbToolbar_tit__elnE0"><span class="blind">신규</span>홈스타일</span>
+          </a>
+        </li>
+      </ul>
+    </div>`;
 }
 
 function applyHomeHeroPatch(sectionHtml, activeSourceId = "", componentPatch = {}) {
@@ -6197,40 +8255,59 @@ function applyHomeHeroPatch(sectionHtml, activeSourceId = "", componentPatch = {
     const cleaned = match.replace(/\sstyle="[^"]*"/, "");
     return cleaned.replace(/>$/, `${inlineStyle ? ` style="${escapeHtml(inlineStyle)}"` : ""}>`);
   });
-  if (patch.badge) {
-    next = replaceFirstMatch(
-      next,
-      /<span class="(?:HomePcBannerHero_banner_hero_badge__|HomeTaBannerHero_banner_hero_badge__|HomeMoBannerHero_banner_hero_badge__)[^"]*"[^>]*>[\s\S]*?<\/span>/,
-      (match) => match[0].replace(/>[\s\S]*?</, `>${escapeHtml(patch.badge)}<`)
-    );
-  }
-  if (patch.headline) {
-    next = replaceFirstMatch(
-      next,
-      /<strong class="(?:HomePcBannerHero_banner_hero_headline__|HomeTaBannerHero_banner_hero_headline__|HomeMoBannerHero_banner_hero_headline__)[^"]*"[^>]*>[\s\S]*?<\/strong>/,
-      (match) => match[0].replace(/>[\s\S]*?</, `>${escapeHtml(patch.headline)}<`)
-    );
-  }
-  if (patch.description) {
-    next = replaceFirstMatch(
-      next,
-      /<p class="(?:HomePcBannerHero_banner_hero_description__|HomeTaBannerHero_banner_hero_description__|HomeMoBannerHero_banner_hero_description__)[^"]*"[^>]*>[\s\S]*?<\/p>/,
-      (match) => match[0].replace(/>[\s\S]*?</, `>${escapeHtml(patch.description)}<`)
-    );
-  }
-  if (patch.ctaHref) {
-    next = replaceFirstMatch(
-      next,
-      /<a class="(?:HomePcBannerHero_banner_hero_item__|HomeTaBannerHero_banner_hero_item__|HomeMoBannerHero_banner_hero_item__)[^"]*"[^>]*href="[^"]*"[^>]*>/,
-      (match) => match[0].replace(/href="[^"]*"/, `href="${escapeHtml(patch.ctaHref)}"`)
-    );
-  }
-  if (patch.ctaLabel) {
-    next = replaceFirstMatch(
-      next,
-      /<a class="(?:HomePcBannerHero_banner_hero_item__|HomeTaBannerHero_banner_hero_item__|HomeMoBannerHero_banner_hero_item__)[^"]*"[^>]*>[\s\S]*?<\/a>/,
-      (match) => match[0].replace(/>[\s\S]*?</, `>${escapeHtml(patch.ctaLabel)}<`)
-    );
+  const applyPatchToHeroSlide = (slideHtml) => {
+    let nextSlide = String(slideHtml || "");
+    if (patch.badge) {
+      const badgePattern = /<span class="(?:HomePcBannerHero_banner_hero_badge__|HomeTaBannerHero_banner_hero_badge__|HomeMoBannerHero_banner_hero_badge__)[^"]*"[^>]*>[\s\S]*?<\/span>/;
+      if (badgePattern.test(nextSlide)) {
+        nextSlide = nextSlide.replace(badgePattern, (match) => {
+          const opening = match.match(/^<span[^>]*>/)?.[0] || '<span>';
+          return `${opening}${escapeHtml(patch.badge)}</span>`;
+        });
+      } else {
+        nextSlide = nextSlide.replace(
+          /(<strong class="(?:HomePcBannerHero_banner_hero_headline__|HomeTaBannerHero_banner_hero_headline__|HomeMoBannerHero_banner_hero_headline__)[^"]*"[^>]*>)/,
+          `<span class="codex-home-hero-badge" style="display:inline-flex;align-items:center;margin-bottom:10px;font:700 14px/1.3 Arial,sans-serif;color:#111827;">${escapeHtml(patch.badge)}</span>$1`
+        );
+      }
+    }
+    if (patch.headline) {
+      nextSlide = replaceFirstMatch(
+        nextSlide,
+        /<strong class="(?:HomePcBannerHero_banner_hero_headline__|HomeTaBannerHero_banner_hero_headline__|HomeMoBannerHero_banner_hero_headline__)[^"]*"[^>]*>[\s\S]*?<\/strong>/,
+        (match) => match[0].replace(/>[\s\S]*?</, `>${escapeHtml(patch.headline)}<`)
+      );
+    }
+    if (patch.description) {
+      nextSlide = replaceFirstMatch(
+        nextSlide,
+        /<p class="(?:HomePcBannerHero_banner_hero_description__|HomeTaBannerHero_banner_hero_description__|HomeMoBannerHero_banner_hero_description__)[^"]*"[^>]*>[\s\S]*?<\/p>/,
+        (match) => match[0].replace(/>[\s\S]*?</, `>${escapeHtml(patch.description)}<`)
+      );
+    }
+    if (patch.ctaHref) {
+      nextSlide = replaceFirstMatch(
+        nextSlide,
+        /<a class="(?:HomePcBannerHero_banner_hero_item__|HomeTaBannerHero_banner_hero_item__|HomeMoBannerHero_banner_hero_item__)[^"]*"[^>]*href="[^"]*"[^>]*>/,
+        (match) => match[0].replace(/href="[^"]*"/, `href="${escapeHtml(patch.ctaHref)}"`)
+      );
+    }
+    if (patch.ctaLabel) {
+      nextSlide = replaceFirstMatch(
+        nextSlide,
+        /<a class="(?:HomePcBannerHero_banner_hero_item__|HomeTaBannerHero_banner_hero_item__|HomeMoBannerHero_banner_hero_item__)[^"]*"[^>]*>[\s\S]*?<\/a>/,
+        (match) => match[0].replace(/>[\s\S]*?</, `>${escapeHtml(patch.ctaLabel)}<`)
+      );
+    }
+    return nextSlide;
+  };
+  if (patch.badge || patch.headline || patch.description || patch.ctaHref || patch.ctaLabel) {
+    const activeSlidePattern = /<div class="swiper-slide[^"]*swiper-slide-active[^"]*"[\s\S]*?<\/a><\/div>/;
+    if (activeSlidePattern.test(next)) {
+      next = next.replace(activeSlidePattern, (match) => applyPatchToHeroSlide(match));
+    } else {
+      next = next.replace(/<div class="swiper-slide[^"]*"[\s\S]*?<\/a><\/div>/, (match) => applyPatchToHeroSlide(match));
+    }
   }
   const titleStyleText = buildTextPatchStyleText(styles, "title");
   const subtitleStyleText = buildTextPatchStyleText(styles, "subtitle") || titleStyleText;
@@ -6278,6 +8355,14 @@ function applyHomeLowerSectionPatch(sectionHtml, slotId = "", activeSourceId = "
       return cleaned.replace(/>$/, `${inlineStyle ? ` style="${escapeHtml(inlineStyle)}"` : ""}>`);
     }
   );
+  if (patch.badge) {
+    const badgeHtml = `<span class="codex-home-section-badge" style="display:inline-flex;align-items:center;margin-bottom:8px;font:700 13px/1.3 Arial,sans-serif;color:#111827;letter-spacing:-0.01em;">${escapeHtml(patch.badge)}</span>`;
+    if (next.includes("codex-home-section-badge")) {
+      next = next.replace(/<span class="codex-home-section-badge"[\s\S]*?<\/span>/, badgeHtml);
+    } else if (/<div class="[^"]*title-home_title-home__[^"]*"[^>]*>/.test(next)) {
+      next = next.replace(/(<div class="[^"]*title-home_title-home__[^"]*"[^>]*>)/, `$1${badgeHtml}`);
+    }
+  }
   if (patch.title) {
     next = replaceFirstMatch(
       next,
@@ -6607,21 +8692,22 @@ function applyHomeHeaderBottomPatch(sectionHtml, activeSourceId = "", componentP
   return next;
 }
 
-function applyHomeQuickmenuPatch(sectionHtml, activeSourceId = "", componentPatch = {}) {
+function applyHomeQuickmenuPatch(sectionHtml, activeSourceId = "", componentPatch = {}, viewportProfile = "pc") {
   if (!sectionHtml) return "";
   const patch = componentPatch && typeof componentPatch === "object" ? componentPatch : {};
   const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
   let next = String(sectionHtml);
+  const contractStyle = buildHomeSectionContractStyle("quickmenu", viewportProfile);
   next = next.replace(/<section([^>]*)>/, (match) => {
     const cleaned = match.replace(/\sstyle="[^"]*"/, "");
-    const inlineStyle = buildSectionPatchStyleText(styles, { hidden: patch.visibility === false });
+    const inlineStyle = [contractStyle, buildSectionPatchStyleText(styles, { hidden: patch.visibility === false })].filter(Boolean).join(";");
     return cleaned.replace(/>$/, `${inlineStyle ? ` style="${escapeHtml(inlineStyle)}"` : ""} data-codex-patched="true">`);
   });
   if (patch.title || patch.subtitle) {
     const titleStyle = buildTextPatchStyleText(styles, "title");
     const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
     const headHtml = `
-      <div class="codex-home-quickmenu-head" style="max-width:1460px;margin:0 auto;padding:8px 24px 16px;">
+      <div class="codex-home-quickmenu-head" style="max-width:var(--codex-content-width, 1460px);margin:0 auto;padding:8px 24px 16px;">
         ${patch.title ? `<strong style="display:block;font:700 24px/1.28 Arial,sans-serif;color:#111827;letter-spacing:-0.03em;${titleStyle ? escapeHtml(`;${titleStyle}`) : ""}">${escapeHtml(patch.title)}</strong>` : ""}
         ${patch.subtitle ? `<span style="display:block;margin-top:6px;font:500 14px/1.5 Arial,sans-serif;color:#6b7280;letter-spacing:-0.01em;${subtitleStyle ? escapeHtml(`;${subtitleStyle}`) : ""}">${escapeHtml(patch.subtitle)}</span>` : ""}
       </div>`;
@@ -6816,8 +8902,8 @@ function applyWorkspacePageVariants(html, pageId, viewportProfile, editableData)
     });
   };
 
-  if (["support", "bestshop", "care-solutions"].includes(normalizedPageId)) {
-    const entry = findServiceGroupEntry(normalizedPageId, viewportProfile, "working");
+  if (isServiceLikePageId(normalizedPageId)) {
+    const entry = resolveServiceGroupEntry(normalizedPageId, viewportProfile, "working");
     const groups = normalizeGroupMap(entry?.groups);
     for (const [slotId, group] of Object.entries(groups || {})) {
       if (!group?.found || !group?.selector) continue;
@@ -6909,7 +8995,15 @@ function mergeImageQueues(...queues) {
 }
 
 function extractMobileHeroSection(rawHtml) {
-  const match = rawHtml.match(/<section class="HomeTaBannerHero_banner_hero__[^"]*"[\s\S]*?<\/section>/);
+  const match = rawHtml.match(/<section class="HomeMoBannerHero_banner_hero__[^"]*"[\s\S]*?<\/section>/);
+  return match ? match[0] : "";
+}
+
+function extractHomeHeroSection(rawHtml) {
+  const match =
+    rawHtml.match(/<section class="HomePcBannerHero_banner_hero__[^"]*"[\s\S]*?<\/section>/) ||
+    rawHtml.match(/<section class="HomeTaBannerHero_banner_hero__[^"]*"[\s\S]*?<\/section>/) ||
+    rawHtml.match(/<section class="HomeMoBannerHero_banner_hero__[^"]*"[\s\S]*?<\/section>/);
   return match ? match[0] : "";
 }
 
@@ -6950,19 +9044,25 @@ function extractHomeHeroSlides(rawHtml) {
 function buildHomeHeroRuntimeCss() {
   return `
       .HomePcBannerHero_banner_hero__NwE3D .swiper,
-      .HomeTaBannerHero_banner_hero__GobEJ .swiper {
+      .HomeTaBannerHero_banner_hero__GobEJ .swiper,
+      .HomeMoBannerHero_banner_hero__l9fR7 .swiper,
+      [class*="HomeMoBannerHero_banner_hero__"] .swiper {
         position: relative !important;
         overflow: hidden !important;
       }
       .HomePcBannerHero_banner_hero__NwE3D .swiper-wrapper,
-      .HomeTaBannerHero_banner_hero__GobEJ .swiper-wrapper {
+      .HomeTaBannerHero_banner_hero__GobEJ .swiper-wrapper,
+      .HomeMoBannerHero_banner_hero__l9fR7 .swiper-wrapper,
+      [class*="HomeMoBannerHero_banner_hero__"] .swiper-wrapper {
         transform: none !important;
         position: relative !important;
         display: block !important;
         height: 100% !important;
       }
       .HomePcBannerHero_banner_hero__NwE3D .swiper-slide,
-      .HomeTaBannerHero_banner_hero__GobEJ .swiper-slide {
+      .HomeTaBannerHero_banner_hero__GobEJ .swiper-slide,
+      .HomeMoBannerHero_banner_hero__l9fR7 .swiper-slide,
+      [class*="HomeMoBannerHero_banner_hero__"] .swiper-slide {
         display: block !important;
         position: absolute !important;
         inset: 0 !important;
@@ -6972,7 +9072,9 @@ function buildHomeHeroRuntimeCss() {
         pointer-events: none !important;
       }
       .HomePcBannerHero_banner_hero__NwE3D .swiper-slide.codex-hero-active,
-      .HomeTaBannerHero_banner_hero__GobEJ .swiper-slide.codex-hero-active {
+      .HomeTaBannerHero_banner_hero__GobEJ .swiper-slide.codex-hero-active,
+      .HomeMoBannerHero_banner_hero__l9fR7 .swiper-slide.codex-hero-active,
+      [class*="HomeMoBannerHero_banner_hero__"] .swiper-slide.codex-hero-active {
         position: relative !important;
         z-index: 1 !important;
         opacity: 1 !important;
@@ -6980,7 +9082,9 @@ function buildHomeHeroRuntimeCss() {
         pointer-events: auto !important;
       }
       .HomePcBannerHero_banner_hero__NwE3D .codex-hero-controls,
-      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-controls {
+      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-controls,
+      .HomeMoBannerHero_banner_hero__l9fR7 .codex-hero-controls,
+      [class*="HomeMoBannerHero_banner_hero__"] .codex-hero-controls {
         position: absolute;
         right: 42px;
         bottom: 24px;
@@ -6994,7 +9098,9 @@ function buildHomeHeroRuntimeCss() {
         backdrop-filter: blur(10px);
       }
       .HomePcBannerHero_banner_hero__NwE3D .codex-hero-nav,
-      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-nav {
+      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-nav,
+      .HomeMoBannerHero_banner_hero__l9fR7 .codex-hero-nav,
+      [class*="HomeMoBannerHero_banner_hero__"] .codex-hero-nav {
         width: 24px;
         height: 24px;
         border: 0;
@@ -7006,11 +9112,15 @@ function buildHomeHeroRuntimeCss() {
         cursor: pointer;
       }
       .HomePcBannerHero_banner_hero__NwE3D .codex-hero-nav:hover,
-      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-nav:hover {
+      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-nav:hover,
+      .HomeMoBannerHero_banner_hero__l9fR7 .codex-hero-nav:hover,
+      [class*="HomeMoBannerHero_banner_hero__"] .codex-hero-nav:hover {
         background: rgba(255,255,255,0.08);
       }
       .HomePcBannerHero_banner_hero__NwE3D .codex-hero-indicator,
-      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-indicator {
+      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-indicator,
+      .HomeMoBannerHero_banner_hero__l9fR7 .codex-hero-indicator,
+      [class*="HomeMoBannerHero_banner_hero__"] .codex-hero-indicator {
         display: inline-flex;
         align-items: baseline;
         gap: 6px;
@@ -7020,7 +9130,9 @@ function buildHomeHeroRuntimeCss() {
         font-family: Arial, sans-serif;
       }
       .HomePcBannerHero_banner_hero__NwE3D .codex-hero-current,
-      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-current {
+      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-current,
+      .HomeMoBannerHero_banner_hero__l9fR7 .codex-hero-current,
+      [class*="HomeMoBannerHero_banner_hero__"] .codex-hero-current {
         font-size: 15px;
         font-weight: 700;
         line-height: 1;
@@ -7028,7 +9140,11 @@ function buildHomeHeroRuntimeCss() {
       .HomePcBannerHero_banner_hero__NwE3D .codex-hero-divider,
       .HomePcBannerHero_banner_hero__NwE3D .codex-hero-total,
       .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-divider,
-      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-total {
+      .HomeTaBannerHero_banner_hero__GobEJ .codex-hero-total,
+      .HomeMoBannerHero_banner_hero__l9fR7 .codex-hero-divider,
+      .HomeMoBannerHero_banner_hero__l9fR7 .codex-hero-total,
+      [class*="HomeMoBannerHero_banner_hero__"] .codex-hero-divider,
+      [class*="HomeMoBannerHero_banner_hero__"] .codex-hero-total {
         font-size: 12px;
         font-weight: 600;
         line-height: 1;
@@ -7040,14 +9156,20 @@ function buildHomeHeroRuntimeCss() {
 function buildHomeHeroRuntimeScript() {
   return `
         function initCodexHomeHeroRuntime(root = document) {
-          const hero = root.querySelector('.HomePcBannerHero_banner_hero__NwE3D, .HomeTaBannerHero_banner_hero__GobEJ');
+          const hero = root.querySelector('.HomePcBannerHero_banner_hero__NwE3D, .HomeTaBannerHero_banner_hero__GobEJ, .HomeMoBannerHero_banner_hero__l9fR7, [class*="HomeMoBannerHero_banner_hero__"]');
           if (!hero || hero.dataset.codexHeroInit === 'true') return;
           hero.setAttribute('data-codex-interaction-id', 'home.hero.carousel');
           const swiper = hero.querySelector('.swiper');
           const slides = Array.from(hero.querySelectorAll('.swiper-slide'));
           if (!swiper || !slides.length) return;
           hero.dataset.codexHeroInit = 'true';
-          let activeIndex = Math.min(1, slides.length - 1);
+          let activeIndex = slides.findIndex((slide) => {
+            const headline = (slide.querySelector('strong')?.textContent || '').replace(/\s+/g, '');
+            const description = (slide.querySelector('p')?.textContent || '').replace(/\s+/g, '');
+            const hasImage = Array.from(slide.querySelectorAll('img')).some((img) => String(img.getAttribute('src') || '').trim());
+            return hasImage || headline || description;
+          });
+          if (activeIndex < 0) activeIndex = 0;
           const controls = document.createElement('div');
           controls.className = 'codex-hero-controls';
           controls.innerHTML =
@@ -7500,13 +9622,16 @@ function buildInternalCloneLinkMap() {
   const map = {};
   for (const row of archive) {
     try {
-      map[row.url] = `/clone/${slugFromUrl(row.url)}`;
+      const pageId = resolveWorkspacePageIdFromUrl(row.url) || slugFromUrl(row.url);
+      map[row.url] = `/clone/${pageId}`;
     } catch {
       // ignore malformed urls
     }
   }
   map["https://www.lge.co.kr"] = "/clone/home";
   map["https://www.lge.co.kr/"] = "/clone/home";
+  map["https://homestyle.lge.co.kr"] = "/clone/homestyle-home";
+  map["https://homestyle.lge.co.kr/"] = "/clone/homestyle-home";
   return map;
 }
 
@@ -7587,12 +9712,15 @@ function toCloneOrLiveHref(rawHref, internalLinkMap, pdpCaptureMap = {}, pageId 
   if (pathname.startsWith("/support")) return "/clone/support";
   if (pathname.startsWith("/best-ranking")) return "/clone/home";
   if (hostname === "bestshop.lge.co.kr" || pathname.startsWith("/bestshop")) return "/clone/bestshop";
+  if (pathname.startsWith("/care-solutions/water-purifiers/wd523vc")) return "/clone/care-solutions-pdp";
   if (pathname.startsWith("/care-solutions") || pathname.startsWith("/category/care-solutions")) return "/clone/care-solutions";
   if (pathname.startsWith("/lg-best-care")) return "/clone/support";
   if (pathname.startsWith("/lg-signature")) return "/clone/lg-signature-info";
   if (pathname.startsWith("/objet-collection")) return "/clone/objet-collection-story";
   if (pathname.startsWith("/category/tvs")) return "/clone/category-tvs";
   if (pathname.startsWith("/category/refrigerators")) return "/clone/category-refrigerators";
+  if (hostname === "homestyle.lge.co.kr" && (pathname === "/" || pathname === "/home")) return "/clone/homestyle-home";
+  if (hostname === "homestyle.lge.co.kr" && pathname === "/item") return "/clone/homestyle-pdp";
   if (pathname.startsWith("/story") || pathname.startsWith("/benefits") || pathname.startsWith("/livecommerce")) return absolute;
   if (/^\/(tvs|refrigerators|kimchi-refrigerators|wash-tower|dishwashers|microwaves-and-ovens|air-purifier|air-conditioners|notebook|system-ironing)\//.test(pathname)) {
     const inferredPageId =
@@ -7820,7 +9948,7 @@ function buildPageEnhancementMaps(data) {
   const pageIds = new Set((data.pages || []).map((p) => p.id));
   const byPageId = {};
   for (const row of archive) {
-    const pageId = slugFromUrl(row.url);
+    const pageId = resolveWorkspacePageIdFromUrl(row.url) || slugFromUrl(row.url);
     byPageId[pageId] = row;
   }
   const linkMap = {};
@@ -7836,7 +9964,7 @@ function buildPageEnhancementMaps(data) {
     const seen = new Set();
     for (const href of row.links || []) {
       try {
-        const linkId = slugFromUrl(href);
+        const linkId = resolveWorkspacePageIdFromUrl(href) || slugFromUrl(href);
         if (!pageIds.has(linkId)) continue;
         if (linkId === pageId || seen.has(linkId)) continue;
         seen.add(linkId);
@@ -7858,6 +9986,9 @@ function buildRuntimePageSummary(data) {
     "support",
     "bestshop",
     "care-solutions",
+    "care-solutions-pdp",
+    "homestyle-home",
+    "homestyle-pdp",
     "category-tvs",
     "category-refrigerators",
   ];
@@ -8058,7 +10189,7 @@ function buildClonePagePayload(pageId, data) {
   const seenMapped = new Set();
   for (const href of archive?.links || []) {
     try {
-      const linkedId = slugFromUrl(href);
+      const linkedId = resolveWorkspacePageIdFromUrl(href) || slugFromUrl(href);
       if (!seenMapped.has(linkedId) && (data.pages || []).some((item) => item.id === linkedId)) {
         seenMapped.add(linkedId);
         const linkedPage = (data.pages || []).find((item) => item.id === linkedId);
@@ -8197,13 +10328,17 @@ function extractQuickMenuSlides(rawHtml) {
 }
 
 function parseHomeEnhancements(rawHtml, mobileHtml = "", options = {}) {
+  const viewportProfile = normalizeHomeViewportProfile(options.viewportProfile || "ta", "ta");
   const normalizedRawHtml = String(rawHtml || "")
     .replace(/\\"/g, '"')
     .replace(/\\u0026/g, "&");
   const normalizedMobileHtml = String(mobileHtml || "")
     .replace(/\\"/g, '"')
     .replace(/\\u0026/g, "&");
-  const quickMenuSection = mobileHtml ? extractMobileQuickMenuSection(mobileHtml) : "";
+  const quickMenuSection =
+    viewportProfile === "mo"
+      ? (mobileHtml ? extractMobileQuickMenuSection(mobileHtml) : "")
+      : extractHomeQuickMenuSection(normalizedRawHtml);
   const promotionSection = mobileHtml ? extractMobilePromotionSection(mobileHtml) : "";
   const lowerPromotionSection = mobileHtml ? extractMobileLowerPromotionSection(normalizedMobileHtml) : "";
   const timedealSection = mobileHtml ? extractMobileTimedealSection(mobileHtml) : "";
@@ -8244,7 +10379,10 @@ function parseHomeEnhancements(rawHtml, mobileHtml = "", options = {}) {
     (!options.homeSandbox || options.homeSandbox === "bestshop-guide") && mobileHtml
       ? extractMobileBestshopGuideSection(normalizedMobileHtml)
       : "";
-  const quickMenus = mobileHtml ? extractMobileQuickMenuItems(mobileHtml) : extractQuickMenuSlides(rawHtml);
+  const quickMenus =
+    viewportProfile === "mo"
+      ? (mobileHtml ? extractMobileQuickMenuItems(mobileHtml) : [])
+      : extractQuickMenuSlides(rawHtml);
   const timedealImages =
     extractImageQueueAroundMarker(normalizedMobileHtml, '"mainTitle":"LGE.COM 타임딜"').length
       ? extractImageQueueAroundMarker(normalizedMobileHtml, '"mainTitle":"LGE.COM 타임딜"')
@@ -8461,28 +10599,30 @@ function renderBestRankingSandboxSection(activeSourceId = "custom-renderer", com
 }
 
 function renderHomeMarketingAreaSection() {
+  const resolution = resolveComponentSourceResolution("home", "marketing-area", "custom-renderer");
   return `
-    <section data-codex-slot="marketing-area" data-codex-source="custom-renderer" class="codex-home-marketing-area HomeMoListMarketingArea_list_marketing_area__lRqzR">
-      <div class="HomeMoListMarketingArea_list_marketing_area_headline__xkOco">
-        <div class="title-home_title-home__tf4br">
+    <section data-codex-slot="marketing-area" data-codex-source="custom-renderer" data-codex-component-id="home.marketing-area" data-codex-active-source-id="custom-renderer" data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}" data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId || "custom-renderer")}" data-codex-render-mode="${escapeHtml(resolution.renderMode)}" class="codex-home-marketing-area">
+      <div class="codex-home-marketing-area__inner">
+        <div class="codex-home-marketing-area__headline">
+          <div class="title-home_title-home__tf4br">
           <h2 class="title-home_title-home_tit__C6CDK">홈스타일 탐색하기</h2>
           <span class="title-home_title-home_sub_tit__PHTeI" style="color:#000000">가전과 공간을 연결하는 새로운 기준</span>
         </div>
       </div>
-      <div class="HomeMoListMarketingArea_list_marketing_area_list__ea_vS">
-        <ul class="HomeMoListMarketingArea_list_marketing_area_list_inner__q_GXF">
+      <div class="codex-home-marketing-area__list">
+        <ul class="codex-home-marketing-area__list-inner">
           ${HOME_MARKETING_AREA_ITEMS.map(
             (item) => `
-              <li class="HomeMoListMarketingArea_list_marketing_area_item__33UOi">
+              <li class="codex-home-marketing-area__item">
                 <a href="${item.href}">
-                  <div class="HomeMoListMarketingArea_list_marketing_area_box__jtl6C">
+                  <div class="codex-home-marketing-area__box">
                     <div class="badge_badge_wrap__pETj_">
                       <span class="badge_badge__A_1cT badge_square__nNiyc badge_black__I9EnC badge_size20__Pxksv badge_text_black__GzeBH" color="black"><span>${item.badge}</span></span>
                     </div>
-                    <strong class="HomeMoListMarketingArea_list_marketing_area_title__8ME8z">${item.title}</strong>
-                    <p class="HomeMoListMarketingArea_list_marketing_area_description__dMjda">${item.description}</p>
+                    <strong class="codex-home-marketing-area__title">${item.title}</strong>
+                    <p class="codex-home-marketing-area__description">${item.description}</p>
                   </div>
-                  <div class="HomeMoListMarketingArea_list_marketing_area_image__YY2gD">
+                  <div class="codex-home-marketing-area__image">
                     <img src="${item.image}" alt="${item.alt}" loading="lazy"/>
                   </div>
                 </a>
@@ -8490,49 +10630,79 @@ function renderHomeMarketingAreaSection() {
           ).join("")}
         </ul>
       </div>
+      </div>
     </section>`;
 }
 
-function getHomeLowerSlotRegistry(editableData = null) {
+function getHomeLowerSlotRegistry(editableData = null, viewportProfile = "") {
   const resolveSlotSourceId = (slotId, fallback) => getActiveSourceId(editableData || readEditableData(), "home", slotId, fallback);
   const resolveComponentPatch = (slotId, sourceId) =>
-    (findComponentPatch(editableData || {}, "home", `home.${slotId}`, sourceId)?.patch) || {};
+    (findComponentPatch(editableData || {}, "home", `home.${slotId}`, sourceId, viewportProfile)?.patch) || {};
+  const resolveHomeFallbackSourceId = (slotId, baseFallback) => {
+    const profile = getHomeDesktopRenderProfile(slotId);
+    if (profile?.desktopPriority === "pc-first") return "custom-live-current";
+    return baseFallback;
+  };
   return [
     {
       id: "md-choice",
-      activeSourceId: resolveSlotSourceId("md-choice", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("md-choice", resolveHomeFallbackSourceId("md-choice", "mobile-derived")),
       enabled: (data) => Boolean(data.mdChoiceSection),
-      render: (data, _options, slot) =>
-        applyHomeLowerSectionPatch(
-          markHomeLowerReplay(
-            injectProductImagesIntoSection(data.mdChoiceSection, data.mdChoiceProducts),
+      render: (data, _options, slot) => {
+        const componentPatch = resolveComponentPatch(slot.id, slot.activeSourceId);
+        return (
+          renderCurrentLiveHomeProductSection(
             "md-choice",
-            slot.activeSourceId
-          ),
-          "md-choice",
-          slot.activeSourceId,
-          resolveComponentPatch(slot.id, slot.activeSourceId)
-        ),
+            slot.activeSourceId,
+            componentPatch,
+            data.mdChoiceProducts,
+            "HomeMoListHorizontype_list_horizontype__"
+          ) ||
+          applyHomeLowerSectionPatch(
+            markHomeLowerReplay(
+              injectProductImagesIntoSection(data.mdChoiceSection, data.mdChoiceProducts),
+              "md-choice",
+              slot.activeSourceId,
+              viewportProfile
+            ),
+            "md-choice",
+            slot.activeSourceId,
+            componentPatch
+          )
+        );
+      },
     },
     {
       id: "timedeal",
-      activeSourceId: resolveSlotSourceId("timedeal", "mobile-derived"),
+      activeSourceId: resolveSlotSourceId("timedeal", resolveHomeFallbackSourceId("timedeal", "mobile-derived")),
       enabled: (data) => Boolean(data.timedealSection),
-      render: (data, _options, slot) =>
-        applyHomeLowerSectionPatch(
-          markHomeLowerReplay(
-            injectProductImagesIntoSection(data.timedealSection, data.timedealProducts),
+      render: (data, _options, slot) => {
+        const componentPatch = resolveComponentPatch(slot.id, slot.activeSourceId);
+        return (
+          renderCurrentLiveHomeProductSection(
             "timedeal",
-            slot.activeSourceId
-          ),
-          "timedeal",
-          slot.activeSourceId,
-          resolveComponentPatch(slot.id, slot.activeSourceId)
-        ),
+            slot.activeSourceId,
+            componentPatch,
+            data.timedealProducts,
+            "HomeMoTimedeal_timedeal__"
+          ) ||
+          applyHomeLowerSectionPatch(
+            markHomeLowerReplay(
+              injectProductImagesIntoSection(data.timedealSection, data.timedealProducts),
+              "timedeal",
+              slot.activeSourceId,
+              viewportProfile
+            ),
+            "timedeal",
+            slot.activeSourceId,
+            componentPatch
+          )
+        );
+      },
     },
     {
       id: "best-ranking",
-      activeSourceId: resolveSlotSourceId("best-ranking", "custom-live-current"),
+      activeSourceId: resolveSlotSourceId("best-ranking", resolveHomeFallbackSourceId("best-ranking", "custom-live-current")),
       enabled: () => true,
       render: (_data, _options, slot) => {
         const effectiveSourceId = slot.activeSourceId === "custom-renderer" ? "custom-live-current" : slot.activeSourceId;
@@ -8555,7 +10725,7 @@ function getHomeLowerSlotRegistry(editableData = null) {
     },
     {
       id: "subscription",
-      activeSourceId: resolveSlotSourceId("subscription", "custom-live-current"),
+      activeSourceId: resolveSlotSourceId("subscription", resolveHomeFallbackSourceId("subscription", "custom-live-current")),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "subscription") && Boolean(data.subscriptionSection),
       render: (data, _options, slot) => {
@@ -8563,17 +10733,19 @@ function getHomeLowerSlotRegistry(editableData = null) {
         const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
         if (effectiveSourceId === "custom-live-current") {
           return (
-            renderCurrentLiveHomeSection(
+            renderCurrentLiveHomeProductSection(
               "subscription",
               effectiveSourceId,
               componentPatch,
+              data.subscriptionProducts,
               "HomeMoListTabsBannertype_list_tabs_bannertype__"
             ) ||
             applyHomeLowerSectionPatch(
               markHomeLowerReplay(
                 injectProductImagesIntoSection(data.subscriptionSection, data.subscriptionProducts),
                 "subscription",
-                effectiveSourceId
+                effectiveSourceId,
+                viewportProfile
               ),
               "subscription",
               effectiveSourceId,
@@ -8585,7 +10757,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
           markHomeLowerReplay(
             injectProductImagesIntoSection(data.subscriptionSection, data.subscriptionProducts),
             "subscription",
-            effectiveSourceId
+            effectiveSourceId,
+            viewportProfile
           ),
           "subscription",
           effectiveSourceId,
@@ -8595,21 +10768,44 @@ function getHomeLowerSlotRegistry(editableData = null) {
     },
     {
       id: "space-renewal",
-      activeSourceId: resolveSlotSourceId("space-renewal", "hybrid-home-space-renewal-v1"),
+      activeSourceId: resolveSlotSourceId("space-renewal", resolveHomeFallbackSourceId("space-renewal", "custom-live-current")),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "space-renewal") &&
         Boolean(data.spaceRenewalSection) &&
         Boolean(data.spaceRenewalData),
       render: (data, _options, slot) => {
         const effectiveSourceId =
-          slot.activeSourceId === "mobile-derived" ? "hybrid-home-space-renewal-v1" : slot.activeSourceId;
+          slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
         const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
-        return effectiveSourceId === "mobile-derived"
+        return effectiveSourceId === "custom-live-current"
+          ? (
+              renderCurrentLiveHomeProductSection(
+                "space-renewal",
+                effectiveSourceId,
+                componentPatch,
+                buildSpaceRenewalProducts(data.spaceRenewalData),
+                "HomePcListBannertype_list_bannertype__",
+                "메인 추천 상품 영역"
+              ) ||
+              applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectProductImagesIntoSection(data.spaceRenewalSection, buildSpaceRenewalProducts(data.spaceRenewalData)),
+                  "space-renewal",
+                  effectiveSourceId,
+                  viewportProfile
+                ),
+                "space-renewal",
+                effectiveSourceId,
+                componentPatch
+              )
+            )
+          : effectiveSourceId === "mobile-derived"
           ? applyHomeLowerSectionPatch(
               markHomeLowerReplay(
                 injectProductImagesIntoSection(data.spaceRenewalSection, buildSpaceRenewalProducts(data.spaceRenewalData)),
                 "space-renewal",
-                effectiveSourceId
+                effectiveSourceId,
+                viewportProfile
               ),
               "space-renewal",
               effectiveSourceId,
@@ -8637,7 +10833,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
                 markHomeLowerReplay(
                   injectTemplateImagesIntoSection(data.brandShowroomSection, data.brandShowroomProducts),
                   "brand-showroom",
-                  effectiveSourceId
+                  effectiveSourceId,
+                  viewportProfile
                 ),
                 "brand-showroom",
                 effectiveSourceId,
@@ -8650,7 +10847,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
               markHomeLowerReplay(
                 injectTemplateImagesIntoSection(data.brandShowroomSection, data.brandShowroomProducts),
                 "brand-showroom",
-                effectiveSourceId
+                effectiveSourceId,
+                viewportProfile
               ),
               "brand-showroom",
               effectiveSourceId,
@@ -8678,7 +10876,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
                 markHomeLowerReplay(
                   injectTemplateImagesIntoSection(data.latestProductNewsSection, data.latestProductNewsProducts),
                   "latest-product-news",
-                  effectiveSourceId
+                  effectiveSourceId,
+                  viewportProfile
                 ),
                 "latest-product-news",
                 effectiveSourceId,
@@ -8691,7 +10890,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
               markHomeLowerReplay(
                 injectTemplateImagesIntoSection(data.latestProductNewsSection, data.latestProductNewsProducts),
                 "latest-product-news",
-                effectiveSourceId
+                effectiveSourceId,
+                viewportProfile
               ),
               "latest-product-news",
               effectiveSourceId,
@@ -8721,7 +10921,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
                   data.smartLifeProducts
                 ),
                 "smart-life",
-                effectiveSourceId
+                effectiveSourceId,
+                viewportProfile
               ),
               "smart-life",
               effectiveSourceId,
@@ -8736,7 +10937,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
               data.smartLifeProducts
             ),
             "smart-life",
-            effectiveSourceId
+            effectiveSourceId,
+            viewportProfile
           ),
           "smart-life",
           effectiveSourceId,
@@ -8746,11 +10948,16 @@ function getHomeLowerSlotRegistry(editableData = null) {
     },
     {
       id: "summary-banner-2",
-      activeSourceId: resolveSlotSourceId("summary-banner-2", "custom-live-current"),
+      activeSourceId: resolveSlotSourceId("summary-banner-2", resolveHomeFallbackSourceId("summary-banner-2", "custom-live-current")),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "summary-banner-2") && Boolean(data.lowerPromotionSection),
-      render: (data, _options, slot) => {
-        const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
+      render: (data, options, slot) => {
+        const isMobileViewport = normalizeHomeViewportProfile(options?.viewportProfile || "ta", "ta") === "mo";
+        const effectiveSourceId = isMobileViewport
+          ? "mobile-derived"
+          : slot.activeSourceId === "mobile-derived"
+            ? "custom-live-current"
+            : slot.activeSourceId;
         const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
         if (effectiveSourceId === "custom-live-current") {
           return (
@@ -8758,14 +10965,15 @@ function getHomeLowerSlotRegistry(editableData = null) {
               "summary-banner-2",
               effectiveSourceId,
               componentPatch,
-              "HomeMoBannerPromotion_banner_promotion__",
-              "메인 상단 배너 영역"
+              "HomePcBannerPromotion_banner_promotion__",
+              "메인 하단 배너 영역"
             ) ||
             applyHomeLowerSectionPatch(
               markHomeLowerReplay(
                 injectTemplateImagesIntoSection(data.lowerPromotionSection, data.lowerPromotionProducts),
                 "summary-banner-2",
-                effectiveSourceId
+                effectiveSourceId,
+                viewportProfile
               ),
               "summary-banner-2",
               effectiveSourceId,
@@ -8777,7 +10985,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
           markHomeLowerReplay(
             injectTemplateImagesIntoSection(data.lowerPromotionSection, data.lowerPromotionProducts),
             "summary-banner-2",
-            effectiveSourceId
+            effectiveSourceId,
+            viewportProfile
           ),
           "summary-banner-2",
           effectiveSourceId,
@@ -8787,7 +10996,7 @@ function getHomeLowerSlotRegistry(editableData = null) {
     },
     {
       id: "missed-benefits",
-      activeSourceId: resolveSlotSourceId("missed-benefits", "custom-live-current"),
+      activeSourceId: resolveSlotSourceId("missed-benefits", resolveHomeFallbackSourceId("missed-benefits", "custom-live-current")),
       enabled: (data, options) =>
         (!options.homeSandbox || options.homeSandbox === "missed-benefits") && Boolean(data.missedBenefitsSection),
       render: (data, _options, slot) => {
@@ -8805,7 +11014,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
               markHomeLowerReplay(
                 injectTemplateImagesIntoSection(data.missedBenefitsSection, data.missedBenefitsProducts),
                 "missed-benefits",
-                effectiveSourceId
+                effectiveSourceId,
+                viewportProfile
               ),
               "missed-benefits",
               effectiveSourceId,
@@ -8817,7 +11027,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
           markHomeLowerReplay(
             injectTemplateImagesIntoSection(data.missedBenefitsSection, data.missedBenefitsProducts),
             "missed-benefits",
-            effectiveSourceId
+            effectiveSourceId,
+            viewportProfile
           ),
           "missed-benefits",
           effectiveSourceId,
@@ -8834,18 +11045,22 @@ function getHomeLowerSlotRegistry(editableData = null) {
         const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
         const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
         if (effectiveSourceId === "custom-live-current") {
+          const serviceItems = extractLgBestCareItems(data.lgBestCareSection);
           return (
-            renderCurrentLiveHomeSection(
+            renderServiceFeatureSection(
               "lg-best-care",
+              "LG 베스트 케어",
+              "고객의 삶에 안심을 더하는 가전 케어 서비스",
+              serviceItems.length ? serviceItems : data.lgBestCareProducts,
               effectiveSourceId,
-              componentPatch,
-              "HomeMoListVerticaltypeFill_list_verticaltype_fill__"
+              componentPatch
             ) ||
             applyHomeLowerSectionPatch(
               markHomeLowerReplay(
                 injectTemplateImagesIntoSection(data.lgBestCareSection, data.lgBestCareProducts),
                 "lg-best-care",
-                effectiveSourceId
+                effectiveSourceId,
+                viewportProfile
               ),
               "lg-best-care",
               effectiveSourceId,
@@ -8857,7 +11072,8 @@ function getHomeLowerSlotRegistry(editableData = null) {
           markHomeLowerReplay(
             injectTemplateImagesIntoSection(data.lgBestCareSection, data.lgBestCareProducts),
             "lg-best-care",
-            effectiveSourceId
+            effectiveSourceId,
+            viewportProfile
           ),
           "lg-best-care",
           effectiveSourceId,
@@ -8874,15 +11090,18 @@ function getHomeLowerSlotRegistry(editableData = null) {
         const effectiveSourceId = slot.activeSourceId === "mobile-derived" ? "custom-live-current" : slot.activeSourceId;
         const componentPatch = resolveComponentPatch(slot.id, effectiveSourceId);
         if (effectiveSourceId === "custom-live-current") {
+          const guideItems = extractBestshopGuideItems(data.bestshopGuideSection);
           return (
-            renderCurrentLiveHomeSection(
+            renderServiceFeatureSection(
               "bestshop-guide",
+              "베스트샵 이용 안내",
+              "오프라인 서비스를 더욱 간단하게",
+              guideItems,
               effectiveSourceId,
-              componentPatch,
-              "HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__"
+              componentPatch
             ) ||
             applyHomeLowerSectionPatch(
-              markHomeLowerReplay(data.bestshopGuideSection, "bestshop-guide", effectiveSourceId),
+              markHomeLowerReplay(data.bestshopGuideSection, "bestshop-guide", effectiveSourceId, viewportProfile),
               "bestshop-guide",
               effectiveSourceId,
               componentPatch
@@ -8890,7 +11109,7 @@ function getHomeLowerSlotRegistry(editableData = null) {
           );
         }
         return applyHomeLowerSectionPatch(
-          markHomeLowerReplay(data.bestshopGuideSection, "bestshop-guide", effectiveSourceId),
+          markHomeLowerReplay(data.bestshopGuideSection, "bestshop-guide", effectiveSourceId, viewportProfile),
           "bestshop-guide",
           effectiveSourceId,
           componentPatch
@@ -8901,7 +11120,7 @@ function getHomeLowerSlotRegistry(editableData = null) {
 }
 
 function renderHomeLowerSlots(data, options = {}) {
-  return getHomeLowerSlotRegistry(options.editableData)
+  return getHomeLowerSlotRegistry(options.editableData, options.viewportProfile || "")
     .filter((slot) => slot.enabled(data, options))
     .map((slot) => slot.render(data, options, slot))
     .filter(Boolean)
@@ -8932,102 +11151,632 @@ function renderHomeEnhancements(rawHtml, mobileHtml = "", options = {}) {
 }
 
 function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
+  const data = parseHomeEnhancements(rawHtml, mobileHtml, options);
   const rebuilt = renderHomeEnhancements(rawHtml, mobileHtml, options);
   if (!rebuilt) return html;
+  const viewportProfile = normalizeHomeViewportProfile(options.viewportProfile || "ta", "ta");
+  const artifactRegistry = buildArtifactSectionRegistry("home", {
+    editableData: options.editableData || null,
+    viewportProfile,
+  });
+  const artifactSectionMap = new Map((artifactRegistry.sections || []).map((section) => [String(section.slotId || "").trim(), section]));
+  const hasExactReferenceSection = (slotId) => artifactSectionMap.get(String(slotId || "").trim())?.extractStatus === "exact-reference-section";
+  const shouldUseCustomArtifactBlock = (slotId) => artifactSectionMap.get(String(slotId || "").trim())?.extractStatus === "missing-reference-section";
+  const preferExactReferenceSource = (slotId, activeSourceId, fallback = "custom-live-current") => {
+    const normalizedSlotId = String(slotId || "").trim();
+    const normalizedSourceId = String(activeSourceId || "").trim();
+    if (!hasExactReferenceSection(normalizedSlotId)) return normalizedSourceId || fallback;
+    if (!normalizedSourceId || normalizedSourceId === "custom-renderer" || normalizedSourceId === "mobile-derived") {
+      return fallback;
+    }
+    return normalizedSourceId;
+  };
 
   const headerTopSourceId = getActiveSourceId(options.editableData || {}, "home", "header-top", "captured-home-header-top");
-  const headerTopPatch = findComponentPatch(options.editableData || {}, "home", "home.header-top", headerTopSourceId)?.patch || {};
+  const headerTopPatch = findComponentPatch(
+    options.editableData || {},
+    "home",
+    "home.header-top",
+    headerTopSourceId,
+    options.viewportProfile || ""
+  )?.patch || {};
   const headerBottomSourceId = getActiveSourceId(options.editableData || {}, "home", "header-bottom", "captured-home-header-bottom");
-  const headerBottomPatch = findComponentPatch(options.editableData || {}, "home", "home.header-bottom", headerBottomSourceId)?.patch || {};
+  const headerBottomPatch = findComponentPatch(
+    options.editableData || {},
+    "home",
+    "home.header-bottom",
+    headerBottomSourceId,
+    options.viewportProfile || ""
+  )?.patch || {};
   const heroSourceId = getActiveSourceId(options.editableData || {}, "home", "hero", "captured-home-hero");
-  const heroPatch = findComponentPatch(options.editableData || {}, "home", "home.hero", heroSourceId)?.patch || {};
+  const heroPatch = findComponentPatch(
+    options.editableData || {},
+    "home",
+    "home.hero",
+    heroSourceId,
+    options.viewportProfile || ""
+  )?.patch || {};
   const quickmenuSourceId = getActiveSourceId(options.editableData || {}, "home", "quickmenu", "captured-home-quickmenu");
-  const quickmenuPatch = findComponentPatch(options.editableData || {}, "home", "home.quickmenu", quickmenuSourceId)?.patch || {};
-  const hero = mobileHtml ? applyHomeHeroPatch(extractMobileHeroSection(mobileHtml), heroSourceId, heroPatch) : "";
+  const quickmenuPatch = findComponentPatch(
+    options.editableData || {},
+    "home",
+    "home.quickmenu",
+    quickmenuSourceId,
+    options.viewportProfile || ""
+  )?.patch || {};
+  const mdChoiceSourceId = getActiveSourceId(options.editableData || {}, "home", "md-choice", "captured-home-md-choice");
+  const mdChoicePatch = findComponentPatch(
+    options.editableData || {},
+    "home",
+    "home.md-choice",
+    mdChoiceSourceId,
+    options.viewportProfile || ""
+  )?.patch || {};
+  const timedealSourceId = getActiveSourceId(options.editableData || {}, "home", "timedeal", "captured-home-timedeal");
+  const timedealPatch = findComponentPatch(
+    options.editableData || {},
+    "home",
+    "home.timedeal",
+    timedealSourceId,
+    options.viewportProfile || ""
+  )?.patch || {};
+  const bestRankingSourceId = getActiveSourceId(options.editableData || {}, "home", "best-ranking", "custom-live-current");
+  const subscriptionSourceId = getActiveSourceId(options.editableData || {}, "home", "subscription", "custom-live-current");
+  const spaceRenewalSourceId = getActiveSourceId(options.editableData || {}, "home", "space-renewal", "custom-live-current");
+  const brandShowroomSourceId = getActiveSourceId(options.editableData || {}, "home", "brand-showroom", "custom-live-current");
+  const latestProductNewsSourceId = getActiveSourceId(options.editableData || {}, "home", "latest-product-news", "custom-live-current");
+  const smartLifeSourceId = getActiveSourceId(options.editableData || {}, "home", "smart-life", "custom-live-current");
+  const lowerPromotionSourceId = getActiveSourceId(options.editableData || {}, "home", "summary-banner-2", "custom-live-current");
+  const missedBenefitsSourceId = getActiveSourceId(options.editableData || {}, "home", "missed-benefits", "custom-live-current");
+  const marketingAreaSourceId = getActiveSourceId(options.editableData || {}, "home", "marketing-area", "custom-live-current");
+  const lgBestCareSourceId = getActiveSourceId(options.editableData || {}, "home", "lg-best-care", "custom-live-current");
+  const bestshopGuideSourceId = getActiveSourceId(options.editableData || {}, "home", "bestshop-guide", "custom-live-current");
+  const bestRankingRenderSourceId = preferExactReferenceSource("best-ranking", bestRankingSourceId);
+  const subscriptionRenderSourceId = preferExactReferenceSource("subscription", subscriptionSourceId);
+  const spaceRenewalRenderSourceId = preferExactReferenceSource("space-renewal", spaceRenewalSourceId);
+  const brandShowroomRenderSourceId = preferExactReferenceSource("brand-showroom", brandShowroomSourceId);
+  const latestProductNewsRenderSourceId = preferExactReferenceSource("latest-product-news", latestProductNewsSourceId);
+  const smartLifeRenderSourceId = preferExactReferenceSource("smart-life", smartLifeSourceId);
+  const lowerPromotionRenderSourceId = preferExactReferenceSource("summary-banner-2", lowerPromotionSourceId);
+  const missedBenefitsRenderSourceId = preferExactReferenceSource("missed-benefits", missedBenefitsSourceId);
+  const marketingAreaRenderSourceId = preferExactReferenceSource("marketing-area", marketingAreaSourceId);
+  const lgBestCareRenderSourceId = preferExactReferenceSource("lg-best-care", lgBestCareSourceId);
+  const bestshopGuideRenderSourceId = preferExactReferenceSource("bestshop-guide", bestshopGuideSourceId);
+  const resolveHomeSlotPatch = (slotId, ...candidateSourceIds) =>
+    findComponentPatchByCandidateSources(
+      options.editableData || {},
+      "home",
+      `home.${slotId}`,
+      candidateSourceIds,
+      options.viewportProfile || ""
+    )?.patch || {};
+  const bestRankingPatch = resolveHomeSlotPatch(
+    "best-ranking",
+    bestRankingSourceId,
+    bestRankingRenderSourceId,
+    "custom-renderer",
+    "custom-live-current"
+  );
+  const subscriptionPatch = resolveHomeSlotPatch(
+    "subscription",
+    subscriptionSourceId,
+    subscriptionRenderSourceId,
+    "mobile-derived",
+    "custom-live-current"
+  );
+  const spaceRenewalPatch = resolveHomeSlotPatch(
+    "space-renewal",
+    spaceRenewalSourceId,
+    spaceRenewalRenderSourceId,
+    "mobile-derived",
+    "custom-live-current"
+  );
+  const brandShowroomPatch = resolveHomeSlotPatch(
+    "brand-showroom",
+    brandShowroomSourceId,
+    brandShowroomRenderSourceId,
+    "mobile-derived",
+    "custom-live-current"
+  );
+  const latestProductNewsPatch = resolveHomeSlotPatch(
+    "latest-product-news",
+    latestProductNewsSourceId,
+    latestProductNewsRenderSourceId,
+    "mobile-derived",
+    "custom-live-current"
+  );
+  const smartLifePatch = resolveHomeSlotPatch(
+    "smart-life",
+    smartLifeSourceId,
+    smartLifeRenderSourceId,
+    "mobile-derived",
+    "custom-live-current"
+  );
+  const lowerPromotionPatch = resolveHomeSlotPatch(
+    "summary-banner-2",
+    lowerPromotionSourceId,
+    lowerPromotionRenderSourceId,
+    "mobile-derived",
+    "custom-live-current"
+  );
+  const missedBenefitsPatch = resolveHomeSlotPatch(
+    "missed-benefits",
+    missedBenefitsSourceId,
+    missedBenefitsRenderSourceId,
+    "mobile-derived",
+    "custom-live-current"
+  );
+  const marketingAreaPatch = resolveHomeSlotPatch(
+    "marketing-area",
+    marketingAreaSourceId,
+    marketingAreaRenderSourceId,
+    "custom-renderer",
+    "custom-live-current"
+  );
+  const lgBestCarePatch = resolveHomeSlotPatch(
+    "lg-best-care",
+    lgBestCareSourceId,
+    lgBestCareRenderSourceId,
+    "mobile-derived",
+    "custom-live-current"
+  );
+  const bestshopGuidePatch = resolveHomeSlotPatch(
+    "bestshop-guide",
+    bestshopGuideSourceId,
+    bestshopGuideRenderSourceId,
+    "mobile-derived",
+    "custom-live-current"
+  );
+  const hero =
+    viewportProfile === "mo"
+      ? (() => {
+          const heroBaseSection = mobileHtml ? extractMobileHeroSection(mobileHtml) : "";
+          return heroBaseSection ? applyHomeHeroPatch(heroBaseSection, heroSourceId, heroPatch) : "";
+        })()
+      : renderCurrentLiveHomeHeroSection(heroSourceId, heroPatch, viewportProfile) ||
+        (() => {
+          const heroBaseSection = extractHomeHeroSection(rawHtml);
+          return heroBaseSection ? applyHomeHeroPatch(heroBaseSection, heroSourceId, heroPatch) : "";
+        })();
+  const liveQuickMenuSection =
+    viewportProfile === "mo"
+      ? ""
+      : extractCurrentLiveHomeSectionByProfile("quickmenu") ||
+        extractCurrentLiveHomeSectionByClass("HomePcQuickmenu_quickmenu__");
   const quickMenu =
     applyHomeQuickmenuPatch(
+      (liveQuickMenuSection
+        ? markHomeLiveCustomSection(liveQuickMenuSection, "quickmenu", quickmenuSourceId)
+        : "") ||
+      (viewportProfile === "mo" ? (mobileHtml ? extractMobileQuickMenuSection(mobileHtml) : "") : extractHomeQuickMenuSection(rawHtml)) ||
       rebuilt.match(/<section class="HomeMoQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
       rebuilt.match(/<section class="codex-home-section codex-home-quickmenu">[\s\S]*?<\/section>/)?.[0] ||
       "",
       quickmenuSourceId,
-      quickmenuPatch
+      quickmenuPatch,
+      viewportProfile
     ) ||
     "";
   const promotion =
-    rebuilt.match(/<section class="HomeMoBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? (() => {
+          const section = mobileHtml ? extractMobilePromotionSection(mobileHtml) : "";
+          return section ? markHomeLowerReplay(section, "promotion", "mobile-derived", viewportProfile) : "";
+        })()
+      : renderCurrentLiveHomeSection(
+          "promotion",
+          "custom-live-current",
+          {},
+          "HomePcBannerPromotion_banner_promotion__",
+          "메인 상단 배너 영역"
+        ) ||
+        rebuilt.match(/<section class="HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        "";
   const lowerPromotion =
-    rebuilt.match(/<section[^>]+data-codex-slot="summary-banner-2"[^>]*class="[^"]*HomeMoBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? (() => {
+          const section = mobileHtml ? extractMobileLowerPromotionSection(mobileHtml) : "";
+          return section
+            ? applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectTemplateImagesIntoSection(section, data.lowerPromotionProducts),
+                  "summary-banner-2",
+                  "mobile-derived",
+                  viewportProfile
+                ),
+                "summary-banner-2",
+                "mobile-derived",
+                lowerPromotionPatch
+              )
+            : "";
+        })()
+      : renderCurrentLiveHomeSection(
+          "summary-banner-2",
+          lowerPromotionRenderSourceId,
+          lowerPromotionPatch,
+          "HomePcBannerPromotion_banner_promotion__",
+          "메인 하단 배너 영역"
+        ) ||
+        (() => {
+          const fallbackSection =
+            rebuilt.match(/<section[^>]+data-codex-slot="summary-banner-2"[^>]*class="[^"]*HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section[^>]+data-codex-slot="summary-banner-2"[^>]*class="[^"]*HomeMoBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            "";
+          return fallbackSection
+            ? applyHomeLowerSectionPatch(fallbackSection, "summary-banner-2", lowerPromotionRenderSourceId, lowerPromotionPatch)
+            : "";
+        })();
   const mdChoice =
-    rebuilt.match(/<section[^>]+data-codex-slot="md-choice"[^>]*class="[^"]*HomeMoListHorizontype_list_horizontype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoListHorizontype_list_horizontype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListHorizontype_list_horizontype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? (() => {
+          const section = mobileHtml ? extractMobileMdChoiceSection(mobileHtml) : "";
+          if (!section) return "";
+          return applyHomeLowerSectionPatch(
+            markHomeLowerReplay(injectProductImagesIntoSection(section, data.mdChoiceProducts), "md-choice", mdChoiceSourceId, viewportProfile),
+            "md-choice",
+            mdChoiceSourceId,
+            mdChoicePatch
+          );
+        })()
+      : renderCurrentLiveHomeProductSection(
+          "md-choice",
+          mdChoiceSourceId,
+          mdChoicePatch,
+          data.mdChoiceProducts,
+          "HomePcListHorizontype_list_horizontype__"
+        ) ||
+        rebuilt.match(/<section[^>]+data-codex-slot="md-choice"[^>]*class="[^"]*HomePcListHorizontype[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="codex-home-lower-replay HomePcListHorizontype[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="HomePcListHorizontype[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        "";
   const timedeal =
-    rebuilt.match(/<section[^>]+data-codex-slot="timedeal"[^>]*class="[^"]*HomeMoTimedeal_timedeal__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoTimedeal_timedeal__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoTimedeal_timedeal__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? (() => {
+          const section = mobileHtml ? extractMobileTimedealSection(mobileHtml) : "";
+          if (!section) return "";
+          return applyHomeLowerSectionPatch(
+            markHomeLowerReplay(injectProductImagesIntoSection(section, data.timedealProducts), "timedeal", timedealSourceId, viewportProfile),
+            "timedeal",
+            timedealSourceId,
+            timedealPatch
+          );
+        })()
+      : renderCurrentLiveHomeProductSection(
+          "timedeal",
+          timedealSourceId,
+          timedealPatch,
+          data.timedealProducts,
+          "HomePcTimedeal_timedeal__"
+        ) ||
+        rebuilt.match(/<section[^>]+data-codex-slot="timedeal"[^>]*class="[^"]*HomePcTimedeal_timedeal__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="codex-home-lower-replay HomePcTimedeal_timedeal__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="HomePcTimedeal_timedeal__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        "";
   const subscription =
-    rebuilt.match(/<section[^>]+data-codex-slot="subscription"[^>]*class="[^"]*HomeMoListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? (() => {
+          const section = mobileHtml ? extractMobileSubscriptionSection(mobileHtml) : "";
+          return section
+            ? applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectProductImagesIntoSection(section, data.subscriptionProducts),
+                  "subscription",
+                  "mobile-derived",
+                  viewportProfile
+                ),
+                "subscription",
+                "mobile-derived",
+                subscriptionPatch
+              )
+            : "";
+        })()
+      : renderCurrentLiveHomeProductSection(
+          "subscription",
+          subscriptionRenderSourceId,
+          subscriptionPatch,
+          data.subscriptionProducts,
+          "HomePcListTabsBannertype_list_tabs_bannertype__",
+          "메인 가전 구독 영역"
+        ) ||
+        (() => {
+          const fallbackSection =
+            rebuilt.match(/<section[^>]+data-codex-slot="subscription"[^>]*class="[^"]*HomePcListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section[^>]+data-codex-slot="subscription"[^>]*class="[^"]*HomeMoListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomePcListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomeMoListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomePcListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomeMoListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            "";
+          return fallbackSection
+            ? applyHomeLowerSectionPatch(fallbackSection, "subscription", subscriptionRenderSourceId, subscriptionPatch)
+            : "";
+        })();
   const spaceRenewal =
-    rebuilt.match(/<section[^>]+data-codex-slot="space-renewal"[^>]*class="[^"]*codex-home-space-renewal[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section[^>]+data-codex-slot="space-renewal"[^>]*class="[^"]*HomeMoListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-space-renewal[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? (() => {
+          const section = mobileHtml ? extractMobileSpaceRenewalSection(mobileHtml) : "";
+          return section
+            ? applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectProductImagesIntoSection(section, buildSpaceRenewalProducts(data.spaceRenewalData)),
+                  "space-renewal",
+                  "mobile-derived",
+                  viewportProfile
+                ),
+                "space-renewal",
+                "mobile-derived",
+                spaceRenewalPatch
+              )
+            : "";
+        })()
+      : renderCurrentLiveHomeProductSection(
+          "space-renewal",
+          spaceRenewalRenderSourceId,
+          spaceRenewalPatch,
+          buildSpaceRenewalProducts(data.spaceRenewalData),
+          "HomePcListBannertype_list_bannertype__",
+          "메인 추천 상품 영역"
+        ) ||
+        (() => {
+          const fallbackSection =
+            rebuilt.match(/<section[^>]+data-codex-slot="space-renewal"[^>]*class="[^"]*HomePcListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section[^>]+data-codex-slot="space-renewal"[^>]*class="[^"]*codex-home-space-renewal[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section[^>]+data-codex-slot="space-renewal"[^>]*class="[^"]*HomeMoListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomePcListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomePcListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-space-renewal[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomeMoListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomeMoListBannertype_list_bannertype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            "";
+          return fallbackSection
+            ? applyHomeLowerSectionPatch(fallbackSection, "space-renewal", spaceRenewalRenderSourceId, spaceRenewalPatch)
+            : "";
+        })();
   const bestRanking =
-    rebuilt.match(/<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-best-ranking"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListTabstypeBestranking_list_tab_bestranking__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? rebuilt.match(/<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="codex-home-best-ranking"[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="HomeMoListTabstypeBestranking_list_tab_bestranking__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        ""
+      : renderCurrentLiveHomeSection(
+          "best-ranking",
+          bestRankingRenderSourceId,
+          bestRankingPatch,
+          "HomePcListTabstypeBestranking_list_tab_bestranking__",
+          "메인 베스트 랭킹 영역"
+        ) ||
+        rebuilt.match(/<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="codex-home-best-ranking"[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="HomeMoListTabstypeBestranking_list_tab_bestranking__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        "";
   const marketingArea =
-    rebuilt.match(/<section[^>]+data-codex-slot="marketing-area"[^>]*class="[^"]*HomeMoListMarketingArea_list_marketing_area__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-marketing-area[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListMarketingArea_list_marketing_area__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? ""
+      : renderCurrentLiveHomeSection(
+          "marketing-area",
+          marketingAreaRenderSourceId,
+          marketingAreaPatch,
+          "HomePcListMarketingArea_list_marketing_area__"
+        ) ||
+        rebuilt.match(/<section[^>]+data-codex-slot="marketing-area"[^>]*[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="codex-home-marketing-area[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        rebuilt.match(/<section class="HomeMoListMarketingArea_list_marketing_area__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+        "";
   const brandShowroom =
-    rebuilt.match(/<section[^>]+data-codex-slot="brand-showroom"[^>]*class="[^"]*codex-home-brand-showroom[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section[^>]+data-codex-slot="brand-showroom"[^>]*class="[^"]*HomeMoListSquaretypeSmall_list_squaretype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoListSquaretypeSmall_list_squaretype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListSquaretypeSmall_list_squaretype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile !== "mo" && hasExactReferenceSection("brand-showroom")
+      ? renderCurrentLiveHomeSection(
+          "brand-showroom",
+          brandShowroomRenderSourceId,
+          brandShowroomPatch,
+          "HomePcListSquaretype_list_squaretype__",
+          "메인 브랜드 쇼룸 영역"
+        ) ||
+        ""
+      : (viewportProfile === "mo" ? (() => {
+          const section = mobileHtml ? extractMobileBrandShowroomSection(mobileHtml) : "";
+          return section
+            ? applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectTemplateImagesIntoSection(section, data.brandShowroomProducts),
+                  "brand-showroom",
+                  "mobile-derived",
+                  viewportProfile
+                ),
+                "brand-showroom",
+                "mobile-derived",
+                brandShowroomPatch
+              )
+            : "";
+        })() : "") ||
+        (() => {
+          const fallbackSection =
+            rebuilt.match(/<section[^>]+data-codex-slot="brand-showroom"[^>]*class="[^"]*codex-home-brand-showroom[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section[^>]+data-codex-slot="brand-showroom"[^>]*class="[^"]*HomeMoListSquaretypeSmall_list_squaretype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomeMoListSquaretypeSmall_list_squaretype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomeMoListSquaretypeSmall_list_squaretype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            "";
+          return fallbackSection
+            ? applyHomeLowerSectionPatch(fallbackSection, "brand-showroom", brandShowroomRenderSourceId, brandShowroomPatch)
+            : "";
+        })();
   const latestProductNews =
-    rebuilt.match(/<section[^>]+data-codex-slot="latest-product-news"[^>]*class="[^"]*codex-home-latest-news[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section[^>]+data-codex-slot="latest-product-news"[^>]*class="[^"]*HomeMoListSquaretypeBig_list_squaretype_big__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoListSquaretypeBig_list_squaretype_big__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListSquaretypeBig_list_squaretype_big__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile !== "mo" && hasExactReferenceSection("latest-product-news")
+      ? renderCurrentLiveHomeSection(
+          "latest-product-news",
+          latestProductNewsRenderSourceId,
+          latestProductNewsPatch,
+          "HomePcListSquaretypeScroll_list_squaretype_scroll__",
+          "메인 최신 제품 소식 영역"
+        ) ||
+        ""
+      : (viewportProfile === "mo" ? (() => {
+          const section = mobileHtml ? extractMobileLatestProductNewsSection(mobileHtml) : "";
+          return section
+            ? applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectTemplateImagesIntoSection(section, data.latestProductNewsProducts),
+                  "latest-product-news",
+                  "mobile-derived",
+                  viewportProfile
+                ),
+                "latest-product-news",
+                "mobile-derived",
+                latestProductNewsPatch
+              )
+            : "";
+        })() : "") ||
+        (() => {
+          const fallbackSection =
+            rebuilt.match(/<section[^>]+data-codex-slot="latest-product-news"[^>]*class="[^"]*codex-home-latest-news[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section[^>]+data-codex-slot="latest-product-news"[^>]*class="[^"]*HomeMoListSquaretypeBig_list_squaretype_big__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomeMoListSquaretypeBig_list_squaretype_big__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomeMoListSquaretypeBig_list_squaretype_big__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            "";
+          return fallbackSection
+            ? applyHomeLowerSectionPatch(fallbackSection, "latest-product-news", latestProductNewsRenderSourceId, latestProductNewsPatch)
+            : "";
+        })();
   const smartLife =
-    rebuilt.match(/<section[^>]+data-codex-slot="smart-life"[^>]*class="[^"]*HomeMoListVerticaltype_list_verticaltype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoListVerticaltype_list_verticaltype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListVerticaltype_list_verticaltype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile !== "mo" && hasExactReferenceSection("smart-life")
+      ? renderCurrentLiveHomeSection(
+          "smart-life",
+          smartLifeRenderSourceId,
+          smartLifePatch,
+          "HomePcListSquaretype_list_squaretype__",
+          "메인 슬기로운 가전생활 영역"
+        ) ||
+        ""
+      : (viewportProfile === "mo" ? (() => {
+          const section = mobileHtml ? extractMobileSmartLifeSection(mobileHtml) : "";
+          return section
+            ? applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectTemplateImagesIntoSection(syncHomeStoryListSection(section, data.smartLifeProducts), data.smartLifeProducts),
+                  "smart-life",
+                  "mobile-derived",
+                  viewportProfile
+                ),
+                "smart-life",
+                "mobile-derived",
+                smartLifePatch
+              )
+            : "";
+        })() : "") ||
+        (() => {
+          const fallbackSection =
+            rebuilt.match(/<section[^>]+data-codex-slot="smart-life"[^>]*class="[^"]*HomeMoListVerticaltype_list_verticaltype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomeMoListVerticaltype_list_verticaltype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomeMoListVerticaltype_list_verticaltype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            "";
+          return fallbackSection
+            ? applyHomeLowerSectionPatch(fallbackSection, "smart-life", smartLifeRenderSourceId, smartLifePatch)
+            : "";
+        })();
   const missedBenefits =
-    rebuilt.match(/<section[^>]+data-codex-slot="missed-benefits"[^>]*class="[^"]*HomeMoListRectangletype_list_rectangle__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoListRectangletype_list_rectangle__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListRectangletype_list_rectangle__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? (() => {
+          const section = mobileHtml ? extractMobileMissedBenefitsSection(mobileHtml) : "";
+          return section
+            ? applyHomeLowerSectionPatch(
+                markHomeLowerReplay(
+                  injectTemplateImagesIntoSection(section, data.missedBenefitsProducts),
+                  "missed-benefits",
+                  "mobile-derived",
+                  viewportProfile
+                ),
+                "missed-benefits",
+                "mobile-derived",
+                missedBenefitsPatch
+              )
+            : "";
+        })()
+      : renderCurrentLiveHomeSection(
+          "missed-benefits",
+          missedBenefitsRenderSourceId,
+          missedBenefitsPatch,
+          "HomePcListRectangletype_list_rectangle__",
+          "메인 놓치면 아쉬운 혜택 영역"
+        ) ||
+        (() => {
+          const fallbackSection =
+            rebuilt.match(/<section[^>]+data-codex-slot="missed-benefits"[^>]*class="[^"]*HomePcListRectangletype_list_rectangle__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section[^>]+data-codex-slot="missed-benefits"[^>]*class="[^"]*HomeMoListRectangletype_list_rectangle__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomePcListRectangletype_list_rectangle__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="codex-home-lower-replay HomeMoListRectangletype_list_rectangle__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomePcListRectangletype_list_rectangle__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            rebuilt.match(/<section class="HomeMoListRectangletype_list_rectangle__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+            "";
+          return fallbackSection
+            ? applyHomeLowerSectionPatch(fallbackSection, "missed-benefits", missedBenefitsRenderSourceId, missedBenefitsPatch)
+            : "";
+        })();
   const lgBestCare =
-    rebuilt.match(/<section[^>]+data-codex-slot="lg-best-care"[^>]*class="[^"]*HomeMoListVerticaltypeFill_list_verticaltype_fill__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoListVerticaltypeFill_list_verticaltype_fill__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListVerticaltypeFill_list_verticaltype_fill__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? (() => {
+          const section = mobileHtml ? extractMobileLgBestCareSection(mobileHtml) : "";
+          return section
+            ? markHomeLowerReplay(
+                injectTemplateImagesIntoSection(section, data.lgBestCareProducts),
+                "lg-best-care",
+                "mobile-derived",
+                viewportProfile
+              )
+            : "";
+        })()
+      : renderCurrentLiveHomeSection(
+          "lg-best-care",
+          lgBestCareRenderSourceId,
+          lgBestCarePatch,
+          "HomePcListBannerRectangletype_list_banner_rectangle__",
+          "메인 베스트 케어 영역"
+        ) ||
+        renderServiceFeatureSection(
+          "lg-best-care",
+          "LG 베스트 케어",
+          "고객의 삶에 안심을 더하는 가전 케어 서비스",
+          extractLgBestCareItems(data.lgBestCareSection).length ? extractLgBestCareItems(data.lgBestCareSection) : data.lgBestCareProducts,
+          lgBestCareRenderSourceId,
+          lgBestCarePatch
+        ) || "";
   const bestshopGuide =
-    rebuilt.match(/<section[^>]+data-codex-slot="bestshop-guide"[^>]*class="[^"]*HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="codex-home-lower-replay HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    rebuilt.match(/<section class="HomeMoListVerticaltypeBgtype_list_verticaltype_bgtype__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-    "";
+    viewportProfile === "mo"
+      ? (() => {
+          const section = mobileHtml ? extractMobileBestshopGuideSection(mobileHtml) : "";
+          return section ? markHomeLowerReplay(section, "bestshop-guide", "mobile-derived", viewportProfile) : "";
+        })()
+      : renderCurrentLiveHomeSection(
+          "bestshop-guide",
+          bestshopGuideRenderSourceId,
+          bestshopGuidePatch,
+          "HomePcListBannerHorizontype_list_banner_horizon__",
+          "메인 베스트샵 이용안내 영역"
+        ) ||
+        renderServiceFeatureSection(
+          "bestshop-guide",
+          "베스트샵 이용 안내",
+          "오프라인 서비스를 더욱 간단하게",
+          extractBestshopGuideItems(data.bestshopGuideSection).length ? extractBestshopGuideItems(data.bestshopGuideSection) : HOME_BESTSHOP_GUIDE_ITEMS,
+          bestshopGuideRenderSourceId,
+          bestshopGuidePatch
+        ) || "";
   if (hero) {
-    html = html.replace(
-      /<section class="HomePcBannerHero_banner_hero__[^"]*"[\s\S]*?(?=<section class="HomePcQuickmenu_quickmenu__)/,
-      () => hero
-    );
+    if (viewportProfile === "mo") {
+      html = html.replace(
+        /<section class="HomeMoBannerHero_banner_hero__[^"]*"[\s\S]*?<\/section>/,
+        () => hero
+      );
+    } else {
+      html = html.replace(
+        /<section class="HomePcBannerHero_banner_hero__[^"]*"[\s\S]*?(?=<section class="HomePcQuickmenu_quickmenu__)/,
+        () => hero
+      );
+      html = html.replace(
+        /<section class="HomeTaBannerHero_banner_hero__[^"]*"[\s\S]*?(?=<section class="HomePcQuickmenu_quickmenu__|<section class="HomeTaQuickmenu_quickmenu__)/,
+        () => hero
+      );
+    }
   }
 
   html = html.replace(
@@ -9040,21 +11789,47 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
   );
 
   if (quickMenu) {
-    html = html.replace(
-      /<section class="HomePcQuickmenu_quickmenu__U0ECR"[\s\S]*?<\/section>/,
-      quickMenu
-    );
-    html = html.replace(
-      /<section class="HomeMoQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
-      quickMenu
-    );
+    if (viewportProfile === "mo") {
+      html = html.replace(
+        /<section class="HomeMoQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
+        quickMenu
+      );
+      html = html.replace(
+        /<section class="HomePcQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
+        quickMenu
+      );
+      html = html.replace(
+        /<section class="HomeTaQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
+        quickMenu
+      );
+    } else {
+      html = html.replace(
+        /<section class="HomePcQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
+        quickMenu
+      );
+      html = html.replace(
+        /<section class="HomeTaQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
+        quickMenu
+      );
+    }
   }
 
   if (promotion) {
-    html = html.replace(
-      /<section class="HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/,
-      promotion
-    );
+    if (viewportProfile === "mo") {
+      html = html.replace(
+        /<section class="HomeMoBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/,
+        promotion
+      );
+      html = html.replace(
+        /<section class="HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/,
+        promotion
+      );
+    } else {
+      html = html.replace(
+        /<section class="HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/,
+        promotion
+      );
+    }
   }
 
   if (lowerPromotion) {
@@ -9065,24 +11840,67 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
   }
 
   if (mdChoice) {
-    html = html.replace(
-      /<section class="list_horizontype HomePcListHorizontypeSkeleton_skeleton__cEI_8"[\s\S]*?<\/section>/,
-      mdChoice
-    );
+    if (viewportProfile === "mo") {
+      html = replaceFirstMatch(
+        html,
+        /<section class="HomeMoListHorizontype_list_horizontype__[^"]*"[\s\S]*?<\/section>/,
+        () => mdChoice
+      );
+      if (!html.includes('data-codex-slot="md-choice"')) {
+        html = injectMarkupAfterSlot(html, "promotion", mdChoice);
+      }
+      if (!html.includes('data-codex-slot="md-choice"')) {
+        html = injectMarkupAfterSlot(html, "bestshop-guide", mdChoice);
+      }
+    } else {
+      html = html.replace(
+        /<section class="list_horizontype HomePcListHorizontypeSkeleton_skeleton__cEI_8"[\s\S]*?<\/section>/,
+        mdChoice
+      );
+    }
   }
 
   if (timedeal) {
-    html = html.replace(
-      /<section class="HomePcTimedealSkeleton_timedeal__SRvIo HomePcTimedealSkeleton_skeleton__VWRlL"[\s\S]*?<\/section>/,
-      timedeal
-    );
+    if (viewportProfile === "mo") {
+      html = replaceFirstMatch(
+        html,
+        /<section class="HomeMoTimedealSkeleton_timedeal__[^"]* HomeMoTimedealSkeleton_skeleton__[^"]*"[\s\S]*?<\/section>/,
+        () => timedeal
+      );
+      if (!html.includes('data-codex-slot="timedeal"')) {
+        html = replaceFirstMatch(
+          html,
+          /<section class="HomeMoTimedeal_timedeal__[^"]*"[\s\S]*?<\/section>/,
+          () => timedeal
+        );
+      }
+      if (!html.includes('data-codex-slot="timedeal"')) {
+        html = injectMarkupAfterSlot(html, "md-choice", timedeal);
+      }
+    } else {
+      html = html.replace(
+        /<section class="HomePcTimedealSkeleton_timedeal__SRvIo HomePcTimedealSkeleton_skeleton__VWRlL"[\s\S]*?<\/section>/,
+        timedeal
+      );
+    }
   }
 
   if (subscription) {
-    html = html.replace(
-      /<section class="HomePcListTabsBannertype_list_tabs_bannertype__KDksU"[\s\S]*?<\/section>/,
-      subscription
-    );
+    if (viewportProfile === "mo") {
+      html = replaceFirstMatch(
+        html,
+        /<section class="HomeMoListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/,
+        () => subscription
+      );
+      if (!html.includes('data-codex-slot="subscription"')) {
+        html = injectMarkupAfterSlot(html, "space-renewal", subscription);
+      }
+    } else {
+      html = html.replace(
+        /<section class="HomePcListTabsBannertype_list_tabs_bannertype__KDksU"[\s\S]*?<\/section>/,
+        subscription
+      );
+    }
   }
 
   if (spaceRenewal) {
@@ -9098,6 +11916,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
     }
     if (!html.includes('data-codex-slot="space-renewal"')) {
       html = html.replace(/<\/footer>/i, `${spaceRenewal}\n</footer>`);
+    }
+    if (!html.includes('data-codex-slot="space-renewal"')) {
+      html = injectMarkupAfterSlot(html, "subscription", spaceRenewal);
     }
   }
 
@@ -9119,6 +11940,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
     );
     if (!html.includes('data-codex-slot="marketing-area"')) {
       html = html.replace(/<\/footer>/i, `${marketingArea}\n</footer>`);
+    }
+    if (!html.includes('data-codex-slot="marketing-area"')) {
+      html = injectMarkupAfterSlot(html, "best-ranking", marketingArea);
     }
   }
 
@@ -9155,6 +11979,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
       /<section[^>]+data-area="메인 베스트 케어 영역"[^>]*>[\s\S]*?<\/section>/,
       lgBestCare
     );
+    if (!html.includes('data-codex-slot="lg-best-care"')) {
+      html = injectMarkupAfterSlot(html, "missed-benefits", lgBestCare);
+    }
   }
 
   if (bestshopGuide) {
@@ -9162,6 +11989,99 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
       /<section[^>]+data-area="메인 베스트샵 이용안내 영역"[^>]*>[\s\S]*?<\/section>/,
       bestshopGuide
     );
+    if (!html.includes('data-codex-slot="bestshop-guide"')) {
+      html = injectMarkupAfterSlot(html, "lg-best-care", bestshopGuide);
+    }
+  }
+
+  if (viewportProfile === "mo") {
+    const mobileSourceHtml = readHomeMobileHtml() || mobileHtml || "";
+    if (!html.includes('data-codex-slot="subscription"')) {
+      const mobileSubscriptionSection = extractMobileSubscriptionSection(mobileSourceHtml);
+      if (mobileSubscriptionSection) {
+        const fallbackSubscription = markHomeLowerReplay(mobileSubscriptionSection, "subscription", "mobile-derived", viewportProfile);
+        html = replaceFirstMatch(
+          html,
+          /<section class="HomeMoListTabsBannertype_list_tabs_bannertype__[^"]*"[\s\S]*?<\/section>/,
+          () => fallbackSubscription
+        );
+        if (!html.includes('data-codex-slot="subscription"')) {
+          html = injectMarkupAfterSlot(html, "space-renewal", fallbackSubscription);
+        }
+      }
+    }
+    if (!html.includes('data-codex-slot="md-choice"')) {
+      const mobileMdChoiceSection = extractMobileMdChoiceSection(mobileSourceHtml);
+      if (mobileMdChoiceSection) {
+        const fallbackMdChoice = applyHomeLowerSectionPatch(
+          markHomeLowerReplay(
+            injectProductImagesIntoSection(mobileMdChoiceSection, data.mdChoiceProducts),
+            "md-choice",
+            mdChoiceSourceId,
+            viewportProfile
+          ),
+          "md-choice",
+          mdChoiceSourceId,
+          mdChoicePatch
+        );
+        html = replaceFirstMatch(
+          html,
+          /<section class="list_horizontype HomeMoListHorizontypeSkeleton_skeleton__[^"]*"[\s\S]*?<\/section>/,
+          () => fallbackMdChoice
+        );
+        if (!html.includes('data-codex-slot="md-choice"')) {
+          html = replaceFirstMatch(
+            html,
+            /<section[^>]+data-codex-slot="promotion"[^>]*>[\s\S]*?<\/section>/,
+            (match) => `${match[0]}\n${fallbackMdChoice}`
+          );
+        }
+        if (!html.includes('data-codex-slot="md-choice"')) {
+          html = injectMarkupAfterSlot(html, "promotion", fallbackMdChoice);
+        }
+        if (!html.includes('data-codex-slot="md-choice"')) {
+          html = injectMarkupAfterSlot(html, "bestshop-guide", fallbackMdChoice);
+        }
+      }
+    }
+    if (!html.includes('data-codex-slot="md-choice"')) {
+      const rawMobileMdChoiceSection = extractMobileMdChoiceSection(mobileSourceHtml);
+      if (rawMobileMdChoiceSection) {
+        const emergencyMdChoice = markHomeLowerReplay(rawMobileMdChoiceSection, "md-choice", "mobile-derived", viewportProfile);
+        html = replaceFirstMatch(
+          html,
+          /<section[^>]+data-codex-slot="promotion"[^>]*>[\s\S]*?<\/section>/,
+          (match) => `${match[0]}\n${emergencyMdChoice}`
+        );
+        if (!html.includes('data-codex-slot="md-choice"')) {
+          html = injectMarkupAfterSlot(html, "promotion", emergencyMdChoice);
+        }
+      }
+    }
+    if (!html.includes('data-codex-slot="timedeal"')) {
+      const mobileTimedealSection = extractMobileTimedealSection(mobileSourceHtml);
+      if (mobileTimedealSection) {
+        const fallbackTimedeal = applyHomeLowerSectionPatch(
+          markHomeLowerReplay(
+            injectProductImagesIntoSection(mobileTimedealSection, data.timedealProducts),
+            "timedeal",
+            timedealSourceId,
+            viewportProfile
+          ),
+          "timedeal",
+          timedealSourceId,
+          timedealPatch
+        );
+        html = replaceFirstMatch(
+          html,
+          /<section class="HomeMoTimedealSkeleton_timedeal__[^"]* HomeMoTimedealSkeleton_skeleton__[^"]*"[\s\S]*?<\/section>/,
+          () => fallbackTimedeal
+        );
+        if (!html.includes('data-codex-slot="timedeal"')) {
+          html = injectMarkupAfterSlot(html, "md-choice", fallbackTimedeal);
+        }
+      }
+    }
   }
 
   html = html.replace(
@@ -9283,7 +12203,7 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
   html = html.replace(/\b(href|src|poster)=("|')\/(?!\/)/gi, `$1=$2https://www.lge.co.kr/`);
   html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
   if (isHome) {
-    html = injectHomeReplacements(html, rawHtml, homeMobileHtml, { ...options, editableData });
+    html = injectHomeReplacements(html, rawHtml, homeMobileHtml, { ...options, editableData, viewportProfile });
     if (viewportProfile === "pc") {
       const desktopFooter = extractFooterSection(readHomeDesktopHtml());
       if (desktopFooter) {
@@ -9292,6 +12212,28 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
     }
   }
   html = applyWorkspacePageVariants(html, pageId, viewportProfile, editableData);
+  if (isHome && viewportProfile === "mo" && homeMobileHtml && !html.includes('data-codex-slot="md-choice"')) {
+    const mobileMdChoiceSection = extractMobileMdChoiceSection(homeMobileHtml);
+    if (mobileMdChoiceSection) {
+      const homeEnhancements = parseHomeEnhancements(rawHtml, homeMobileHtml, { viewportProfile });
+      const emergencyMdChoice = markHomeLowerReplay(
+        injectProductImagesIntoSection(mobileMdChoiceSection, homeEnhancements.mdChoiceProducts),
+        "md-choice",
+        "mobile-derived",
+        viewportProfile
+      );
+      html = html.replace(
+        /<section class="list_horizontype HomeMoListHorizontypeSkeleton_skeleton__[^"]*"[\s\S]*?<\/section>/,
+        emergencyMdChoice
+      );
+      if (!html.includes('data-codex-slot="md-choice"')) {
+        html = html.replace(
+          /(<section[^>]+data-codex-slot="promotion"[^>]*>[\s\S]*?<\/section>)/,
+          `$1\n${emergencyMdChoice}`
+        );
+      }
+    }
+  }
   if (
     isHome &&
     homeMobileHtml &&
@@ -9797,17 +12739,68 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       }
       :root {
         --codex-home-lower-width: min(767px, 52.5342466vw);
+        --codex-home-lower-pc-width: min(1380px, calc(100vw - 80px));
         --codex-home-lower-media-size: clamp(112px, 17.21%, 132px);
       }
+      section[data-codex-slot="quickmenu"] {
+        width: min(var(--codex-section-width, 1460px), 100vw) !important;
+        max-width: min(var(--codex-section-width, 1460px), 100vw) !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        box-sizing: border-box;
+      }
+      section[data-codex-slot="quickmenu"] .carousel_carousel__2JX9H,
+      section[data-codex-slot="quickmenu"] .carousel_carousel__01_6W,
+      section[data-codex-slot="quickmenu"] [class*="HomePcQuickmenu_quickmenu_wrap__"],
+      section[data-codex-slot="quickmenu"] [class*="HomeTaQuickmenu_quickmenu_wrap__"],
+      section[data-codex-slot="quickmenu"] [class*="HomeMoQuickmenu_quickmenu_wrap__"] {
+        width: min(var(--codex-content-width, 1460px), 100%) !important;
+        max-width: min(var(--codex-content-width, 1460px), 100%) !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        box-sizing: border-box;
+      }
       .codex-home-lower-replay {
-        width: var(--codex-home-lower-width);
+        width: min(var(--codex-section-width, var(--codex-home-lower-width)), 100vw);
+        max-width: min(var(--codex-section-width, var(--codex-home-lower-width)), 100vw);
         margin-left: auto;
         margin-right: auto;
       }
       .codex-home-lower-replay[class*="HomePcListHorizontype_list_horizontype__"],
       .codex-home-lower-replay[class*="HomePcTimedeal_timedeal__"],
+      .codex-home-lower-replay[class*="HomePcListTabsBannertype_list_tabs_bannertype__"],
+      .codex-home-lower-replay[class*="HomePcListRectangletype_list_rectangle__"],
       .codex-home-lower-replay[class*="HomeMoTimedeal_timedeal__"] {
-        max-width: var(--codex-home-lower-width);
+        width: var(--codex-home-lower-pc-width);
+        max-width: var(--codex-home-lower-pc-width);
+      }
+      .codex-home-lower-replay[class*="HomePcBannerPromotion_banner_promotion__"] {
+        width: min(1460px, 100vw);
+        max-width: min(1460px, 100vw);
+      }
+      .codex-home-lower-replay[class*="HomePcListHorizontype_list_horizontype__"] [class*="HomePcListHorizontype_content__"],
+      .codex-home-lower-replay[class*="HomePcTimedeal_timedeal__"] .carousel_carousel__2JX9H,
+      .codex-home-lower-replay[class*="HomePcListTabsBannertype_list_tabs_bannertype__"] [class*="HomePcListTabsBannertype_content__"],
+      .codex-home-lower-replay[class*="HomePcListRectangletype_list_rectangle__"] [class*="HomePcListRectangletype_content__"] {
+        width: min(var(--codex-content-width, 100%), 100%) !important;
+        max-width: min(var(--codex-content-width, 100%), 100%) !important;
+        box-sizing: border-box;
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+      .codex-home-lower-replay[class*="HomePcListHorizontype_list_horizontype__"] [class*="HomePcListHorizontype_list_horizontype_headline__"],
+      .codex-home-lower-replay[class*="HomePcTimedeal_timedeal__"] [class*="HomePcTimedeal_title_wrap__"],
+      .codex-home-lower-replay[class*="HomePcListTabsBannertype_list_tabs_bannertype__"] .list_tabs_bannertype_headline,
+      .codex-home-lower-replay[class*="HomePcListRectangletype_list_rectangle__"] .title_wrap {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box;
+      }
+      .codex-home-lower-replay[class*="HomePcListHorizontype_list_horizontype__"] .swiper,
+      .codex-home-lower-replay[class*="HomePcTimedeal_timedeal__"] .swiper,
+      .codex-home-lower-replay[class*="HomePcListTabsBannertype_list_tabs_bannertype__"] .swiper {
+        width: min(var(--codex-content-width, 100%), 100%) !important;
+        max-width: min(var(--codex-content-width, 100%), 100%) !important;
       }
       .codex-home-lower-replay .product-card-image_image img {
         visibility: visible !important;
@@ -10275,6 +13268,118 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
         width: var(--codex-home-lower-width) !important;
         max-width: var(--codex-home-lower-width);
         margin: 0 auto !important;
+      }
+      .codex-home-marketing-area__inner {
+        display: grid;
+        gap: 24px;
+      }
+      .codex-home-marketing-area__headline {
+        display: grid;
+        gap: 8px;
+      }
+      .codex-home-marketing-area__list {
+        display: block;
+      }
+      .codex-home-marketing-area__list-inner {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .codex-home-marketing-area__item {
+        display: block;
+      }
+      .codex-home-marketing-area__item > a {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 236px;
+        align-items: stretch;
+        min-height: 280px;
+        overflow: hidden;
+        border-radius: 28px;
+        background: #f5f6f8;
+        text-decoration: none;
+        color: inherit;
+      }
+      .codex-home-marketing-area__box {
+        display: grid;
+        align-content: start;
+        gap: 16px;
+        padding: 32px;
+      }
+      .codex-home-marketing-area__title {
+        font-size: 28px;
+        line-height: 1.25;
+        color: #111111;
+        font-weight: 700;
+      }
+      .codex-home-marketing-area__description {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #4b5563;
+      }
+      .codex-home-marketing-area__image {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+      }
+      .codex-home-marketing-area__image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .codex-home-service-feature {
+        display: block !important;
+        width: var(--codex-home-lower-width) !important;
+        max-width: var(--codex-home-lower-width);
+        margin: 0 auto !important;
+      }
+      .codex-home-service-feature__inner {
+        display: grid;
+        gap: 24px;
+        padding: 48px 40px;
+        border-radius: 28px;
+        background: linear-gradient(180deg, #ffffff 0%, #f7f7f8 100%);
+        border: 1px solid rgba(17,17,17,0.08);
+      }
+      .codex-home-service-feature__head {
+        display: grid;
+        gap: 8px;
+      }
+      .codex-home-service-feature__grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+      }
+      .codex-home-service-feature__card {
+        display: flex;
+        min-height: 180px;
+        padding: 28px;
+        border-radius: 24px;
+        background: #ffffff;
+        border: 1px solid rgba(17,17,17,0.08);
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 18px 40px rgba(17,17,17,0.06);
+      }
+      .codex-home-service-feature__card-body {
+        display: grid;
+        align-content: start;
+        gap: 12px;
+      }
+      .codex-home-service-feature__card-title {
+        font-size: 28px;
+        line-height: 1.24;
+        color: #111111;
+        font-weight: 700;
+      }
+      .codex-home-service-feature__card-description {
+        font-size: 16px;
+        line-height: 1.6;
+        color: #4b5563;
       }
       .codex-home-space-renewal-head {
         display: flex;
@@ -10903,9 +14008,10 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       </form>
     </section>`
     : `<div class="codex-link-toast" aria-live="polite"></div>`;
+  const mobileBottomToolbar = isHome && viewportProfile === "mo" ? buildHomeMobileBottomToolbar() : "";
   html = html.replace(
     /<body([^>]*)>/i,
-    `<body$1><div class="codex-gnb-overlay" data-codex-interaction-id="home.gnb.open" data-codex-open-state="closed" aria-hidden="true"></div>${injectedBodyChrome}`
+    `<body$1><div class="codex-gnb-overlay" data-codex-interaction-id="home.gnb.open" data-codex-open-state="closed" aria-hidden="true"></div>${injectedBodyChrome}${mobileBottomToolbar}`
   );
   html = html.replace(
     /<\/body>/i,
@@ -11080,9 +14186,12 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
               let clonePageHref = '';
               if (pathname.startsWith('/support')) clonePageHref = '/clone/support';
               else if (hostname === 'bestshop.lge.co.kr' || pathname.startsWith('/bestshop')) clonePageHref = '/clone/bestshop';
+              else if (pathname.startsWith('/care-solutions/water-purifiers/wd523vc')) clonePageHref = '/clone/care-solutions-pdp';
               else if (pathname.startsWith('/care-solutions') || pathname.startsWith('/category/care-solutions')) clonePageHref = '/clone/care-solutions';
               else if (pathname.startsWith('/lg-signature')) clonePageHref = '/clone/lg-signature-info';
               else if (pathname.startsWith('/objet-collection')) clonePageHref = '/clone/objet-collection-story';
+              else if (hostname === 'homestyle.lge.co.kr' && (pathname === '/' || pathname === '/home')) clonePageHref = '/clone/homestyle-home';
+              else if (hostname === 'homestyle.lge.co.kr' && pathname === '/item') clonePageHref = '/clone/homestyle-pdp';
               if (clonePageHref) {
                 anchor.setAttribute('href', clonePageHref);
                 anchor.setAttribute('data-codex-internal-link', 'true');
@@ -11656,7 +14765,7 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
   return html;
 }
 
-function rewriteReferenceHtml(rawHtml, pageId) {
+function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
   let html = rawHtml;
   const isHome = pageId === "home";
   const homeMobileHtml = isHome ? readHomeMobileHtml() : "";
@@ -11669,7 +14778,7 @@ function rewriteReferenceHtml(rawHtml, pageId) {
   html = html.replace(/url\((["']?)\/(?!\/)/gi, `url($1https://www.lge.co.kr/`);
   html = html.replace(/\shidden(?=[\s>])/gi, "");
   if (isHome) {
-    html = injectHomeReplacements(html, rawHtml, homeMobileHtml);
+    html = injectHomeReplacements(html, rawHtml, homeMobileHtml, { viewportProfile });
   }
   if (isHome && homeMobileHtml) {
     const extraMobileStyles = extractMissingStylesheetLinks(html, homeMobileHtml);
@@ -11680,6 +14789,9 @@ function rewriteReferenceHtml(rawHtml, pageId) {
   html = html.replace(/<section class="HomePcBannerHero_banner_hero__([^"]*)"/, '<section data-codex-slot="hero" class="HomePcBannerHero_banner_hero__$1"');
   html = html.replace(/<section class="HomeTaBannerHero_banner_hero__([^"]*)"/, '<section data-codex-slot="hero" class="HomeTaBannerHero_banner_hero__$1"');
   html = html.replace(/<section class="HomePcQuickmenu_quickmenu__([^"]*)"/, '<section data-codex-slot="quickmenu" class="HomePcQuickmenu_quickmenu__$1"');
+  html = html.replace(/<section class="HomeMoBannerHero_banner_hero__([^"]*)"/, '<section data-codex-slot="hero" class="HomeMoBannerHero_banner_hero__$1"');
+  html = html.replace(/<section class="HomeMoQuickmenu_quickmenu__([^"]*)"/, '<section data-codex-slot="quickmenu" class="HomeMoQuickmenu_quickmenu__$1"');
+  html = html.replace(/<section class="HomeMoBannerPromotion_banner_promotion__([^"]*)"/, '<section data-codex-slot="promotion" class="HomeMoBannerPromotion_banner_promotion__$1"');
 
   html = html.replace(
     /<\/head>/i,
@@ -11894,8 +15006,9 @@ function sendCloneContent(req, res, pageId, requestUrl = null) {
     const viewportProfile = String(requestUrl?.searchParams?.get("viewportProfile") || "pc").trim() || "pc";
     const homeSandbox = String(requestUrl?.searchParams?.get("homeSandbox") || "").trim();
     const homeVariant = String(requestUrl?.searchParams?.get("homeVariant") || "").trim();
+    const sectionPreviewSlot = String(requestUrl?.searchParams?.get("sectionPreviewSlot") || "").trim();
     const editorEnabled = String(requestUrl?.searchParams?.get("editor") || "").trim() === "1";
-    const { data: editableData } = resolvePinnedDataForPage(req, pageId);
+    const { data: editableData } = resolvePinnedDataForPage(req, pageId, viewportProfile);
     const rawHtml = readCloneSourceHtmlByPageId(pageId, viewportProfile);
     if (!rawHtml) {
       return sendRawHtml(
@@ -11910,7 +15023,20 @@ function sendCloneContent(req, res, pageId, requestUrl = null) {
       editableData,
       editorEnabled,
     });
-    return sendRawHtml(res, 200, transformed);
+    const imageDiffMeta = sectionPreviewSlot
+      ? buildSectionPreviewImageDiffMeta({
+          req,
+          pageId,
+          viewportProfile,
+          slotId: sectionPreviewSlot,
+          rawHtml,
+          currentHtml: transformed,
+          homeSandbox,
+          homeVariant,
+          editorEnabled,
+        })
+      : null;
+    return sendRawHtml(res, 200, sectionPreviewSlot ? applySectionPreviewMode(transformed, sectionPreviewSlot, { imageDiff: imageDiffMeta }) : transformed);
   } catch (error) {
     return sendRawHtml(
       res,
@@ -11925,7 +15051,8 @@ function sendCloneProductContent(req, res, requestUrl) {
     const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
     const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "pc").trim() || "pc";
     const href = String(requestUrl.searchParams.get("href") || "").trim();
-    const { data: editableData } = resolvePinnedDataForPage(req, pageId);
+    const sectionPreviewSlot = String(requestUrl.searchParams.get("sectionPreviewSlot") || "").trim();
+    const { data: editableData } = resolvePinnedDataForPage(req, pageId, viewportProfile);
     const pdpContext = resolvePdpRuntimeContext(pageId, href);
     const capturePageId = pdpContext?.runtimePageId || pageId;
     const effectiveHref = pdpContext?.href || href;
@@ -11949,7 +15076,18 @@ function sendCloneProductContent(req, res, requestUrl) {
     }
     const rawHtml = fs.readFileSync(htmlPath, "utf-8");
     const transformed = rewriteProductCapturedHtml(rawHtml, pageId, viewportProfile, effectiveHref, editableData);
-    return sendRawHtml(res, 200, transformed);
+    const imageDiffMeta = sectionPreviewSlot
+      ? buildSectionPreviewImageDiffMeta({
+          req,
+          pageId,
+          viewportProfile,
+          slotId: sectionPreviewSlot,
+          rawHtml,
+          currentHtml: transformed,
+          href: effectiveHref,
+        })
+      : null;
+    return sendRawHtml(res, 200, sectionPreviewSlot ? applySectionPreviewMode(transformed, sectionPreviewSlot, { imageDiff: imageDiffMeta }) : transformed);
   } catch (error) {
     return sendRawHtml(
       res,
@@ -11963,10 +15101,15 @@ function sendCloneProductShell(req, res, requestUrl) {
   const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
   const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "pc").trim() || "pc";
   const href = String(requestUrl.searchParams.get("href") || "").trim();
-  const { pinnedView } = resolvePinnedDataForPage(req, pageId);
+  const draftBuildId = String(requestUrl.searchParams.get("draftBuildId") || "").trim();
+  const snapshotState = String(requestUrl.searchParams.get("snapshotState") || "").trim();
+  const { pinnedView } = resolvePinnedDataForPage(req, pageId, viewportProfile);
   const title = escapeHtml(requestUrl.searchParams.get("title") || href || "PDP");
   const visibleTitle = `${title}${pinnedView?.version?.versionLabel ? ` · ${escapeHtml(pinnedView.version.versionLabel)}` : ""}`;
-  const iframeSrc = `/clone-product-content?pageId=${encodeURIComponent(pageId)}&viewportProfile=${encodeURIComponent(viewportProfile)}&href=${encodeURIComponent(href)}&v=${Date.now()}`;
+  const snapshotQuery = draftBuildId
+    ? `&draftBuildId=${encodeURIComponent(draftBuildId)}${snapshotState ? `&snapshotState=${encodeURIComponent(snapshotState)}` : ""}`
+    : "";
+  const iframeSrc = `/clone-product-content?pageId=${encodeURIComponent(pageId)}&viewportProfile=${encodeURIComponent(viewportProfile)}&href=${encodeURIComponent(href)}&v=${Date.now()}${snapshotQuery}`;
   return sendRawHtml(
     res,
     200,
@@ -12000,7 +15143,9 @@ function sendCloneProductShell(req, res, requestUrl) {
 function sendReferenceContent(res, pageId, requestUrl = null) {
   try {
     const viewportProfile = String(requestUrl?.searchParams?.get("viewportProfile") || "pc").trim() || "pc";
-    const rawHtml = String(pageId || "").startsWith("category-")
+    const rawHtml = pageId === "home"
+      ? readCloneSourceHtmlByPageId(pageId, viewportProfile)
+      : String(pageId || "").startsWith("category-")
       ? readPlpReferenceHtml(pageId, viewportProfile)
       : readReferenceSourceHtmlByPageId(pageId);
     if (!rawHtml) {
@@ -12010,7 +15155,7 @@ function sendReferenceContent(res, pageId, requestUrl = null) {
         `<!doctype html><html><head><meta charset="utf-8"><title>Reference not found</title></head><body><h1>Reference not found</h1><p>${pageId}</p></body></html>`
       );
     }
-    return sendRawHtml(res, 200, rewriteReferenceHtml(rawHtml, pageId));
+    return sendRawHtml(res, 200, rewriteReferenceHtml(rawHtml, pageId, viewportProfile));
   } catch (error) {
     return sendRawHtml(
       res,
@@ -12031,16 +15176,31 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
   )
     .trim()
     .toLowerCase();
+  const isHome = safePageId === "home";
   const homeSandboxQuery = homeSandbox ? `&homeSandbox=${encodeURIComponent(homeSandbox)}` : "";
   const homeVariantQuery = homeVariant ? `&homeVariant=${encodeURIComponent(homeVariant)}` : "";
-  const { pinnedView, effectiveSource } = resolvePinnedDataForPage(req, safePageId);
+  const draftBuildId = String(requestUrl?.searchParams?.get("draftBuildId") || "").trim();
+  const snapshotState = String(requestUrl?.searchParams?.get("snapshotState") || "").trim();
+  const snapshotQuery = draftBuildId
+    ? `&draftBuildId=${encodeURIComponent(draftBuildId)}${snapshotState ? `&snapshotState=${encodeURIComponent(snapshotState)}` : ""}`
+    : "";
+  const explicitViewportProfile =
+    isHome && (requestedView === "pc" || requestedView === "mo" || requestedView === "ta")
+      ? normalizeHomeViewportProfile(requestedView, "pc")
+      : requestedView === "pc" || requestedView === "mo"
+        ? requestedView
+        : "";
+  const { pinnedView, effectiveSource } = resolvePinnedDataForPage(req, safePageId, explicitViewportProfile || "pc");
   const workspaceSource = effectiveSource || "shared-default";
   const baseline = resolveBaselineInfo(safePageId);
-  const shellViewportProfile = requestedView === "mo" || requestedView === "pc"
-    ? requestedView
+  const autoViewportEnabled = isHome && !explicitViewportProfile;
+  const shellViewportProfile = explicitViewportProfile
+    ? explicitViewportProfile
     : baseline.mode === "mobile"
       ? "mo"
-      : "pc";
+      : isHome
+        ? "ta"
+        : "pc";
   const isMobileShell = shellViewportProfile === "mo";
   const useCapturedShellHeader = true;
   const gnb = isMobileShell ? { topLinks: [], brandTabs: [], utilityLinks: [], dropdownMenus: {} } : buildShellGnbData();
@@ -12475,7 +15635,7 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         id="clone-frame"
         class="clone-frame"
         title="Captured clone"
-        src="/clone-content/${encodeURIComponent(safePageId)}?viewportProfile=${encodeURIComponent(shellViewportProfile)}&v=${Date.now()}${homeSandboxQuery}${homeVariantQuery}"
+        src="/clone-content/${encodeURIComponent(safePageId)}?viewportProfile=${encodeURIComponent(shellViewportProfile)}&v=${Date.now()}${homeSandboxQuery}${homeVariantQuery}${snapshotQuery}"
       ></iframe>
     </div>
     <script>
@@ -12491,6 +15651,30 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         let toastTimer = null;
         let productPanelCloseTimer = null;
         let activeMenuId = null;
+        const homeViewportMode = ${JSON.stringify(autoViewportEnabled ? "auto" : shellViewportProfile)};
+
+        function detectHomeViewportProfile() {
+          const width = window.innerWidth || document.documentElement.clientWidth || 0;
+          if (width < 768) return 'mo';
+          if (width < 1280) return 'ta';
+          return 'pc';
+        }
+
+        function buildFrameSrc(pageId, viewportProfile) {
+          return '/clone-content/' + encodeURIComponent(pageId) + '?viewportProfile=' + encodeURIComponent(viewportProfile) + '&v=' + cacheBust + '${homeSandboxQuery}${homeVariantQuery}${snapshotQuery}';
+        }
+
+        function syncHomeViewport(forceReload = false) {
+          if (${JSON.stringify(isHome)} !== true || homeViewportMode !== 'auto') return;
+          const nextViewport = detectHomeViewportProfile();
+          const expectedSrc = buildFrameSrc('${escapeHtml(safePageId)}', nextViewport);
+          if (forceReload || frame.getAttribute('src') !== expectedSrc) {
+            frame.src = expectedSrc;
+            loading.classList.remove('is-hidden');
+            window.clearTimeout(loadingTimer);
+            loadingTimer = window.setTimeout(hideLoading, 2200);
+          }
+        }
 
         function hideLoading() {
           loading.classList.add('is-hidden');
@@ -12507,9 +15691,13 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
 
         function setPage(nextPageId) {
           const normalized = decodeURIComponent(nextPageId || 'home');
-          const nextUrl = '/clone/' + encodeURIComponent(normalized) + '${homeSandbox ? `?homeSandbox=${homeSandbox}${homeVariant ? `&homeVariant=${homeVariant}` : ""}` : homeVariant ? `?homeVariant=${homeVariant}` : ""}';
+          const nextViewport = homeViewportMode === 'auto' && normalized === 'home' ? detectHomeViewportProfile() : homeViewportMode;
+          const nextQuery = normalized === 'home'
+            ? '${homeSandbox ? `?homeSandbox=${homeSandbox}${homeVariant ? `&homeVariant=${homeVariant}` : ""}` : homeVariant ? `?homeVariant=${homeVariant}` : ""}' + (homeViewportMode === 'auto' ? '' : '${homeSandbox || homeVariant ? '&' : '?'}viewportProfile=' + encodeURIComponent(nextViewport))
+            : '${homeSandbox ? `?homeSandbox=${homeSandbox}${homeVariant ? `&homeVariant=${homeVariant}` : ""}` : homeVariant ? `?homeVariant=${homeVariant}` : ""}';
+          const nextUrl = '/clone/' + encodeURIComponent(normalized) + nextQuery;
           history.replaceState({ pageId: normalized }, '', nextUrl);
-          frame.src = '/clone-content/' + encodeURIComponent(normalized) + '?v=' + cacheBust + '${homeSandboxQuery}${homeVariantQuery}';
+          frame.src = buildFrameSrc(normalized, normalized === 'home' ? nextViewport : 'pc');
           loading.classList.remove('is-hidden');
           window.clearTimeout(loadingTimer);
           loadingTimer = window.setTimeout(hideLoading, 2200);
@@ -12520,6 +15708,14 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
           loadingTimer = window.setTimeout(hideLoading, 300);
           scheduleShellMeasurements(280);
         });
+        if (homeViewportMode === 'auto') {
+          let resizeTimer = null;
+          window.addEventListener('resize', () => {
+            window.clearTimeout(resizeTimer);
+            resizeTimer = window.setTimeout(() => syncHomeViewport(false), 120);
+          });
+          syncHomeViewport(true);
+        }
 
         function routeLink(href) {
           if (!href || href === '#') {
@@ -12854,12 +16050,24 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
   return sendRawHtml(res, 200, html);
 }
 
-function sendCompareShell(res, pageId) {
+function sendCompareShell(res, pageId, requestUrl = null) {
   const safePageId = String(pageId || "home");
-  const baseline = resolveBaselineInfo(safePageId);
-  const liveReferenceSrc = toVisualUrl(path.join(VISUAL_DIR, safePageId, "live-reference.png"));
-  const usesMobileHomeBaseline = baseline.mode === "mobile";
-  const liveReferenceUrl = baseline.url;
+  const requestedViewportProfile = safePageId === "home"
+    ? normalizeHomeViewportProfile(requestUrl?.searchParams?.get("viewportProfile") || "ta", "ta")
+    : normalizeViewportProfile(requestUrl?.searchParams?.get("viewportProfile") || "pc", "pc");
+  const draftBuildId = String(requestUrl?.searchParams?.get("draftBuildId") || "").trim();
+  const buildCloneUrl = (snapshotState) => {
+    const params = new URLSearchParams();
+    if (safePageId === "home") params.set("viewportProfile", requestedViewportProfile);
+    if (draftBuildId) {
+      params.set("draftBuildId", draftBuildId);
+      params.set("snapshotState", snapshotState);
+    }
+    const query = params.toString();
+    return `/clone/${encodeURIComponent(safePageId)}${query ? `?${query}` : ""}`;
+  };
+  const beforeCloneUrl = buildCloneUrl("before");
+  const afterCloneUrl = buildCloneUrl("after");
   const html = `<!doctype html>
 <html lang="ko">
   <head>
@@ -12943,36 +16151,6 @@ function sendCompareShell(res, pageId) {
         transform-origin: top left;
         width: ${DEFAULT_CANVAS_WIDTH}px;
       }
-      .compare-image-wrap {
-        min-width: 0;
-        min-height: 0;
-        overflow: auto;
-        background: #cbd5e1;
-        display: flex;
-        align-items: flex-start;
-        justify-content: center;
-      }
-      .compare-image {
-        width: ${DEFAULT_CANVAS_WIDTH}px;
-        height: auto;
-        display: block;
-        background: #fff;
-      }
-      .compare-empty {
-        width: ${DEFAULT_CANVAS_WIDTH}px;
-        min-height: 320px;
-        box-sizing: border-box;
-        padding: 24px;
-        background: #e2e8f0;
-        color: #0f172a;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      .compare-empty a {
-        color: #0f172a;
-        font-weight: 700;
-      }
       .compare-measure {
         overflow: auto;
         padding: 8px 10px;
@@ -12994,62 +16172,48 @@ function sendCompareShell(res, pageId) {
     </style>
   </head>
   <body>
-      <div class="compare-shell">
+    <div class="compare-shell">
       <div class="compare-toolbar">
-        <strong>Compare: ${safePageId} · canvas ${DEFAULT_CANVAS_WIDTH}px</strong>
-        <a href="/clone/${encodeURIComponent(safePageId)}">작업본만 보기</a>
+        <strong>Compare: ${safePageId} · ${requestedViewportProfile} · ${draftBuildId ? `draft ${escapeHtml(draftBuildId)}` : "before/after"} · canvas ${DEFAULT_CANVAS_WIDTH}px</strong>
+        <a href="${escapeHtml(afterCloneUrl)}">생성 후 화면만 보기</a>
       </div>
       <div class="compare-grid">
         <section class="compare-pane">
-          <div class="compare-label">Live Visual Baseline · ${baseline.route}</div>
-          <div class="compare-canvas-wrap" data-compare-wrap>
-            <div class="compare-canvas-stage" data-compare-stage>
-              ${liveReferenceSrc
-                ? `<img
-                    class="compare-image"
-                    id="reference-image"
-                    src="${liveReferenceSrc}?v=${Date.now()}"
-                    alt="Live visual baseline"
-                  />`
-                : `<div class="compare-empty">
-                    <strong>Live visual baseline capture is missing.</strong>
-                    <div>현재 기준 캡처 이미지가 없어 비교 화면에 직접 표시할 수 없습니다.</div>
-                    <div>기준 경로: ${escapeHtml(baseline.route)}</div>
-                    <a href="${escapeHtml(liveReferenceUrl)}" target="_blank" rel="noopener">원본 기준 페이지 열기</a>
-                  </div>`}
-            </div>
-          </div>
-          <pre class="compare-measure" id="reference-measure">reference metrics pending…</pre>
-        </section>
-        <section class="compare-pane">
-          <div class="compare-label">Working Clone</div>
+          <div class="compare-label">생성 이전 화면</div>
           <div class="compare-canvas-wrap" data-compare-wrap>
             <div class="compare-canvas-stage" data-compare-stage>
               <iframe
                 class="compare-frame"
-                id="working-frame"
-                src="/clone/${encodeURIComponent(safePageId)}"
+                id="before-frame"
+                src="${escapeHtml(beforeCloneUrl)}"
               ></iframe>
             </div>
           </div>
-          <pre class="compare-measure" id="working-measure">working metrics pending…</pre>
+          <pre class="compare-measure" id="before-measure">before metrics pending…</pre>
+        </section>
+        <section class="compare-pane">
+          <div class="compare-label">생성 이후 화면</div>
+          <div class="compare-canvas-wrap" data-compare-wrap>
+            <div class="compare-canvas-stage" data-compare-stage>
+              <iframe
+                class="compare-frame"
+                id="after-frame"
+                src="${escapeHtml(afterCloneUrl)}"
+              ></iframe>
+            </div>
+          </div>
+          <pre class="compare-measure" id="after-measure">after metrics pending…</pre>
         </section>
       </div>
-      <iframe
-        style="position:absolute;width:1px;height:1px;left:-99999px;top:-99999px;border:0;opacity:0;pointer-events:none"
-        aria-hidden="true"
-        tabindex="-1"
-        src="/reference-content/${encodeURIComponent(safePageId)}"
-      ></iframe>
       <pre class="compare-diff" id="compare-diff">diff pending…</pre>
       <script>
         (() => {
           const pageId = ${JSON.stringify(safePageId)};
-          const referenceEl = document.getElementById('reference-measure');
-          const workingEl = document.getElementById('working-measure');
+          const beforeEl = document.getElementById('before-measure');
+          const afterEl = document.getElementById('after-measure');
           const diffEl = document.getElementById('compare-diff');
-          const workingFrame = document.getElementById('working-frame');
-          const referenceFrame = document.querySelector('iframe[aria-hidden="true"]');
+          const beforeFrame = document.getElementById('before-frame');
+          const afterFrame = document.getElementById('after-frame');
           const store = {};
 
           function summarizeRows(items) {
@@ -13230,85 +16394,46 @@ function sendCompareShell(res, pageId) {
 
           function updateMeasurementStores() {
             try {
-              const refDoc = referenceFrame?.contentDocument || referenceFrame?.contentWindow?.document;
-              const workingShellDoc = workingFrame?.contentDocument || workingFrame?.contentWindow?.document;
-              const cloneInnerFrame = workingShellDoc?.getElementById('clone-frame');
-              const cloneContentDoc = cloneInnerFrame?.contentDocument || cloneInnerFrame?.contentWindow?.document;
-              const innerFrameRect = cloneInnerFrame?.getBoundingClientRect?.() || { x: 0, y: 0 };
-              const refPayload = collectDocumentSlotMetrics(refDoc, 'reference-content');
-              const shellPayload = collectShellMetrics(workingShellDoc);
-              const contentPayload = collectDocumentSlotMetrics(cloneContentDoc, 'clone-content', {
-                x: Math.round(innerFrameRect.x || 0),
-                y: Math.round(innerFrameRect.y || 0)
+              const beforeShellDoc = beforeFrame?.contentDocument || beforeFrame?.contentWindow?.document;
+              const beforeInnerFrame = beforeShellDoc?.getElementById('clone-frame');
+              const beforeContentDoc = beforeInnerFrame?.contentDocument || beforeInnerFrame?.contentWindow?.document;
+              const beforeInnerRect = beforeInnerFrame?.getBoundingClientRect?.() || { x: 0, y: 0 };
+              const afterShellDoc = afterFrame?.contentDocument || afterFrame?.contentWindow?.document;
+              const afterInnerFrame = afterShellDoc?.getElementById('clone-frame');
+              const afterContentDoc = afterInnerFrame?.contentDocument || afterInnerFrame?.contentWindow?.document;
+              const afterInnerRect = afterInnerFrame?.getBoundingClientRect?.() || { x: 0, y: 0 };
+              const beforeShellPayload = collectShellMetrics(beforeShellDoc);
+              const beforeContentPayload = collectDocumentSlotMetrics(beforeContentDoc, 'clone-content-before', {
+                x: Math.round(beforeInnerRect.x || 0),
+                y: Math.round(beforeInnerRect.y || 0)
               });
-              if (refPayload) {
-                store.reference = store.reference || {};
-                store.reference['reference-content'] = refPayload;
-                persistMeasurement(refPayload);
+              const afterShellPayload = collectShellMetrics(afterShellDoc);
+              const afterContentPayload = collectDocumentSlotMetrics(afterContentDoc, 'clone-content-after', {
+                x: Math.round(afterInnerRect.x || 0),
+                y: Math.round(afterInnerRect.y || 0)
+              });
+              if (beforeShellPayload) {
+                store.before = store.before || {};
+                store.before['clone-shell-before'] = beforeShellPayload;
+                persistMeasurement(beforeShellPayload);
               }
-              if (shellPayload) {
-                store.working = store.working || {};
-                store.working['clone-shell'] = shellPayload;
-                persistMeasurement(shellPayload);
+              if (beforeContentPayload) {
+                store.before = store.before || {};
+                store.before['clone-content-before'] = beforeContentPayload;
+                persistMeasurement(beforeContentPayload);
               }
-              if (contentPayload) {
-                store.working = store.working || {};
-                store.working['clone-content'] = contentPayload;
-                persistMeasurement(contentPayload);
+              if (afterShellPayload) {
+                store.after = store.after || {};
+                store.after['clone-shell-after'] = afterShellPayload;
+                persistMeasurement(afterShellPayload);
+              }
+              if (afterContentPayload) {
+                store.after = store.after || {};
+                store.after['clone-content-after'] = afterContentPayload;
+                persistMeasurement(afterContentPayload);
               }
               refresh();
             } catch (_) {}
-          }
-
-          function seedReference() {
-            Promise.all([
-              fetch('/api/slot-snapshots?pageId=' + encodeURIComponent(pageId) + '&source=reference').then((r) => r.json()),
-              fetch('/api/slot-diff?pageId=' + encodeURIComponent(pageId)).then((r) => r.json()),
-              fetch('/api/baseline-audit?pageId=' + encodeURIComponent(pageId)).then((r) => r.json())
-            ]).then(([reference, diff, audit]) => {
-              store.reference = {
-                'visual-baseline': {
-                  source: 'visual-baseline',
-                  pageId,
-                  baselineUrl: ${JSON.stringify(liveReferenceUrl)},
-                  baselineRoute: ${JSON.stringify(baseline.route)},
-                  baselineMode: ${JSON.stringify(baseline.mode)}
-                },
-                'reference-structure': {
-                  source: 'reference-structure',
-                  pageId,
-                  slots: reference.slots || [],
-                  states: reference.states || []
-                }
-              };
-              if (diff && diff.reference) {
-                store.reference['reference-diff'] = diff.reference;
-              }
-              if (audit) {
-                store.audit = audit;
-              }
-              refresh();
-            }).catch(() => {});
-          }
-
-          function pollWorking() {
-            fetch('/api/measurements?pageId=' + encodeURIComponent(pageId))
-              .then((r) => r.json())
-              .then((payload) => {
-                const measurements = payload.measurements || {};
-                if (measurements['clone-shell'] || measurements['clone-content']) {
-                  store.working = store.working || {};
-                  if (measurements['clone-shell']) {
-                    store.working['clone-shell'] = measurements['clone-shell'];
-                  }
-                  if (measurements['clone-content']) {
-                    store.working['clone-content'] = measurements['clone-content'];
-                  }
-                  refresh();
-                }
-              })
-              .catch(() => {});
-            updateMeasurementStores();
           }
 
           function renderBucket(bucket) {
@@ -13322,11 +16447,9 @@ function sendCompareShell(res, pageId) {
           }
 
           function refresh() {
-            referenceEl.textContent = renderBucket(store.reference);
-            workingEl.textContent = renderBucket(store.working);
-            const renderedDiff = renderDiff();
-            const auditText = renderAudit();
-            diffEl.textContent = [renderedDiff, '', auditText].filter(Boolean).join('\\n');
+            beforeEl.textContent = renderBucket(store.before);
+            afterEl.textContent = renderBucket(store.after);
+            diffEl.textContent = renderDiff();
           }
 
           function normalize(bucket) {
@@ -13340,50 +16463,32 @@ function sendCompareShell(res, pageId) {
           }
 
           function renderDiff() {
-            const referenceSlots = normalize(store.reference);
-            const workingSlots = normalize(store.working);
-            const slotIds = Array.from(new Set([...Object.keys(referenceSlots), ...Object.keys(workingSlots)]));
+            const beforeSlots = normalize(store.before);
+            const afterSlots = normalize(store.after);
+            const slotIds = Array.from(new Set([...Object.keys(beforeSlots), ...Object.keys(afterSlots)]));
             if (!slotIds.length) return 'diff pending…';
             const lines = [];
             slotIds.forEach((slotId) => {
-              const ref = referenceSlots[slotId];
-              const work = workingSlots[slotId];
-              if (!ref || !work) {
-                lines.push(slotId + ': missing on ' + (!ref ? 'reference' : 'working'));
+              const before = beforeSlots[slotId];
+              const after = afterSlots[slotId];
+              if (!before || !after) {
+                lines.push(slotId + ': missing on ' + (!before ? 'before' : 'after'));
                 return;
               }
-              const dx = work.x - ref.x;
-              const dy = work.y - ref.y;
-              const dw = work.width - ref.width;
-              const dh = work.height - ref.height;
+              const dx = after.x - before.x;
+              const dy = after.y - before.y;
+              const dw = after.width - before.width;
+              const dh = after.height - before.height;
               lines.push(
                 slotId +
-                  ' :: x ' + ref.x + ' -> ' + work.x + ' (' + (dx >= 0 ? '+' : '') + dx + ')' +
-                  ', y ' + ref.y + ' -> ' + work.y + ' (' + (dy >= 0 ? '+' : '') + dy + ')' +
-                  ', w ' + ref.width + ' -> ' + work.width + ' (' + (dw >= 0 ? '+' : '') + dw + ')' +
-                  ', h ' + ref.height + ' -> ' + work.height + ' (' + (dh >= 0 ? '+' : '') + dh + ')'
+                  ' :: x ' + before.x + ' -> ' + after.x + ' (' + (dx >= 0 ? '+' : '') + dx + ')' +
+                  ', y ' + before.y + ' -> ' + after.y + ' (' + (dy >= 0 ? '+' : '') + dy + ')' +
+                  ', w ' + before.width + ' -> ' + after.width + ' (' + (dw >= 0 ? '+' : '') + dw + ')' +
+                  ', h ' + before.height + ' -> ' + after.height + ' (' + (dh >= 0 ? '+' : '') + dh + ')'
               );
-              if ((ref.rowGroups || []).length || (work.rowGroups || []).length) {
-                lines.push('  rows ref=' + JSON.stringify(ref.rowGroups || []) + ' work=' + JSON.stringify(work.rowGroups || []));
+              if ((before.rowGroups || []).length || (after.rowGroups || []).length) {
+                lines.push('  rows before=' + JSON.stringify(before.rowGroups || []) + ' after=' + JSON.stringify(after.rowGroups || []));
               }
-            });
-            return lines.join('\\n');
-          }
-
-          function renderAudit() {
-            if (!store.audit) return 'audit pending…';
-            const audit = store.audit;
-            const lines = [
-              '[baseline-audit]',
-              'overall=' + String(audit.overallStatus || 'unknown'),
-              'pageStatus=' + String(audit.pageStatus || 'unknown'),
-              'interactionStatus=' + String(audit.interactionStatus || 'unknown'),
-            ];
-            (audit.checks || []).forEach((check) => {
-              lines.push('- ' + check.id + ' [' + check.status + '] ' + check.detail);
-            });
-            (audit.slots || []).forEach((slot) => {
-              lines.push('* ' + slot.slotId + ' [' + slot.status + '] ' + slot.reason);
             });
             return lines.join('\\n');
           }
@@ -13405,26 +16510,13 @@ function sendCompareShell(res, pageId) {
             if (data.type !== 'codex:measure' || !data.payload) return;
             const payload = data.payload;
             if (payload.pageId && payload.pageId !== pageId) return;
-            fetch('/api/measure', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload),
-              keepalive: true
-            }).catch(() => {});
-            const bucket =
-              payload.source === 'reference-content'
-                ? 'reference'
-                : 'working';
-            store[bucket] = store[bucket] || {};
-            store[bucket][payload.source] = payload;
-            refresh();
+            updateMeasurementStores();
           });
 
-          seedReference();
-          pollWorking();
-          setInterval(pollWorking, 1200);
-          workingFrame?.addEventListener('load', () => setTimeout(updateMeasurementStores, 200));
-          referenceFrame?.addEventListener('load', () => setTimeout(updateMeasurementStores, 200));
+          updateMeasurementStores();
+          setInterval(updateMeasurementStores, 1200);
+          beforeFrame?.addEventListener('load', () => setTimeout(updateMeasurementStores, 220));
+          afterFrame?.addEventListener('load', () => setTimeout(updateMeasurementStores, 220));
           fitCanvases();
           window.addEventListener('resize', fitCanvases);
         })();
@@ -13504,7 +16596,7 @@ function route(req, res) {
   }
   if (pathname.startsWith("/compare/")) {
     const pageId = decodeURIComponent(pathname.slice("/compare/".length));
-    return sendCompareShell(res, pageId);
+    return sendCompareShell(res, pageId, requestUrl);
   }
   if (pathname === "/workbench/gnb") {
     const pageId = requestUrl.searchParams.get("pageId") || "home";
@@ -13562,19 +16654,21 @@ function route(req, res) {
   }
   if (pathname === "/api/component-inventory") {
     const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
     const source = requestUrl.searchParams.get("source") || "working";
     if (source !== "working") {
       return sendJson(res, 400, { error: "component_inventory_source_not_supported", pageId, source });
     }
-    return sendJson(res, 200, buildWorkingComponentInventory(pageId));
+    return sendJson(res, 200, buildWorkingComponentInventory(pageId, { viewportProfile }));
   }
   if (pathname === "/api/component-editability") {
     const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
     const source = requestUrl.searchParams.get("source") || "working";
     if (source !== "working") {
       return sendJson(res, 400, { error: "component_editability_source_not_supported", pageId, source });
     }
-    return sendJson(res, 200, buildWorkingEditableComponentCatalog(pageId));
+    return sendJson(res, 200, buildWorkingEditableComponentCatalog(pageId, { viewportProfile }));
   }
   if (pathname === "/api/component-rollback") {
     const pageId = requestUrl.searchParams.get("pageId") || "home";
@@ -13830,9 +16924,10 @@ function route(req, res) {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+    const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "").trim();
     const limit = Math.max(1, Math.min(200, Number(requestUrl.searchParams.get("limit") || 50)));
     return sendJson(res, 200, {
-      items: listRequirementPlans(user.userId, { pageId, limit }),
+      items: listRequirementPlans(user.userId, { pageId, viewportProfile, limit }),
     });
   }
   if (pathname === "/api/workspace/page-identity") {
@@ -13885,9 +16980,10 @@ function route(req, res) {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+    const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "").trim();
     const limit = Math.max(1, Math.min(200, Number(requestUrl.searchParams.get("limit") || 50)));
     return sendJson(res, 200, {
-      items: listDraftBuilds(user.userId, { pageId, limit }),
+      items: listDraftBuilds(user.userId, { pageId, viewportProfile, limit }),
     });
   }
   if (pathname === "/api/workspace/draft-build" && req.method === "POST") {
@@ -13907,9 +17003,10 @@ function route(req, res) {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+    const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "").trim();
     const limit = Math.max(1, Math.min(200, Number(requestUrl.searchParams.get("limit") || 50)));
     return sendJson(res, 200, {
-      items: listSavedVersions(user.userId, { pageId, limit }),
+      items: listSavedVersions(user.userId, { pageId, viewportProfile, limit }),
     });
   }
   if (pathname === "/api/workspace/version-save" && req.method === "POST") {
@@ -13919,17 +17016,18 @@ function route(req, res) {
         if (!user) return;
         const payload = body ? JSON.parse(body) : {};
         const pageId = String(payload.pageId || "").trim();
+        const viewportProfile = String(payload.viewportProfile || "").trim();
         if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
         const currentData = readWorkspaceData(user.userId);
         const buildId = String(payload.buildId || "").trim();
         const draftBuild =
           buildId
-            ? listDraftBuilds(user.userId, { pageId, limit: 200 }).find((item) => item.id === buildId) || null
+            ? listDraftBuilds(user.userId, { pageId, viewportProfile, limit: 200 }).find((item) => item.id === buildId) || null
             : null;
-        const pageSnapshot =
+        const effectivePageSnapshot =
           (payload.snapshotData && payload.snapshotData.pageSnapshot) ||
           draftBuild?.snapshotData?.pageSnapshot ||
-          extractPageScopedSnapshot(currentData, pageId);
+          extractPageScopedSnapshot(currentData, pageId, viewportProfile || draftBuild?.viewportProfile || "");
         const changedComponentIds = Array.isArray(payload.snapshotData?.changedComponentIds)
           ? payload.snapshotData.changedComponentIds.filter(Boolean)
           : Array.isArray(draftBuild?.snapshotData?.changedComponentIds)
@@ -13943,7 +17041,7 @@ function route(req, res) {
           snapshotData: {
             ...(payload.snapshotData && typeof payload.snapshotData === "object" ? payload.snapshotData : {}),
             changedComponentIds,
-            pageSnapshot,
+            pageSnapshot: effectivePageSnapshot,
           },
           createdBy: user.userId,
         });
@@ -13956,9 +17054,10 @@ function route(req, res) {
     if (!user) return;
     if (req.method === "GET") {
       const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+      const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "").trim();
       if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
       return sendJson(res, 200, {
-        item: getPinnedView(user.userId, pageId),
+        item: getPinnedView(user.userId, pageId, viewportProfile),
       });
     }
     if (req.method === "POST") {
@@ -13967,7 +17066,8 @@ function route(req, res) {
           const payload = body ? JSON.parse(body) : {};
           const pageId = String(payload.pageId || "").trim();
           const versionId = String(payload.versionId || "").trim();
-          const item = pinSavedVersion(user.userId, pageId, versionId);
+          const viewportProfile = String(payload.viewportProfile || "").trim();
+          const item = pinSavedVersion(user.userId, pageId, versionId, viewportProfile);
           return sendJson(res, 200, { ok: true, item });
         })
         .catch((error) => sendJson(res, 500, { error: "workspace_view_pin_failed", detail: String(error) }));
@@ -14045,8 +17145,9 @@ function route(req, res) {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
     const data = readWorkspaceData(user.userId);
-    return sendJson(res, 200, buildWorkingComponentInventory(pageId, { editableData: data }));
+    return sendJson(res, 200, buildWorkingComponentInventory(pageId, { editableData: data, viewportProfile }));
   }
   if (pathname === "/api/workspace/component-patches") {
     const user = requireAuthenticatedUser(req, res);
@@ -14054,18 +17155,21 @@ function route(req, res) {
     const pageId = requestUrl.searchParams.get("pageId") || "";
     const componentId = requestUrl.searchParams.get("componentId") || "";
     const sourceId = requestUrl.searchParams.get("sourceId") || "";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
     const data = readWorkspaceData(user.userId);
     if (componentId) {
       return sendJson(res, 200, {
         pageId,
         componentId,
         sourceId,
-        patch: findComponentPatch(data, pageId, componentId, sourceId)?.patch || null,
+        viewportProfile: viewportProfile || null,
+        patch: findComponentPatch(data, pageId, componentId, sourceId, viewportProfile)?.patch || null,
       });
     }
     return sendJson(res, 200, {
       pageId,
-      items: listComponentPatches(data, pageId),
+      viewportProfile: viewportProfile || null,
+      items: listComponentPatches(data, pageId, viewportProfile),
     });
   }
   if (pathname === "/api/workspace/component-patch" && req.method === "POST") {
@@ -14077,24 +17181,26 @@ function route(req, res) {
         const pageId = String(payload.pageId || "").trim();
         const componentId = String(payload.componentId || "").trim();
         const sourceId = String(payload.sourceId || "").trim();
+        const viewportProfile = String(payload.viewportProfile || "").trim();
         const patch = payload.patch && typeof payload.patch === "object" ? payload.patch : null;
         if (!pageId || !componentId || !sourceId || !patch) {
           return sendJson(res, 400, { error: "page_id_component_id_source_id_patch_required" });
         }
         const data = readWorkspaceData(user.userId);
-        const editableCatalog = buildWorkingEditableComponentCatalog(pageId, { editableData: data });
+        const editableCatalog = buildWorkingEditableComponentCatalog(pageId, { editableData: data, viewportProfile });
         const editable = (editableCatalog.components || []).find((item) => item.componentId === componentId);
         if (!editable) {
           return sendJson(res, 404, { error: "component_not_found", pageId, componentId });
         }
-        const sanitizedPatch = sanitizeComponentPatch(patch, editable.patchSchema || {});
-        const nextData = upsertComponentPatch(data, pageId, componentId, sourceId, sanitizedPatch);
-        saveDataForUser(user, nextData, `component_patch:${pageId}:${componentId}:${sourceId}`);
+        const sanitizedPatch = sanitizeComponentPatch(patch, editable.patchSchema || {}, { pageId, slotId: editable.slotId });
+        const nextData = upsertComponentPatch(data, pageId, componentId, sourceId, sanitizedPatch, viewportProfile);
+        saveDataForUser(user, nextData, `component_patch:${pageId}:${viewportProfile || "pc"}:${componentId}:${sourceId}`);
         return sendJson(res, 200, {
           ok: true,
           pageId,
           componentId,
           sourceId,
+          viewportProfile: viewportProfile || null,
           patch: sanitizedPatch,
           patchSchema: editable.patchSchema || { rootKeys: [], styleKeys: [] },
         });
@@ -14105,8 +17211,9 @@ function route(req, res) {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
     const data = readWorkspaceData(user.userId);
-    return sendJson(res, 200, buildWorkingEditableComponentCatalog(pageId, { editableData: data }));
+    return sendJson(res, 200, buildWorkingEditableComponentCatalog(pageId, { editableData: data, viewportProfile }));
   }
   if (pathname === "/api/workspace/component-rollback") {
     const user = requireAuthenticatedUser(req, res);
@@ -14137,6 +17244,16 @@ function route(req, res) {
     const pageIdentityOverride = getPageIdentityOverride(user.userId, pageId);
     return sendJson(res, 200, buildBuilderAuditReport(pageId, { editableData: data, viewportProfile, pageIdentityOverride }));
   }
+  if (pathname === "/api/workspace/design-reference-library") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+    const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "pc").trim() || "pc";
+    const data = readWorkspaceData(user.userId);
+    const page = findPage(data, pageId);
+    const pageGroup = page?.pageGroup || "";
+    return sendJson(res, 200, buildDesignReferenceLibraryContext(pageId, { pageGroup, viewportProfile, limit: 12 }));
+  }
   if (pathname === "/api/workspace/llm-progress") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
@@ -14163,15 +17280,33 @@ function route(req, res) {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
     const data = readWorkspaceData(user.userId);
-    return sendJson(res, 200, buildPreLlmGapReport(pageId, { editableData: data }));
+    return sendJson(res, 200, buildPreLlmGapReport(pageId, { editableData: data, viewportProfile }));
   }
   if (pathname === "/api/workspace/llm-editable-list") {
     const user = requireAuthenticatedUser(req, res);
     if (!user) return;
     const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
     const data = readWorkspaceData(user.userId);
-    return sendJson(res, 200, buildLlmEditableList(pageId, { editableData: data }));
+    return sendJson(res, 200, buildLlmEditableList(pageId, { editableData: data, viewportProfile }));
+  }
+  if (pathname === "/api/workspace/share-section-registry") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
+    const data = readWorkspaceData(user.userId);
+    return sendJson(res, 200, buildShareSectionRegistry(pageId, { editableData: data, viewportProfile }));
+  }
+  if (pathname === "/api/workspace/artifact-section-registry") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
+    const data = readWorkspaceData(user.userId);
+    return sendJson(res, 200, buildArtifactSectionRegistry(pageId, { editableData: data, viewportProfile }));
   }
   if (pathname === "/api/workspace/final-readiness") {
     const user = requireAuthenticatedUser(req, res);
@@ -14486,12 +17621,16 @@ function route(req, res) {
         if (!approvedPlan) {
           return sendJson(res, 400, { error: "approved_plan_required" });
         }
+        console.log(
+          `[builder] request user=${user.userId} page=${pageId} viewport=${viewportProfile} planId=${matchedPlan?.id || planId || ""} intensity=${intensity} scope=${targetScope} targetComponents=${targetComponents.length}`
+        );
         setLlmProgress(user.userId, pageId, "builder", {
           status: "running",
           stage: "prepare_input",
           message: "실제 반영 가능한 슬롯과 patch 범위를 정리하고 있습니다.",
           percent: 28,
         });
+        const beforePageSnapshot = extractPageScopedSnapshot(data, pageId, viewportProfile);
         const builderInput = buildBuilderInputPayload({
           editableData: data,
           pageId,
@@ -14542,6 +17681,7 @@ function route(req, res) {
             previewUrl: buildPreviewUrlForWorkspacePage(pageId),
             intensity,
             designChangeLevel,
+            beforePageSnapshot,
             pageSnapshot,
           },
         });
@@ -14557,6 +17697,9 @@ function route(req, res) {
           planId: matchedPlan?.id || planId || null,
           intensity,
         });
+        console.log(
+          `[builder] success user=${user.userId} page=${pageId} viewport=${viewportProfile} draftBuildId=${saved?.id || ""} operations=${Array.isArray(buildResult.buildResult?.operations) ? buildResult.buildResult.operations.length : 0} changed=${changedComponentIds.length}`
+        );
         setLlmProgress(user.userId, pageId, "builder", {
           status: "completed",
           stage: "completed",
@@ -14579,6 +17722,9 @@ function route(req, res) {
           const user = getUserFromRequest(req);
           const payload = req.__lastParsedBody ? JSON.parse(req.__lastParsedBody) : {};
           const pageId = String(payload.pageId || "").trim();
+          if (user && pageId) {
+            console.error(`[builder] failed user=${user.userId} page=${pageId}`, error);
+          }
           if (user && pageId) {
             setLlmProgress(user.userId, pageId, "builder", {
               status: "failed",

@@ -1,0 +1,215 @@
+{
+  "generatedAt": "2026-04-15T00:00:00Z",
+  "entries": [
+    {
+      "id": "designmd-nordic-yellow",
+      "title": "Nordic Yellow",
+      "provider": "designmd.ai",
+      "url": "https://designmd.ai/chef/nordic-yellow",
+      "referenceType": "design-md",
+      "pageTypes": ["home", "generic"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["editorial", "warm-premium", "soft-contrast", "section-rhythm"],
+      "recommendedFor": ["hero", "banner", "section-rhythm", "brand-story"],
+      "usageNotes": [
+        "따뜻한 포인트 컬러와 라이트 베이스를 함께 쓰는 프리미엄-에디토리얼 방향 참고용",
+        "섹션 리듬을 만들되 과한 장식보다 톤 차와 여백으로 분위기를 만드는 방식 참고"
+      ]
+    },
+    {
+      "id": "getdesign-ferrari",
+      "title": "Design System Inspired by Ferrari",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/ferrari/preview.html",
+      "referenceType": "design-md",
+      "pageTypes": ["home", "pdp"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["high-contrast", "hero-led", "bold-brand", "cinematic"],
+      "recommendedFor": ["hero", "cta", "premium-message", "dark-surface"],
+      "usageNotes": [
+        "강한 브랜드 포인트 컬러와 시네마틱 히어로 설계 참고용",
+        "한두 개 핵심 구간만 강하게 밀고 나가되 페이지 전체 리듬을 잃지 않는 방식 참고"
+      ]
+    },
+    {
+      "id": "getdesign-hashicorp",
+      "title": "Design System Inspired by HashiCorp",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/hashicorp/preview",
+      "referenceType": "design-md",
+      "pageTypes": ["support", "care-solution", "generic"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["enterprise", "structured", "calm-dark", "documentation-friendly"],
+      "recommendedFor": ["service-info", "trust", "form", "utility-layout"],
+      "usageNotes": [
+        "서비스/지원 페이지에서 구조적 신뢰감과 정돈된 정보 밀도를 만드는 참고용",
+        "강한 컬러 사용보다 체계적인 위계와 차분한 대비 설계 참고"
+      ]
+    },
+    {
+      "id": "getdesign-wise",
+      "title": "Design System Inspired by Wise",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/wise/preview.html",
+      "referenceType": "design-md",
+      "pageTypes": ["plp", "home"],
+      "viewportProfiles": ["pc", "ta", "mo"],
+      "styleSignals": ["bold-cta", "friendly-utility", "green-accent", "conversion-clarity"],
+      "recommendedFor": ["cta", "card", "grid", "benefit-section"],
+      "usageNotes": [
+        "명확한 CTA, 큰 타이포, 친근한 액센트 컬러 운용 참고용",
+        "PLP나 혜택/전환 구간에서 읽기 쉬운 카드 구조 참고"
+      ]
+    },
+    {
+      "id": "getdesign-cal",
+      "title": "Design System Inspired by Cal.com",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/cal/preview",
+      "referenceType": "design-md",
+      "pageTypes": ["support", "bestshop", "generic"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["monochrome", "minimal", "clean-grid", "productivity"],
+      "recommendedFor": ["utility-navigation", "list", "calendar-like-density", "simple-hero"],
+      "usageNotes": [
+        "컬러보다 타이포와 간격으로 정돈된 인상을 만드는 참고용",
+        "지원/안내/예약성 페이지에서 절제된 레이아웃 참고"
+      ]
+    },
+    {
+      "id": "getdesign-cursor",
+      "title": "Design System Inspired by Cursor",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/cursor/preview.html",
+      "referenceType": "design-md",
+      "pageTypes": ["home", "generic"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["warm-neo", "cream-surface", "tech-editorial", "accent-led"],
+      "recommendedFor": ["feature-block", "section-background", "storytelling", "card-surface"],
+      "usageNotes": [
+        "라이트 베이스에 특유의 포인트 컬러와 소프트 서피스를 쓰는 테크-에디토리얼 방향 참고용",
+        "섹션별 배경 변주와 카드 표정 차이를 설계할 때 참고"
+      ]
+    },
+    {
+      "id": "getdesign-xai",
+      "title": "Design System Inspired by xAI",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/x.ai/preview.html",
+      "referenceType": "design-md",
+      "pageTypes": ["home", "pdp", "generic"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["dark-system", "mono-tech", "high-clarity", "display-type"],
+      "recommendedFor": ["dark-hero", "tech-brand", "headline", "contrast-system"],
+      "usageNotes": [
+        "다크 테마를 쓸 때 전체 시스템 차원에서 일관되게 적용해야 한다는 참고용",
+        "부분 다크 블록이 아니라 전체 화면 톤 전략으로만 사용하는 기준 참고"
+      ]
+    },
+    {
+      "id": "getdesign-mongodb",
+      "title": "Design System Inspired by MongoDB",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/mongodb/preview.html",
+      "referenceType": "design-md",
+      "pageTypes": ["pdp", "support", "care-solution"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["developer-trust", "green-accent", "systematic", "spec-clarity"],
+      "recommendedFor": ["spec-summary", "trust-section", "benefit-block", "structured-copy"],
+      "usageNotes": [
+        "PDP/서비스 페이지에서 신뢰감과 구조적 명료함을 살리는 참고용",
+        "복잡한 정보를 정돈된 카드/설명 블록으로 나누는 방식 참고"
+      ]
+    },
+    {
+      "id": "getdesign-notion",
+      "title": "Design System Inspired by Notion",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/notion/preview.html",
+      "referenceType": "design-md",
+      "pageTypes": ["support", "bestshop", "generic"],
+      "viewportProfiles": ["pc", "ta", "mo"],
+      "styleSignals": ["warm-neutral", "soft-editorial", "document-like", "badge-friendly"],
+      "recommendedFor": ["information-section", "faq", "guide", "soft-callout"],
+      "usageNotes": [
+        "문서형 정보 페이지나 가이드성 페이지에서 부드러운 정보 밀도 참고용",
+        "배지/콜아웃/구획 분리를 과하지 않게 쓰는 방식 참고"
+      ]
+    },
+    {
+      "id": "getdesign-superhuman",
+      "title": "Design System Inspired by Superhuman",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/superhuman/preview.html",
+      "referenceType": "design-md",
+      "pageTypes": ["home", "bestshop", "generic"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["premium-gradient", "hero-drama", "luxury-tech", "soft-glow"],
+      "recommendedFor": ["hero", "feature-highlight", "cta", "premium-story"],
+      "usageNotes": [
+        "프리미엄 감도와 테크 감성을 같이 줄 때 참고용",
+        "히어로 주도형 첫 인상과 하이라이트 섹션의 연결 방식 참고"
+      ]
+    },
+    {
+      "id": "getdesign-elevenlabs",
+      "title": "Design System Inspired by ElevenLabs",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/elevenlabs/preview.html",
+      "referenceType": "design-md",
+      "pageTypes": ["home", "pdp", "generic"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["editorial-light", "serif-display", "calm-premium", "content-led"],
+      "recommendedFor": ["hero-copy", "story-section", "product-highlight", "feature-card"],
+      "usageNotes": [
+        "콘텐츠 중심의 프리미엄 화면에서 세리프/산세리프 조합과 여백 운용 참고용",
+        "강한 제품 카피를 차분한 화면 안에서 돋보이게 하는 방식 참고"
+      ]
+    },
+    {
+      "id": "getdesign-spacex",
+      "title": "Design System Inspired by SpaceX",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/spacex/preview.html",
+      "referenceType": "design-md",
+      "pageTypes": ["pdp", "home"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["cinematic-dark", "photo-overlay", "uppercase-tech", "mission-led"],
+      "recommendedFor": ["hero", "gallery", "product-story", "immersive-dark"],
+      "usageNotes": [
+        "강한 비주얼 사진과 오버레이 카피 조합 참고용",
+        "다크 톤을 쓸 때 제품/브랜드 서사가 앞에 오도록 설계하는 기준 참고"
+      ]
+    },
+    {
+      "id": "getdesign-revolut",
+      "title": "Design System Inspired by Revolut",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/revolut/preview",
+      "referenceType": "design-md",
+      "pageTypes": ["plp", "pdp", "generic"],
+      "viewportProfiles": ["pc", "ta", "mo"],
+      "styleSignals": ["fintech-premium", "sharp-contrast", "card-led", "conversion"],
+      "recommendedFor": ["price", "plan-card", "benefit-comparison", "cta-surface"],
+      "usageNotes": [
+        "가격/혜택/플랜 비교 구조를 날카롭고 선명하게 정리하는 참고용",
+        "전환 카드와 핵심 CTA를 분명하게 세우는 방식 참고"
+      ]
+    },
+    {
+      "id": "getdesign-kraken",
+      "title": "Design System Inspired by Kraken",
+      "provider": "getdesign.md",
+      "url": "https://getdesign.md/design-md/kraken/preview",
+      "referenceType": "design-md",
+      "pageTypes": ["plp", "generic"],
+      "viewportProfiles": ["pc", "ta"],
+      "styleSignals": ["dark-utility", "data-led", "dense-card", "market-clarity"],
+      "recommendedFor": ["ranking", "grid", "comparison", "data-section"],
+      "usageNotes": [
+        "데이터성 카드와 랭킹/비교형 UI를 높은 밀도로 정리하는 참고용",
+        "다크/라이트 대비를 정보 구획 용도로만 쓰는 기준 참고"
+      ]
+    }
+  ]
+}
