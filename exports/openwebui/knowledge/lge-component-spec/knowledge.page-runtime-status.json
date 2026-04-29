@@ -1,0 +1,21 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.page-runtime-status",
+  "collection": "lge-component-spec",
+  "truthLevel": "runtime-truth",
+  "freshness": "current",
+  "sourcePath": "data/normalized/page-runtime-status.json",
+  "sourceHash": "sha256:c680c848e3ea0cab196248443135a2eaeac26df0ca66672ad624f39cac60eb0d",
+  "generatedAt": "2026-04-29T05:04:13.211Z",
+  "title": "LGE Page Runtime Status",
+  "summary": "14 pages with runtime, asset, and asset contract status by viewport.",
+  "markdown": "# LGE Page Runtime Status\n\n- generatedAt: 2026-04-27T04:29:26.488Z\n- principle: Runtime pass, source asset sufficiency, and authoring contract readiness are separate statuses.\n- viewports: pc, mo\n\n## Pages\n\n### bestshop\n\n- label: 베스트샵\n- targetKind: service\n- runtimeStatus: runtime-pass\n- assetStatus: asset-empty\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### care-solutions\n\n- label: 가전 구독 메인\n- targetKind: service\n- runtimeStatus: runtime-pass\n- assetStatus: asset-insufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### care-solutions-pdp\n\n- label: 가전 구독 PDP\n- targetKind: service\n- runtimeStatus: runtime-pass\n- assetStatus: asset-empty\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### category-refrigerators\n\n- label: PLP - 냉장고 카테고리\n- targetKind: plp\n- runtimeStatus: runtime-pass\n- assetStatus: asset-insufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### category-tvs\n\n- label: PLP - TV 카테고리\n- targetKind: plp\n- runtimeStatus: runtime-pass\n- assetStatus: asset-insufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### home\n\n- label: 홈 - 태블릿\n- targetKind: home\n- runtimeStatus: runtime-pass\n- assetStatus: asset-insufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### homestyle-home\n\n- label: 홈스타일 메인\n- targetKind: service\n- runtimeStatus: runtime-pass\n- assetStatus: asset-empty\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### homestyle-pdp\n\n- label: 홈스타일 PDP\n- targetKind: service\n- runtimeStatus: runtime-pass\n- assetStatus: asset-empty\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### pdp-refrigerator-general\n\n- label: PDP - 냉장고 일반형\n- targetKind: pdp\n- runtimeStatus: runtime-pass\n- assetStatus: asset-insufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### pdp-refrigerator-glass\n\n- label: PDP - 냉장고 글라스형\n- targetKind: pdp\n- runtimeStatus: runtime-pass\n- assetStatus: asset-insufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### pdp-refrigerator-knockon\n\n- label: PDP - 냉장고 노크온형\n- targetKind: pdp\n- runtimeStatus: runtime-pass\n- assetStatus: asset-insufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### pdp-tv-general\n\n- label: PDP - TV 일반형\n- targetKind: pdp\n- runtimeStatus: runtime-pass\n- assetStatus: asset-insufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### pdp-tv-premium\n\n- label: PDP - TV 프리미엄형\n- targetKind: pdp\n- runtimeStatus: runtime-pass\n- assetStatus: asset-insufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n\n### support\n\n- label: 고객지원 - 태블릿\n- targetKind: service\n- runtimeStatus: runtime-pass\n- assetStatus: asset-sufficient\n- assetContractStatus: asset-contract-pass\n- staleBlueprintSignal: true\n- viewportProfiles: pc, mo\n",
+  "metadata": {
+    "pageId": "all",
+    "tags": [
+      "#runtime-truth",
+      "#page",
+      "#validation"
+    ]
+  }
+}

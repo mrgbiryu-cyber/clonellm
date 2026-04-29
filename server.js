@@ -171,6 +171,11 @@ const PAGE_COMPUTE_CACHE_TTL_MS = 15000;
 const PAGE_COMPUTE_CACHE_MAX_ENTRIES = 250;
 const RUNTIME_JOB_RETENTION_MS = Math.max(5 * 60 * 1000, Number(process.env.RUNTIME_JOB_RETENTION_MS || 60 * 60 * 1000));
 const RUNTIME_JOB_CACHE_MAX_ENTRIES = Math.max(10, Number(process.env.RUNTIME_JOB_CACHE_MAX_ENTRIES || 80));
+const OPENWEBUI_BUILDER_SERVICE_TOKEN = String(process.env.OPENWEBUI_BUILDER_SERVICE_TOKEN || "dev-openwebui-builder-token").trim();
+const OPENWEBUI_PREVIEW_TOKEN_SECRET = String(process.env.OPENWEBUI_PREVIEW_TOKEN_SECRET || OPENWEBUI_BUILDER_SERVICE_TOKEN || "dev-openwebui-preview-secret").trim();
+const OPENWEBUI_BUILDER_USER_ID = String(process.env.OPENWEBUI_BUILDER_USER_ID || "openwebui-builder-service").trim();
+const OPENWEBUI_BUILDER_JOB_RETENTION_MS = Math.max(5 * 60 * 1000, Number(process.env.OPENWEBUI_BUILDER_JOB_RETENTION_MS || 24 * 60 * 60 * 1000));
+const OPENWEBUI_BUILDER_JOBS = new Map();
 const WORKING_COMPONENT_INVENTORY_CACHE = new Map();
 const WORKING_EDITABILITY_CACHE = new Map();
 const WORKING_SHARE_SECTION_REGISTRY_CACHE = new Map();
@@ -523,6 +528,108 @@ function sendJson(res, status, payload) {
   const body = JSON.stringify(payload, null, 2);
   res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
   res.end(body);
+}
+
+function base64urlEncodeJson(value) {
+  return Buffer.from(JSON.stringify(value)).toString("base64url");
+}
+
+function signPreviewPayload(payload) {
+  const encodedPayload = base64urlEncodeJson(payload);
+  const signature = crypto.createHmac("sha256", OPENWEBUI_PREVIEW_TOKEN_SECRET).update(encodedPayload).digest("base64url");
+  return `${encodedPayload}.${signature}`;
+}
+
+function verifyPreviewToken(token = "") {
+  const [encodedPayload, signature] = String(token || "").trim().split(".");
+  if (!encodedPayload || !signature) return null;
+  const expected = crypto.createHmac("sha256", OPENWEBUI_PREVIEW_TOKEN_SECRET).update(encodedPayload).digest("base64url");
+  if (Buffer.byteLength(signature) !== Buffer.byteLength(expected)) return null;
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  try {
+    const payload = JSON.parse(Buffer.from(encodedPayload, "base64url").toString("utf8"));
+    if (Number(payload.expiresAt || 0) < Date.now()) return null;
+    if (!Array.isArray(payload.scope) || !payload.scope.includes("preview:read")) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+function createPreviewToken({ draftBuildId, userId, projectId, ttlMs = 7 * 24 * 60 * 60 * 1000 } = {}) {
+  return signPreviewPayload({
+    type: "preview",
+    draftBuildId: String(draftBuildId || "").trim(),
+    userId: String(userId || "").trim(),
+    projectId: String(projectId || "").trim(),
+    scope: ["preview:read"],
+    expiresAt: Date.now() + ttlMs,
+  });
+}
+
+function getRuntimePreviewUser(req, draftBuildId = "") {
+  const user = getUserFromRequest(req);
+  if (user) return user;
+  try {
+    const requestUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+    const tokenPayload = verifyPreviewToken(requestUrl.searchParams.get("token") || "");
+    if (!tokenPayload) return null;
+    if (String(tokenPayload.draftBuildId || "").trim() !== String(draftBuildId || "").trim()) return null;
+    const userId = String(tokenPayload.userId || "").trim();
+    if (!userId) return null;
+    return {
+      userId,
+      loginId: "openwebui-preview-token",
+      displayName: "Open WebUI Preview",
+      previewToken: true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function requireOpenWebuiBuilderRequest(req, res) {
+  const authHeader = String(req.headers.authorization || "").trim();
+  const token = authHeader.toLowerCase().startsWith("bearer ") ? authHeader.slice(7).trim() : "";
+  if (!token || token !== OPENWEBUI_BUILDER_SERVICE_TOKEN) {
+    sendJson(res, 401, { error: "builder_service_token_required" });
+    return null;
+  }
+  const userId = String(req.headers["x-openwebui-user-id"] || OPENWEBUI_BUILDER_USER_ID).trim() || OPENWEBUI_BUILDER_USER_ID;
+  const projectId = String(req.headers["x-openwebui-project-id"] || "").trim();
+  const requestId = String(req.headers["x-openwebui-request-id"] || crypto.randomUUID()).trim();
+  getWorkspace(userId);
+  return {
+    user: {
+      userId,
+      loginId: "openwebui-builder-service",
+      displayName: "Open WebUI Builder Service",
+    },
+    externalOwner: {
+      provider: "open-webui",
+      userId,
+      projectId,
+      requestId,
+    },
+  };
+}
+
+function pruneOpenwebuiBuilderJobs() {
+  const now = Date.now();
+  for (const [jobId, job] of OPENWEBUI_BUILDER_JOBS.entries()) {
+    const completedAt = Date.parse(job.completedAt || job.failedAt || job.acknowledgedAt || job.startedAt || job.queuedAt || "");
+    if (Number.isFinite(completedAt) && now - completedAt > OPENWEBUI_BUILDER_JOB_RETENTION_MS) {
+      OPENWEBUI_BUILDER_JOBS.delete(jobId);
+    }
+  }
+}
+
+function setOpenwebuiBuilderJob(jobId, patch = {}) {
+  pruneOpenwebuiBuilderJobs();
+  const current = OPENWEBUI_BUILDER_JOBS.get(jobId) || {};
+  const next = { ...current, ...patch, jobId };
+  OPENWEBUI_BUILDER_JOBS.set(jobId, next);
+  return next;
 }
 
 function sendHtml(res, status, fileName) {
@@ -2685,6 +2792,414 @@ function requireAuthenticatedUser(req, res) {
     return null;
   }
   return user;
+}
+
+function validateOpenWebuiBuilderPayload(payload = {}) {
+  const errors = [];
+  const required = ["builderApiVersion", "externalProjectId", "externalConceptId", "conceptThreadId", "pageId", "viewportProfile", "conceptDocument", "conceptPackage", "builderOptions"];
+  required.forEach((field) => {
+    if (payload[field] === undefined || payload[field] === null || payload[field] === "") {
+      errors.push({ code: "required", field });
+    }
+  });
+  if (payload.builderApiVersion !== "v1") errors.push({ code: "builder_api_version", detail: "builderApiVersion must be v1" });
+  if (!/^ct-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(String(payload.conceptThreadId || ""))) {
+    errors.push({ code: "concept_thread_id", detail: "conceptThreadId must use ct-{uuid-v4} format" });
+  }
+  if (!["pc", "mo", "ta"].includes(String(payload.viewportProfile || "").trim())) {
+    errors.push({ code: "viewport_profile", detail: "viewportProfile must be pc, mo, or ta" });
+  }
+  const targetGroup = payload.conceptPackage?.targetGroup || {};
+  if (!Array.isArray(targetGroup.slotIds) || !targetGroup.slotIds.length) errors.push({ code: "target_slots_required" });
+  if (!Array.isArray(targetGroup.componentIds) || !targetGroup.componentIds.length) errors.push({ code: "target_components_required" });
+  return { ok: errors.length === 0, errors };
+}
+
+function validateOpenWebuiConceptAgainstBuilderContract(payload = {}) {
+  const contractPath = path.join(ROOT, "exports", "openwebui", "builder-contract", "builder-contract-v1.json");
+  if (!fs.existsSync(contractPath)) return { ok: true, skipped: true, reason: "builder_contract_export_missing" };
+  const contract = readJsonFile(contractPath);
+  const pageId = String(payload.pageId || "").trim();
+  const viewportProfile = String(payload.viewportProfile || "").trim();
+  const targetGroup = payload.conceptPackage?.targetGroup || {};
+  const slotIds = Array.isArray(targetGroup.slotIds) ? targetGroup.slotIds.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const componentIds = Array.isArray(targetGroup.componentIds) ? targetGroup.componentIds.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const errors = [];
+  if (!contract.pages?.some((page) => page.pageId === pageId)) errors.push({ code: "page_not_in_contract", pageId });
+  slotIds.forEach((slotId) => {
+    const slot = contract.slots?.find((item) => item.pageId === pageId && item.slotId === slotId);
+    if (!slot) errors.push({ code: "slot_not_in_contract", pageId, slotId });
+    else if (!slot.viewportProfiles?.includes(viewportProfile)) errors.push({ code: "slot_viewport_not_in_contract", slotId, viewportProfile });
+  });
+  componentIds.forEach((componentId) => {
+    if (!contract.components?.some((item) => item.componentId === componentId)) errors.push({ code: "component_not_in_contract", componentId });
+    if (!componentId.startsWith(`${pageId}.`)) errors.push({ code: "component_page_mismatch", pageId, componentId });
+  });
+  return { ok: errors.length === 0, errors };
+}
+
+function buildApprovedPlanFromOpenWebuiPayload(payload = {}) {
+  const conceptPackage = payload.conceptPackage && typeof payload.conceptPackage === "object" ? payload.conceptPackage : {};
+  const targetGroup = conceptPackage.targetGroup && typeof conceptPackage.targetGroup === "object" ? conceptPackage.targetGroup : {};
+  const designPolicy = conceptPackage.designPolicy && typeof conceptPackage.designPolicy === "object" ? conceptPackage.designPolicy : {};
+  const slotIds = Array.isArray(targetGroup.slotIds) ? targetGroup.slotIds.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const componentIds = Array.isArray(targetGroup.componentIds) ? targetGroup.componentIds.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const title = String(conceptPackage.title || payload.externalConceptId || "Open WebUI Builder Concept").trim();
+  return {
+    id: String(payload.externalConceptId || "").trim(),
+    title,
+    designChangeLevel: String(payload.builderOptions?.designChangeLevel || "medium").trim() || "medium",
+    targetGroupId: String(targetGroup.groupId || "openwebui-target").trim() || "openwebui-target",
+    targetGroupLabel: String(targetGroup.groupLabel || targetGroup.groupId || "Open WebUI Target").trim(),
+    targetComponents: componentIds,
+    planningDirection: [title, String(payload.conceptDocument || "").slice(0, 1600)].filter(Boolean),
+    designDirection: [String(payload.conceptDocument || "").slice(0, 1600)].filter(Boolean),
+    guardrails: [
+      ...safeArray(designPolicy.guardrails, 20),
+      "Preserve conceptDocument source text without builder-side re-summarization.",
+    ],
+    builderBrief: {
+      objective: title,
+      mustKeep: safeArray(designPolicy.mustKeep, 20),
+      mustChange: safeArray(designPolicy.mustChange, 20),
+      suggestedFocusSlots: slotIds,
+    },
+    sectionBlueprints: slotIds.map((slotId, index) => ({
+      order: index + 1,
+      slotId,
+      label: slotId,
+      archetype: slotId === "hero" ? "hero-carousel-composition" : "section-composition",
+      objective: title,
+      mustKeep: safeArray(designPolicy.mustKeep, 5).join("; "),
+      mustChange: safeArray(designPolicy.mustChange, 5).join("; "),
+    })),
+    selectedConcept: {
+      conceptId: String(payload.externalConceptId || "").trim(),
+      conceptLabel: title,
+    },
+    conceptPlans: [
+      {
+        conceptId: String(payload.externalConceptId || "").trim(),
+        conceptLabel: title,
+        layoutSystem: String(targetGroup.groupLabel || targetGroup.groupId || "").trim(),
+      },
+    ],
+    planningPackage: {
+      designPolicy: {
+        mustKeep: safeArray(designPolicy.mustKeep, 20),
+        mustChange: safeArray(designPolicy.mustChange, 20),
+        guardrails: safeArray(designPolicy.guardrails, 20),
+        problemStatement: [title],
+      },
+    },
+    conceptDocument: String(payload.conceptDocument || ""),
+    conceptPackage,
+  };
+}
+
+function adaptOpenWebuiBuilderPayload(payload = {}) {
+  const conceptPackage = payload.conceptPackage && typeof payload.conceptPackage === "object" ? payload.conceptPackage : {};
+  const targetGroup = conceptPackage.targetGroup && typeof conceptPackage.targetGroup === "object" ? conceptPackage.targetGroup : {};
+  const builderOptions = payload.builderOptions && typeof payload.builderOptions === "object" ? payload.builderOptions : {};
+  return {
+    pageId: String(payload.pageId || "").trim(),
+    viewportProfile: String(payload.viewportProfile || "pc").trim() || "pc",
+    planId: String(payload.externalConceptId || "").trim(),
+    approvedPlan: buildApprovedPlanFromOpenWebuiPayload(payload),
+    targetComponents: safeArray(targetGroup.componentIds, 50),
+    targetGroupId: String(targetGroup.groupId || "openwebui-target").trim() || "openwebui-target",
+    targetGroupLabel: String(targetGroup.groupLabel || targetGroup.groupId || "Open WebUI Target").trim(),
+    targetScope: String(builderOptions.interventionLayer || "section-group").trim() || "section-group",
+    patchDepth: String(builderOptions.patchDepth || "medium").trim() || "medium",
+    designChangeLevel: String(builderOptions.designChangeLevel || "medium").trim() || "medium",
+    interventionLayer: String(builderOptions.interventionLayer || "section-group").trim() || "section-group",
+    rendererSurface: String(builderOptions.rendererSurface || "tailwind").trim() || "tailwind",
+    builderProvider: String(builderOptions.authorProvider || "local").trim() || "local",
+    authorProvider: String(builderOptions.authorProvider || "local").trim() || "local",
+    externalProjectId: String(payload.externalProjectId || "").trim(),
+    externalConceptId: String(payload.externalConceptId || "").trim(),
+    conceptThreadId: String(payload.conceptThreadId || "").trim(),
+    conceptDocument: String(payload.conceptDocument || ""),
+    conceptPackage,
+  };
+}
+
+function httpError(status, error, detail = "") {
+  const next = new Error(detail || error);
+  next.status = status;
+  next.error = error;
+  next.detail = detail || "";
+  return next;
+}
+
+async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner = null } = {}) {
+  const pageId = String(payload.pageId || "").trim();
+  if (!pageId) throw httpError(400, "page_id_required");
+  const approvedPlan = payload.approvedPlan && typeof payload.approvedPlan === "object" ? payload.approvedPlan : null;
+  if (!approvedPlan) throw httpError(400, "approved_plan_required");
+
+  const editableData = readWorkspaceData(user.userId);
+  const page = findPage(editableData, pageId);
+  const editablePayload = buildLlmEditableList(pageId, {
+    editableData,
+    viewportProfile: payload.viewportProfile || "pc",
+  });
+  const pageEditableComponents = Array.isArray(editablePayload?.components) ? editablePayload.components : [];
+  const pdpContext = resolvePdpRuntimeContext(pageId);
+  const defaultIdentity = buildPageIdentityBrief(pageId, {
+    pageTitle: pdpContext?.title || page?.title || pageId,
+    pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
+  });
+  const override = getPageIdentityOverride(user.userId, pageId);
+  const effectiveIdentity = mergePageIdentityBrief(defaultIdentity, override || {});
+  const buildInput = buildLocalBuildProviderInput(payload, {
+    effectiveIdentity,
+    pageEditableComponents,
+  });
+  const foundation = buildLocalBuildFoundation(buildInput, {
+    selectedConceptId: approvedPlan?.selectedConcept?.conceptId,
+    selectedConceptLabel: approvedPlan?.selectedConcept?.conceptLabel,
+  });
+  const slotIds = Array.isArray(foundation?.request?.targetGroup?.slotIds)
+    ? foundation.request.targetGroup.slotIds
+    : [];
+  const referenceArtifacts = buildRuntimeReferenceArtifacts(pageId, payload.viewportProfile, slotIds);
+  if (!referenceArtifacts?.rawShellHtml) {
+    throw httpError(404, "reference_page_shell_not_found", `${pageId}:${payload.viewportProfile || "pc"}`);
+  }
+  const conceptPackage = buildConceptPackageFromRequirementPlan(approvedPlan, {
+    viewportProfile: referenceArtifacts.viewportProfile || payload.viewportProfile,
+    pageIdentity: effectiveIdentity,
+    targetGroupId: payload.targetGroupId,
+    targetGroupLabel: payload.targetGroupLabel,
+    targetScope: payload.targetScope,
+    patchDepth: payload.patchDepth,
+    designChangeLevel: payload.designChangeLevel,
+  });
+  if (payload.conceptDocument) conceptPackage.conceptDocument = String(payload.conceptDocument || "");
+  if (payload.conceptPackage && typeof payload.conceptPackage === "object") {
+    conceptPackage.externalConceptPackage = JSON.parse(JSON.stringify(payload.conceptPackage));
+  }
+  const authorInput = buildDesignAuthorInput({
+    pageId,
+    viewportProfile: referenceArtifacts.viewportProfile,
+    conceptPackage,
+    referenceContext: {
+      rawShellHtml: referenceArtifacts.rawShellHtml,
+      currentPageHtmlExcerpt: referenceArtifacts.rawShellHtml,
+      currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+    },
+    currentSectionContext: {
+      currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+      currentSectionAssetMap:
+        referenceArtifacts.currentSectionAssetMap && typeof referenceArtifacts.currentSectionAssetMap === "object"
+          ? referenceArtifacts.currentSectionAssetMap
+          : Object.fromEntries(
+              Object.entries(referenceArtifacts.currentSectionHtmlMap || {}).map(([slotId]) => [
+                slotId,
+                Object.entries(referenceArtifacts.currentPageAssetMap || {})
+                  .filter(([assetSlotId]) => String(assetSlotId || "").startsWith(`${slotId}-`))
+                  .map(([assetSlotId, sourceUrl]) => ({ assetSlotId, source: sourceUrl })),
+              ])
+            ),
+    },
+  });
+  const authorSequencePlan = buildSectionSequencePlan(authorInput);
+  const designAuthorProvider = normalizeDesignAuthorProvider(payload.builderProvider || payload.authorProvider || "local");
+  if (designAuthorProvider !== "local") {
+    throw httpError(400, "builder_provider_not_supported_for_phase1", "Phase 1 builder-only API currently supports authorProvider=local.");
+  }
+  let authoredSectionHtmlPackage = buildLocalAuthoredSectionHtmlPackage({
+    pageId,
+    viewportProfile: referenceArtifacts.viewportProfile,
+    authorInput,
+    cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+    referenceContext: {
+      currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+      currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+    },
+  });
+  authoredSectionHtmlPackage = enrichAuthoredSectionHtmlPackageWithAuthorInput({
+    authoredSectionHtmlPackage,
+    authorInput,
+    cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+  });
+  const authorInputSnapshot = buildDesignAuthorInputSnapshot(authorInput);
+  const normalizedAssetUsage = normalizeAuthoredAssetUsage({
+    authoredSectionHtmlPackage,
+    authorInputSnapshot,
+  });
+  authoredSectionHtmlPackage = normalizedAssetUsage?.package || authoredSectionHtmlPackage;
+  const authoredSectionMarkdownDocument = buildLocalAuthoredSectionMarkdownDocument({
+    pageId,
+    viewportProfile: referenceArtifacts.viewportProfile,
+    authorInput,
+    cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+    referenceContext: {
+      currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+      currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+    },
+  });
+  const authorProviderMeta = { provider: "local", usedDemoFallback: false };
+  const authoringStageTrace = buildAuthoringStageTrace({
+    payload,
+    approvedPlan,
+    pageEditableComponents,
+    buildInput,
+    foundation,
+    referenceArtifacts,
+    conceptPackage,
+    authorInput,
+    sequencePlan: authorSequencePlan,
+    authorProviderMeta,
+  });
+  const authorOutputValidation = validateDesignAuthorOutput({
+    authoredSectionMarkdownDocument,
+    authoredSectionHtmlPackage,
+    conceptPackage,
+    authorInputSnapshot,
+    validationContext: {
+      referencePageShell: {
+        pageId,
+        viewportProfile: referenceArtifacts.viewportProfile,
+        rawShellHtml: referenceArtifacts.rawShellHtml,
+        sectionBoundaryMap: referenceArtifacts.sectionBoundaryMap,
+        currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+        currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+      },
+      assetResolutionContext: {
+        currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+      },
+      sanitizePolicy: {
+        stripScripts: true,
+        stripInlineHandlers: true,
+        stripJavascriptUrls: true,
+      },
+    },
+  });
+  if (!authorOutputValidation?.deliveryReadiness?.readyForRuntime) {
+    throw httpError(422, "design_author_output_not_ready", JSON.stringify(authorOutputValidation));
+  }
+  const runtimeResult = renderRuntimeDraft({
+    authoredSectionMarkdownDocument,
+    authoredSectionHtmlPackage,
+    referencePageShell: {
+      pageId,
+      viewportProfile: referenceArtifacts.viewportProfile,
+      rawShellHtml: referenceArtifacts.rawShellHtml,
+      sectionBoundaryMap: referenceArtifacts.sectionBoundaryMap,
+    },
+    runtimeContext: {
+      assetResolutionContext: {
+        currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+      },
+    },
+  });
+  const runtimeDraft = runtimeResult?.draftBuild && typeof runtimeResult.draftBuild === "object" ? runtimeResult.draftBuild : {};
+  const storedConceptPackage = sanitizeAuthoringSnapshotForStorage(conceptPackage);
+  const storedAuthorInputSnapshot = sanitizeAuthoringSnapshotForStorage(authorInputSnapshot);
+  const storedAuthoringStageTrace = sanitizeAuthoringSnapshotForStorage(authoringStageTrace);
+  const storedFoundation = sanitizeAuthoringSnapshotForStorage(foundation);
+  const draftItem = sanitizeAuthoringSnapshotForStorage({
+    ...runtimeDraft,
+    id: String(runtimeDraft.id || "").trim() || `runtime-draft-${Date.now()}`,
+    planId: String(payload.planId || payload.externalConceptId || "").trim(),
+    summary: foundation?.draft?.summary || runtimeDraft.summary || "Open WebUI builder draft",
+    builderProvider: designAuthorProvider,
+    builderVersion: "design-runtime-v1",
+    builderApiVersion: "v1",
+    builderContractVersion: "builder-contract-v1",
+    rendererSurface: "tailwind",
+    targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
+    externalOwner,
+    externalProjectId: String(payload.externalProjectId || "").trim(),
+    externalConceptId: String(payload.externalConceptId || "").trim(),
+    conceptThreadId: String(payload.conceptThreadId || "").trim(),
+    executionStrategy: {
+      builderProvider: designAuthorProvider,
+      rendererSurface: "tailwind",
+      targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
+    },
+    operations: Array.isArray(foundation?.draft?.operations) ? foundation.draft.operations : [],
+    report: {
+      ...(foundation?.draft?.report && typeof foundation.draft.report === "object" ? foundation.draft.report : {}),
+      authoredSections: runtimeDraft?.report?.authoredSections || [],
+      sanitizeRemoved: runtimeDraft?.report?.sanitizeRemoved || [],
+      resolvedAssets: runtimeDraft?.report?.resolvedAssets || [],
+    },
+    snapshotData: {
+      ...(runtimeDraft?.snapshotData && typeof runtimeDraft.snapshotData === "object" ? runtimeDraft.snapshotData : {}),
+      source: "openwebui-builder-api-v1",
+      pageId,
+      workspacePageId: pageId,
+      builderProvider: designAuthorProvider,
+      builderApiVersion: "v1",
+      builderContractVersion: "builder-contract-v1",
+      patchDepth: String(payload.patchDepth || "medium").trim() || "medium",
+      interventionLayer: String(payload.interventionLayer || "section-group").trim() || "section-group",
+      targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
+      executionMode: "authored-section-html",
+      cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+      conceptDocument: String(payload.conceptDocument || ""),
+      conceptPackage: storedConceptPackage,
+      designAuthorInput: storedAuthorInputSnapshot,
+      designAuthorOutputValidation: authorOutputValidation,
+      designAuthorProviderMeta: authorProviderMeta,
+      authoredSectionMarkdownDocument,
+      authoredSectionHtmlPackage,
+      authoringStageTrace: storedAuthoringStageTrace,
+      externalOwner,
+      referencePageShell: {
+        pageId,
+        viewportProfile: referenceArtifacts.viewportProfile,
+        rawShellHtml: referenceArtifacts.rawShellHtml,
+        currentPageHtmlExcerpt: referenceArtifacts.rawShellHtml,
+        sectionBoundaryMap: referenceArtifacts.sectionBoundaryMap,
+        currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+        currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+      },
+      currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+      currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+      runtimeAdvisory: Array.isArray(runtimeResult?.advisory) ? runtimeResult.advisory : [],
+    },
+  });
+  const saved = saveDraftBuild(user.userId, draftItem);
+  const previewToken = createPreviewToken({
+    draftBuildId: String(saved?.id || "").trim(),
+    userId: user.userId,
+    projectId: externalOwner?.projectId || payload.externalProjectId || "",
+  });
+  const previewPath = `/runtime-draft/${encodeURIComponent(String(saved?.id || "").trim())}?token=${encodeURIComponent(previewToken)}`;
+  const comparePath = `/runtime-compare/${encodeURIComponent(String(saved?.id || "").trim())}?token=${encodeURIComponent(previewToken)}`;
+  return {
+    saved,
+    previewToken,
+    previewPath,
+    comparePath,
+    artifact: {
+      pageId,
+      viewportProfile: referenceArtifacts.viewportProfile,
+      targetGroup: payload.conceptPackage?.targetGroup || null,
+      authoredSectionMarkdownDocument,
+      authoredSectionHtmlPackage,
+      snapshotData: saved?.snapshotData || {},
+      report: saved?.report || {},
+      validation: authorOutputValidation,
+      runtimeAdvisory: runtimeResult?.advisory || [],
+      externalOwner,
+    },
+    providerResult: {
+      ...storedFoundation,
+      conceptPackage: storedConceptPackage,
+      authorInput: storedAuthorInputSnapshot,
+      authorOutputValidation,
+      authorProviderMeta,
+      authoringStageTrace: storedAuthoringStageTrace,
+      authoredSectionMarkdownDocument,
+      authoredSectionHtmlPackage,
+      runtimeAdvisory: runtimeResult?.advisory || [],
+    },
+  };
 }
 
 function getInternalVisualCriticUser(req) {
@@ -30895,9 +31410,9 @@ function route(req, res) {
     return sendRawHtml(res, rendered.status, rendered.html);
   }
   if (pathname.startsWith("/runtime-compare/")) {
-    const user = requireAuthenticatedUser(req, res);
-    if (!user) return;
     const draftBuildId = decodeURIComponent(pathname.slice("/runtime-compare/".length));
+    const user = getRuntimePreviewUser(req, draftBuildId);
+    if (!user) return sendJson(res, 401, { error: "auth_or_preview_token_required" });
     const sectionPreviewSlot = String(requestUrl.searchParams.get("sectionPreviewSlot") || "").trim();
     const draftBuild = findDraftBuildById(user.userId, draftBuildId);
     if (!draftBuild) {
@@ -31070,9 +31585,9 @@ function route(req, res) {
     );
   }
   if (pathname.startsWith("/runtime-draft/")) {
-    const user = requireAuthenticatedUser(req, res);
-    if (!user) return;
     const draftBuildId = decodeURIComponent(pathname.slice("/runtime-draft/".length));
+    const user = getRuntimePreviewUser(req, draftBuildId);
+    if (!user) return sendJson(res, 401, { error: "auth_or_preview_token_required" });
     const snapshotState = String(requestUrl.searchParams.get("snapshotState") || "after").trim().toLowerCase();
     const sectionPreviewSlot = String(requestUrl.searchParams.get("sectionPreviewSlot") || "").trim();
     const includeJourneyWidget = String(requestUrl.searchParams.get("journeyWidget") || "").trim() === "1";
@@ -31671,6 +32186,98 @@ function route(req, res) {
         return sendJson(res, 200, { ok: true, item, providerResult: foundation });
       })
       .catch((error) => sendJson(res, 500, { error: "workspace_build_local_preview_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/builder/lge/v1/draft" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const authContext = requireOpenWebuiBuilderRequest(req, res);
+        if (!authContext) return;
+        const payload = body ? JSON.parse(body) : {};
+        const payloadValidation = validateOpenWebuiBuilderPayload(payload);
+        if (!payloadValidation.ok) {
+          return sendJson(res, 400, { error: "builder_payload_invalid", validation: payloadValidation });
+        }
+        const contractValidation = validateOpenWebuiConceptAgainstBuilderContract(payload);
+        if (!contractValidation.ok) {
+          return sendJson(res, 422, { error: "builder_payload_contract_mismatch", validation: contractValidation });
+        }
+        const jobId = `builder-job-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+        const queuedAt = new Date().toISOString();
+        setOpenwebuiBuilderJob(jobId, {
+          ok: true,
+          jobId,
+          status: "queued",
+          queuedAt,
+          pollUrl: `/api/builder/lge/v1/jobs/${encodeURIComponent(jobId)}`,
+          externalOwner: authContext.externalOwner,
+          validation: {
+            payload: payloadValidation,
+            contract: contractValidation,
+          },
+        });
+        const adaptedPayload = adaptOpenWebuiBuilderPayload(payload);
+        setImmediate(async () => {
+          const startedAt = new Date().toISOString();
+          setOpenwebuiBuilderJob(jobId, { status: "running", startedAt });
+          try {
+            const result = await buildRuntimeDraftForBuilderPayload({
+              user: authContext.user,
+              payload: adaptedPayload,
+              externalOwner: authContext.externalOwner,
+            });
+            const completedAt = new Date().toISOString();
+            setOpenwebuiBuilderJob(jobId, {
+              ok: true,
+              status: "done",
+              builderRunId: String(result.saved?.id || "").trim(),
+              previewPath: result.previewPath,
+              comparePath: result.comparePath,
+              previewToken: result.previewToken,
+              artifact: result.artifact,
+              externalOwner: authContext.externalOwner,
+              completedAt,
+            });
+          } catch (error) {
+            setOpenwebuiBuilderJob(jobId, {
+              ok: false,
+              status: "failed",
+              error: error?.error || "builder_draft_failed",
+              detail: error?.detail || String(error?.message || error),
+              failedAt: new Date().toISOString(),
+            });
+          }
+        });
+        return sendJson(res, 202, {
+          ok: true,
+          jobId,
+          status: "queued",
+          pollUrl: `/api/builder/lge/v1/jobs/${encodeURIComponent(jobId)}`,
+          externalOwner: authContext.externalOwner,
+          queuedAt,
+        });
+      })
+      .catch((error) => sendJson(res, 500, { error: "builder_draft_request_failed", detail: String(error) }));
+  }
+  if (pathname.startsWith("/api/builder/lge/v1/jobs/") && pathname.endsWith("/ack") && req.method === "POST") {
+    const authContext = requireOpenWebuiBuilderRequest(req, res);
+    if (!authContext) return;
+    const jobId = decodeURIComponent(pathname.slice("/api/builder/lge/v1/jobs/".length, -"/ack".length));
+    const job = OPENWEBUI_BUILDER_JOBS.get(jobId);
+    if (!job) return sendJson(res, 404, { ok: false, jobId, status: "not_found", error: "builder_job_not_found" });
+    const next = setOpenwebuiBuilderJob(jobId, {
+      acknowledged: true,
+      acknowledgedAt: new Date().toISOString(),
+      acknowledgedBy: authContext.externalOwner,
+    });
+    return sendJson(res, 200, { ok: true, jobId, status: next.status, acknowledged: true, acknowledgedAt: next.acknowledgedAt });
+  }
+  if (pathname.startsWith("/api/builder/lge/v1/jobs/")) {
+    const authContext = requireOpenWebuiBuilderRequest(req, res);
+    if (!authContext) return;
+    const jobId = decodeURIComponent(pathname.slice("/api/builder/lge/v1/jobs/".length));
+    const job = OPENWEBUI_BUILDER_JOBS.get(jobId);
+    if (!job) return sendJson(res, 404, { ok: false, jobId, status: "not_found", error: "builder_job_not_found" });
+    return sendJson(res, 200, job);
   }
   if (pathname === "/api/workspace/build-local-draft" && req.method === "POST") {
     return readBody(req)

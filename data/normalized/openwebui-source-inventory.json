@@ -1,0 +1,4902 @@
+{
+  "projectionVersion": "openwebui-source-inventory-v1",
+  "generatedAt": "2026-04-29T04:31:22.139Z",
+  "sourceRoot": "data/normalized",
+  "outputPath": "data/normalized/openwebui-source-inventory.json",
+  "summary": {
+    "totalSources": 80,
+    "parsedSources": 80,
+    "parseErrors": 0,
+    "dryRunTargetsPresent": 5,
+    "dryRunTargetsExpected": 5,
+    "byTruthLevel": {
+      "historical": 37,
+      "candidate": 27,
+      "policy": 10,
+      "runtime-truth": 6
+    },
+    "byImportPolicy": {
+      "knowledge": 37,
+      "candidate": 27,
+      "project": 16
+    },
+    "byProjection": {
+      "knowledge": 80,
+      "ontology": 25,
+      "builder-contract": 8
+    }
+  },
+  "dryRunTargets": [
+    {
+      "sourcePath": "data/normalized/asset-role-policies.json",
+      "exists": true,
+      "sourceHash": "sha256:14f89e0ff0ee94db097232b55d88c93ba5ff78ec958f1d9f507bd5bbc40eed92",
+      "truthLevel": "policy",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ]
+    },
+    {
+      "sourcePath": "data/normalized/component-rebuild-schema-catalog.json",
+      "exists": true,
+      "sourceHash": "sha256:6357414a62e133d7c5b5d99f17f0ff36e471aaf2dee0823629062c19bbba022b",
+      "truthLevel": "policy",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ]
+    },
+    {
+      "sourcePath": "data/normalized/image-asset-registry.json",
+      "exists": true,
+      "sourceHash": "sha256:f73230b972ed2ff0474fb06af523117a9683a09471eec8d7f16d3cde74ba470a",
+      "truthLevel": "policy",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ]
+    },
+    {
+      "sourcePath": "data/normalized/page-runtime-status.json",
+      "exists": true,
+      "sourceHash": "sha256:c680c848e3ea0cab196248443135a2eaeac26df0ca66672ad624f39cac60eb0d",
+      "truthLevel": "runtime-truth",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ]
+    },
+    {
+      "sourcePath": "data/normalized/section-family-contracts.json",
+      "exists": true,
+      "sourceHash": "sha256:96573ee597c17b194edb2deed80fc2dc42bbed52b5f460fafadca48a4f933b29",
+      "truthLevel": "policy",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-bestshop-validation-after-restart.json",
+      "exists": true,
+      "sourceHash": "sha256:a646fd828ec4890d73a2e5b2b5b22810fbb12ba31ce97c90b0c82afc4b341e6d",
+      "byteSize": 2452,
+      "modifiedAt": "2026-04-29T03:55:03.923Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 2,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-bestshop-validation-after-restart.md",
+      "exists": true,
+      "sourceHash": "sha256:844f235837664a2528990d97be612c3b25ca2be21129e7cfc73d36e0d037b224",
+      "byteSize": 459,
+      "modifiedAt": "2026-04-29T03:55:03.929Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 16,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-bestshop-validation-fixed.json",
+      "exists": true,
+      "sourceHash": "sha256:7d7194f487296a7331bc4f49f954e017a75b38dd516be29de0c938ffa61b1446",
+      "byteSize": 8066,
+      "modifiedAt": "2026-04-29T03:55:03.934Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 2,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-bestshop-validation-fixed.md",
+      "exists": true,
+      "sourceHash": "sha256:468cfd636288f7b41fa4f8d0216dc35a0819d3857699dedf74747b54972c9387",
+      "byteSize": 738,
+      "modifiedAt": "2026-04-29T03:55:03.939Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 17,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-bestshop-validation.json",
+      "exists": true,
+      "sourceHash": "sha256:f1c2dc04d4827bc6f32d52307d584e6c12c7b0bfabd5072e9e0e5ca5f1cb4b0d",
+      "byteSize": 8066,
+      "modifiedAt": "2026-04-29T03:55:03.943Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 2,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-bestshop-validation.md",
+      "exists": true,
+      "sourceHash": "sha256:d03f31bac4d84c764951d8c68a04122a70ee797c9ac38bad81fbb186c83bd229",
+      "byteSize": 738,
+      "modifiedAt": "2026-04-29T03:55:03.947Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 17,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-care-solutions-pc-validation-after-restart.json",
+      "exists": true,
+      "sourceHash": "sha256:33ac0ad11ac9fb96c228054dd447f994836354fbdd80a8bdab46e832d21f0d2a",
+      "byteSize": 1301,
+      "modifiedAt": "2026-04-29T03:55:03.953Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 1,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-care-solutions-pc-validation-after-restart.md",
+      "exists": true,
+      "sourceHash": "sha256:74dc82ea34312746dca354027e569f40e5c4640ebc97b0df87d4750ee29475db",
+      "byteSize": 408,
+      "modifiedAt": "2026-04-29T03:55:03.958Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 15,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-care-solutions-pc-validation-fixed.json",
+      "exists": true,
+      "sourceHash": "sha256:0f6acbc49014b157704a440df938a5e53f3268a4fab2ba62f557d4c5afe998dc",
+      "byteSize": 5545,
+      "modifiedAt": "2026-04-29T03:55:03.963Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 1,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-care-solutions-pc-validation-fixed.md",
+      "exists": true,
+      "sourceHash": "sha256:fd7f61fa0286454d1476b35d10e9b2586559c10238d755124824b0c9b1e797e6",
+      "byteSize": 560,
+      "modifiedAt": "2026-04-29T03:55:03.967Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 15,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-care-solutions-pc-validation.json",
+      "exists": true,
+      "sourceHash": "sha256:a15ada810aacf1f6417448a6c7802c171b839872901fd2e27bcf2442a380440e",
+      "byteSize": 5545,
+      "modifiedAt": "2026-04-29T03:55:03.971Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 1,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-care-solutions-pc-validation.md",
+      "exists": true,
+      "sourceHash": "sha256:0834165feb941729a7d16358f4ae552995a0e11be736fda555d0a9f64a2c5c4f",
+      "byteSize": 560,
+      "modifiedAt": "2026-04-29T03:55:03.976Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 15,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-final.json",
+      "exists": true,
+      "sourceHash": "sha256:36f4183d5c49e3ea35f490172e35f8ff349ebf9e9fffcd15f448b28eb32e46ba",
+      "byteSize": 36380,
+      "modifiedAt": "2026-04-29T03:55:03.981Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results",
+          "sourceReports"
+        ],
+        "arrayFields": [
+          "results",
+          "sourceReports"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 29,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "sourceReports": {
+            "kind": "array",
+            "length": 4,
+            "itemKinds": [
+              "string"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-final.md",
+      "exists": true,
+      "sourceHash": "sha256:cb1cec4d86baf2b3387b04448e8f3ff84143bf101739768d743c783f952d2868",
+      "byteSize": 3201,
+      "modifiedAt": "2026-04-29T03:55:03.985Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 45,
+        "headings": [
+          "# Admin Design Target Audit Final",
+          "## Summary"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-home-validation-after-restart.json",
+      "exists": true,
+      "sourceHash": "sha256:dfb63b29a8b661feb07118ba3405b6cb1e79850fec59d2bac8878dae3ed094ce",
+      "byteSize": 5761,
+      "modifiedAt": "2026-04-29T03:55:03.990Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 3,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-home-validation-after-restart.md",
+      "exists": true,
+      "sourceHash": "sha256:9178c20cf8d0de19c4be271eb67b1d1204b9e9722e5c323b99a33ee0bb597045",
+      "byteSize": 520,
+      "modifiedAt": "2026-04-29T03:55:03.994Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 17,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-home-validation-fixed.json",
+      "exists": true,
+      "sourceHash": "sha256:8e790e0fc41ac0773f59e82de18e0a05959e9dc7bb8d569566de414236db0939",
+      "byteSize": 33026,
+      "modifiedAt": "2026-04-29T03:55:04.001Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 3,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-home-validation-fixed.md",
+      "exists": true,
+      "sourceHash": "sha256:ddaf905bd7aa190d007da79a82e19aa512716f41fdf20ee329df6d403f10e134",
+      "byteSize": 1839,
+      "modifiedAt": "2026-04-29T03:55:04.005Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 19,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-home-validation.json",
+      "exists": true,
+      "sourceHash": "sha256:e63151789b681854b7639c5809a6948146b4be62a4127245f0ec69312d131b24",
+      "byteSize": 37776,
+      "modifiedAt": "2026-04-29T03:55:04.010Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 7,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-home-validation.md",
+      "exists": true,
+      "sourceHash": "sha256:7ff695ce0530cdf32939dcb1aef31c10d7856966d6dd81d7f842edb07d3cba43",
+      "byteSize": 2093,
+      "modifiedAt": "2026-04-29T03:55:04.016Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 23,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-zero-asset-bestshop-mo-fallback-check.json",
+      "exists": true,
+      "sourceHash": "sha256:82877e7efdacb2e853fa64671a2762d77eec956c0e2d1801af5f2521a11bbb71",
+      "byteSize": 1319,
+      "modifiedAt": "2026-04-29T03:55:04.020Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 1,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit-zero-asset-bestshop-mo-fallback-check.md",
+      "exists": true,
+      "sourceHash": "sha256:57319674f75ef394113d18ca5ec4ac7c982410723a9c782600d375ac48304657",
+      "byteSize": 401,
+      "modifiedAt": "2026-04-29T03:55:04.025Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 15,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit.json",
+      "exists": true,
+      "sourceHash": "sha256:a3bdff740af5ea1e24958bb9c30e809df809b657416d797059e71fbeef9b4701",
+      "byteSize": 35433,
+      "modifiedAt": "2026-04-29T03:55:04.029Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "targetSet",
+          "buildExecuted"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "targetSet": {
+            "kind": "string"
+          },
+          "buildExecuted": {
+            "kind": "boolean"
+          },
+          "results": {
+            "kind": "array",
+            "length": 29,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-audit.md",
+      "exists": true,
+      "sourceHash": "sha256:82276822bd9026fb597a8d7afc68546db854c6340a762a105f03fdab54eccc49",
+      "byteSize": 3999,
+      "modifiedAt": "2026-04-29T03:55:04.034Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 48,
+        "headings": [
+          "# Admin Design Target Audit",
+          "## Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-runtime-http-check.json",
+      "exists": true,
+      "sourceHash": "sha256:b8b3b92c267654d4955fc61e00668d4099b45ddd2d1c9d7cd92a53493c76339c",
+      "byteSize": 7288,
+      "modifiedAt": "2026-04-29T03:55:04.039Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "authenticatedAs",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "authenticatedAs"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "authenticatedAs": {
+            "kind": "string"
+          },
+          "results": {
+            "kind": "array",
+            "length": 29,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/admin-design-target-runtime-http-check.md",
+      "exists": true,
+      "sourceHash": "sha256:20cf1748018a0ad146e2dda05d123a2e4ccb40b23b46bfa5fb150c83c21a2908",
+      "byteSize": 2178,
+      "modifiedAt": "2026-04-29T03:55:04.046Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 36,
+        "headings": [
+          "# Admin Design Target Runtime HTTP Check"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/artifact-sidecar-audit.json",
+      "exists": true,
+      "sourceHash": "sha256:4cd17ce6797cd36dbbe1952a4ad4984252a2e69de7990ea145623bfc64785531",
+      "byteSize": 5142,
+      "modifiedAt": "2026-04-29T03:55:04.051Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "results"
+        ],
+        "arrayFields": [
+          "results"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "results": {
+            "kind": "array",
+            "length": 15,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/artifact-sidecar-audit.md",
+      "exists": true,
+      "sourceHash": "sha256:87b2c1c2b1ba5c27611a87dc55b4557141e06c4d71b5be26f65f2ce21c93b4f4",
+      "byteSize": 934,
+      "modifiedAt": "2026-04-29T03:55:04.056Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 24,
+        "headings": [
+          "# Artifact Sidecar Audit"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/asset-authoring-contract-audit.json",
+      "exists": true,
+      "sourceHash": "sha256:5fd691aae79b540ecb6bda69122bb23976ef518d2ad7f74b34b0e271b0f3c9a0",
+      "byteSize": 109313,
+      "modifiedAt": "2026-04-29T03:55:04.063Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "loginId",
+          "viewports",
+          "summary",
+          "pages",
+          "reviewTargets"
+        ],
+        "arrayFields": [
+          "viewports",
+          "pages",
+          "reviewTargets"
+        ],
+        "objectFields": [
+          "summary"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl",
+          "loginId"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "loginId": {
+            "kind": "string"
+          },
+          "viewports": {
+            "kind": "array",
+            "length": 2,
+            "itemKinds": [
+              "string"
+            ]
+          },
+          "summary": {
+            "kind": "object",
+            "keys": [
+              "componentRows",
+              "rowsWithAssets",
+              "rowsWithApprovedImage",
+              "rowsWithApprovedIconFamily",
+              "rowsWithApprovedInteraction",
+              "rowsNeedingReview"
+            ]
+          },
+          "pages": {
+            "kind": "array",
+            "length": 14,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "reviewTargets": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/asset-authoring-contract-audit.md",
+      "exists": true,
+      "sourceHash": "sha256:cdc010cca365a8a029aea1be2211b89d678b291e47b48e46c04efa3048ce5e94",
+      "byteSize": 1933,
+      "modifiedAt": "2026-04-29T03:55:04.067Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 54,
+        "headings": [
+          "# Asset Authoring Contract Audit",
+          "## Summary",
+          "## Page Coverage",
+          "## Review Targets"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/asset-fallback-policies.json",
+      "exists": true,
+      "sourceHash": "sha256:1b5291b77cf13d2a3db5daad784dc47acb10a3129db75e8377c7eed192912279",
+      "byteSize": 3042,
+      "modifiedAt": "2026-04-29T03:55:04.072Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "version",
+          "policies"
+        ],
+        "arrayFields": [
+          "policies"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "version"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "version": {
+            "kind": "number"
+          },
+          "policies": {
+            "kind": "array",
+            "length": 4,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/asset-gap-report.json",
+      "exists": true,
+      "sourceHash": "sha256:91bf8e4cff0437d13948af62783830e1d3f911886d7bed94d6d8fdc726a78129",
+      "byteSize": 28804,
+      "modifiedAt": "2026-04-29T03:55:04.077Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "sourceAudit",
+          "summary",
+          "pages"
+        ],
+        "arrayFields": [
+          "pages"
+        ],
+        "objectFields": [
+          "summary"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "sourceAudit"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "sourceAudit": {
+            "kind": "string"
+          },
+          "summary": {
+            "kind": "object",
+            "keys": [
+              "targetCount",
+              "editableSectionCount",
+              "emptySectionCount",
+              "priority",
+              "emptyRatio"
+            ]
+          },
+          "pages": {
+            "kind": "array",
+            "length": 29,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/asset-gap-report.md",
+      "exists": true,
+      "sourceHash": "sha256:6cbe3e74db449f5046d2fba259601139cce95462a94269cf26ea4001504bad09",
+      "byteSize": 8455,
+      "modifiedAt": "2026-04-29T03:55:04.081Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 47,
+        "headings": [
+          "# Asset Gap Report",
+          "## Summary",
+          "## Targets"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/asset-pipeline-starter.json",
+      "exists": true,
+      "sourceHash": "sha256:595fede5e24d9d200c52c666c82e587dbd8e9733b26abfc8e6de328f877080af",
+      "byteSize": 35904,
+      "modifiedAt": "2026-04-29T03:55:04.088Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "assetCatalog",
+          "iconFamilyContracts",
+          "assetFamilies",
+          "geometrySpecs",
+          "iconSets",
+          "badgePresets",
+          "visualSets",
+          "thumbnailPresets",
+          "pageDefaults",
+          "familyDefaults",
+          "componentDefaults",
+          "updatedAt"
+        ],
+        "arrayFields": [
+          "assetCatalog",
+          "assetFamilies",
+          "iconSets",
+          "badgePresets",
+          "visualSets",
+          "thumbnailPresets"
+        ],
+        "objectFields": [
+          "iconFamilyContracts",
+          "geometrySpecs",
+          "pageDefaults",
+          "familyDefaults",
+          "componentDefaults"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "updatedAt"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "assetCatalog": {
+            "kind": "array",
+            "length": 14,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "iconFamilyContracts": {
+            "kind": "object",
+            "keys": [
+              "home-quickmenu-line",
+              "home-quickmenu-solid",
+              "editorial-accent-glyph"
+            ]
+          },
+          "assetFamilies": {
+            "kind": "array",
+            "length": 13,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "geometrySpecs": {
+            "kind": "object",
+            "keys": [
+              "home.hero",
+              "home.quickmenu",
+              "home.md-choice",
+              "home.best-ranking",
+              "home.summary-banner-2",
+              "home.latest-product-news"
+            ]
+          },
+          "iconSets": {
+            "kind": "array",
+            "length": 5,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "badgePresets": {
+            "kind": "array",
+            "length": 5,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "visualSets": {
+            "kind": "array",
+            "length": 6,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "thumbnailPresets": {
+            "kind": "array",
+            "length": 5,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "pageDefaults": {
+            "kind": "object",
+            "keys": [
+              "home",
+              "homestyle-home",
+              "care-solutions"
+            ]
+          },
+          "familyDefaults": {
+            "kind": "object",
+            "keys": [
+              "hero-carousel-composition",
+              "icon-link-grid-composition",
+              "commerce-card-grid-composition",
+              "ranking-list-composition",
+              "service-benefit-hub-composition",
+              "editorial-visual-story-composition",
+              "pdp-summary-stack-composition",
+              "pdp-sticky-buybox-composition",
+              "image-banner-strip-composition"
+            ]
+          },
+          "componentDefaults": {
+            "kind": "object",
+            "keys": [
+              "home.hero",
+              "home.quickmenu",
+              "home.md-choice",
+              "home.best-ranking",
+              "home.timedeal",
+              "home.summary-banner-2",
+              "home.marketing-area",
+              "home.latest-product-news",
+              "home.smart-life",
+              "care-solutions.hero",
+              "homestyle-home.hero"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/asset-role-policies.json",
+      "exists": true,
+      "sourceHash": "sha256:14f89e0ff0ee94db097232b55d88c93ba5ff78ec958f1d9f507bd5bbc40eed92",
+      "byteSize": 3472,
+      "modifiedAt": "2026-04-29T03:55:04.094Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "version",
+          "policies"
+        ],
+        "arrayFields": [
+          "policies"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "version"
+        ],
+        "nestedKeySample": {
+          "version": {
+            "kind": "number"
+          },
+          "policies": {
+            "kind": "array",
+            "length": 7,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": true
+    },
+    {
+      "sourcePath": "data/normalized/component-candidates.json",
+      "exists": true,
+      "sourceHash": "sha256:cade51fd81b93664d36156e5c3c48086d0a37ae05c04da33fd852736225e4ada",
+      "byteSize": 300,
+      "modifiedAt": "2026-04-29T03:55:04.099Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "array",
+        "length": 1,
+        "itemKinds": [
+          "object"
+        ],
+        "firstItemKeys": [
+          "pageId",
+          "pageGroup",
+          "title",
+          "candidates"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/component-rebuild-schema-catalog.json",
+      "exists": true,
+      "sourceHash": "sha256:6357414a62e133d7c5b5d99f17f0ff36e471aaf2dee0823629062c19bbba022b",
+      "byteSize": 8212,
+      "modifiedAt": "2026-04-29T03:55:04.104Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "families",
+          "assignments"
+        ],
+        "arrayFields": [
+          "families",
+          "assignments"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "families": {
+            "kind": "array",
+            "length": 9,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "assignments": {
+            "kind": "array",
+            "length": 43,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": true
+    },
+    {
+      "sourcePath": "data/normalized/design-diversity-profiles.json",
+      "exists": true,
+      "sourceHash": "sha256:1cda2229f5a0d4c7f5e6b90edd59bfd2962ea6cea6268c00bf704c9d74b2a27c",
+      "byteSize": 7622,
+      "modifiedAt": "2026-04-29T03:55:04.109Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "version",
+          "updatedAt",
+          "registryKind",
+          "selectionPolicy",
+          "profiles"
+        ],
+        "arrayFields": [
+          "profiles"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "version",
+          "updatedAt",
+          "registryKind",
+          "selectionPolicy"
+        ],
+        "nestedKeySample": {
+          "version": {
+            "kind": "number"
+          },
+          "updatedAt": {
+            "kind": "string"
+          },
+          "registryKind": {
+            "kind": "string"
+          },
+          "selectionPolicy": {
+            "kind": "string"
+          },
+          "profiles": {
+            "kind": "array",
+            "length": 6,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/design-diversity-sample-library.json",
+      "exists": true,
+      "sourceHash": "sha256:ff5b6c6b322245404c6d83f66ca755131ff1ddd71af24e96e35b082b87b23848",
+      "byteSize": 17374,
+      "modifiedAt": "2026-04-29T03:55:04.114Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "version",
+          "updatedAt",
+          "registryKind",
+          "selectionPolicy",
+          "samples"
+        ],
+        "arrayFields": [
+          "samples"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "version",
+          "updatedAt",
+          "registryKind",
+          "selectionPolicy"
+        ],
+        "nestedKeySample": {
+          "version": {
+            "kind": "number"
+          },
+          "updatedAt": {
+            "kind": "string"
+          },
+          "registryKind": {
+            "kind": "string"
+          },
+          "selectionPolicy": {
+            "kind": "string"
+          },
+          "samples": {
+            "kind": "array",
+            "length": 12,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/design-reference-library.json",
+      "exists": true,
+      "sourceHash": "sha256:2d74fd00f885b6a1ca8b4e4ef25f163d6e8d6308aee7a3663b64b16dee7c696d",
+      "byteSize": 10042,
+      "modifiedAt": "2026-04-29T03:55:04.119Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "entries"
+        ],
+        "arrayFields": [
+          "entries"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "entries": {
+            "kind": "array",
+            "length": 14,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "runtime-truth",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/design-reference-source-seeds.json",
+      "exists": true,
+      "sourceHash": "sha256:aceef0baa894ad8062006a3c5fde27115d400e9386cfd569cb10f7e6875aac57",
+      "byteSize": 4653,
+      "modifiedAt": "2026-04-29T03:55:04.124Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "entries"
+        ],
+        "arrayFields": [
+          "entries"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "entries": {
+            "kind": "array",
+            "length": 12,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "runtime-truth",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/editable-prototype.json",
+      "exists": true,
+      "sourceHash": "sha256:ad183c5e746a63ca7f72709628362831cf80269f3427b87afeb597aefe37bd11",
+      "byteSize": 2060,
+      "modifiedAt": "2026-04-29T03:55:04.128Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "siteId",
+          "pages"
+        ],
+        "arrayFields": [
+          "pages"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "siteId"
+        ],
+        "nestedKeySample": {
+          "siteId": {
+            "kind": "string"
+          },
+          "pages": {
+            "kind": "array",
+            "length": 1,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/external-free-image-asset-collection-report.json",
+      "exists": true,
+      "sourceHash": "sha256:a8f8221537c2dbc8b25596fb00ec9299a88ac556df73cba244d9e4a3e2e33c53",
+      "byteSize": 18236,
+      "modifiedAt": "2026-04-29T03:55:04.135Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "dryRun",
+          "limitPerProfile",
+          "maxImports",
+          "maxPerProfile",
+          "delayMs",
+          "thumbWidth",
+          "collected",
+          "downloaded",
+          "inserted",
+          "updated",
+          "skipped",
+          "errors",
+          "assets"
+        ],
+        "arrayFields": [
+          "skipped",
+          "errors",
+          "assets"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "dryRun",
+          "limitPerProfile",
+          "maxImports",
+          "maxPerProfile",
+          "delayMs",
+          "thumbWidth",
+          "collected",
+          "downloaded",
+          "inserted",
+          "updated"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "dryRun": {
+            "kind": "boolean"
+          },
+          "limitPerProfile": {
+            "kind": "number"
+          },
+          "maxImports": {
+            "kind": "number"
+          },
+          "maxPerProfile": {
+            "kind": "number"
+          },
+          "delayMs": {
+            "kind": "number"
+          },
+          "thumbWidth": {
+            "kind": "number"
+          },
+          "collected": {
+            "kind": "number"
+          },
+          "downloaded": {
+            "kind": "number"
+          },
+          "inserted": {
+            "kind": "number"
+          },
+          "updated": {
+            "kind": "number"
+          },
+          "skipped": {
+            "kind": "array",
+            "length": 8,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/external-free-image-source-profiles.json",
+      "exists": true,
+      "sourceHash": "sha256:7226ffdf98c73224f21570d0304b6717c0496539f6539b34f679d935f9f43e3c",
+      "byteSize": 5559,
+      "modifiedAt": "2026-04-29T03:55:04.141Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "version",
+          "updatedAt",
+          "registryKind",
+          "defaultStatus",
+          "providerProfiles"
+        ],
+        "arrayFields": [
+          "providerProfiles"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "version",
+          "updatedAt",
+          "registryKind",
+          "defaultStatus"
+        ],
+        "nestedKeySample": {
+          "version": {
+            "kind": "number"
+          },
+          "updatedAt": {
+            "kind": "string"
+          },
+          "registryKind": {
+            "kind": "string"
+          },
+          "defaultStatus": {
+            "kind": "string"
+          },
+          "providerProfiles": {
+            "kind": "array",
+            "length": 1,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/generated-asset-cache.json",
+      "exists": true,
+      "sourceHash": "sha256:9658ee506b9d596f40ea7e6f7383cc8f085eefa2996c04846a7b6e41b275573d",
+      "byteSize": 25461,
+      "modifiedAt": "2026-04-29T03:55:04.147Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "updatedAt",
+          "entries"
+        ],
+        "arrayFields": [],
+        "objectFields": [
+          "entries"
+        ],
+        "primitiveFields": [
+          "updatedAt"
+        ],
+        "nestedKeySample": {
+          "updatedAt": {
+            "kind": "string"
+          },
+          "entries": {
+            "kind": "object",
+            "keys": [
+              "b58f37441cbf871741ae687fc2c1e605584ea70b",
+              "3da390c7a0ad6dd123eb1f576535efef7fde601b",
+              "2aae115d8468a28bcbb4a97ffddea3677830519a",
+              "f455ef8a3f31d6360767b11e2a1c70fd3f07a6d3",
+              "975e4baef95d4fbcc1565510a22d50ee5bedffda",
+              "0163dd713b815e73a0516314ffb053b7952ec179",
+              "661b09f984ef0fe1ab05a222b90e2ff0d01e6ddc",
+              "8e65fa51723fa814ec362e392cb4633d875af94e",
+              "775c464071d2d731c8818b6f35a673ef2c463ef6",
+              "303e87340b367f9023e37c4c91843c3c52dc99a0"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/generated-asset-families.json",
+      "exists": true,
+      "sourceHash": "sha256:c389c814998de7fe0cb046f697c1b9de04c1e5d27482db1713a28a1b37d83bbf",
+      "byteSize": 67521,
+      "modifiedAt": "2026-04-29T03:55:04.153Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "updatedAt",
+          "families"
+        ],
+        "arrayFields": [],
+        "objectFields": [
+          "families"
+        ],
+        "primitiveFields": [
+          "updatedAt"
+        ],
+        "nestedKeySample": {
+          "updatedAt": {
+            "kind": "string"
+          },
+          "families": {
+            "kind": "object",
+            "keys": [
+              "home.quickmenu.icon.family.v1",
+              "support.service.icon.family.v1",
+              "plp.filter.utility.icon.family.v1",
+              "pdp.commerce.utility.icon.family.v1",
+              "care.solution.service.icon.family.v1",
+              "mobile.nav.action.icon.family.v1",
+              "home.quickmenu.premium.arc.icon.family.v1",
+              "home.story.micro.cue.icon.family.v1",
+              "support.status.badge.icon.family.v1",
+              "plp.product.signal.icon.family.v1",
+              "pdp.benefit.chip.icon.family.v1",
+              "care.wellness.rounded.icon.family.v1",
+              "mobile.gesture.utility.icon.family.v1"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/home-quickmenu-icon-family.template.json",
+      "exists": true,
+      "sourceHash": "sha256:f170c1cd5184af0f3f32363cfe59de2378d0b79eddec45904dff9e01d4a03a27",
+      "byteSize": 2113,
+      "modifiedAt": "2026-04-29T03:55:04.157Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "assetFamilyId",
+          "familyId",
+          "generatedAt",
+          "status",
+          "styleSummary",
+          "styleSpec",
+          "members"
+        ],
+        "arrayFields": [
+          "members"
+        ],
+        "objectFields": [
+          "styleSpec"
+        ],
+        "primitiveFields": [
+          "assetFamilyId",
+          "familyId",
+          "generatedAt",
+          "status",
+          "styleSummary"
+        ],
+        "nestedKeySample": {
+          "assetFamilyId": {
+            "kind": "string"
+          },
+          "familyId": {
+            "kind": "string"
+          },
+          "generatedAt": {
+            "kind": "string"
+          },
+          "status": {
+            "kind": "string"
+          },
+          "styleSummary": {
+            "kind": "string"
+          },
+          "styleSpec": {
+            "kind": "object",
+            "keys": [
+              "viewport",
+              "strokeWeight",
+              "cornerStyle",
+              "fillMode",
+              "visualDensity",
+              "backgroundUsage",
+              "palette"
+            ]
+          },
+          "members": {
+            "kind": "array",
+            "length": 9,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/home-recipe-library.json",
+      "exists": true,
+      "sourceHash": "sha256:f971717261ec161c80b014d52c4eef410c7b08a47ab68e75f69fb5bc56fa8400",
+      "byteSize": 17291,
+      "modifiedAt": "2026-04-29T03:55:04.162Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "heroRecipes",
+          "quickmenuRecipes",
+          "bannerRecipes",
+          "rankingRecipes"
+        ],
+        "arrayFields": [
+          "heroRecipes",
+          "quickmenuRecipes",
+          "bannerRecipes",
+          "rankingRecipes"
+        ],
+        "objectFields": [],
+        "primitiveFields": [],
+        "nestedKeySample": {
+          "heroRecipes": {
+            "kind": "array",
+            "length": 12,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "quickmenuRecipes": {
+            "kind": "array",
+            "length": 9,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "bannerRecipes": {
+            "kind": "array",
+            "length": 3,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "rankingRecipes": {
+            "kind": "array",
+            "length": 2,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/icon-family-registry.json",
+      "exists": true,
+      "sourceHash": "sha256:77e4a73550b0426703df618feb5314e3f1287481c001855b1f4deccfbb4de0ce",
+      "byteSize": 42844,
+      "modifiedAt": "2026-04-29T03:55:04.167Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "version",
+          "updatedAt",
+          "registryKind",
+          "families",
+          "auditLog"
+        ],
+        "arrayFields": [
+          "families",
+          "auditLog"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "version",
+          "updatedAt",
+          "registryKind"
+        ],
+        "nestedKeySample": {
+          "version": {
+            "kind": "number"
+          },
+          "updatedAt": {
+            "kind": "string"
+          },
+          "registryKind": {
+            "kind": "string"
+          },
+          "families": {
+            "kind": "array",
+            "length": 13,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "auditLog": {
+            "kind": "array",
+            "length": 3,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/image-asset-registry.json",
+      "exists": true,
+      "sourceHash": "sha256:f73230b972ed2ff0474fb06af523117a9683a09471eec8d7f16d3cde74ba470a",
+      "byteSize": 936295,
+      "modifiedAt": "2026-04-29T03:55:04.187Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "version",
+          "updatedAt",
+          "registryKind",
+          "statusValues",
+          "sourceProfiles",
+          "assets",
+          "importLog",
+          "auditLog"
+        ],
+        "arrayFields": [
+          "statusValues",
+          "assets",
+          "importLog",
+          "auditLog"
+        ],
+        "objectFields": [
+          "sourceProfiles"
+        ],
+        "primitiveFields": [
+          "version",
+          "updatedAt",
+          "registryKind"
+        ],
+        "nestedKeySample": {
+          "version": {
+            "kind": "number"
+          },
+          "updatedAt": {
+            "kind": "string"
+          },
+          "registryKind": {
+            "kind": "string"
+          },
+          "statusValues": {
+            "kind": "array",
+            "length": 4,
+            "itemKinds": [
+              "string"
+            ]
+          },
+          "sourceProfiles": {
+            "kind": "object",
+            "keys": [
+              "lge-derived",
+              "external-stock",
+              "generated",
+              "imported"
+            ]
+          },
+          "assets": {
+            "kind": "array",
+            "length": 215,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "importLog": {
+            "kind": "array",
+            "length": 6,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "auditLog": {
+            "kind": "array",
+            "length": 129,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": true
+    },
+    {
+      "sourcePath": "data/normalized/interaction-component-registry.json",
+      "exists": true,
+      "sourceHash": "sha256:2f8d74da4a4bfc6408f063c279eb33d9c6f73ced66ecaf98d7f99da973e2c70a",
+      "byteSize": 19944,
+      "modifiedAt": "2026-04-29T03:55:04.192Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "version",
+          "updatedAt",
+          "registryKind",
+          "adapterInterface",
+          "components",
+          "auditLog"
+        ],
+        "arrayFields": [
+          "adapterInterface",
+          "components",
+          "auditLog"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "version",
+          "updatedAt",
+          "registryKind"
+        ],
+        "nestedKeySample": {
+          "version": {
+            "kind": "number"
+          },
+          "updatedAt": {
+            "kind": "string"
+          },
+          "registryKind": {
+            "kind": "string"
+          },
+          "adapterInterface": {
+            "kind": "array",
+            "length": 5,
+            "itemKinds": [
+              "string"
+            ]
+          },
+          "components": {
+            "kind": "array",
+            "length": 9,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "auditLog": {
+            "kind": "array",
+            "length": 9,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/interaction-snapshots/reference.home.json",
+      "exists": true,
+      "sourceHash": "sha256:477cbfe18c5ccee898b55402ced75a520a4eb98c4ab7ed841c2a7baab3d281cf",
+      "byteSize": 13718,
+      "modifiedAt": "2026-04-29T03:55:04.201Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "pageId",
+          "source",
+          "url",
+          "visualUrl",
+          "structuralUrl",
+          "mode",
+          "interactions"
+        ],
+        "arrayFields": [
+          "interactions"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "pageId",
+          "source",
+          "url",
+          "visualUrl",
+          "structuralUrl",
+          "mode"
+        ],
+        "nestedKeySample": {
+          "pageId": {
+            "kind": "string"
+          },
+          "source": {
+            "kind": "string"
+          },
+          "url": {
+            "kind": "string"
+          },
+          "visualUrl": {
+            "kind": "string"
+          },
+          "structuralUrl": {
+            "kind": "string"
+          },
+          "mode": {
+            "kind": "string"
+          },
+          "interactions": {
+            "kind": "array",
+            "length": 36,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "runtime-truth",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/journey-definitions.json",
+      "exists": true,
+      "sourceHash": "sha256:ead8ee48d2d5f89dbec3c167f6acfac6eef02658704cf179b3713520e0cba1f6",
+      "byteSize": 3295,
+      "modifiedAt": "2026-04-29T03:55:04.205Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "journeys"
+        ],
+        "arrayFields": [
+          "journeys"
+        ],
+        "objectFields": [],
+        "primitiveFields": [],
+        "nestedKeySample": {
+          "journeys": {
+            "kind": "array",
+            "length": 4,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/lge-asset-import-report.json",
+      "exists": true,
+      "sourceHash": "sha256:4bc93d4c9212d0357b63cec9d41f5c4a6e56ca93d59ab1f231198c3b51513fa2",
+      "byteSize": 22634,
+      "modifiedAt": "2026-04-29T03:55:04.210Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "candidateCount",
+          "addedCount",
+          "updatedCount",
+          "skippedCount",
+          "added",
+          "updated",
+          "skipped"
+        ],
+        "arrayFields": [
+          "added",
+          "updated",
+          "skipped"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "candidateCount",
+          "addedCount",
+          "updatedCount",
+          "skippedCount"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "candidateCount": {
+            "kind": "number"
+          },
+          "addedCount": {
+            "kind": "number"
+          },
+          "updatedCount": {
+            "kind": "number"
+          },
+          "skippedCount": {
+            "kind": "number"
+          },
+          "added": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          },
+          "updated": {
+            "kind": "array",
+            "length": 158,
+            "itemKinds": [
+              "string"
+            ]
+          },
+          "skipped": {
+            "kind": "array",
+            "length": 64,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/lge-asset-review-queue.json",
+      "exists": true,
+      "sourceHash": "sha256:ce1e8ac8691b7e83cb7d9126cb6f875b6b2b5935f35eb952ac0565559ef84901",
+      "byteSize": 143071,
+      "modifiedAt": "2026-04-29T03:55:04.217Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "apply",
+          "criteria",
+          "summary",
+          "statusDistributionBefore",
+          "statusDistributionAfter",
+          "autoApproved",
+          "autoBlocked",
+          "manualReview"
+        ],
+        "arrayFields": [
+          "autoApproved",
+          "autoBlocked",
+          "manualReview"
+        ],
+        "objectFields": [
+          "criteria",
+          "summary",
+          "statusDistributionBefore",
+          "statusDistributionAfter"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "apply"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "apply": {
+            "kind": "boolean"
+          },
+          "criteria": {
+            "kind": "object",
+            "keys": [
+              "autoApprove",
+              "autoBlock",
+              "manualReview"
+            ]
+          },
+          "summary": {
+            "kind": "object",
+            "keys": [
+              "candidateVariantCount",
+              "autoApprovedCount",
+              "autoBlockedCount",
+              "manualReviewCount",
+              "skippedCount",
+              "appliedUpdateCount"
+            ]
+          },
+          "statusDistributionBefore": {
+            "kind": "object",
+            "keys": [
+              "root",
+              "variants"
+            ]
+          },
+          "statusDistributionAfter": {
+            "kind": "object",
+            "keys": [
+              "root",
+              "variants"
+            ]
+          },
+          "autoApproved": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          },
+          "autoBlocked": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          },
+          "manualReview": {
+            "kind": "array",
+            "length": 159,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/lge-mobile-reference-assets.json",
+      "exists": true,
+      "sourceHash": "sha256:32f85786d69bc693666e15193bb968cab8862d636c676f636cf7b4b76a57140f",
+      "byteSize": 421177,
+      "modifiedAt": "2026-04-29T03:55:04.227Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "source",
+          "viewportProfile",
+          "fileCount",
+          "assetCount",
+          "downloadedCount",
+          "reusedCount",
+          "failedCount",
+          "byPage",
+          "assets",
+          "failed"
+        ],
+        "arrayFields": [
+          "assets",
+          "failed"
+        ],
+        "objectFields": [
+          "byPage"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "source",
+          "viewportProfile",
+          "fileCount",
+          "assetCount",
+          "downloadedCount",
+          "reusedCount",
+          "failedCount"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "source": {
+            "kind": "string"
+          },
+          "viewportProfile": {
+            "kind": "string"
+          },
+          "fileCount": {
+            "kind": "number"
+          },
+          "assetCount": {
+            "kind": "number"
+          },
+          "downloadedCount": {
+            "kind": "number"
+          },
+          "reusedCount": {
+            "kind": "number"
+          },
+          "failedCount": {
+            "kind": "number"
+          },
+          "byPage": {
+            "kind": "object",
+            "keys": [
+              "bestshop",
+              "care-solutions-pdp",
+              "care-solutions",
+              "category-refrigerators",
+              "category-tvs",
+              "home",
+              "pdp-refrigerator-general",
+              "pdp-refrigerator-glass",
+              "pdp-refrigerator-knockon",
+              "pdp-tv-general",
+              "pdp-tv-premium",
+              "support"
+            ]
+          },
+          "assets": {
+            "kind": "array",
+            "length": 499,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "failed": {
+            "kind": "array",
+            "length": 85,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "runtime-truth",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/lge-text-removal-queue.json",
+      "exists": true,
+      "sourceHash": "sha256:613c3a452791c5c20a1767c8fd8320965af1916d1b67f98375ee9cd67ab7b996",
+      "byteSize": 81277,
+      "modifiedAt": "2026-04-29T03:55:04.233Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "registryPath",
+          "derivativeOutputDir",
+          "summary",
+          "byViewport",
+          "byPage",
+          "bySlot",
+          "excludedByReason",
+          "workOrders",
+          "excluded"
+        ],
+        "arrayFields": [
+          "workOrders",
+          "excluded"
+        ],
+        "objectFields": [
+          "summary",
+          "byViewport",
+          "byPage",
+          "bySlot",
+          "excludedByReason"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "registryPath",
+          "derivativeOutputDir"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "registryPath": {
+            "kind": "string"
+          },
+          "derivativeOutputDir": {
+            "kind": "string"
+          },
+          "summary": {
+            "kind": "object",
+            "keys": [
+              "candidateCount",
+              "heavyDerivativeCount",
+              "excludedCount",
+              "totalBlockedVariantCount",
+              "outputExistingCount"
+            ]
+          },
+          "byViewport": {
+            "kind": "object",
+            "keys": [
+              "mo",
+              "pc"
+            ]
+          },
+          "byPage": {
+            "kind": "object",
+            "keys": [
+              "home",
+              "care-solutions",
+              "category-refrigerators"
+            ]
+          },
+          "bySlot": {
+            "kind": "object",
+            "keys": [
+              "hero",
+              "banner",
+              "marketing-area"
+            ]
+          },
+          "excludedByReason": {
+            "kind": "object",
+            "keys": [
+              "local-source-missing",
+              "small-label-or-badge-not-worth-inpainting"
+            ]
+          },
+          "workOrders": {
+            "kind": "array",
+            "length": 19,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "excluded": {
+            "kind": "array",
+            "length": 32,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/lge-text-removed-registration-report.json",
+      "exists": true,
+      "sourceHash": "sha256:fd7d036a50c2a414d119e05899bdf59ae4185ea5e9c66d0e239314d3cee62e6f",
+      "byteSize": 4973,
+      "modifiedAt": "2026-04-29T03:55:04.242Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "registeredCount",
+          "skippedCount",
+          "failedCount",
+          "registered",
+          "skipped",
+          "failed"
+        ],
+        "arrayFields": [
+          "registered",
+          "skipped",
+          "failed"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "registeredCount",
+          "skippedCount",
+          "failedCount"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "registeredCount": {
+            "kind": "number"
+          },
+          "skippedCount": {
+            "kind": "number"
+          },
+          "failedCount": {
+            "kind": "number"
+          },
+          "registered": {
+            "kind": "array",
+            "length": 2,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "skipped": {
+            "kind": "array",
+            "length": 17,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "failed": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/openwebui-projection-schema-v1.json",
+      "exists": true,
+      "sourceHash": "sha256:ee876153adbb7354b5f94c60033c43073eebf19882b17f59bffe21cee7771ebe",
+      "byteSize": 24952,
+      "modifiedAt": "2026-04-29T04:10:26.592Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "projectionVersion",
+          "generatedAt",
+          "schemaDialect",
+          "policy",
+          "constants",
+          "schemas",
+          "crossFieldRules"
+        ],
+        "arrayFields": [
+          "crossFieldRules"
+        ],
+        "objectFields": [
+          "policy",
+          "constants",
+          "schemas"
+        ],
+        "primitiveFields": [
+          "projectionVersion",
+          "generatedAt",
+          "schemaDialect"
+        ],
+        "nestedKeySample": {
+          "projectionVersion": {
+            "kind": "string"
+          },
+          "generatedAt": {
+            "kind": "string"
+          },
+          "schemaDialect": {
+            "kind": "string"
+          },
+          "policy": {
+            "kind": "object",
+            "keys": [
+              "canonicalAdditionalProperties",
+              "debugSidecarPaths",
+              "conceptThreadIdFormat",
+              "blockingValidation"
+            ]
+          },
+          "constants": {
+            "kind": "object",
+            "keys": [
+              "truthLevels",
+              "freshnessValues",
+              "targetCollections",
+              "canonicalOntologyEdges"
+            ]
+          },
+          "schemas": {
+            "kind": "object",
+            "keys": [
+              "knowledgeProjectionV1",
+              "ontologyProjectionV1",
+              "builderContractProjectionV1",
+              "feedbackProjectionV1",
+              "importManifestV1",
+              "conceptThreadV1"
+            ]
+          },
+          "crossFieldRules": {
+            "kind": "array",
+            "length": 7,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/page-builder-prompt-blueprints.json",
+      "exists": true,
+      "sourceHash": "sha256:ab42ddefbf776e513242cb8f4cd6f008d6fbfd2fcfcff6c8625b63cc59bfadd5",
+      "byteSize": 29037,
+      "modifiedAt": "2026-04-29T03:55:04.247Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "version",
+          "global",
+          "pageBlueprints"
+        ],
+        "arrayFields": [
+          "pageBlueprints"
+        ],
+        "objectFields": [
+          "global"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "version"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "version": {
+            "kind": "number"
+          },
+          "global": {
+            "kind": "object",
+            "keys": [
+              "promptOrder",
+              "executionModel",
+              "rendererPolicy",
+              "qualityChecks"
+            ]
+          },
+          "pageBlueprints": {
+            "kind": "array",
+            "length": 18,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/page-runtime-status.json",
+      "exists": true,
+      "sourceHash": "sha256:c680c848e3ea0cab196248443135a2eaeac26df0ca66672ad624f39cac60eb0d",
+      "byteSize": 34733,
+      "modifiedAt": "2026-04-29T03:55:04.251Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "sourceAudit",
+          "sourceAssetContractAudit",
+          "principle",
+          "viewports",
+          "summary",
+          "pages"
+        ],
+        "arrayFields": [
+          "viewports",
+          "pages"
+        ],
+        "objectFields": [
+          "summary"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "sourceAudit",
+          "sourceAssetContractAudit",
+          "principle"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "sourceAudit": {
+            "kind": "string"
+          },
+          "sourceAssetContractAudit": {
+            "kind": "string"
+          },
+          "principle": {
+            "kind": "string"
+          },
+          "viewports": {
+            "kind": "array",
+            "length": 2,
+            "itemKinds": [
+              "string"
+            ]
+          },
+          "summary": {
+            "kind": "object",
+            "keys": [
+              "pageCount",
+              "runtimeStatus",
+              "assetStatus",
+              "assetContractStatus",
+              "staleBlueprintSignals"
+            ]
+          },
+          "pages": {
+            "kind": "array",
+            "length": 14,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "runtime-truth",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": true
+    },
+    {
+      "sourcePath": "data/normalized/page-runtime-status.md",
+      "exists": true,
+      "sourceHash": "sha256:dc3ea942321df57171d995f5dcb90671487a8aef02860eb5f48370694231bb98",
+      "byteSize": 4771,
+      "modifiedAt": "2026-04-29T03:55:04.256Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 39,
+        "headings": [
+          "# Page Runtime Status",
+          "## Summary",
+          "## Pages"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/pdp-groups/index.json",
+      "exists": true,
+      "sourceHash": "sha256:17b8b5af941001ab415b3388f4bc0930ee38f6a63295f02658d2afa0339c4fbd",
+      "byteSize": 76736,
+      "modifiedAt": "2026-04-29T03:55:04.268Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "entryCount",
+          "entries",
+          "errors"
+        ],
+        "arrayFields": [
+          "entries",
+          "errors"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "entryCount"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "entryCount": {
+            "kind": "number"
+          },
+          "entries": {
+            "kind": "array",
+            "length": 22,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "errors": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/plp-groups/index.json",
+      "exists": true,
+      "sourceHash": "sha256:0e0f1842bf425b9bba443e4a0d46094bdf70545273e7ec92a44390cefce27d39",
+      "byteSize": 20999,
+      "modifiedAt": "2026-04-29T03:55:04.279Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "entryCount",
+          "entries",
+          "errors"
+        ],
+        "arrayFields": [
+          "entries",
+          "errors"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "entryCount"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "entryCount": {
+            "kind": "number"
+          },
+          "entries": {
+            "kind": "array",
+            "length": 8,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "errors": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/primitive-composition-catalog.json",
+      "exists": true,
+      "sourceHash": "sha256:9d0c77aade12fdd321bc846b52f1006f98543378fab2007e7fb3355f17accc18",
+      "byteSize": 7446,
+      "modifiedAt": "2026-04-29T03:55:04.284Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "version",
+          "primitives",
+          "templateMappings",
+          "pageAssignments"
+        ],
+        "arrayFields": [
+          "primitives"
+        ],
+        "objectFields": [
+          "templateMappings",
+          "pageAssignments"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "version"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "version": {
+            "kind": "number"
+          },
+          "primitives": {
+            "kind": "array",
+            "length": 13,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "templateMappings": {
+            "kind": "object",
+            "keys": [
+              "hero-carousel-composition-v1",
+              "hero-editorial-v1",
+              "hero-premium-stage-v1",
+              "hero-centered-v1",
+              "hero-stacked-v1",
+              "icon-link-grid-composition-v1",
+              "quickmenu-panel-v1",
+              "quickmenu-editorial-strip-v1"
+            ]
+          },
+          "pageAssignments": {
+            "kind": "object",
+            "keys": [
+              "home",
+              "homestyle-home",
+              "care-solutions"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/readiness-audit.json",
+      "exists": true,
+      "sourceHash": "sha256:a28f8f6a495d0c5d78c5f61c2205a3bd17c785441f48874cf9724b8e5f40f172",
+      "byteSize": 28788,
+      "modifiedAt": "2026-04-29T03:55:04.288Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "baseUrl",
+          "accountIsolation",
+          "pages"
+        ],
+        "arrayFields": [
+          "pages"
+        ],
+        "objectFields": [
+          "accountIsolation"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "baseUrl"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "baseUrl": {
+            "kind": "string"
+          },
+          "accountIsolation": {
+            "kind": "object",
+            "keys": [
+              "mrgbiryu",
+              "codexreview"
+            ]
+          },
+          "pages": {
+            "kind": "array",
+            "length": 15,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/readiness-audit.md",
+      "exists": true,
+      "sourceHash": "sha256:b31430937f086c79157b423eeff58766e08830628abc70ea56312205a510f930",
+      "byteSize": 1393,
+      "modifiedAt": "2026-04-29T03:55:04.294Z",
+      "fileType": "md",
+      "schemaFingerprint": {
+        "rootKind": "text",
+        "lineCount": 33,
+        "headings": [
+          "# Readiness Audit",
+          "## Account Isolation",
+          "## Page Summary",
+          "## Failures / Gaps"
+        ]
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "knowledge",
+      "truthLevel": "historical",
+      "freshnessPolicy": "provenance-only",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/representative-pdps/index.json",
+      "exists": true,
+      "sourceHash": "sha256:63a66f328b7c64a3e5e9408fae9385c6153fa49ee62eb872fbca8069dc3d6320",
+      "byteSize": 15044,
+      "modifiedAt": "2026-04-29T03:55:04.303Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "sourceDir",
+          "setCount",
+          "pdpCount",
+          "sets",
+          "pdps"
+        ],
+        "arrayFields": [
+          "sets",
+          "pdps"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "sourceDir",
+          "setCount",
+          "pdpCount"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "sourceDir": {
+            "kind": "string"
+          },
+          "setCount": {
+            "kind": "number"
+          },
+          "pdpCount": {
+            "kind": "number"
+          },
+          "sets": {
+            "kind": "array",
+            "length": 4,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "pdps": {
+            "kind": "array",
+            "length": 11,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/representative-urls/category-refrigerators.mo.json",
+      "exists": true,
+      "sourceHash": "sha256:a3e6461ff552ba79d822c3de3bb4e5cecd2d8af29e0b92242e072a7384fa3602",
+      "byteSize": 34420,
+      "modifiedAt": "2026-04-29T03:55:04.314Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "pageId",
+          "viewportProfile",
+          "url",
+          "viewport",
+          "capturedAt",
+          "title",
+          "candidateCount",
+          "selectedRowY",
+          "selectedCount",
+          "representativeProducts",
+          "debug"
+        ],
+        "arrayFields": [
+          "representativeProducts"
+        ],
+        "objectFields": [
+          "viewport",
+          "debug"
+        ],
+        "primitiveFields": [
+          "pageId",
+          "viewportProfile",
+          "url",
+          "capturedAt",
+          "title",
+          "candidateCount",
+          "selectedRowY",
+          "selectedCount"
+        ],
+        "nestedKeySample": {
+          "pageId": {
+            "kind": "string"
+          },
+          "viewportProfile": {
+            "kind": "string"
+          },
+          "url": {
+            "kind": "string"
+          },
+          "viewport": {
+            "kind": "object",
+            "keys": [
+              "profile",
+              "width",
+              "height"
+            ]
+          },
+          "capturedAt": {
+            "kind": "string"
+          },
+          "title": {
+            "kind": "string"
+          },
+          "candidateCount": {
+            "kind": "number"
+          },
+          "selectedRowY": {
+            "kind": "null"
+          },
+          "selectedCount": {
+            "kind": "number"
+          },
+          "representativeProducts": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          },
+          "debug": {
+            "kind": "object",
+            "keys": [
+              "allAnchorCount",
+              "runtimeCardCount",
+              "topByArea",
+              "interestingBlocks",
+              "interestingClassCounts",
+              "resources",
+              "networkBodies",
+              "topCandidates",
+              "firstRows"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/representative-urls/category-refrigerators.pc.json",
+      "exists": true,
+      "sourceHash": "sha256:0ba727ec1b6d4b148a83f29dba9255e4d37650cb991c6ac1f4779c992aaae6fe",
+      "byteSize": 81204,
+      "modifiedAt": "2026-04-29T03:55:04.325Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "pageId",
+          "viewportProfile",
+          "url",
+          "viewport",
+          "capturedAt",
+          "title",
+          "candidateCount",
+          "selectedRowY",
+          "selectedCount",
+          "representativeProducts",
+          "debug"
+        ],
+        "arrayFields": [
+          "representativeProducts"
+        ],
+        "objectFields": [
+          "viewport",
+          "debug"
+        ],
+        "primitiveFields": [
+          "pageId",
+          "viewportProfile",
+          "url",
+          "capturedAt",
+          "title",
+          "candidateCount",
+          "selectedRowY",
+          "selectedCount"
+        ],
+        "nestedKeySample": {
+          "pageId": {
+            "kind": "string"
+          },
+          "viewportProfile": {
+            "kind": "string"
+          },
+          "url": {
+            "kind": "string"
+          },
+          "viewport": {
+            "kind": "object",
+            "keys": [
+              "profile",
+              "width",
+              "height"
+            ]
+          },
+          "capturedAt": {
+            "kind": "string"
+          },
+          "title": {
+            "kind": "string"
+          },
+          "candidateCount": {
+            "kind": "number"
+          },
+          "selectedRowY": {
+            "kind": "number"
+          },
+          "selectedCount": {
+            "kind": "number"
+          },
+          "representativeProducts": {
+            "kind": "array",
+            "length": 3,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "debug": {
+            "kind": "object",
+            "keys": [
+              "allAnchorCount",
+              "runtimeCardCount",
+              "topByArea",
+              "interestingBlocks",
+              "interestingClassCounts",
+              "resources",
+              "networkBodies",
+              "topCandidates",
+              "firstRows"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/representative-urls/category-tvs.mo.json",
+      "exists": true,
+      "sourceHash": "sha256:be0b3f5155646c20fd08872e3d41695d83d36191646c99a9d0cbdd2c58fd1a39",
+      "byteSize": 75405,
+      "modifiedAt": "2026-04-29T03:55:04.332Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "pageId",
+          "viewportProfile",
+          "url",
+          "viewport",
+          "capturedAt",
+          "title",
+          "candidateCount",
+          "selectedRowY",
+          "selectedCount",
+          "representativeProducts",
+          "debug"
+        ],
+        "arrayFields": [
+          "representativeProducts"
+        ],
+        "objectFields": [
+          "viewport",
+          "debug"
+        ],
+        "primitiveFields": [
+          "pageId",
+          "viewportProfile",
+          "url",
+          "capturedAt",
+          "title",
+          "candidateCount",
+          "selectedRowY",
+          "selectedCount"
+        ],
+        "nestedKeySample": {
+          "pageId": {
+            "kind": "string"
+          },
+          "viewportProfile": {
+            "kind": "string"
+          },
+          "url": {
+            "kind": "string"
+          },
+          "viewport": {
+            "kind": "object",
+            "keys": [
+              "profile",
+              "width",
+              "height"
+            ]
+          },
+          "capturedAt": {
+            "kind": "string"
+          },
+          "title": {
+            "kind": "string"
+          },
+          "candidateCount": {
+            "kind": "number"
+          },
+          "selectedRowY": {
+            "kind": "number"
+          },
+          "selectedCount": {
+            "kind": "number"
+          },
+          "representativeProducts": {
+            "kind": "array",
+            "length": 2,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "debug": {
+            "kind": "object",
+            "keys": [
+              "allAnchorCount",
+              "runtimeCardCount",
+              "topByArea",
+              "interestingBlocks",
+              "interestingClassCounts",
+              "resources",
+              "networkBodies",
+              "topCandidates",
+              "firstRows"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/representative-urls/category-tvs.pc.json",
+      "exists": true,
+      "sourceHash": "sha256:9c5bf11a1ac34b7647ca34baa7c0575d203e672c91c11da28ce5a319bbfe97b9",
+      "byteSize": 75701,
+      "modifiedAt": "2026-04-29T03:55:04.338Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "pageId",
+          "viewportProfile",
+          "url",
+          "viewport",
+          "capturedAt",
+          "title",
+          "candidateCount",
+          "selectedRowY",
+          "selectedCount",
+          "representativeProducts",
+          "debug"
+        ],
+        "arrayFields": [
+          "representativeProducts"
+        ],
+        "objectFields": [
+          "viewport",
+          "debug"
+        ],
+        "primitiveFields": [
+          "pageId",
+          "viewportProfile",
+          "url",
+          "capturedAt",
+          "title",
+          "candidateCount",
+          "selectedRowY",
+          "selectedCount"
+        ],
+        "nestedKeySample": {
+          "pageId": {
+            "kind": "string"
+          },
+          "viewportProfile": {
+            "kind": "string"
+          },
+          "url": {
+            "kind": "string"
+          },
+          "viewport": {
+            "kind": "object",
+            "keys": [
+              "profile",
+              "width",
+              "height"
+            ]
+          },
+          "capturedAt": {
+            "kind": "string"
+          },
+          "title": {
+            "kind": "string"
+          },
+          "candidateCount": {
+            "kind": "number"
+          },
+          "selectedRowY": {
+            "kind": "number"
+          },
+          "selectedCount": {
+            "kind": "number"
+          },
+          "representativeProducts": {
+            "kind": "array",
+            "length": 3,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "debug": {
+            "kind": "object",
+            "keys": [
+              "allAnchorCount",
+              "runtimeCardCount",
+              "topByArea",
+              "interestingBlocks",
+              "interestingClassCounts",
+              "resources",
+              "networkBodies",
+              "topCandidates",
+              "firstRows"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/sample-openwebui-builder-request-v1.json",
+      "exists": true,
+      "sourceHash": "sha256:89ba4618e37d4c8feb84fbce173a988a5b606690ab0658c40cea8a8337d9b015",
+      "byteSize": 1511,
+      "modifiedAt": "2026-04-29T04:31:02.849Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "builderApiVersion",
+          "externalProjectId",
+          "externalConceptId",
+          "conceptThreadId",
+          "pageId",
+          "viewportProfile",
+          "conceptDocument",
+          "conceptPackage",
+          "builderOptions"
+        ],
+        "arrayFields": [],
+        "objectFields": [
+          "conceptPackage",
+          "builderOptions"
+        ],
+        "primitiveFields": [
+          "builderApiVersion",
+          "externalProjectId",
+          "externalConceptId",
+          "conceptThreadId",
+          "pageId",
+          "viewportProfile",
+          "conceptDocument"
+        ],
+        "nestedKeySample": {
+          "builderApiVersion": {
+            "kind": "string"
+          },
+          "externalProjectId": {
+            "kind": "string"
+          },
+          "externalConceptId": {
+            "kind": "string"
+          },
+          "conceptThreadId": {
+            "kind": "string"
+          },
+          "pageId": {
+            "kind": "string"
+          },
+          "viewportProfile": {
+            "kind": "string"
+          },
+          "conceptDocument": {
+            "kind": "string"
+          },
+          "conceptPackage": {
+            "kind": "object",
+            "keys": [
+              "title",
+              "targetGroup",
+              "designPolicy"
+            ]
+          },
+          "builderOptions": {
+            "kind": "object",
+            "keys": [
+              "rendererSurface",
+              "designChangeLevel",
+              "patchDepth",
+              "interventionLayer",
+              "authorProvider"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/section-family-contracts.json",
+      "exists": true,
+      "sourceHash": "sha256:96573ee597c17b194edb2deed80fc2dc42bbed52b5f460fafadca48a4f933b29",
+      "byteSize": 18554,
+      "modifiedAt": "2026-04-29T03:55:04.343Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "version",
+          "global",
+          "clusters",
+          "families"
+        ],
+        "arrayFields": [],
+        "objectFields": [
+          "global",
+          "clusters",
+          "families"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "version"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "version": {
+            "kind": "number"
+          },
+          "global": {
+            "kind": "object",
+            "keys": [
+              "principles",
+              "successSignals",
+              "identityProfiles",
+              "pageIdentityHints"
+            ]
+          },
+          "clusters": {
+            "kind": "object",
+            "keys": [
+              "home.top-stage",
+              "support.service-entry",
+              "care-solutions.service-value",
+              "pdp.summary-buy"
+            ]
+          },
+          "families": {
+            "kind": "object",
+            "keys": [
+              "hero",
+              "quickmenu",
+              "ranking",
+              "banner",
+              "commerce",
+              "benefit-hub",
+              "service-hero",
+              "service-tabs",
+              "page-shell"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "builder-contract",
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": true
+    },
+    {
+      "sourcePath": "data/normalized/service-groups/index.json",
+      "exists": true,
+      "sourceHash": "sha256:b6a30566520d2ebcd5d45bdb8bc497d6411a1e005951e17506d278cc25dbb509",
+      "byteSize": 37288,
+      "modifiedAt": "2026-04-29T03:55:04.354Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "entryCount",
+          "entries",
+          "errors"
+        ],
+        "arrayFields": [
+          "entries",
+          "errors"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "entryCount"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "entryCount": {
+            "kind": "number"
+          },
+          "entries": {
+            "kind": "array",
+            "length": 24,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "errors": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/site-document.json",
+      "exists": true,
+      "sourceHash": "sha256:1fe2f45a9627ac7cab7b7965ebf953b6539f8be432243d40b8c62998d75fabb6",
+      "byteSize": 11993,
+      "modifiedAt": "2026-04-29T03:55:04.359Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "siteId",
+          "source",
+          "pages",
+          "components",
+          "componentInstances",
+          "assets",
+          "componentCandidates",
+          "analysisSummary"
+        ],
+        "arrayFields": [
+          "pages",
+          "components",
+          "componentInstances",
+          "assets",
+          "componentCandidates"
+        ],
+        "objectFields": [
+          "analysisSummary"
+        ],
+        "primitiveFields": [
+          "siteId",
+          "source"
+        ],
+        "nestedKeySample": {
+          "siteId": {
+            "kind": "string"
+          },
+          "source": {
+            "kind": "string"
+          },
+          "pages": {
+            "kind": "array",
+            "length": 1,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "components": {
+            "kind": "array",
+            "length": 12,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "componentInstances": {
+            "kind": "array",
+            "length": 0,
+            "itemKinds": []
+          },
+          "assets": {
+            "kind": "array",
+            "length": 20,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "componentCandidates": {
+            "kind": "array",
+            "length": 1,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "analysisSummary": {
+            "kind": "object",
+            "keys": [
+              "pageCountByGroup",
+              "componentUsage",
+              "assetKindCounts",
+              "pagesByGroup"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/slot-snapshots/reference.home.json",
+      "exists": true,
+      "sourceHash": "sha256:ea746ce31d5e1560dbd36c1b1951b57bc325f23607ea264bf8ebdc8e6a3b2736",
+      "byteSize": 122815,
+      "modifiedAt": "2026-04-29T03:55:04.371Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "pageId",
+          "source",
+          "mode",
+          "url",
+          "visualUrl",
+          "structuralUrl",
+          "viewport",
+          "zones",
+          "slots",
+          "states"
+        ],
+        "arrayFields": [
+          "zones",
+          "slots",
+          "states"
+        ],
+        "objectFields": [
+          "viewport"
+        ],
+        "primitiveFields": [
+          "pageId",
+          "source",
+          "mode",
+          "url",
+          "visualUrl",
+          "structuralUrl"
+        ],
+        "nestedKeySample": {
+          "pageId": {
+            "kind": "string"
+          },
+          "source": {
+            "kind": "string"
+          },
+          "mode": {
+            "kind": "string"
+          },
+          "url": {
+            "kind": "string"
+          },
+          "visualUrl": {
+            "kind": "string"
+          },
+          "structuralUrl": {
+            "kind": "string"
+          },
+          "viewport": {
+            "kind": "object",
+            "keys": [
+              "width",
+              "height"
+            ]
+          },
+          "zones": {
+            "kind": "array",
+            "length": 3,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "slots": {
+            "kind": "array",
+            "length": 4,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "states": {
+            "kind": "array",
+            "length": 22,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "runtime-truth",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/style-runtime-token-presets.json",
+      "exists": true,
+      "sourceHash": "sha256:ffc9e60730fff307a5e2db9b793111c3e8be22edc0aad21e4a815fecc9f754e2",
+      "byteSize": 9759,
+      "modifiedAt": "2026-04-29T03:55:04.375Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "version",
+          "presets"
+        ],
+        "arrayFields": [
+          "presets"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "generatedAt",
+          "version"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "version": {
+            "kind": "number"
+          },
+          "presets": {
+            "kind": "array",
+            "length": 15,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/tailwind-replacement-skeleton-catalog.json",
+      "exists": true,
+      "sourceHash": "sha256:d788e968d20705f14a2d8c7a83039a75e622e1613066273eb4f79ff5efc11302",
+      "byteSize": 6756,
+      "modifiedAt": "2026-04-29T03:55:04.379Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "version",
+          "global",
+          "families"
+        ],
+        "arrayFields": [
+          "families"
+        ],
+        "objectFields": [
+          "global"
+        ],
+        "primitiveFields": [
+          "generatedAt",
+          "version"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "version": {
+            "kind": "number"
+          },
+          "global": {
+            "kind": "object",
+            "keys": [
+              "principles",
+              "rendererPolicy"
+            ]
+          },
+          "families": {
+            "kind": "array",
+            "length": 9,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "project",
+      "truthLevel": "policy",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
+      "sourcePath": "data/normalized/workbench-targets/index.json",
+      "exists": true,
+      "sourceHash": "sha256:14aed42707cd37392282806b4beb3b61c6ce349ea5327fc69e8823cc56e4834a",
+      "byteSize": 17890,
+      "modifiedAt": "2026-04-29T03:55:04.391Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "generatedAt",
+          "source",
+          "plpTargets",
+          "pdpTargets"
+        ],
+        "arrayFields": [
+          "plpTargets",
+          "pdpTargets"
+        ],
+        "objectFields": [
+          "source"
+        ],
+        "primitiveFields": [
+          "generatedAt"
+        ],
+        "nestedKeySample": {
+          "generatedAt": {
+            "kind": "string"
+          },
+          "source": {
+            "kind": "object",
+            "keys": [
+              "representativeUrlsDir",
+              "representativePdpsPath"
+            ]
+          },
+          "plpTargets": {
+            "kind": "array",
+            "length": 4,
+            "itemKinds": [
+              "object"
+            ]
+          },
+          "pdpTargets": {
+            "kind": "array",
+            "length": 4,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge",
+        "ontology"
+      ],
+      "dryRunTarget": false
+    }
+  ]
+}

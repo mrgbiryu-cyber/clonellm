@@ -1,0 +1,137 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "clonellm LGE Builder API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3100"
+    }
+  ],
+  "security": [
+    {
+      "builderServiceToken": []
+    }
+  ],
+  "paths": {
+    "/api/builder/lge/v1/draft": {
+      "post": {
+        "operationId": "create_lge_builder_draft",
+        "summary": "Queue an LGE builder draft job",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuilderDraftRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Job queued"
+          }
+        }
+      }
+    },
+    "/api/builder/lge/v1/jobs/{jobId}": {
+      "get": {
+        "operationId": "get_lge_builder_job",
+        "summary": "Poll an LGE builder job",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job status"
+          }
+        }
+      }
+    },
+    "/api/builder/lge/v1/jobs/{jobId}/ack": {
+      "post": {
+        "operationId": "ack_lge_builder_job",
+        "summary": "Acknowledge that Open WebUI persisted the artifact",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Job acknowledged"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "builderServiceToken": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    },
+    "schemas": {
+      "BuilderDraftRequest": {
+        "type": "object",
+        "required": [
+          "builderApiVersion",
+          "externalProjectId",
+          "externalConceptId",
+          "conceptThreadId",
+          "pageId",
+          "viewportProfile",
+          "conceptDocument",
+          "conceptPackage",
+          "builderOptions"
+        ],
+        "properties": {
+          "builderApiVersion": {
+            "type": "string",
+            "const": "v1"
+          },
+          "externalProjectId": {
+            "type": "string"
+          },
+          "externalConceptId": {
+            "type": "string"
+          },
+          "conceptThreadId": {
+            "type": "string"
+          },
+          "pageId": {
+            "type": "string"
+          },
+          "viewportProfile": {
+            "type": "string",
+            "enum": ["pc", "mo", "ta"]
+          },
+          "conceptDocument": {
+            "type": "string"
+          },
+          "conceptPackage": {
+            "type": "object"
+          },
+          "builderOptions": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

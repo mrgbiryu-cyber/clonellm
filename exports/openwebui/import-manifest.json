@@ -1,0 +1,76 @@
+{
+  "manifestVersion": "import-manifest-v1",
+  "lastExportedAt": "2026-04-29T05:04:13.420Z",
+  "files": [
+    {
+      "source": "data/normalized/asset-role-policies.json",
+      "sourceHash": "sha256:14f89e0ff0ee94db097232b55d88c93ba5ff78ec958f1d9f507bd5bbc40eed92",
+      "projection": "exports/openwebui/knowledge/lge-policy/knowledge.asset-role-policies.json",
+      "projectionHash": "sha256:023e6fa1419039a857ff5038e4cb981ca506aa66c97f95397f4c105c68515eb2",
+      "projectionType": "knowledge",
+      "collection": "lge-policy",
+      "truthLevel": "policy",
+      "freshness": "current"
+    },
+    {
+      "source": "data/normalized/component-rebuild-schema-catalog.json",
+      "sourceHash": "sha256:6357414a62e133d7c5b5d99f17f0ff36e471aaf2dee0823629062c19bbba022b",
+      "projection": "exports/openwebui/knowledge/lge-policy/knowledge.component-rebuild-schema-catalog.json",
+      "projectionHash": "sha256:522de96f5117c27bf6b44958aa8ebc92792b5f88d8efeee9025277028828eb0e",
+      "projectionType": "knowledge",
+      "collection": "lge-policy",
+      "truthLevel": "policy",
+      "freshness": "current"
+    },
+    {
+      "source": "data/normalized/image-asset-registry.json",
+      "sourceHash": "sha256:f73230b972ed2ff0474fb06af523117a9683a09471eec8d7f16d3cde74ba470a",
+      "projection": "exports/openwebui/knowledge/lge-component-spec/knowledge.image-asset-registry.json",
+      "projectionHash": "sha256:5985b1c04e12f2bdbf24a38887c335e736b457ebc5aa3a218bdb06b01bed0a03",
+      "projectionType": "knowledge",
+      "collection": "lge-component-spec",
+      "truthLevel": "policy",
+      "freshness": "current"
+    },
+    {
+      "source": "data/normalized/page-runtime-status.json",
+      "sourceHash": "sha256:c680c848e3ea0cab196248443135a2eaeac26df0ca66672ad624f39cac60eb0d",
+      "projection": "exports/openwebui/knowledge/lge-component-spec/knowledge.page-runtime-status.json",
+      "projectionHash": "sha256:ad58034b70369f59cc22291fd275d7d86b9811cca31d4eb047fcb7c48d5de0b1",
+      "projectionType": "knowledge",
+      "collection": "lge-component-spec",
+      "truthLevel": "runtime-truth",
+      "freshness": "current"
+    },
+    {
+      "source": "data/normalized/section-family-contracts.json",
+      "sourceHash": "sha256:96573ee597c17b194edb2deed80fc2dc42bbed52b5f460fafadca48a4f933b29",
+      "projection": "exports/openwebui/knowledge/lge-policy/knowledge.section-family-contracts.json",
+      "projectionHash": "sha256:d5ddbf2413d0db691ee2c45f408f5ab2e0425a51e19e3439a4a6baee13e5e20c",
+      "projectionType": "knowledge",
+      "collection": "lge-policy",
+      "truthLevel": "policy",
+      "freshness": "current"
+    },
+    {
+      "source": "data/normalized/page-runtime-status.json",
+      "sourceHash": "sha256:c680c848e3ea0cab196248443135a2eaeac26df0ca66672ad624f39cac60eb0d",
+      "projection": "exports/openwebui/ontology/ontology-projection-v1.json",
+      "projectionHash": "sha256:f6b557c5d8f0dd7a4c639d5c92f29d69654ab8a07aa4453c9335cf4b3fdf919f",
+      "projectionType": "ontology",
+      "collection": "lge-component-spec",
+      "truthLevel": "runtime-truth",
+      "freshness": "current"
+    },
+    {
+      "source": "data/normalized/section-family-contracts.json",
+      "sourceHash": "sha256:96573ee597c17b194edb2deed80fc2dc42bbed52b5f460fafadca48a4f933b29",
+      "projection": "exports/openwebui/builder-contract/builder-contract-v1.json",
+      "projectionHash": "sha256:ac9208fc4264d66d10797c5441aca1da489a67d3e5875377988627ddbc581114",
+      "projectionType": "builder-contract",
+      "collection": "lge-policy",
+      "truthLevel": "policy",
+      "freshness": "current"
+    }
+  ]
+}

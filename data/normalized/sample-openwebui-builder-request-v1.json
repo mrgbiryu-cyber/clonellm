@@ -1,0 +1,44 @@
+{
+  "builderApiVersion": "v1",
+  "externalProjectId": "openwebui-project-lge-home-2026-q2",
+  "externalConceptId": "concept-home-top-premium-phase0d",
+  "conceptThreadId": "ct-123e4567-e89b-42d3-a456-426614174000",
+  "pageId": "home",
+  "viewportProfile": "pc",
+  "conceptDocument": "---\nconceptId: concept-home-top-premium-phase0d\nprojectId: openwebui-project-lge-home-2026-q2\npageId: home\ntargetGroup: home-top\nslots: [hero, quickmenu]\nstatus: draft\n---\n\n## Concept Summary\n\nStrengthen the home top premium experience while preserving the LGE runtime and asset-role guardrails.\n",
+  "conceptPackage": {
+    "title": "Home Top Premium Experience Phase 0D Sample",
+    "targetGroup": {
+      "groupId": "home-top",
+      "groupLabel": "Home Top",
+      "slotIds": [
+        "hero",
+        "quickmenu"
+      ],
+      "componentIds": [
+        "home.hero",
+        "home.quickmenu"
+      ]
+    },
+    "designPolicy": {
+      "mustKeep": [
+        "Preserve Tailwind runtime parity",
+        "Hero full-bleed imagery must obey background-only role policy"
+      ],
+      "mustChange": [
+        "Clarify first-screen hierarchy"
+      ],
+      "guardrails": [
+        "Do not reuse promo-complete assets as hero backgrounds",
+        "Quickmenu must keep icon-only family consistency"
+      ]
+    }
+  },
+  "builderOptions": {
+    "rendererSurface": "tailwind",
+    "designChangeLevel": "medium",
+    "patchDepth": "medium",
+    "interventionLayer": "section-group",
+    "authorProvider": "local"
+  }
+}

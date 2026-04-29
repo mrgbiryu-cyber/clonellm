@@ -1,0 +1,3782 @@
+{
+  "builderContractVersion": "builder-contract-v1",
+  "generatedAt": "2026-04-29T05:04:13.410Z",
+  "sourceManifest": [
+    {
+      "sourcePath": "data/normalized/section-family-contracts.json",
+      "sourceHash": "sha256:96573ee597c17b194edb2deed80fc2dc42bbed52b5f460fafadca48a4f933b29",
+      "truthLevel": "policy",
+      "freshness": "current"
+    },
+    {
+      "sourcePath": "data/normalized/component-rebuild-schema-catalog.json",
+      "sourceHash": "sha256:6357414a62e133d7c5b5d99f17f0ff36e471aaf2dee0823629062c19bbba022b",
+      "truthLevel": "policy",
+      "freshness": "current"
+    },
+    {
+      "sourcePath": "data/normalized/image-asset-registry.json",
+      "sourceHash": "sha256:f73230b972ed2ff0474fb06af523117a9683a09471eec8d7f16d3cde74ba470a",
+      "truthLevel": "policy",
+      "freshness": "current"
+    },
+    {
+      "sourcePath": "data/normalized/asset-role-policies.json",
+      "sourceHash": "sha256:14f89e0ff0ee94db097232b55d88c93ba5ff78ec958f1d9f507bd5bbc40eed92",
+      "truthLevel": "policy",
+      "freshness": "current"
+    },
+    {
+      "sourcePath": "data/normalized/page-runtime-status.json",
+      "sourceHash": "sha256:c680c848e3ea0cab196248443135a2eaeac26df0ca66672ad624f39cac60eb0d",
+      "truthLevel": "runtime-truth",
+      "freshness": "current"
+    }
+  ],
+  "pages": [
+    {
+      "pageId": "bestshop",
+      "label": "베스트샵",
+      "slotIds": [
+        "hero",
+        "shortcut",
+        "brandBanner"
+      ]
+    },
+    {
+      "pageId": "care-solutions",
+      "label": "가전 구독 메인",
+      "slotIds": [
+        "hero",
+        "ranking",
+        "benefit",
+        "tabs",
+        "careBanner"
+      ]
+    },
+    {
+      "pageId": "care-solutions-pdp",
+      "label": "가전 구독 PDP",
+      "slotIds": [
+        "visual"
+      ]
+    },
+    {
+      "pageId": "category-refrigerators",
+      "label": "PLP - 냉장고 카테고리",
+      "slotIds": [
+        "banner"
+      ]
+    },
+    {
+      "pageId": "category-tvs",
+      "label": "PLP - TV 카테고리",
+      "slotIds": [
+        "banner"
+      ]
+    },
+    {
+      "pageId": "home",
+      "label": "홈 - 태블릿",
+      "slotIds": [
+        "hero",
+        "quickmenu",
+        "md-choice",
+        "timedeal",
+        "best-ranking",
+        "marketing-area",
+        "subscription",
+        "space-renewal",
+        "brand-showroom",
+        "latest-product-news",
+        "smart-life",
+        "summary-banner-2",
+        "missed-benefits",
+        "lg-best-care",
+        "bestshop-guide"
+      ]
+    },
+    {
+      "pageId": "homestyle-home",
+      "label": "홈스타일 메인",
+      "slotIds": [
+        "quickMenu",
+        "labelBanner",
+        "brandStory"
+      ]
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "label": "홈스타일 PDP",
+      "slotIds": [
+        "bestProduct"
+      ]
+    },
+    {
+      "pageId": "pdp-refrigerator-general",
+      "label": "PDP - 냉장고 일반형",
+      "slotIds": [
+        "summary",
+        "sticky"
+      ]
+    },
+    {
+      "pageId": "pdp-refrigerator-glass",
+      "label": "PDP - 냉장고 글라스형",
+      "slotIds": [
+        "summary",
+        "sticky"
+      ]
+    },
+    {
+      "pageId": "pdp-refrigerator-knockon",
+      "label": "PDP - 냉장고 노크온형",
+      "slotIds": [
+        "summary",
+        "sticky"
+      ]
+    },
+    {
+      "pageId": "pdp-tv-general",
+      "label": "PDP - TV 일반형",
+      "slotIds": [
+        "summary",
+        "sticky"
+      ]
+    },
+    {
+      "pageId": "pdp-tv-premium",
+      "label": "PDP - TV 프리미엄형",
+      "slotIds": [
+        "summary",
+        "sticky"
+      ]
+    },
+    {
+      "pageId": "support",
+      "label": "고객지원 - 태블릿",
+      "slotIds": [
+        "mainService",
+        "tipsBanner",
+        "bestcare"
+      ]
+    }
+  ],
+  "slots": [
+    {
+      "slotId": "brandBanner",
+      "pageId": "bestshop",
+      "componentIds": [
+        "bestshop.brandBanner"
+      ],
+      "assetRolePolicyIds": [
+        "banner-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "hero",
+      "pageId": "bestshop",
+      "componentIds": [
+        "bestshop.hero"
+      ],
+      "assetRolePolicyIds": [
+        "stage-hero"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "shortcut",
+      "pageId": "bestshop",
+      "componentIds": [
+        "bestshop.shortcut"
+      ],
+      "assetRolePolicyIds": [
+        "quickmenu-icon-family"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "visual",
+      "pageId": "care-solutions-pdp",
+      "componentIds": [
+        "care-solutions-pdp.visual"
+      ],
+      "assetRolePolicyIds": [
+        "stage-hero"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "benefit",
+      "pageId": "care-solutions",
+      "componentIds": [
+        "care-solutions.benefit"
+      ],
+      "assetRolePolicyIds": [
+        "benefit-hub"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "careBanner",
+      "pageId": "care-solutions",
+      "componentIds": [
+        "care-solutions.careBanner"
+      ],
+      "assetRolePolicyIds": [
+        "banner-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "hero",
+      "pageId": "care-solutions",
+      "componentIds": [
+        "care-solutions.hero"
+      ],
+      "assetRolePolicyIds": [
+        "stage-hero"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "ranking",
+      "pageId": "care-solutions",
+      "componentIds": [
+        "care-solutions.ranking"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "tabs",
+      "pageId": "care-solutions",
+      "componentIds": [
+        "care-solutions.tabs"
+      ],
+      "assetRolePolicyIds": [
+        "quickmenu-icon-family"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "banner",
+      "pageId": "category-refrigerators",
+      "componentIds": [
+        "category-refrigerators.banner"
+      ],
+      "assetRolePolicyIds": [
+        "banner-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "banner",
+      "pageId": "category-tvs",
+      "componentIds": [
+        "category-tvs.banner"
+      ],
+      "assetRolePolicyIds": [
+        "banner-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "best-ranking",
+      "pageId": "home",
+      "componentIds": [
+        "home.best-ranking"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "bestshop-guide",
+      "pageId": "home",
+      "componentIds": [
+        "home.bestshop-guide"
+      ],
+      "assetRolePolicyIds": [],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "brand-showroom",
+      "pageId": "home",
+      "componentIds": [
+        "home.brand-showroom"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "hero",
+      "pageId": "home",
+      "componentIds": [
+        "home.hero"
+      ],
+      "assetRolePolicyIds": [
+        "stage-hero"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "latest-product-news",
+      "pageId": "home",
+      "componentIds": [
+        "home.latest-product-news"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "lg-best-care",
+      "pageId": "home",
+      "componentIds": [
+        "home.lg-best-care"
+      ],
+      "assetRolePolicyIds": [],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "marketing-area",
+      "pageId": "home",
+      "componentIds": [
+        "home.marketing-area"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "md-choice",
+      "pageId": "home",
+      "componentIds": [
+        "home.md-choice"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "missed-benefits",
+      "pageId": "home",
+      "componentIds": [
+        "home.missed-benefits"
+      ],
+      "assetRolePolicyIds": [],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "quickmenu",
+      "pageId": "home",
+      "componentIds": [
+        "home.quickmenu"
+      ],
+      "assetRolePolicyIds": [
+        "quickmenu-icon-family"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "smart-life",
+      "pageId": "home",
+      "componentIds": [
+        "home.smart-life"
+      ],
+      "assetRolePolicyIds": [],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "space-renewal",
+      "pageId": "home",
+      "componentIds": [
+        "home.space-renewal"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "subscription",
+      "pageId": "home",
+      "componentIds": [
+        "home.subscription"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "summary-banner-2",
+      "pageId": "home",
+      "componentIds": [
+        "home.summary-banner-2"
+      ],
+      "assetRolePolicyIds": [
+        "banner-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "timedeal",
+      "pageId": "home",
+      "componentIds": [
+        "home.timedeal"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "brandStory",
+      "pageId": "homestyle-home",
+      "componentIds": [
+        "homestyle-home.brandStory"
+      ],
+      "assetRolePolicyIds": [],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "labelBanner",
+      "pageId": "homestyle-home",
+      "componentIds": [
+        "homestyle-home.labelBanner"
+      ],
+      "assetRolePolicyIds": [
+        "banner-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "quickMenu",
+      "pageId": "homestyle-home",
+      "componentIds": [
+        "homestyle-home.quickMenu"
+      ],
+      "assetRolePolicyIds": [
+        "quickmenu-icon-family"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "bestProduct",
+      "pageId": "homestyle-pdp",
+      "componentIds": [
+        "homestyle-pdp.bestProduct"
+      ],
+      "assetRolePolicyIds": [
+        "commerce-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "sticky",
+      "pageId": "pdp-refrigerator-general",
+      "componentIds": [
+        "pdp-refrigerator-general.sticky"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-sticky-buybox"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "summary",
+      "pageId": "pdp-refrigerator-general",
+      "componentIds": [
+        "pdp-refrigerator-general.summary"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-summary-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "sticky",
+      "pageId": "pdp-refrigerator-glass",
+      "componentIds": [
+        "pdp-refrigerator-glass.sticky"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-sticky-buybox"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "summary",
+      "pageId": "pdp-refrigerator-glass",
+      "componentIds": [
+        "pdp-refrigerator-glass.summary"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-summary-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "sticky",
+      "pageId": "pdp-refrigerator-knockon",
+      "componentIds": [
+        "pdp-refrigerator-knockon.sticky"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-sticky-buybox"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "summary",
+      "pageId": "pdp-refrigerator-knockon",
+      "componentIds": [
+        "pdp-refrigerator-knockon.summary"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-summary-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "sticky",
+      "pageId": "pdp-tv-general",
+      "componentIds": [
+        "pdp-tv-general.sticky"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-sticky-buybox"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "summary",
+      "pageId": "pdp-tv-general",
+      "componentIds": [
+        "pdp-tv-general.summary"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-summary-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "sticky",
+      "pageId": "pdp-tv-premium",
+      "componentIds": [
+        "pdp-tv-premium.sticky"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-sticky-buybox"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "summary",
+      "pageId": "pdp-tv-premium",
+      "componentIds": [
+        "pdp-tv-premium.summary"
+      ],
+      "assetRolePolicyIds": [
+        "pdp-summary-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "bestcare",
+      "pageId": "support",
+      "componentIds": [
+        "support.bestcare"
+      ],
+      "assetRolePolicyIds": [
+        "benefit-hub"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "mainService",
+      "pageId": "support",
+      "componentIds": [
+        "support.mainService"
+      ],
+      "assetRolePolicyIds": [
+        "benefit-hub"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    },
+    {
+      "slotId": "tipsBanner",
+      "pageId": "support",
+      "componentIds": [
+        "support.tipsBanner"
+      ],
+      "assetRolePolicyIds": [
+        "banner-stage"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ]
+    }
+  ],
+  "components": [
+    {
+      "componentId": "home.hero",
+      "familyId": "hero-carousel-composition",
+      "slotIds": [
+        "hero"
+      ]
+    },
+    {
+      "componentId": "home.quickmenu",
+      "familyId": "icon-link-grid-composition",
+      "slotIds": [
+        "quickmenu"
+      ]
+    },
+    {
+      "componentId": "home.md-choice",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "md-choice"
+      ]
+    },
+    {
+      "componentId": "home.timedeal",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "timedeal"
+      ]
+    },
+    {
+      "componentId": "home.best-ranking",
+      "familyId": "ranking-list-composition",
+      "slotIds": [
+        "best-ranking"
+      ]
+    },
+    {
+      "componentId": "home.marketing-area",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "marketing-area"
+      ]
+    },
+    {
+      "componentId": "home.subscription",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "subscription"
+      ]
+    },
+    {
+      "componentId": "home.space-renewal",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "space-renewal"
+      ]
+    },
+    {
+      "componentId": "home.brand-showroom",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "brand-showroom"
+      ]
+    },
+    {
+      "componentId": "home.latest-product-news",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "latest-product-news"
+      ]
+    },
+    {
+      "componentId": "home.smart-life",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "smart-life"
+      ]
+    },
+    {
+      "componentId": "home.summary-banner-2",
+      "familyId": "image-banner-strip-composition",
+      "slotIds": [
+        "summary-banner-2"
+      ]
+    },
+    {
+      "componentId": "home.missed-benefits",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "missed-benefits"
+      ]
+    },
+    {
+      "componentId": "home.lg-best-care",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "lg-best-care"
+      ]
+    },
+    {
+      "componentId": "home.bestshop-guide",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "bestshop-guide"
+      ]
+    },
+    {
+      "componentId": "support.mainService",
+      "familyId": "service-benefit-hub-composition",
+      "slotIds": [
+        "mainService"
+      ]
+    },
+    {
+      "componentId": "support.tipsBanner",
+      "familyId": "image-banner-strip-composition",
+      "slotIds": [
+        "tipsBanner"
+      ]
+    },
+    {
+      "componentId": "support.bestcare",
+      "familyId": "service-benefit-hub-composition",
+      "slotIds": [
+        "bestcare"
+      ]
+    },
+    {
+      "componentId": "bestshop.hero",
+      "familyId": "hero-carousel-composition",
+      "slotIds": [
+        "hero"
+      ]
+    },
+    {
+      "componentId": "bestshop.shortcut",
+      "familyId": "icon-link-grid-composition",
+      "slotIds": [
+        "shortcut"
+      ]
+    },
+    {
+      "componentId": "bestshop.brandBanner",
+      "familyId": "image-banner-strip-composition",
+      "slotIds": [
+        "brandBanner"
+      ]
+    },
+    {
+      "componentId": "care-solutions.hero",
+      "familyId": "hero-carousel-composition",
+      "slotIds": [
+        "hero"
+      ]
+    },
+    {
+      "componentId": "care-solutions.ranking",
+      "familyId": "ranking-list-composition",
+      "slotIds": [
+        "ranking"
+      ]
+    },
+    {
+      "componentId": "care-solutions.benefit",
+      "familyId": "service-benefit-hub-composition",
+      "slotIds": [
+        "benefit"
+      ]
+    },
+    {
+      "componentId": "care-solutions.tabs",
+      "familyId": "icon-link-grid-composition",
+      "slotIds": [
+        "tabs"
+      ]
+    },
+    {
+      "componentId": "care-solutions.careBanner",
+      "familyId": "image-banner-strip-composition",
+      "slotIds": [
+        "careBanner"
+      ]
+    },
+    {
+      "componentId": "care-solutions-pdp.visual",
+      "familyId": "editorial-visual-story-composition",
+      "slotIds": [
+        "visual"
+      ]
+    },
+    {
+      "componentId": "homestyle-home.quickMenu",
+      "familyId": "icon-link-grid-composition",
+      "slotIds": [
+        "quickMenu"
+      ]
+    },
+    {
+      "componentId": "homestyle-home.labelBanner",
+      "familyId": "image-banner-strip-composition",
+      "slotIds": [
+        "labelBanner"
+      ]
+    },
+    {
+      "componentId": "homestyle-home.brandStory",
+      "familyId": "editorial-visual-story-composition",
+      "slotIds": [
+        "brandStory"
+      ]
+    },
+    {
+      "componentId": "homestyle-pdp.bestProduct",
+      "familyId": "commerce-card-grid-composition",
+      "slotIds": [
+        "bestProduct"
+      ]
+    },
+    {
+      "componentId": "category-tvs.banner",
+      "familyId": "image-banner-strip-composition",
+      "slotIds": [
+        "banner"
+      ]
+    },
+    {
+      "componentId": "category-refrigerators.banner",
+      "familyId": "image-banner-strip-composition",
+      "slotIds": [
+        "banner"
+      ]
+    },
+    {
+      "componentId": "pdp-tv-general.summary",
+      "familyId": "pdp-summary-stack-composition",
+      "slotIds": [
+        "summary"
+      ]
+    },
+    {
+      "componentId": "pdp-tv-general.sticky",
+      "familyId": "pdp-sticky-buybox-composition",
+      "slotIds": [
+        "sticky"
+      ]
+    },
+    {
+      "componentId": "pdp-tv-premium.summary",
+      "familyId": "pdp-summary-stack-composition",
+      "slotIds": [
+        "summary"
+      ]
+    },
+    {
+      "componentId": "pdp-tv-premium.sticky",
+      "familyId": "pdp-sticky-buybox-composition",
+      "slotIds": [
+        "sticky"
+      ]
+    },
+    {
+      "componentId": "pdp-refrigerator-general.summary",
+      "familyId": "pdp-summary-stack-composition",
+      "slotIds": [
+        "summary"
+      ]
+    },
+    {
+      "componentId": "pdp-refrigerator-general.sticky",
+      "familyId": "pdp-sticky-buybox-composition",
+      "slotIds": [
+        "sticky"
+      ]
+    },
+    {
+      "componentId": "pdp-refrigerator-knockon.summary",
+      "familyId": "pdp-summary-stack-composition",
+      "slotIds": [
+        "summary"
+      ]
+    },
+    {
+      "componentId": "pdp-refrigerator-knockon.sticky",
+      "familyId": "pdp-sticky-buybox-composition",
+      "slotIds": [
+        "sticky"
+      ]
+    },
+    {
+      "componentId": "pdp-refrigerator-glass.summary",
+      "familyId": "pdp-summary-stack-composition",
+      "slotIds": [
+        "summary"
+      ]
+    },
+    {
+      "componentId": "pdp-refrigerator-glass.sticky",
+      "familyId": "pdp-sticky-buybox-composition",
+      "slotIds": [
+        "sticky"
+      ]
+    }
+  ],
+  "componentFamilies": [
+    {
+      "familyId": "hero-carousel-composition",
+      "contractId": "hero-carousel-composition"
+    },
+    {
+      "familyId": "icon-link-grid-composition",
+      "contractId": "icon-link-grid-composition"
+    },
+    {
+      "familyId": "commerce-card-grid-composition",
+      "contractId": "commerce-card-grid-composition"
+    },
+    {
+      "familyId": "ranking-list-composition",
+      "contractId": "ranking-list-composition"
+    },
+    {
+      "familyId": "image-banner-strip-composition",
+      "contractId": "image-banner-strip-composition"
+    },
+    {
+      "familyId": "service-benefit-hub-composition",
+      "contractId": "service-benefit-hub-composition"
+    },
+    {
+      "familyId": "pdp-summary-stack-composition",
+      "contractId": "pdp-summary-stack-composition"
+    },
+    {
+      "familyId": "pdp-sticky-buybox-composition",
+      "contractId": "pdp-sticky-buybox-composition"
+    },
+    {
+      "familyId": "editorial-visual-story-composition",
+      "contractId": "editorial-visual-story-composition"
+    }
+  ],
+  "assetRolePolicies": [
+    {
+      "policyId": "stage-hero",
+      "slotIds": [
+        "hero",
+        "service-intro",
+        "visual"
+      ],
+      "allowedRoles": [
+        "background-only",
+        "object-only",
+        "icon-only"
+      ],
+      "forbiddenRoles": [
+        "promo-complete"
+      ]
+    },
+    {
+      "policyId": "quickmenu-icon-family",
+      "slotIds": [
+        "quickmenu",
+        "quickMenu",
+        "tabs",
+        "shortcut"
+      ],
+      "allowedRoles": [
+        "icon-only"
+      ],
+      "forbiddenRoles": [
+        "promo-complete"
+      ]
+    },
+    {
+      "policyId": "banner-stage",
+      "slotIds": [
+        "summary-banner-2",
+        "tipsBanner",
+        "brandBanner",
+        "careBanner",
+        "labelBanner",
+        "banner",
+        "noticeBanner"
+      ],
+      "allowedRoles": [
+        "background-only",
+        "object-only"
+      ],
+      "forbiddenRoles": [
+        "promo-complete"
+      ]
+    },
+    {
+      "policyId": "commerce-grid",
+      "slotIds": [
+        "md-choice",
+        "timedeal",
+        "subscription",
+        "space-renewal",
+        "latest-product-news",
+        "brand-showroom",
+        "marketing-area",
+        "bestProduct",
+        "best-ranking",
+        "ranking"
+      ],
+      "allowedRoles": [
+        "background-only",
+        "object-only",
+        "reference-only"
+      ],
+      "forbiddenRoles": []
+    },
+    {
+      "policyId": "benefit-hub",
+      "slotIds": [
+        "benefit",
+        "benefit-highlight",
+        "mainService",
+        "bestcare",
+        "service-benefit"
+      ],
+      "allowedRoles": [
+        "icon-only",
+        "object-only"
+      ],
+      "forbiddenRoles": [
+        "promo-complete"
+      ]
+    },
+    {
+      "policyId": "pdp-summary-stage",
+      "slotIds": [
+        "summary"
+      ],
+      "allowedRoles": [
+        "background-only",
+        "object-only"
+      ],
+      "forbiddenRoles": [
+        "promo-complete"
+      ]
+    },
+    {
+      "policyId": "pdp-sticky-buybox",
+      "slotIds": [
+        "sticky"
+      ],
+      "allowedRoles": [],
+      "forbiddenRoles": []
+    }
+  ],
+  "assets": [
+    {
+      "assetId": "home.hero.generated.premium-stage.candidate-a",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "home.hero.generated.premium-stage.candidate-a.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "home.hero.generated.premium-stage.candidate-a.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "home.hero.lge.promo-complete.blocked-main",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "home.hero.lge.promo-complete.blocked-main.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "home.hero.lge.promo-complete.blocked-main.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "home.hero.lge.sofa-object.v1",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "home.hero.lge.sofa-object.v1.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.1760x360-pc-20260407-093645.27204ced33",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.1760x360-pc-20260407-093645.27204ced33.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-airo20240319-145134.2d61939770",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-airo20240319-145134.2d61939770.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-airo20240319-145134.2d61939770.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-airpuri20240319-145046.994e74588e",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-airpuri20240319-145046.994e74588e.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-airpuri20240319-145046.994e74588e.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-chair20240319-150243.1d37423cd6",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-chair20240319-150243.1d37423cd6.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-chair20240319-150243.1d37423cd6.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-cleaner20240319-150158.8c02a19ad2",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-cleaner20240319-150158.8c02a19ad2.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-cleaner20240319-150158.8c02a19ad2.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-cook20240319-145621.7e21e0ca29",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-cook20240319-145621.7e21e0ca29.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-cook20240319-145621.7e21e0ca29.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-dehumidifier20240610-172223.4322475887",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-dehumidifier20240610-172223.4322475887.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-dehumidifier20240610-172223.4322475887.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-dishwash20240319-145709.2f5b6e83b0",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-dishwash20240319-145709.2f5b6e83b0.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-dishwash20240319-145709.2f5b6e83b0.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-dry20240319-145942.daf953fb91",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-dry20240319-145942.daf953fb91.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-dry20240319-145943.ac4e780677",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-dry20240319-145943.ac4e780677.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-humidi20240319-145532.e6520f5587",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-humidi20240319-145532.e6520f5587.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-humidi20240319-145532.e6520f5587.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-icerefriger20240319-144701.d2a5ee9e3a",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-icerefriger20240319-144701.d2a5ee9e3a.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-icerefriger20240319-144701.d2a5ee9e3a.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-kimchi20240319-144854.6db6518c85",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-kimchi20240319-144854.6db6518c85.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-kimchi20240319-144854.6db6518c85.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-pc20240319-144439.4c85b8b4e3",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-pc20240319-144439.4c85b8b4e3.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-pc20240319-144439.4c85b8b4e3.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-puri20240319-144350.1267ed607c",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-puri20240319-144350.1267ed607c.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-puri20240319-144352.b97cd1edc3",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-puri20240319-144352.b97cd1edc3.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-refriger20240319-144801.6f5fb209cb",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-refriger20240319-144801.6f5fb209cb.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-refriger20240319-144801.6f5fb209cb.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-shoes20240319-150118.68a393c738",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-shoes20240319-150118.68a393c738.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-shoes20240319-150118.68a393c738.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-styler20240319-150032.6b2612ed18",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-styler20240319-150032.6b2612ed18.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-styler20240319-150032.6b2612ed18.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-tower20240319-145755.53acebe4e4",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-tower20240319-145755.53acebe4e4.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-tower20240319-145755.53acebe4e4.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-tv20240319-144532.99366e64c3",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-tv20240319-144532.99366e64c3.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-tv20240319-144532.99366e64c3.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-wash20240319-145849.8095dcd7e0",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-wash20240319-145849.8095dcd7e0.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-wash20240319-145849.8095dcd7e0.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.img-rental-category-washcombo2024040920240409-153837.7478f441be",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-washcombo2024040920240409-153837.7478f441be.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.care-solutions.careBanner.img-rental-category-washcombo2024040920240409-153837.7478f441be.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.quick-menu-mo-64x64-20260310-125603.762eabf863",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.quick-menu-mo-64x64-20260310-125603.762eabf863.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.careBanner.quick-menu-pc-88x88-20260310-125602.128e148e51",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.careBanner.quick-menu-pc-88x88-20260310-125602.128e148e51.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172043.decf2e52c8",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172043.decf2e52c8.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172043.decf2e52c8.text-removed.pc.v1",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172043.decf2e52c8.text-removed.pc.v1.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172129.c21a7bfb0c",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172129.c21a7bfb0c.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172217.3f93ae5ce1",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172217.3f93ae5ce1.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.hero-banner-pc-img-20260401-135149.1ff6cb9ff6",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.hero-banner-pc-img-20260401-135149.1ff6cb9ff6.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.herobanner-1760-360pc-260330-20260331-101429-20260401-.14b8520aba",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.herobanner-1760-360pc-260330-20260331-101429-20260401-.14b8520aba.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.herobanner-1760x360-20260112-134326.50585a4288",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.herobanner-1760x360-20260112-134326.50585a4288.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.homemain-hero-subs-changeupfesta-pc-20260106-135517.740151c6de",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.homemain-hero-subs-changeupfesta-pc-20260106-135517.740151c6de.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.img-hero-pc-1760x360-20260303-143905.58c405c256",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.img-hero-pc-1760x360-20260303-143905.58c405c256.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.pc-herobanner-gooddog-20251216-132215.480accc89b",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.pc-herobanner-gooddog-20251216-132215.480accc89b.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.care-solutions.hero.subscribedays-hero-pc-20260409-102017.f19137ad79",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.care-solutions.hero.subscribedays-hero-pc-20260409-102017.f19137ad79.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-refrigerators.banner.category-plp-banner-680x435-20260403-140419.3063890b1f",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-refrigerators.banner.category-plp-banner-680x435-20260403-140419.3063890b1f.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.category-refrigerators.banner.category-plp-banner-680x435-20260403-140419.3063890b1f.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-refrigerators.marketing-area.1-함께-사면-가전-번들-할인-20260331-113629.4f86115f50",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-refrigerators.marketing-area.1-함께-사면-가전-번들-할인-20260331-113629.4f86115f50.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-refrigerators.marketing-area.1-함께-사면-가전-번들-할인-20260331-113629.946d36b4ee",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-refrigerators.marketing-area.1-함께-사면-가전-번들-할인-20260331-113629.946d36b4ee.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-stan-by-me.marketing-area.6-다품목-기획전-20260331-141814.848c741283",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-stan-by-me.marketing-area.6-다품목-기획전-20260331-141814.848c741283.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-stan-by-me.md-choice.2-md초이스-20260331-141619.683e70b33b",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-stan-by-me.md-choice.2-md초이스-20260331-141619.683e70b33b.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-tumbler-cleaner.marketing-area.6-다품목-기획전-20260401-095526.9c534d9728",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-tumbler-cleaner.marketing-area.6-다품목-기획전-20260401-095526.9c534d9728.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-tumbler-cleaner.md-choice.md-20250903-143152.65556b91fc",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-tumbler-cleaner.md-choice.md-20250903-143152.65556b91fc.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-tvs.banner.category-plp-banner-680x435-4-20260414-104543.49064fe588",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-tvs.banner.category-plp-banner-680x435-4-20260414-104543.49064fe588.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-tvs.marketing-area.6-다품목-기획전-20260331-141050.fb606ff553",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-tvs.marketing-area.6-다품목-기획전-20260331-141050.fb606ff553.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-tvs.md-choice.2-md초이스-20260331-140941.15d7f5d49b",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-tvs.md-choice.2-md초이스-20260331-140941.15d7f5d49b.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.category-tvs.md-choice.2-md초이스-20260331-140941.e0f5000bc4",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.category-tvs.md-choice.2-md초이스-20260331-140941.e0f5000bc4.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.banner.02-01-promotion-banner-mo-img-b1a7ba-20260422-102332.3cf7e2ebf5",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.banner.02-01-promotion-banner-mo-img-b1a7ba-20260422-102332.3cf7e2ebf5.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.banner.02-01-promotion-banner-pc-img-20260407-160827.1d73842dc1",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.banner.02-01-promotion-banner-pc-img-20260407-160827.1d73842dc1.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.banner.home-mo-banner-270-220-v2-20260326-103108.3498371365",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.banner.home-mo-banner-270-220-v2-20260326-103108.3498371365.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.banner.home-mo-banner-270x220-20260417-152538.a9eca33f4d",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.banner.home-mo-banner-270x220-20260417-152538.a9eca33f4d.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.banner.home-pc-banner-promotion-1-20260325-135524.e7b739d9e5",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.banner.home-pc-banner-promotion-1-20260325-135524.e7b739d9e5.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.benefit.07r-20260320-163707.4b680bb567",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.benefit.07r-20260320-163707.4b680bb567.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.benefit.카드혜택-20251120-133423.07d39e052f",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.benefit.카드혜택-20251120-133423.07d39e052f.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.benefit.혜택이벤트-20251120-133323.eee7cd32df",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.benefit.혜택이벤트-20251120-133323.eee7cd32df.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.1-homemain-bn-20251215-161443.2bee0ae31f",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.1-homemain-bn-20251215-161443.2bee0ae31f.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.2-homemain-bn-20251215-161530.e72d6e9bc1",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.2-homemain-bn-20251215-161530.e72d6e9bc1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.3-homemain-bn-20251215-165644.ee9797353f",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.3-homemain-bn-20251215-165644.ee9797353f.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.4-homemain-bn-20251215-161809.77e38ad4e8",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.4-homemain-bn-20251215-161809.77e38ad4e8.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.herobanner-mo-20260421-151809.c9065cc50b",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.herobanner-mo-20260421-151809.c9065cc50b.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.herobanner-mo-20260421-151809.c9065cc50b.text-removed.mo.v1",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.herobanner-mo-20260421-151809.c9065cc50b.text-removed.mo.v1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.herobanner-pc-20260402-173215.2972d4d8d5",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.herobanner-pc-20260402-173215.2972d4d8d5.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.home-hero-pc-1760x500-20260331-153421.4cff64f7ee",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.home-hero-pc-1760x500-20260331-153421.4cff64f7ee.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-mo-260224-20260303-142033.362f9ebb7c",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.homemain-hero-mo-260224-20260303-142033.362f9ebb7c.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-mo-260403-20260403-173224.d0e6dd7013",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.homemain-hero-mo-260403-20260403-173224.d0e6dd7013.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-mo-780x780-20260331-144053.817591b297",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.homemain-hero-mo-780x780-20260331-144053.817591b297.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-mo-v2-20260421-171551.ce40096b29",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.homemain-hero-mo-v2-20260421-171551.ce40096b29.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-pc-1-20260227-164209.aba44eb17b",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.homemain-hero-pc-1-20260227-164209.aba44eb17b.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-pc-260224-20260303-142033.8297ccc711",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.homemain-hero-pc-260224-20260303-142033.8297ccc711.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-pc-260403-20260403-173224.c21062a37b",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.homemain-hero-pc-260403-20260403-173224.c21062a37b.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-pc-4-20260401-171950.cbca60c3f8",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.homemain-hero-pc-4-20260401-171950.cbca60c3f8.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.homemainhero-pc-1760x500-homestylebrand-260331-v2-2026.0b9be3553b",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.homemainhero-pc-1760x500-homestylebrand-260331-v2-2026.0b9be3553b.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.img-homemain-mo-720x472-20260420-190704.5bcab0ff43",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.img-homemain-mo-720x472-20260420-190704.5bcab0ff43.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.img-homemain-pc-1380x180-260331-20260331-153150.ca6459629f",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.img-homemain-pc-1380x180-260331-20260331-153150.ca6459629f.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.mo-home-main-herobanner-20260309-155028.1385d7798d",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.mo-home-main-herobanner-20260309-155028.1385d7798d.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.mo-home-main-herobanner-view-1-20260422-143550.3f5316a11f",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.mo-home-main-herobanner-view-1-20260422-143550.3f5316a11f.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.pc-home-main-herobanner-20260309-155028.8348128580",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.pc-home-main-herobanner-20260309-155028.8348128580.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.hero.pc-homemain-hero-20260407-133435.4c80269949",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.hero.pc-homemain-hero-20260407-133435.4c80269949.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.01-하이드로에센셜-20251027-151058.7c1cbad431",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.01-하이드로에센셜-20251027-151058.7c1cbad431.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.01r-20251014-111653.b5d18ed0d6",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.01r-20251014-111653.b5d18ed0d6.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.home.marketing-area.01r-20251014-111653.b5d18ed0d6.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.01r-20260303-142033.369ca02161",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.01r-20260303-142033.369ca02161.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.home.marketing-area.01r-20260303-142033.369ca02161.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.01r-20260402-173215.56d9354473",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.01r-20260402-173215.56d9354473.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.01r-20260407-154645.9dfc7bdbe0",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.01r-20260407-154645.9dfc7bdbe0.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.home.marketing-area.01r-20260407-154645.9dfc7bdbe0.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.01w-20260421-153328.fcd4091107",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.01w-20260421-153328.fcd4091107.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.02-사계절에어컨-20251027-161252.d172cdb400",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.02-사계절에어컨-20251027-161252.d172cdb400.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.03r-20260331-153016.f62b23a31f",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.03r-20260331-153016.f62b23a31f.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260113-151034.69e3ca0c00",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.04r-20260113-151034.69e3ca0c00.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260306-173744.da63076433",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.04r-20260306-173744.da63076433.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.home.marketing-area.04r-20260306-173744.da63076433.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260309-155028.79668f9ca1",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.04r-20260309-155028.79668f9ca1.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.home.marketing-area.04r-20260309-155028.79668f9ca1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260331-155333.ef45a5dd70",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.04r-20260331-155333.ef45a5dd70.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260416-111927.fc6aa71971",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.04r-20260416-111927.fc6aa71971.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260421-140839.de8cbe1d48",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.04r-20260421-140839.de8cbe1d48.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.06r-20251217-111246.ec3b68df82",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.06r-20251217-111246.ec3b68df82.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.home.marketing-area.06r-20251217-111246.ec3b68df82.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.06r-20260407-132937.4f78326a4d",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.06r-20260407-132937.4f78326a4d.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "lge.home.marketing-area.06r-20260407-132937.4f78326a4d.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.06r-20260407-132957.0e42f1ddff",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.06r-20260407-132957.0e42f1ddff.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.08r-20260421-151809.e47c703842",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.08r-20260421-151809.e47c703842.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.100mrgb96bk-wallv3-20260407-102703.87936b6ee1",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.100mrgb96bk-wallv3-20260407-102703.87936b6ee1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.2-promotion-v1-pc-20250806-114037.5576e18bfa",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.2-promotion-v1-pc-20250806-114037.5576e18bfa.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.260421-standbyme2-quick-full-mo-20260421-164021.034e6035ca",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.260421-standbyme2-quick-full-mo-20260421-164021.034e6035ca.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.32lx6bpga-v2-20260420-134122.29604a1e7e",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.32lx6bpga-v2-20260420-134122.29604a1e7e.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.5-style-tip-20251215-161912.277d0fe5db",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.5-style-tip-20251215-161912.277d0fe5db.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.가습기-20250812-160930.5fa3755ac0",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.가습기-20250812-160930.5fa3755ac0.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.가전구독-20250826-165534.0c13cb8ac6",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.가전구독-20250826-165534.0c13cb8ac6.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.가전구독-20251023-160616.f289afc0e0",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.가전구독-20251023-160616.f289afc0e0.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.가전구독r-20260130-175316.6cba0728a0",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.가전구독r-20260130-175316.6cba0728a0.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.가전구독r-20260130-175316.9a67abe1c9",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.가전구독r-20260130-175316.9a67abe1c9.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.고객지원-20250826-165716.ca72048b9f",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.고객지원-20250826-165716.ca72048b9f.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.고객지원-20251023-160514.308cb86ffa",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.고객지원-20251023-160514.308cb86ffa.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.공기청정기-20250812-160701.8c66cd16f1",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.공기청정기-20250812-160701.8c66cd16f1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.광파오븐-20250812-160716.e7e2113590",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.광파오븐-20250812-160716.e7e2113590.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.구매혜택-red-20260331-144053.a03b804dcb",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.구매혜택-red-20260331-144053.a03b804dcb.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.김치냉장고-20250812-160732.120b720476",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.김치냉장고-20250812-160732.120b720476.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.냉장고-20250812-160542.129aa2f43a",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.냉장고-20250812-160542.129aa2f43a.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.노트북-20250812-160557.a88835e34b",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.노트북-20250812-160557.a88835e34b.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.다품목할인-20251120-133343.bf7ff62085",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.다품목할인-20251120-133343.bf7ff62085.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.다품목할인-20251120-133501.c7f9a4c8e8",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.다품목할인-20251120-133501.c7f9a4c8e8.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.라이브-20251120-133405.6cff8d7f27",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.라이브-20251120-133405.6cff8d7f27.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.라이브-20251120-133516.e90bf40a5a",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.라이브-20251120-133516.e90bf40a5a.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.렛츠그램-20250806-155423.d814d67dd6",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.렛츠그램-20250806-155423.d814d67dd6.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.모니터-20250812-160144.60ad65a9cd",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.모니터-20250812-160144.60ad65a9cd.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.세탁기-20250812-160219.b60f2e7caf",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.세탁기-20250812-160219.b60f2e7caf.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.소모품-20250826-165621.1bfb03d3c9",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.소모품-20250826-165621.1bfb03d3c9.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.소모품-20251023-160543.a563b9ccc6",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.소모품-20251023-160543.a563b9ccc6.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.스탠바이미-20250812-161050.ae8158f563",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.스탠바이미-20250812-161050.ae8158f563.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.식기세척기-20250812-160824.bb61fada1b",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.식기세척기-20250812-160824.bb61fada1b.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.에어컨-20250812-160203.5bb19730a0",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.에어컨-20250812-160203.5bb19730a0.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.오디오-20250812-160916.e67e83a6a2",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.오디오-20250812-160916.e67e83a6a2.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.와인셀러-20250812-161034.00a8dc67a3",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.와인셀러-20250812-161034.00a8dc67a3.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.워시콤보-20250812-160837.803bfbcca1",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.워시콤보-20250812-160837.803bfbcca1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.워시타워-20250812-160629.c7ad9a4d18",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.워시타워-20250812-160629.c7ad9a4d18.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.의류건조기-20250812-160643.9d2e21ba31",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.의류건조기-20250812-160643.9d2e21ba31.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.의류관리기-20250812-160615.776fd0ce16",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.의류관리기-20250812-160615.776fd0ce16.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.이미지-11-20250811-150404.27e7738a87",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.이미지-11-20250811-150404.27e7738a87.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.전기레인지-20250812-160750.473fc250d9",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.전기레인지-20250812-160750.473fc250d9.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.정수기-20250812-161004.7ebd358917",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.정수기-20250812-161004.7ebd358917.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.제습기-20250812-160944.6907c1a7a3",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.제습기-20250812-160944.6907c1a7a3.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.청소기-20250812-160230.a25d91727c",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.청소기-20250812-160230.a25d91727c.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.최신제품소식-2026-그램-20260107-144305.ba8660736c",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.최신제품소식-2026-그램-20260107-144305.ba8660736c.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.카드혜택-20251120-133531.57a572a580",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.카드혜택-20251120-133531.57a572a580.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.컨버터블패키지-20250812-161018.8f35a6deb6",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.컨버터블패키지-20250812-161018.8f35a6deb6.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.프로젝터-20250812-160857.3f170593a3",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.프로젝터-20250812-160857.3f170593a3.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.혜택이벤트-20251120-133446.d3755048e7",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.혜택이벤트-20251120-133446.d3755048e7.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.홈스타일-20251119-160123.3f3cc2d20a",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.홈스타일-20251119-160123.3f3cc2d20a.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.홈스타일-20251119-160746.09fee0ff77",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.홈스타일-20251119-160746.09fee0ff77.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.air-conditioners-654x654-ver2-20260122-160156.fc8635fe22",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.air-conditioners-654x654-ver2-20260122-160156.fc8635fe22.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.air-purifier-654x654-20260122-102840.7113fb88b1",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.air-purifier-654x654-20260122-102840.7113fb88b1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.bath-mo-2x-780-780-20260126-163123.3681efe745",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.bath-mo-2x-780-780-20260126-163123.3681efe745.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.bath-pc-20260126-163123.f820e124d8",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.bath-pc-20260126-163123.f820e124d8.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.businessmall-20250826-170056.16ab7369c7",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.businessmall-20250826-170056.16ab7369c7.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.businessmall-20251023-160349.90c644558c",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.businessmall-20251023-160349.90c644558c.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.dimension-5-20251216-20251216-160002.e3145c179e",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.dimension-5-20251216-20251216-160002.e3145c179e.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.img-1-20250731-154323.ef2e3450e1",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.img-1-20250731-154323.ef2e3450e1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.img-2-20250731-154342.ed0f87978a",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.img-2-20250731-154342.ed0f87978a.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.img-mo-1313x718-20260320-152211.443f910db4",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.img-mo-1313x718-20260320-152211.443f910db4.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.lg스마트코티지-20250806-155339.e62934f29a",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.lg스마트코티지-20250806-155339.e62934f29a.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.lg시그니처-20250806-155222.67af4d5018",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.lg시그니처-20250806-155222.67af4d5018.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.lg오브제컬렉션-20250806-155250.7081b91364",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.lg오브제컬렉션-20250806-155250.7081b91364.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-20260306-185815.e8834ba5f1",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-20260306-185815.e8834ba5f1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-20260331-151127.b776f43669",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-20260331-151127.b776f43669.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-20260416-111927.c5a8356d42",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-20260416-111927.c5a8356d42.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-20260421-144939.d3b3eeb6b0",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-20260421-144939.d3b3eeb6b0.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-20260421-165853.b6da70ea6f",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-20260421-165853.b6da70ea6f.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-가습기-270x180-20260106-143816.473361febb",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-가습기-270x180-20260106-143816.473361febb.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-건조기-270x180-20260106-143841.81cb0d5075",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-건조기-270x180-20260106-143841.81cb0d5075.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-공기청정기-270-180-20250807-154309.97cea83842",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-공기청정기-270-180-20250807-154309.97cea83842.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-그램-270x180-20260106-143859.505f68b93c",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-그램-270x180-20260106-143859.505f68b93c.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-김치냉장고-270-180-20260106-143918.c111804843",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-김치냉장고-270-180-20260106-143918.c111804843.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-냉장-270-180-20250807-154344.f1e0567c79",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-냉장-270-180-20250807-154344.f1e0567c79.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-로청기-270-180-20250807-154355.0501dee5fe",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-로청기-270-180-20250807-154355.0501dee5fe.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-스타일러-270-180-20250807-154331.a115a17a91",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-스타일러-270-180-20250807-154331.a115a17a91.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-식기세척기-270x180-20260106-143939.96cfa7abc0",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-식기세척기-270x180-20260106-143939.96cfa7abc0.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-안마의자-270-180-20250807-154406.29942da0bd",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-안마의자-270-180-20250807-154406.29942da0bd.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-에어컨-270-180-20260106-141230.fcc364f4bb",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-에어컨-270-180-20260106-141230.fcc364f4bb.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-워시타워-270-180-20250807-154420.555e02f6e7",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-워시타워-270-180-20250807-154420.555e02f6e7.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-전기레인지-270x180-20260106-144003.395c63a2e4",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-전기레인지-270x180-20260106-144003.395c63a2e4.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-정수기-270-180-20250807-154248.1ea5b47089",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-정수기-270-180-20250807-154248.1ea5b47089.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-콤보-270-180-20250807-154321.6f2908af7d",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-콤보-270-180-20250807-154321.6f2908af7d.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.mo-tv-270-180-20250807-154434.117439886b",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.mo-tv-270-180-20250807-154434.117439886b.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.obs-홈히어로-메인배너-mo-문구제외-20260203-154656.e93596b64b",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.obs-홈히어로-메인배너-mo-문구제외-20260203-154656.e93596b64b.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.obs-홈히어로-메인배너-pc-copy-20260203-154656.fc7f11f3ea",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.obs-홈히어로-메인배너-pc-copy-20260203-154656.fc7f11f3ea.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.oled-654x654-20260317-153054.48b55e1795",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.oled-654x654-20260317-153054.48b55e1795.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-20260123-180808.d5bdf741d0",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.pc-20260123-180808.d5bdf741d0.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-20260306-185815.336ddad9e0",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.pc-20260306-185815.336ddad9e0.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-20260331-150932.8daffd0b70",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.pc-20260331-150932.8daffd0b70.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-20260331-151127.92740d39a7",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.pc-20260331-151127.92740d39a7.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-allnew-20260330-140416.e6a74af055",
+      "role": "promo-complete",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.pc-allnew-20260330-140416.e6a74af055.pc",
+          "viewportProfile": "pc"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.styler-2-20260107-172548.fc7ff127ef",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.styler-2-20260107-172548.fc7ff127ef.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.system-ironing-654x654-20260129-155433.0cadfbeb8f",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.system-ironing-654x654-20260129-155433.0cadfbeb8f.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "lge.home.marketing-area.tv-20250812-160130.45d670f7dd",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "lge.home.marketing-area.tv-20250812-160130.45d670f7dd.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e",
+      "role": "reference-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1",
+      "role": "background-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    },
+    {
+      "assetId": "external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d",
+      "role": "object-only",
+      "usableSlotIds": [],
+      "variants": [
+        {
+          "variantId": "external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d.pc",
+          "viewportProfile": "pc"
+        },
+        {
+          "variantId": "external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d.mo",
+          "viewportProfile": "mo"
+        }
+      ]
+    }
+  ]
+}

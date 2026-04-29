@@ -56,7 +56,17 @@
     "asset-family:register": "node scripts/register_asset_family_package.mjs",
     "report:runtime-status": "node scripts/report_runtime_status.mjs",
     "report:journey-flow": "node scripts/report_journey_flow_state.mjs",
-    "report:asset-gaps": "node scripts/report_asset_gaps.mjs"
+    "report:asset-gaps": "node scripts/report_asset_gaps.mjs",
+    "openwebui:inventory": "node scripts/inventory-openwebui-sources.mjs",
+    "openwebui:inventory:check": "node scripts/inventory-openwebui-sources.mjs --check",
+    "openwebui:schema:check": "node scripts/check-openwebui-schema.mjs",
+    "export:openwebui": "node scripts/export-openwebui.mjs",
+    "export:openwebui:knowledge": "node scripts/export-openwebui-knowledge.mjs",
+    "export:openwebui:ontology": "node scripts/export-openwebui-ontology.mjs",
+    "export:openwebui:builder-contract": "node scripts/export-builder-contract-v1.mjs",
+    "check:openwebui-export": "node scripts/check-openwebui-export.mjs",
+    "openwebui:phase0d": "node scripts/run-openwebui-phase0d-dry-run.mjs",
+    "smoke:openwebui-builder": "node scripts/smoke-openwebui-builder-api.mjs"
   },
   "keywords": [],
   "author": "",

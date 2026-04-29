@@ -1,0 +1,128 @@
+{
+  "reportVersion": "openwebui-phase0d-dry-run-v1",
+  "generatedAt": "2026-04-29T05:04:13.939Z",
+  "status": "passed",
+  "exportRoot": "exports/openwebui",
+  "sampleRequestPath": "data/normalized/sample-openwebui-builder-request-v1.json",
+  "gates": [
+    {
+      "name": "Source existence",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "targetCount": 5,
+        "sources": [
+          "data/normalized/asset-role-policies.json",
+          "data/normalized/component-rebuild-schema-catalog.json",
+          "data/normalized/image-asset-registry.json",
+          "data/normalized/page-runtime-status.json",
+          "data/normalized/section-family-contracts.json"
+        ]
+      }
+    },
+    {
+      "name": "Source hash",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "checked": 5
+      }
+    },
+    {
+      "name": "Knowledge projection metadata",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "checked": 5
+      }
+    },
+    {
+      "name": "Builder contract validation",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "pages": 14,
+        "slots": 43,
+        "components": 43,
+        "assets": 215
+      }
+    },
+    {
+      "name": "Concept payload validation",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "sampleRequest": "data/normalized/sample-openwebui-builder-request-v1.json",
+        "pageId": "home",
+        "viewportProfile": "pc",
+        "slots": [
+          "hero",
+          "quickmenu"
+        ]
+      }
+    },
+    {
+      "name": "Concept vs contract validation",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "pageId": "home",
+        "viewportProfile": "pc",
+        "componentIds": [
+          "home.hero",
+          "home.quickmenu"
+        ]
+      }
+    },
+    {
+      "name": "Projection consistency",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "checked": true
+      }
+    },
+    {
+      "name": "Ontology referential integrity",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "entities": 608,
+        "edges": 708
+      }
+    },
+    {
+      "name": "Ontology canonical path",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "path": "Page:home -> Slot:home.hero -> Component:home.hero"
+      }
+    },
+    {
+      "name": "Ontology role constraint",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "checked": true
+      }
+    },
+    {
+      "name": "import-manifest integrity",
+      "blocking": true,
+      "status": "pass",
+      "detail": {
+        "checked": 7
+      }
+    },
+    {
+      "name": "LLM readability",
+      "blocking": false,
+      "status": "skipped",
+      "detail": {
+        "status": "not-run",
+        "reason": "Phase 0D blocking gate is deterministic-only. LLM readability remains optional."
+      }
+    }
+  ]
+}

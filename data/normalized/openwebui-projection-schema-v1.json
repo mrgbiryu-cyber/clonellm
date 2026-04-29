@@ -1,0 +1,972 @@
+{
+  "projectionVersion": "openwebui-projection-schema-v1",
+  "generatedAt": "2026-04-29T04:10:00.000Z",
+  "schemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "policy": {
+    "canonicalAdditionalProperties": false,
+    "debugSidecarPaths": [
+      "exports/openwebui/debug/",
+      "exports/openwebui/traces/"
+    ],
+    "conceptThreadIdFormat": "ct-{uuid-v4}",
+    "blockingValidation": "deterministic-only"
+  },
+  "constants": {
+    "truthLevels": [
+      "policy",
+      "runtime-truth",
+      "candidate",
+      "historical",
+      "legacy-reference"
+    ],
+    "freshnessValues": [
+      "current",
+      "stale",
+      "historical",
+      "legacy-reference"
+    ],
+    "targetCollections": [
+      "lge-policy",
+      "lge-design-history",
+      "lge-idea-archive",
+      "lge-requirements",
+      "lge-component-spec"
+    ],
+    "canonicalOntologyEdges": [
+      "Page -> has_slot -> Slot",
+      "Slot -> implemented_by -> Component",
+      "Component -> belongs_to_family -> ComponentFamily",
+      "ComponentFamily -> governed_by -> SectionFamilyContract",
+      "Slot -> governed_by -> AssetRolePolicy",
+      "Asset -> usable_for -> Slot",
+      "Asset -> has_variant -> AssetVariant",
+      "AssetVariant -> targets_viewport -> ViewportProfile",
+      "ConceptDocument -> targets -> Page / Slot / Component",
+      "ConceptDocument -> starts -> ConceptThread",
+      "ConceptThread -> contains -> ConceptDocument",
+      "ConceptThread -> contains -> DraftBuild",
+      "DraftBuild -> belongs_to -> ConceptThread",
+      "BuilderRun -> executes -> ConceptDocument",
+      "DraftBuild -> generated_from -> BuilderRun",
+      "DraftBuild -> revised_from -> DraftBuild",
+      "Evaluation -> reviews -> DraftBuild",
+      "Decision -> accepts/rejects/requests_revision -> DraftBuild",
+      "Handoff -> implements -> DraftBuild"
+    ]
+  },
+  "schemas": {
+    "knowledgeProjectionV1": {
+      "$id": "knowledge-projection-v1",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "projectionVersion",
+        "documentId",
+        "collection",
+        "truthLevel",
+        "freshness",
+        "sourcePath",
+        "sourceHash",
+        "generatedAt",
+        "title",
+        "markdown"
+      ],
+      "properties": {
+        "projectionVersion": {
+          "type": "string",
+          "const": "knowledge-projection-v1"
+        },
+        "documentId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "collection": {
+          "type": "string",
+          "enum": [
+            "lge-policy",
+            "lge-design-history",
+            "lge-idea-archive",
+            "lge-requirements",
+            "lge-component-spec"
+          ]
+        },
+        "truthLevel": {
+          "type": "string",
+          "enum": [
+            "policy",
+            "runtime-truth",
+            "candidate",
+            "historical",
+            "legacy-reference"
+          ]
+        },
+        "freshness": {
+          "type": "string",
+          "enum": [
+            "current",
+            "stale",
+            "historical",
+            "legacy-reference"
+          ]
+        },
+        "sourcePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string"
+        },
+        "markdown": {
+          "type": "string",
+          "minLength": 1
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "pageId": {
+              "type": "string"
+            },
+            "slots": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "componentIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "assetRoleIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "tags": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "ontologyProjectionV1": {
+      "$id": "ontology-projection-v1",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "projectionVersion",
+        "generatedAt",
+        "sourcePath",
+        "sourceHash",
+        "entities",
+        "edges"
+      ],
+      "properties": {
+        "projectionVersion": {
+          "type": "string",
+          "const": "ontology-projection-v1"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sourcePath": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceHash": {
+          "type": "string",
+          "pattern": "^sha256:[a-f0-9]{64}$"
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ontologyEntity"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ontologyEdge"
+          }
+        }
+      },
+      "$defs": {
+        "ontologyEntity": {
+          "type": "object",
+          "required": [
+            "id",
+            "type",
+            "label",
+            "externalKeys",
+            "provenance"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "Project",
+                "Document",
+                "Policy",
+                "Requirement",
+                "ConceptDocument",
+                "ConceptThread",
+                "DesignIdea",
+                "Decision",
+                "DesignHistory",
+                "Page",
+                "Slot",
+                "Component",
+                "ComponentFamily",
+                "SectionFamilyContract",
+                "Asset",
+                "AssetVariant",
+                "AssetRole",
+                "AssetRolePolicy",
+                "ViewportProfile",
+                "BuilderRun",
+                "DraftBuild",
+                "RuntimePreview",
+                "Evaluation",
+                "Artifact",
+                "Handoff",
+                "UserWorkspace"
+              ]
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "externalKeys": {
+              "type": "object",
+              "properties": {
+                "clonellm": {
+                  "type": "string"
+                },
+                "openWebui": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "provenance": {
+              "$ref": "#/$defs/provenance"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ontologyEdge": {
+          "type": "object",
+          "required": [
+            "id",
+            "sourceId",
+            "relation",
+            "targetId",
+            "provenance"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "relation": {
+              "type": "string",
+              "enum": [
+                "has_slot",
+                "implemented_by",
+                "belongs_to_family",
+                "governed_by",
+                "usable_for",
+                "has_variant",
+                "targets_viewport",
+                "targets",
+                "starts",
+                "contains",
+                "belongs_to",
+                "executes",
+                "generated_from",
+                "revised_from",
+                "reviews",
+                "accepts",
+                "rejects",
+                "requests_revision",
+                "implements"
+              ]
+            },
+            "targetId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": true
+            },
+            "provenance": {
+              "$ref": "#/$defs/provenance"
+            }
+          },
+          "additionalProperties": false
+        },
+        "provenance": {
+          "type": "object",
+          "required": [
+            "sourcePath",
+            "sourceHash",
+            "projectionVersion"
+          ],
+          "properties": {
+            "sourcePath": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceHash": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            },
+            "projectionVersion": {
+              "type": "string",
+              "minLength": 1
+            },
+            "truthLevel": {
+              "type": "string",
+              "enum": [
+                "policy",
+                "runtime-truth",
+                "candidate",
+                "historical",
+                "legacy-reference"
+              ]
+            },
+            "freshness": {
+              "type": "string",
+              "enum": [
+                "current",
+                "stale",
+                "historical",
+                "legacy-reference"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "builderContractProjectionV1": {
+      "$id": "builder-contract-projection-v1",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "builderContractVersion",
+        "generatedAt",
+        "sourceManifest",
+        "pages",
+        "slots",
+        "components",
+        "componentFamilies",
+        "assetRolePolicies",
+        "assets"
+      ],
+      "properties": {
+        "builderContractVersion": {
+          "type": "string",
+          "const": "builder-contract-v1"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sourceManifest": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/sourceRef"
+          },
+          "minItems": 1
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/page"
+          }
+        },
+        "slots": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/slot"
+          }
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/component"
+          }
+        },
+        "componentFamilies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/componentFamily"
+          }
+        },
+        "assetRolePolicies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/assetRolePolicy"
+          }
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/asset"
+          }
+        }
+      },
+      "$defs": {
+        "sourceRef": {
+          "type": "object",
+          "required": [
+            "sourcePath",
+            "sourceHash",
+            "truthLevel",
+            "freshness"
+          ],
+          "properties": {
+            "sourcePath": {
+              "type": "string",
+              "minLength": 1
+            },
+            "sourceHash": {
+              "type": "string",
+              "pattern": "^sha256:[a-f0-9]{64}$"
+            },
+            "truthLevel": {
+              "type": "string",
+              "enum": [
+                "policy",
+                "runtime-truth",
+                "candidate",
+                "historical",
+                "legacy-reference"
+              ]
+            },
+            "freshness": {
+              "type": "string",
+              "enum": [
+                "current",
+                "stale",
+                "historical",
+                "legacy-reference"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "page": {
+          "type": "object",
+          "required": [
+            "pageId",
+            "label",
+            "slotIds"
+          ],
+          "properties": {
+            "pageId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "slotIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "slot": {
+          "type": "object",
+          "required": [
+            "slotId",
+            "pageId",
+            "componentIds",
+            "assetRolePolicyIds"
+          ],
+          "properties": {
+            "slotId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pageId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "componentIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "assetRolePolicyIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "viewportProfiles": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "pc",
+                  "mo",
+                  "ta"
+                ]
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "component": {
+          "type": "object",
+          "required": [
+            "componentId",
+            "familyId",
+            "slotIds"
+          ],
+          "properties": {
+            "componentId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "familyId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "slotIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "componentFamily": {
+          "type": "object",
+          "required": [
+            "familyId",
+            "contractId"
+          ],
+          "properties": {
+            "familyId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "contractId": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "assetRolePolicy": {
+          "type": "object",
+          "required": [
+            "policyId",
+            "slotIds",
+            "allowedRoles",
+            "forbiddenRoles"
+          ],
+          "properties": {
+            "policyId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "slotIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "allowedRoles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "forbiddenRoles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "asset": {
+          "type": "object",
+          "required": [
+            "assetId",
+            "role",
+            "usableSlotIds",
+            "variants"
+          ],
+          "properties": {
+            "assetId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "role": {
+              "type": "string",
+              "minLength": 1
+            },
+            "usableSlotIds": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "variants": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "variantId",
+                  "viewportProfile"
+                ],
+                "properties": {
+                  "variantId": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "viewportProfile": {
+                    "type": "string",
+                    "enum": [
+                      "pc",
+                      "mo",
+                      "ta"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "feedbackProjectionV1": {
+      "$id": "feedback-projection-v1",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "feedbackId",
+        "sourceType",
+        "pageId",
+        "verdict",
+        "targetCollection",
+        "projectionVersion",
+        "generatedAt"
+      ],
+      "properties": {
+        "feedbackId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceType": {
+          "type": "string",
+          "enum": [
+            "critic",
+            "human",
+            "contract-violation"
+          ]
+        },
+        "conceptThreadId": {
+          "type": "string",
+          "pattern": "^ct-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "draftId": {
+          "type": "string"
+        },
+        "pageId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slots": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "tone": {
+          "type": "string"
+        },
+        "verdict": {
+          "type": "string",
+          "enum": [
+            "passed",
+            "failed",
+            "passed-with-warning",
+            "approved",
+            "rejected",
+            "revision_requested",
+            "violation"
+          ]
+        },
+        "strengths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "weaknesses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actionableSignals": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "qualityScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "violationDetail": {
+          "type": "object",
+          "properties": {
+            "rule": {
+              "type": "string"
+            },
+            "attempted": {
+              "type": "string"
+            },
+            "blocked": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        },
+        "targetCollection": {
+          "type": "string",
+          "enum": [
+            "lge-design-history",
+            "lge-policy"
+          ]
+        },
+        "projectionVersion": {
+          "type": "string",
+          "const": "feedback-projection-v1"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false
+    },
+    "importManifestV1": {
+      "$id": "import-manifest-v1",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "manifestVersion",
+        "lastExportedAt",
+        "files"
+      ],
+      "properties": {
+        "manifestVersion": {
+          "type": "string",
+          "const": "import-manifest-v1"
+        },
+        "lastExportedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "source",
+              "sourceHash",
+              "projection",
+              "projectionHash",
+              "projectionType",
+              "truthLevel",
+              "freshness"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sourceHash": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "projection": {
+                "type": "string",
+                "minLength": 1
+              },
+              "projectionHash": {
+                "type": "string",
+                "pattern": "^sha256:[a-f0-9]{64}$"
+              },
+              "projectionType": {
+                "type": "string",
+                "enum": [
+                  "knowledge",
+                  "ontology",
+                  "builder-contract",
+                  "feedback"
+                ]
+              },
+              "collection": {
+                "type": "string",
+                "enum": [
+                  "lge-policy",
+                  "lge-design-history",
+                  "lge-idea-archive",
+                  "lge-requirements",
+                  "lge-component-spec"
+                ]
+              },
+              "truthLevel": {
+                "type": "string",
+                "enum": [
+                  "policy",
+                  "runtime-truth",
+                  "candidate",
+                  "historical",
+                  "legacy-reference"
+                ]
+              },
+              "freshness": {
+                "type": "string",
+                "enum": [
+                  "current",
+                  "stale",
+                  "historical",
+                  "legacy-reference"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "conceptThreadV1": {
+      "$id": "concept-thread-v1",
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "required": [
+        "conceptThreadId",
+        "projectId",
+        "pageId",
+        "targetGroup",
+        "createdAt"
+      ],
+      "properties": {
+        "conceptThreadId": {
+          "type": "string",
+          "pattern": "^ct-[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "name": {
+          "type": "string"
+        },
+        "projectId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pageId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "targetGroup": {
+          "type": "string",
+          "minLength": 1
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "crossFieldRules": [
+    {
+      "schema": "feedback-projection-v1",
+      "rule": "sourceType=critic -> targetCollection=lge-design-history"
+    },
+    {
+      "schema": "feedback-projection-v1",
+      "rule": "sourceType=human -> targetCollection=lge-design-history"
+    },
+    {
+      "schema": "feedback-projection-v1",
+      "rule": "sourceType=contract-violation -> targetCollection=lge-policy"
+    },
+    {
+      "schema": "feedback-projection-v1",
+      "rule": "sourceType=contract-violation -> violationDetail required"
+    },
+    {
+      "schema": "builder-contract-projection-v1",
+      "rule": "truthLevel=policy/runtime-truth sources with freshness=stale cannot enter current builder contract"
+    },
+    {
+      "schema": "ontology-projection-v1",
+      "rule": "every edge sourceId and targetId must reference existing entities"
+    },
+    {
+      "schema": "ontology-projection-v1",
+      "rule": "home.hero must resolve through Page -> has_slot -> Slot -> implemented_by -> Component"
+    }
+  ]
+}

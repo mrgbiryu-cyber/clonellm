@@ -1,0 +1,29 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.asset-role-policies",
+  "collection": "lge-policy",
+  "truthLevel": "policy",
+  "freshness": "current",
+  "sourcePath": "data/normalized/asset-role-policies.json",
+  "sourceHash": "sha256:14f89e0ff0ee94db097232b55d88c93ba5ff78ec958f1d9f507bd5bbc40eed92",
+  "generatedAt": "2026-04-29T05:04:13.170Z",
+  "title": "LGE Asset Role Policies",
+  "summary": "7 asset role policies covering stage hero, quickmenu icon family, banner, commerce, benefit, and PDP summary usage.",
+  "markdown": "# LGE Asset Role Policies\n\n## Stage Hero Asset Policy\n\n- policyId: stage-hero\n- targetSlots: hero, service-intro, visual\n- imageUsageMode: full-bleed-background\n- allowedBackgroundRoles: background-only\n- allowedPrimaryRoles: n/a\n- allowedAccentRoles: object-only, icon-only\n- disallowPromoReoverlay: true\n\n- note: Full-bleed stage images must use background-only assets.\n- note: Object-only assets may appear as badges, logos, or secondary product accents only.\n\n## Quickmenu Icon Family Policy\n\n- policyId: quickmenu-icon-family\n- targetSlots: quickmenu, quickMenu, tabs, shortcut\n- imageUsageMode: icon-family\n- allowedBackgroundRoles: n/a\n- allowedPrimaryRoles: icon-only\n- allowedAccentRoles: n/a\n- disallowPromoReoverlay: true\n\n- note: Quickmenu and tab-entry surfaces must use one consistent icon family.\n- note: Promo-complete thumbnails must not be reused as icon shells.\n\n## Banner Asset Policy\n\n- policyId: banner-stage\n- targetSlots: summary-banner-2, tipsBanner, brandBanner, careBanner, labelBanner, banner, noticeBanner\n- imageUsageMode: full-bleed-background\n- allowedBackgroundRoles: background-only\n- allowedPrimaryRoles: n/a\n- allowedAccentRoles: object-only\n- disallowPromoReoverlay: true\n\n- note: Banner backgrounds should be text-free or image-only surfaces.\n- note: Promo-complete banner art must not receive a second text overlay.\n\n## Commerce Grid Asset Policy\n\n- policyId: commerce-grid\n- targetSlots: md-choice, timedeal, subscription, space-renewal, latest-product-news, brand-showroom, marketing-area, bestProduct, best-ranking, ranking\n- imageUsageMode: card-media\n- allowedBackgroundRoles: n/a\n- allowedPrimaryRoles: n/a\n- allowedAccentRoles: n/a\n- disallowPromoReoverlay: false\n\n- note: Commerce sections may use product/object imagery directly.\n- note: Use promo-complete assets only when they are the complete card content, not a re-overlaid background.\n\n## Benefit Hub Asset Policy\n\n- policyId: benefit-hub\n- targetSlots: benefit, benefit-highlight, mainService, bestcare, service-benefit\n- imageUsageMode: icon-or-object\n- allowedBackgroundRoles: n/a\n- allowedPrimaryRoles: icon-only, object-only\n- allowedAccentRoles: n/a\n- disallowPromoReoverlay: true\n\n- note: Benefit hubs should use icons or simple object visuals, not full promo banners.\n\n## PDP Summary Stage Asset Policy\n\n- policyId: pdp-summary-stage\n- targetSlots: summary\n- imageUsageMode: full-bleed-background\n- allowedBackgroundRoles: background-only\n- allowedPrimaryRoles: n/a\n- allowedAccentRoles: object-only\n- disallowPromoReoverlay: true\n\n- note: PDP summary hero surfaces should use product/background imagery without embedded promo text.\n\n## PDP Sticky Buybox Asset Policy\n\n- policyId: pdp-sticky-buybox\n- targetSlots: sticky\n- imageUsageMode: no-required-image\n- allowedBackgroundRoles: n/a\n- allowedPrimaryRoles: n/a\n- allowedAccentRoles: n/a\n- disallowPromoReoverlay: false\n\n- note: Sticky buybox should avoid decorative media unless explicitly requested.\n",
+  "metadata": {
+    "assetRoleIds": [
+      "stage-hero",
+      "quickmenu-icon-family",
+      "banner-stage",
+      "commerce-grid",
+      "benefit-hub",
+      "pdp-summary-stage",
+      "pdp-sticky-buybox"
+    ],
+    "tags": [
+      "#policy",
+      "#asset-role",
+      "#guardrail"
+    ]
+  }
+}

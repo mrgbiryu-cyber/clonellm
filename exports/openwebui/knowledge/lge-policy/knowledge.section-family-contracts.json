@@ -1,0 +1,48 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.section-family-contracts",
+  "collection": "lge-policy",
+  "truthLevel": "policy",
+  "freshness": "current",
+  "sourcePath": "data/normalized/section-family-contracts.json",
+  "sourceHash": "sha256:96573ee597c17b194edb2deed80fc2dc42bbed52b5f460fafadca48a4f933b29",
+  "generatedAt": "2026-04-29T05:04:13.215Z",
+  "title": "LGE Section Family Contracts",
+  "summary": "9 section family contracts and global design guardrails.",
+  "markdown": "# LGE Section Family Contracts\n\n## Global Principles\n\n- Treat the page as a connected visual system, not isolated slot cards.\n- Prefer strong first-pass hierarchy over repeated corrective loops.\n- If a section changes, make the hierarchy, focal point, and rhythm visibly clearer than before.\n- Use contrast, scale, spacing, and massing to create dominance before adding decorative detail.\n- Preserve clone identity according to scope: broad page work may move more, but narrower component work must stay more faithful to the surrounding page identity.\n\n## Families\n\n### hero\n\n- label: Hero Generation Contract\n- targetSlots: hero\n- primaryGoal: \n\n- avoid: Flat white slabs with weak contrast\n- avoid: Headline and support cards competing at equal weight\n- avoid: Tiny visual placeholders that collapse the stage\n\n### quickmenu\n\n- label: Quickmenu Generation Contract\n- targetSlots: quickmenu, quickMenu, tabs\n- primaryGoal: \n\n- avoid: Uniform cards with no dominant entry\n- avoid: Inconsistent icon shells or image sizing\n- avoid: Dense grids that compete with the hero stage\n\n### ranking\n\n- label: Ranking Contract\n- targetSlots: best-ranking, ranking\n- primaryGoal: \n\n- avoid: Flat list with no visual rank hierarchy\n- avoid: Rank numbers that are too small to register\n- avoid: Equal-weight item treatment that removes the ranking intent\n\n### banner\n\n- label: Banner Contract\n- targetSlots: summary-banner-2, carebanner, labelbanner\n- primaryGoal: \n\n- avoid: Undecided card with soft headline and no visual weight\n- avoid: Equal-size headline and visual that split attention without a focal winner\n- avoid: Text-only banner that uses the slot as a paragraph container\n\n### commerce\n\n- label: Commerce Grid Contract\n- targetSlots: md-choice, timedeal, subscription, space-renewal, latest-product-news, brand-showroom, marketing-area\n- primaryGoal: \n\n- avoid: Uniform cards with no lead/support distinction in promo contexts\n- avoid: Dense thumbnail grids that eliminate product identity\n- avoid: Mixed card styles within the same grid family\n\n### benefit-hub\n\n- label: Benefit Hub Contract\n- targetSlots: benefit, benefit-highlight, mainService, bestcare, service-benefit\n- primaryGoal: \n\n- avoid: Benefit blocks with long paragraph descriptions per item\n- avoid: Icons at inconsistent scales that break grid rhythm\n- avoid: Generic benefit language that could apply to any brand\n\n### service-hero\n\n- label: Service Hero Contract\n- targetSlots: service-intro, hero\n- primaryGoal: \n\n- avoid: Campaign glamour tone that replaces service clarity with visual drama\n- avoid: Support cards that visually compete with the headline at equal scale\n- avoid: Dark cinematic surfaces that conflict with the service-trust context\n\n### service-tabs\n\n- label: Service Tabs Contract\n- targetSlots: quickMenu, tabs\n- primaryGoal: \n\n- avoid: Tabs that visually compete with the intro headline above\n- avoid: Tab labels that wrap to 2 lines in the default layout\n- avoid: Tab styling that introduces a new color system disconnected from the page palette\n\n### page-shell\n\n- label: Page Shell Contract\n- targetSlots: page-shell\n- primaryGoal: \n\n",
+  "metadata": {
+    "slots": [
+      "hero",
+      "quickmenu",
+      "quickMenu",
+      "tabs",
+      "best-ranking",
+      "ranking",
+      "summary-banner-2",
+      "carebanner",
+      "labelbanner",
+      "md-choice",
+      "timedeal",
+      "subscription",
+      "space-renewal",
+      "latest-product-news",
+      "brand-showroom",
+      "marketing-area",
+      "benefit",
+      "benefit-highlight",
+      "mainService",
+      "bestcare",
+      "service-benefit",
+      "service-intro",
+      "hero",
+      "quickMenu",
+      "tabs",
+      "page-shell"
+    ],
+    "tags": [
+      "#policy",
+      "#component",
+      "#section-family"
+    ]
+  }
+}
