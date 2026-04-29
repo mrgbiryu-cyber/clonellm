@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const zlib = require("zlib");
 const { normalizeEditableData, readEditableData, writeEditableData } = require("./llm");
 
 const ROOT = __dirname;
@@ -8,8 +9,17 @@ const RUNTIME_DIR = path.join(ROOT, "data", "runtime");
 const USERS_PATH = path.join(RUNTIME_DIR, "users.json");
 const SESSIONS_PATH = path.join(RUNTIME_DIR, "sessions.json");
 const WORKSPACES_PATH = path.join(RUNTIME_DIR, "workspaces.json");
+const WORKSPACE_SHARDS_DIR = path.join(RUNTIME_DIR, "workspaces");
+const WORKSPACE_LOCKS_DIR = path.join(WORKSPACE_SHARDS_DIR, ".locks");
 const ACTIVITY_PATH = path.join(RUNTIME_DIR, "activity-log.json");
 const COOKIE_NAME = "lge_workspace_session";
+let workspaceStoreCache = null;
+let workspaceStoreCacheStat = null;
+const workspaceShardCache = new Map();
+const WORKSPACE_SHARD_CACHE_MAX = 20;
+const WORKSPACE_LOCK_STALE_MS = 2 * 60 * 1000;
+const WORKSPACE_LOCK_TIMEOUT_MS = 30 * 1000;
+const MAX_SESSIONS_PER_USER = 8;
 
 function ensureDir(dir) {
   fs.mkdirSync(dir, { recursive: true });
@@ -25,7 +35,15 @@ function readJson(filePath, fallback) {
 
 function writeJson(filePath, payload) {
   ensureDir(path.dirname(filePath));
-  fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf-8");
+  const tmpPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(tmpPath, `${JSON.stringify(payload, null, 2)}\n`, "utf-8");
+  fs.renameSync(tmpPath, filePath);
+}
+
+function sleepSync(ms) {
+  const buffer = new SharedArrayBuffer(4);
+  const view = new Int32Array(buffer);
+  Atomics.wait(view, 0, 0, Math.max(1, Number(ms || 1)));
 }
 
 function nowIso() {
@@ -41,7 +59,6 @@ function normalizeViewportProfile(value, fallback = "pc") {
 function resolveWorkspaceViewportKey(pageId, viewportProfile = "pc") {
   const normalizedPageId = String(pageId || "").trim();
   if (!normalizedPageId) return "";
-  if (normalizedPageId !== "home") return normalizedPageId;
   return `${normalizedPageId}@${normalizeViewportProfile(viewportProfile, "pc")}`;
 }
 
@@ -51,6 +68,185 @@ function toPlainObject(value) {
 
 function toPlainArray(value) {
   return Array.isArray(value) ? JSON.parse(JSON.stringify(value)) : [];
+}
+
+function normalizeGeneratedAssetEntry(item) {
+  return {
+    id: String(item?.id || "").trim(),
+    label: String(item?.label || "").trim(),
+    assetUrl: String(item?.assetUrl || "").trim(),
+    kind: String(item?.kind || "").trim(),
+    role: String(item?.role || "").trim(),
+    source: String(item?.source || "").trim(),
+    model: String(item?.model || "").trim(),
+    prompt: String(item?.prompt || "").trim(),
+    format: String(item?.format || "").trim(),
+    width: Number(item?.width || 0) || 0,
+    height: Number(item?.height || 0) || 0,
+    aspectRatio: String(item?.aspectRatio || "").trim(),
+    slotId: String(item?.slotId || "").trim(),
+    componentId: String(item?.componentId || "").trim(),
+    tags: Array.isArray(item?.tags) ? item.tags.map((tag) => String(tag || "").trim()).filter(Boolean) : [],
+  };
+}
+
+function mergeGeneratedAssetsIntoDraftReport(report, snapshotData) {
+  const nextReport = toPlainObject(report);
+  const generatedAssets = toPlainArray(snapshotData?.generatedAssets)
+    .map((item) => normalizeGeneratedAssetEntry(item))
+    .filter((item) => item.assetUrl);
+  if (!generatedAssets.length) return nextReport;
+  const generatedByComponent = new Map(
+    generatedAssets.map((item) => [`${item.componentId}::${item.slotId}`, item])
+  );
+  const nextComponentComposition = toPlainArray(nextReport.componentComposition).map((item) => {
+    const nextItem = toPlainObject(item);
+    const key = `${String(nextItem.componentId || "").trim()}::${String(nextItem.slotId || "").trim()}`;
+    const generated = generatedByComponent.get(key);
+    if (!generated) return nextItem;
+    const assetPlan = toPlainObject(nextItem.assetPlan);
+    const existingGenerated = toPlainArray(assetPlan.generatedAssets)
+      .map((entry) => normalizeGeneratedAssetEntry(entry))
+      .filter((entry) => entry.assetUrl && entry.id !== generated.id);
+    return {
+      ...nextItem,
+      assetPlan: {
+        ...assetPlan,
+        generatedAssets: [generated, ...existingGenerated],
+      },
+    };
+  });
+  const assetReferences = toPlainObject(nextReport.assetReferences);
+  const existingReportGenerated = toPlainArray(assetReferences.generatedAssets)
+    .map((entry) => normalizeGeneratedAssetEntry(entry))
+    .filter((entry) => entry.assetUrl);
+  return {
+    ...nextReport,
+    componentComposition: nextComponentComposition,
+    assetReferences: {
+      ...assetReferences,
+      generatedAssets: [
+        ...existingReportGenerated,
+        ...generatedAssets.filter((item) => !existingReportGenerated.some((entry) => entry.id === item.id)),
+      ],
+    },
+  };
+}
+
+function normalizePlanLine(value, maxLength = 480) {
+  const text = String(value || "")
+    .replace(/�+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return "";
+  return text.slice(0, maxLength);
+}
+
+function tokenizePlanLine(value = "") {
+  return normalizePlanLine(value, 600)
+    .toLowerCase()
+    .replace(/[`"'“”‘’.,:;!?()[\]{}<>|/\\_-]+/g, " ")
+    .split(/\s+/)
+    .map((item) => item.trim())
+    .filter((item) => item.length >= 2);
+}
+
+function planLineSimilarity(left = "", right = "") {
+  const leftTokens = new Set(tokenizePlanLine(left));
+  const rightTokens = new Set(tokenizePlanLine(right));
+  if (!leftTokens.size || !rightTokens.size) return 0;
+  let intersection = 0;
+  leftTokens.forEach((token) => {
+    if (rightTokens.has(token)) intersection += 1;
+  });
+  const union = new Set([...leftTokens, ...rightTokens]).size;
+  return union ? intersection / union : 0;
+}
+
+function sanitizePlanLineArray(value, { limit = 8, maxLength = 480 } = {}) {
+  const source = Array.isArray(value) ? value : [];
+  const next = [];
+  for (const raw of source) {
+    const line = normalizePlanLine(raw, maxLength);
+    if (!line) continue;
+    if (next.some((existing) => existing === line || planLineSimilarity(existing, line) >= 0.9)) {
+      continue;
+    }
+    next.push(line);
+    if (next.length >= limit) break;
+  }
+  return next;
+}
+
+function sanitizePlannerPriorityItems(value, limit = 6) {
+  const source = Array.isArray(value) ? value : [];
+  return source
+    .map((item, index) => ({
+      rank: Number(item?.rank || index + 1) || index + 1,
+      target: normalizePlanLine(item?.target || "", 120),
+      reason: normalizePlanLine(item?.reason || "", 320),
+    }))
+    .filter((item) => item.target)
+    .slice(0, limit);
+}
+
+function sanitizeReferenceNotes(value, limit = 5) {
+  const source = Array.isArray(value) ? value : [];
+  return source
+    .map((item) => ({
+      url: normalizePlanLine(item?.url || "", 320),
+      takeaways: sanitizePlanLineArray(item?.takeaways, { limit: 5, maxLength: 240 }),
+    }))
+    .filter((item) => item.url || item.takeaways.length)
+    .slice(0, limit);
+}
+
+function sanitizeSectionBlueprints(value, limit = 8) {
+  const source = Array.isArray(value) ? value : [];
+  return source
+    .map((item, index) => ({
+      order: Number(item?.order || index + 1) || index + 1,
+      slotId: normalizePlanLine(item?.slotId || "", 120),
+      label: normalizePlanLine(item?.label || "", 160),
+      archetype: normalizePlanLine(item?.archetype || "", 80),
+      containerMode: normalizePlanLine(item?.containerMode || "", 80),
+      objective: normalizePlanLine(item?.objective || "", 320),
+      problemStatement: normalizePlanLine(item?.problemStatement || "", 320),
+      visualDirection: normalizePlanLine(item?.visualDirection || "", 320),
+      mustKeep: normalizePlanLine(item?.mustKeep || "", 240),
+      mustChange: normalizePlanLine(item?.mustChange || "", 240),
+      hierarchy: sanitizePlanLineArray(item?.hierarchy, { limit: 6, maxLength: 120 }),
+      actionCue: normalizePlanLine(item?.actionCue || "", 80),
+    }))
+    .filter((item) => item.label || item.slotId)
+    .slice(0, limit);
+}
+
+function sanitizeRequirementPlanOutput(value) {
+  const source = value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  const builderBrief = source.builderBrief && typeof source.builderBrief === "object" ? source.builderBrief : {};
+  return {
+    ...JSON.parse(JSON.stringify(source)),
+    title: normalizePlanLine(source.title || "", 200),
+    designChangeLevel: normalizePlanLine(source.designChangeLevel || "", 20) || "medium",
+    requestSummary: sanitizePlanLineArray(source.requestSummary, { limit: 7, maxLength: 360 }),
+    planningDirection: sanitizePlanLineArray(source.planningDirection, { limit: 8, maxLength: 520 }),
+    designDirection: sanitizePlanLineArray(source.designDirection, { limit: 8, maxLength: 520 }),
+    priority: sanitizePlannerPriorityItems(source.priority, 6),
+    guardrails: sanitizePlanLineArray(source.guardrails, { limit: 6, maxLength: 240 }),
+    referenceNotes: sanitizeReferenceNotes(source.referenceNotes, 5),
+    builderBrief: {
+      ...JSON.parse(JSON.stringify(builderBrief)),
+      objective: normalizePlanLine(builderBrief.objective || "", 320),
+      mustKeep: sanitizePlanLineArray(builderBrief.mustKeep, { limit: 5, maxLength: 240 }),
+      mustChange: sanitizePlanLineArray(builderBrief.mustChange, { limit: 5, maxLength: 240 }),
+      suggestedFocusSlots: sanitizePlanLineArray(builderBrief.suggestedFocusSlots, { limit: 8, maxLength: 80 }),
+    },
+    builderMarkdown: String(source.builderMarkdown || "").slice(0, 32000),
+    layoutMockupMarkdown: String(source.layoutMockupMarkdown || "").slice(0, 32000),
+    designSpecMarkdown: String(source.designSpecMarkdown || "").slice(0, 32000),
+    sectionBlueprints: sanitizeSectionBlueprints(source.sectionBlueprints, 24),
+  };
 }
 
 function normalizeLoginId(value) {
@@ -73,12 +269,308 @@ function writeSessions(payload) {
   writeJson(SESSIONS_PATH, payload);
 }
 
+function buildWorkspaceShardFileName(userId = "") {
+  const normalizedUserId = String(userId || "").trim();
+  if (!normalizedUserId) return "";
+  if (/^[a-zA-Z0-9._-]+$/.test(normalizedUserId)) return `${normalizedUserId}.json`;
+  return `${crypto.createHash("sha1").update(normalizedUserId).digest("hex")}.json`;
+}
+
+function buildWorkspaceStorageBaseName(userId = "") {
+  return buildWorkspaceShardFileName(userId).replace(/\.json$/, "");
+}
+
+function getWorkspaceShardPath(userId = "") {
+  const fileName = buildWorkspaceShardFileName(userId);
+  return fileName ? path.join(WORKSPACE_SHARDS_DIR, fileName) : "";
+}
+
+function getWorkspaceLockPath(userId = "") {
+  const baseName = buildWorkspaceStorageBaseName(userId);
+  return baseName ? path.join(WORKSPACE_LOCKS_DIR, `${baseName}.lock`) : "";
+}
+
+function acquireWorkspaceWriteLock(userId = "") {
+  const lockPath = getWorkspaceLockPath(userId);
+  if (!lockPath) return () => {};
+  ensureDir(WORKSPACE_LOCKS_DIR);
+  const startedAt = Date.now();
+  while (true) {
+    try {
+      fs.mkdirSync(lockPath);
+      fs.writeFileSync(path.join(lockPath, "owner.json"), JSON.stringify({
+        pid: process.pid,
+        userId: String(userId || "").trim(),
+        acquiredAt: nowIso(),
+      }));
+      return () => {
+        try {
+          fs.rmSync(lockPath, { recursive: true, force: true });
+        } catch {}
+      };
+    } catch (error) {
+      try {
+        const stat = fs.statSync(lockPath);
+        if (Date.now() - Number(stat.mtimeMs || 0) > WORKSPACE_LOCK_STALE_MS) {
+          fs.rmSync(lockPath, { recursive: true, force: true });
+          continue;
+        }
+      } catch {}
+      if (Date.now() - startedAt > WORKSPACE_LOCK_TIMEOUT_MS) {
+        throw new Error("workspace_write_lock_timeout");
+      }
+      sleepSync(25);
+    }
+  }
+}
+
+function withWorkspaceWriteLock(userId = "", fn) {
+  const release = acquireWorkspaceWriteLock(userId);
+  try {
+    return typeof fn === "function" ? fn() : undefined;
+  } finally {
+    release();
+  }
+}
+
+function getFileSignature(filePath = "") {
+  try {
+    const stat = fs.statSync(filePath);
+    return `${Number(stat.mtimeMs || 0)}:${Number(stat.size || 0)}`;
+  } catch {
+    return "";
+  }
+}
+
+function rememberWorkspaceShard(userId = "", filePath = "", workspace = null) {
+  const normalizedUserId = String(userId || "").trim();
+  if (!normalizedUserId || !workspace) return;
+  workspaceShardCache.delete(normalizedUserId);
+  workspaceShardCache.set(normalizedUserId, {
+    signature: getFileSignature(filePath),
+    workspace,
+  });
+  while (workspaceShardCache.size > WORKSPACE_SHARD_CACHE_MAX) {
+    const oldestKey = workspaceShardCache.keys().next().value;
+    workspaceShardCache.delete(oldestKey);
+  }
+}
+
+function readWorkspaceShard(userId = "") {
+  const normalizedUserId = String(userId || "").trim();
+  const filePath = getWorkspaceShardPath(normalizedUserId);
+  if (!normalizedUserId || !filePath || !fs.existsSync(filePath)) return null;
+  const signature = getFileSignature(filePath);
+  const cached = workspaceShardCache.get(normalizedUserId);
+  if (cached && cached.signature === signature) {
+    workspaceShardCache.delete(normalizedUserId);
+    workspaceShardCache.set(normalizedUserId, cached);
+    return cached.workspace;
+  }
+  const workspace = readJson(filePath, null);
+  if (!workspace || typeof workspace !== "object") return null;
+  rememberWorkspaceShard(normalizedUserId, filePath, workspace);
+  return workspace;
+}
+
+function writeWorkspaceShard(userId = "", workspace = null) {
+  const normalizedUserId = String(userId || workspace?.userId || "").trim();
+  const filePath = getWorkspaceShardPath(normalizedUserId);
+  if (!normalizedUserId || !filePath || !workspace) return null;
+  const normalizedWorkspace = normalizeWorkspaceRecord(workspace, { userId: normalizedUserId });
+  const hasFullRequirementPlans = normalizedWorkspace.requirementPlans.some((item) =>
+    Boolean(item?.builderMarkdown || item?.designSpecMarkdown || item?.output?.requirementPlan?.builderMarkdown || item?.output?.requirementPlan?.designSpecMarkdown)
+  );
+  const hasFullDraftBuilds = normalizedWorkspace.draftBuilds.some((item) =>
+    Boolean(item?.snapshotData && Object.keys(item.snapshotData).length)
+  );
+  if (hasFullRequirementPlans) writeWorkspaceCollection(normalizedUserId, "requirementPlans", normalizedWorkspace.requirementPlans);
+  if (hasFullDraftBuilds) writeWorkspaceCollection(normalizedUserId, "draftBuilds", normalizedWorkspace.draftBuilds);
+  normalizedWorkspace.requirementPlans = normalizedWorkspace.requirementPlans.map(summarizeRequirementPlanRecord);
+  normalizedWorkspace.draftBuilds = normalizedWorkspace.draftBuilds.map(summarizeDraftBuildRecord);
+  writeJson(filePath, normalizedWorkspace);
+  rememberWorkspaceShard(normalizedUserId, filePath, normalizedWorkspace);
+  return normalizedWorkspace;
+}
+
+function getWorkspaceCollectionPath(userId = "", collectionName = "") {
+  const baseName = buildWorkspaceStorageBaseName(userId);
+  const normalizedCollectionName = String(collectionName || "").trim();
+  if (!baseName || !/^(requirementPlans|draftBuilds)$/.test(normalizedCollectionName)) return "";
+  return path.join(WORKSPACE_SHARDS_DIR, `${baseName}.${normalizedCollectionName}.json`);
+}
+
+function getWorkspaceCollectionIndexPath(userId = "", collectionName = "") {
+  const baseName = buildWorkspaceStorageBaseName(userId);
+  const normalizedCollectionName = String(collectionName || "").trim();
+  if (!baseName || !/^(requirementPlans|draftBuilds)$/.test(normalizedCollectionName)) return "";
+  return path.join(WORKSPACE_SHARDS_DIR, `${baseName}.${normalizedCollectionName}.index.json`);
+}
+
+function getWorkspaceCollectionItemPath(userId = "", collectionName = "", itemId = "") {
+  const baseName = buildWorkspaceStorageBaseName(userId);
+  const normalizedCollectionName = String(collectionName || "").trim();
+  const normalizedItemId = String(itemId || "").trim();
+  if (!baseName || !/^(requirementPlans|draftBuilds)$/.test(normalizedCollectionName) || !normalizedItemId) return "";
+  const safeItemId = /^[a-zA-Z0-9._-]+$/.test(normalizedItemId)
+    ? normalizedItemId
+    : crypto.createHash("sha1").update(normalizedItemId).digest("hex");
+  return path.join(WORKSPACE_SHARDS_DIR, `${baseName}.${normalizedCollectionName}.${safeItemId}.json`);
+}
+
+function normalizeWorkspaceCollectionItem(collectionName = "", item = {}) {
+  if (collectionName === "requirementPlans") return normalizeRequirementPlan(item);
+  if (collectionName === "draftBuilds") return normalizeDraftBuild(item);
+  return item;
+}
+
+function readWorkspaceCollectionItem(userId = "", collectionName = "", itemId = "") {
+  const filePath = getWorkspaceCollectionItemPath(userId, collectionName, itemId);
+  if (filePath && fs.existsSync(filePath)) {
+    const payload = readJson(filePath, null);
+    const item = payload?.item && typeof payload.item === "object" ? payload.item : payload;
+    return item ? normalizeWorkspaceCollectionItem(collectionName, item) : null;
+  }
+  const gzipPath = filePath ? `${filePath}.gz` : "";
+  if (gzipPath && fs.existsSync(gzipPath)) {
+    try {
+      const payload = JSON.parse(zlib.gunzipSync(fs.readFileSync(gzipPath)).toString("utf8"));
+      const item = payload?.item && typeof payload.item === "object" ? payload.item : payload;
+      return item ? normalizeWorkspaceCollectionItem(collectionName, item) : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+function writeWorkspaceCollectionItem(userId = "", collectionName = "", item = {}) {
+  const itemId = String(item?.id || "").trim();
+  const filePath = getWorkspaceCollectionItemPath(userId, collectionName, itemId);
+  if (!filePath || !itemId) return null;
+  const normalizedItem = normalizeWorkspaceCollectionItem(collectionName, item);
+  writeJson(filePath, {
+    userId: String(userId || "").trim(),
+    collection: collectionName,
+    itemId,
+    updatedAt: nowIso(),
+    item: normalizedItem,
+  });
+  try {
+    fs.rmSync(`${filePath}.gz`, { force: true });
+  } catch {}
+  return normalizedItem;
+}
+
+function summarizeWorkspaceCollectionItem(collectionName = "", item = {}) {
+  if (collectionName === "requirementPlans") return summarizeRequirementPlanRecord(item);
+  if (collectionName === "draftBuilds") return summarizeDraftBuildRecord(item);
+  return item;
+}
+
+function readWorkspaceCollectionIndex(userId = "", collectionName = "") {
+  const normalizedUserId = String(userId || "").trim();
+  const indexPath = getWorkspaceCollectionIndexPath(normalizedUserId, collectionName);
+  if (indexPath && fs.existsSync(indexPath)) {
+    const payload = readJson(indexPath, { items: [] });
+    return toPlainArray(payload?.items).map((item) => summarizeWorkspaceCollectionItem(collectionName, item));
+  }
+  const collectionPath = getWorkspaceCollectionPath(normalizedUserId, collectionName);
+  if (collectionPath && fs.existsSync(collectionPath)) {
+    const payload = readJson(collectionPath, { items: [] });
+    return toPlainArray(payload?.items).map((item) => summarizeWorkspaceCollectionItem(collectionName, item));
+  }
+  const workspace = readWorkspaceShard(normalizedUserId);
+  return toPlainArray(workspace?.[collectionName]).map((item) => summarizeWorkspaceCollectionItem(collectionName, item));
+}
+
+function writeWorkspaceCollectionIndex(userId = "", collectionName = "", items = []) {
+  const normalizedUserId = String(userId || "").trim();
+  const indexPath = getWorkspaceCollectionIndexPath(normalizedUserId, collectionName);
+  if (!normalizedUserId || !indexPath) return [];
+  const summaries = toPlainArray(items).map((item) => summarizeWorkspaceCollectionItem(collectionName, item)).slice(0, 200);
+  writeJson(indexPath, {
+    userId: normalizedUserId,
+    collection: collectionName,
+    updatedAt: nowIso(),
+    items: summaries,
+  });
+  return summaries;
+}
+
+function readWorkspaceCollection(userId = "", collectionName = "") {
+  const normalizedUserId = String(userId || "").trim();
+  const indexItems = readWorkspaceCollectionIndex(normalizedUserId, collectionName);
+  if (indexItems.length) {
+    const hydrated = indexItems
+      .map((item) => readWorkspaceCollectionItem(normalizedUserId, collectionName, item.id) || null)
+      .filter(Boolean);
+    if (hydrated.length) return hydrated;
+  }
+  const collectionPath = getWorkspaceCollectionPath(normalizedUserId, collectionName);
+  if (collectionPath && fs.existsSync(collectionPath)) {
+    const payload = readJson(collectionPath, { items: [] });
+    const items = toPlainArray(payload?.items).map((item) => normalizeWorkspaceCollectionItem(collectionName, item));
+    if (items.length) return items;
+  }
+  const workspace = readWorkspaceShard(normalizedUserId);
+  const inlineItems = toPlainArray(workspace?.[collectionName]);
+  if (inlineItems.length && !inlineItems.every((item) => item?.output?.requirementPlan || item?.snapshotData)) {
+    const legacy = readWorkspaces();
+    const legacyWorkspace = (legacy.workspaces || []).find((item) => item.userId === normalizedUserId);
+    const legacyItems = toPlainArray(legacyWorkspace?.[collectionName]);
+    if (legacyItems.length) return legacyItems.map((item) => normalizeWorkspaceCollectionItem(collectionName, item));
+  }
+  if (inlineItems.length) return inlineItems.map((item) => normalizeWorkspaceCollectionItem(collectionName, item));
+  const legacy = readWorkspaces();
+  const legacyWorkspace = (legacy.workspaces || []).find((item) => item.userId === normalizedUserId);
+  return toPlainArray(legacyWorkspace?.[collectionName]).map((item) => normalizeWorkspaceCollectionItem(collectionName, item));
+}
+
+function writeWorkspaceCollection(userId = "", collectionName = "", items = []) {
+  const normalizedUserId = String(userId || "").trim();
+  const filePath = getWorkspaceCollectionPath(normalizedUserId, collectionName);
+  if (!normalizedUserId || !filePath) return [];
+  const normalizedItems = toPlainArray(items).map((item) => normalizeWorkspaceCollectionItem(collectionName, item)).slice(0, 200);
+  normalizedItems.forEach((item) => writeWorkspaceCollectionItem(normalizedUserId, collectionName, item));
+  const summaries = writeWorkspaceCollectionIndex(normalizedUserId, collectionName, normalizedItems);
+  writeJson(filePath, {
+    userId: normalizedUserId,
+    collection: collectionName,
+    updatedAt: nowIso(),
+    storageMode: "item-files",
+    items: summaries,
+  });
+  return normalizedItems;
+}
+
 function readWorkspaces() {
-  return readJson(WORKSPACES_PATH, { workspaces: [] });
+  try {
+    const stat = fs.statSync(WORKSPACES_PATH);
+    const signature = `${Number(stat.mtimeMs || 0)}:${Number(stat.size || 0)}`;
+    if (workspaceStoreCache && workspaceStoreCacheStat === signature) {
+      return workspaceStoreCache;
+    }
+    workspaceStoreCache = readJson(WORKSPACES_PATH, { workspaces: [] });
+    workspaceStoreCacheStat = signature;
+    return workspaceStoreCache;
+  } catch {
+    const fallback = { workspaces: [] };
+    workspaceStoreCache = fallback;
+    workspaceStoreCacheStat = null;
+    return fallback;
+  }
 }
 
 function writeWorkspaces(payload) {
   writeJson(WORKSPACES_PATH, payload);
+  workspaceStoreCache = payload;
+  try {
+    const stat = fs.statSync(WORKSPACES_PATH);
+    workspaceStoreCacheStat = `${Number(stat.mtimeMs || 0)}:${Number(stat.size || 0)}`;
+  } catch {
+    workspaceStoreCacheStat = null;
+  }
 }
 
 function readActivityLog() {
@@ -144,12 +636,21 @@ function parseCookies(req) {
 function createSession(userId) {
   const payload = readSessions();
   const token = crypto.randomBytes(24).toString("hex");
-  payload.sessions = (payload.sessions || []).filter((item) => item.userId !== userId);
-  payload.sessions.push({
+  const nextSession = {
     token,
     userId,
     createdAt: nowIso(),
-  });
+  };
+  const sessions = Array.isArray(payload.sessions) ? payload.sessions : [];
+  const sameUserSessions = sessions
+    .filter((item) => item.userId === userId)
+    .sort((left, right) => String(right.createdAt || "").localeCompare(String(left.createdAt || "")))
+    .slice(0, Math.max(0, MAX_SESSIONS_PER_USER - 1));
+  payload.sessions = [
+    ...sessions.filter((item) => item.userId !== userId),
+    ...sameUserSessions,
+    nextSession,
+  ];
   writeSessions(payload);
   return token;
 }
@@ -188,15 +689,116 @@ function normalizeHistoryEntry(entry) {
 }
 
 function normalizeRequirementPlan(plan) {
+  const output = toPlainObject(plan?.output);
+  const requirementPlanOutput = sanitizeRequirementPlanOutput(output?.requirementPlan);
+  const topLevelRequirementPlan = sanitizeRequirementPlanOutput(plan);
+  const generatedBy = String(plan?.generatedBy || output?.generatedBy || "").trim();
+  const originType = (() => {
+    const explicit = String(plan?.originType || "").trim();
+    if (explicit) return explicit;
+    if (generatedBy === "codex-docs-backfill") return "auto-backfilled";
+    return "user-input";
+  })();
+  const approvalState = String(
+    plan?.approvalState ||
+    (originType === "auto-backfilled" ? "system-generated" : "user-reviewed")
+  ).trim();
   return {
     id: String(plan?.id || crypto.randomUUID()),
     pageId: String(plan?.pageId || "").trim(),
     viewportProfile: normalizeViewportProfile(plan?.viewportProfile, "pc"),
     mode: String(plan?.mode || "direct").trim() || "direct",
     status: String(plan?.status || "draft").trim() || "draft",
-    title: String(plan?.title || plan?.output?.title || "").trim(),
+    originType,
+    approvalState,
+    generatedBy,
+    title: String(plan?.title || requirementPlanOutput?.title || output?.title || "").trim(),
+    designChangeLevel: normalizePlanLine(
+      plan?.designChangeLevel || requirementPlanOutput?.designChangeLevel || topLevelRequirementPlan?.designChangeLevel || "",
+      20
+    ) || "medium",
+    interventionLayer: normalizePlanLine(
+      plan?.interventionLayer || topLevelRequirementPlan?.interventionLayer || "",
+      40
+    ),
+    patchDepth: normalizePlanLine(
+      plan?.patchDepth || topLevelRequirementPlan?.patchDepth || "",
+      40
+    ),
+    targetGroupId: normalizePlanLine(
+      plan?.targetGroupId || topLevelRequirementPlan?.targetGroupId || "",
+      120
+    ),
+    targetGroupLabel: normalizePlanLine(
+      plan?.targetGroupLabel || topLevelRequirementPlan?.targetGroupLabel || "",
+      160
+    ),
+    targetComponents: sanitizePlanLineArray(
+      plan?.targetComponents || topLevelRequirementPlan?.targetComponents,
+      { limit: 24, maxLength: 160 }
+    ),
+    planningDirection: sanitizePlanLineArray(
+      plan?.planningDirection || topLevelRequirementPlan?.planningDirection,
+      { limit: 8, maxLength: 520 }
+    ),
+    designDirection: sanitizePlanLineArray(
+      plan?.designDirection || topLevelRequirementPlan?.designDirection,
+      { limit: 8, maxLength: 520 }
+    ),
+    guardrails: sanitizePlanLineArray(
+      plan?.guardrails || topLevelRequirementPlan?.guardrails,
+      { limit: 8, maxLength: 240 }
+    ),
+    referenceNotes: sanitizeReferenceNotes(
+      plan?.referenceNotes || topLevelRequirementPlan?.referenceNotes,
+      5
+    ),
+    builderBrief: sanitizeRequirementPlanOutput({
+      builderBrief:
+        (plan?.builderBrief && typeof plan.builderBrief === "object" ? plan.builderBrief : null) ||
+        (topLevelRequirementPlan?.builderBrief && typeof topLevelRequirementPlan.builderBrief === "object"
+          ? topLevelRequirementPlan.builderBrief
+          : null) ||
+        {},
+    }).builderBrief,
+    builderMarkdown: String(
+      plan?.builderMarkdown || topLevelRequirementPlan?.builderMarkdown || ""
+    ).slice(0, 32000),
+    designSpecMarkdown: String(
+      plan?.designSpecMarkdown || topLevelRequirementPlan?.designSpecMarkdown || ""
+    ).slice(0, 32000),
+    sectionBlueprints: sanitizeSectionBlueprints(
+      plan?.sectionBlueprints || topLevelRequirementPlan?.sectionBlueprints,
+      24
+    ),
+    conceptPlans: Array.isArray(plan?.conceptPlans)
+      ? JSON.parse(JSON.stringify(plan.conceptPlans)).slice(0, 8)
+      : (Array.isArray(topLevelRequirementPlan?.conceptPlans)
+        ? JSON.parse(JSON.stringify(topLevelRequirementPlan.conceptPlans)).slice(0, 8)
+        : []),
+    selectedConcept:
+      plan?.selectedConcept && typeof plan.selectedConcept === "object"
+        ? JSON.parse(JSON.stringify(plan.selectedConcept))
+        : (topLevelRequirementPlan?.selectedConcept && typeof topLevelRequirementPlan.selectedConcept === "object"
+          ? JSON.parse(JSON.stringify(topLevelRequirementPlan.selectedConcept))
+          : null),
+    planningPackage:
+      plan?.planningPackage && typeof plan.planningPackage === "object"
+        ? JSON.parse(JSON.stringify(plan.planningPackage))
+        : (topLevelRequirementPlan?.planningPackage && typeof topLevelRequirementPlan.planningPackage === "object"
+          ? JSON.parse(JSON.stringify(topLevelRequirementPlan.planningPackage))
+          : null),
+    journeyFlow:
+      plan?.journeyFlow && typeof plan.journeyFlow === "object"
+        ? JSON.parse(JSON.stringify(plan.journeyFlow))
+        : (topLevelRequirementPlan?.journeyFlow && typeof topLevelRequirementPlan.journeyFlow === "object"
+          ? JSON.parse(JSON.stringify(topLevelRequirementPlan.journeyFlow))
+          : null),
     input: toPlainObject(plan?.input),
-    output: toPlainObject(plan?.output),
+    output: {
+      ...output,
+      ...(Object.keys(requirementPlanOutput || {}).length ? { requirementPlan: requirementPlanOutput } : {}),
+    },
     summary: String(plan?.summary || "").trim(),
     createdAt: String(plan?.createdAt || nowIso()),
     updatedAt: String(plan?.updatedAt || plan?.createdAt || nowIso()),
@@ -204,19 +806,86 @@ function normalizeRequirementPlan(plan) {
 }
 
 function normalizeDraftBuild(build) {
+  const snapshotData = toPlainObject(build?.snapshotData);
+  const report = mergeGeneratedAssetsIntoDraftReport(build?.report, snapshotData);
   return {
     id: String(build?.id || crypto.randomUUID()),
     pageId: String(build?.pageId || "").trim(),
     viewportProfile: normalizeViewportProfile(build?.viewportProfile, "pc"),
     planId: String(build?.planId || "").trim(),
+    builderVersion: String(build?.builderVersion || "").trim(),
+    rendererSurface: String(build?.rendererSurface || "").trim(),
     status: String(build?.status || "draft").trim() || "draft",
     summary: String(build?.summary || "").trim(),
     proposedVersionLabel: String(build?.proposedVersionLabel || "").trim(),
     operations: toPlainArray(build?.operations),
-    report: toPlainObject(build?.report),
-    snapshotData: toPlainObject(build?.snapshotData),
+    report,
+    snapshotData,
     createdAt: String(build?.createdAt || nowIso()),
     updatedAt: String(build?.updatedAt || build?.createdAt || nowIso()),
+  };
+}
+
+function summarizeRequirementPlanRecord(plan = {}) {
+  const userInput = toPlainObject(plan?.input?.userInput);
+  const journeyFlow =
+    plan?.journeyFlow && typeof plan.journeyFlow === "object"
+      ? JSON.parse(JSON.stringify(plan.journeyFlow))
+      : (plan?.output?.requirementPlan?.journeyFlow && typeof plan.output.requirementPlan.journeyFlow === "object"
+        ? JSON.parse(JSON.stringify(plan.output.requirementPlan.journeyFlow))
+        : null);
+  const journeyStrategy =
+    plan?.journeyStrategy && typeof plan.journeyStrategy === "object"
+      ? JSON.parse(JSON.stringify(plan.journeyStrategy))
+      : (plan?.output?.requirementPlan?.journeyStrategy && typeof plan.output.requirementPlan.journeyStrategy === "object"
+        ? JSON.parse(JSON.stringify(plan.output.requirementPlan.journeyStrategy))
+        : null);
+  const outputRequirementPlan = plan?.output?.requirementPlan
+    ? {
+      title: String(plan.output.requirementPlan.title || plan.title || "").trim(),
+      ...(journeyFlow ? { journeyFlow } : {}),
+      ...(journeyStrategy ? { journeyStrategy } : {}),
+    }
+    : {};
+  return {
+    id: String(plan?.id || "").trim(),
+    pageId: String(plan?.pageId || "").trim(),
+    viewportProfile: normalizeViewportProfile(plan?.viewportProfile, "pc"),
+    mode: String(plan?.mode || "").trim(),
+    status: String(plan?.status || "").trim(),
+    originType: String(plan?.originType || "").trim(),
+    approvalState: String(plan?.approvalState || "").trim(),
+    generatedBy: String(plan?.generatedBy || "").trim(),
+    title: String(plan?.title || plan?.output?.requirementPlan?.title || "").trim(),
+    summary: String(plan?.summary || "").trim(),
+    designChangeLevel: String(plan?.designChangeLevel || "").trim(),
+    interventionLayer: String(plan?.interventionLayer || "").trim(),
+    patchDepth: String(plan?.patchDepth || "").trim(),
+    targetGroupId: String(plan?.targetGroupId || "").trim(),
+    targetGroupLabel: String(plan?.targetGroupLabel || "").trim(),
+    targetComponents: toPlainArray(plan?.targetComponents).slice(0, 24),
+    ...(journeyFlow ? { journeyFlow } : {}),
+    ...(journeyStrategy ? { journeyStrategy } : {}),
+    input: { userInput },
+    output: Object.keys(outputRequirementPlan).length ? { requirementPlan: outputRequirementPlan } : {},
+    createdAt: String(plan?.createdAt || ""),
+    updatedAt: String(plan?.updatedAt || plan?.createdAt || ""),
+  };
+}
+
+function summarizeDraftBuildRecord(build = {}) {
+  return {
+    id: String(build?.id || "").trim(),
+    pageId: String(build?.pageId || "").trim(),
+    viewportProfile: normalizeViewportProfile(build?.viewportProfile, "pc"),
+    planId: String(build?.planId || "").trim(),
+    builderVersion: String(build?.builderVersion || "").trim(),
+    rendererSurface: String(build?.rendererSurface || "").trim(),
+    status: String(build?.status || "").trim(),
+    summary: String(build?.summary || "").trim(),
+    proposedVersionLabel: String(build?.proposedVersionLabel || "").trim(),
+    createdAt: String(build?.createdAt || ""),
+    updatedAt: String(build?.updatedAt || build?.createdAt || ""),
   };
 }
 
@@ -312,12 +981,16 @@ function ensureWorkspaceStorage(workspace, { userId = "" } = {}) {
 }
 
 function initializeWorkspace(userId) {
+  const sharded = readWorkspaceShard(userId);
+  if (sharded) {
+    ensureWorkspaceStorage(sharded, { userId });
+    return sharded;
+  }
   const payload = readWorkspaces();
   const existing = (payload.workspaces || []).find((item) => item.userId === userId);
   if (existing) {
     ensureWorkspaceStorage(existing, { userId });
-    writeWorkspaces(payload);
-    return existing;
+    return writeWorkspaceShard(userId, existing) || existing;
   }
   const workspace = normalizeWorkspaceRecord({
     userId,
@@ -332,79 +1005,77 @@ function initializeWorkspace(userId) {
     pinnedViewsByPage: {},
     pageIdentityOverrides: {},
   });
-  payload.workspaces.push(workspace);
-  writeWorkspaces(payload);
+  writeWorkspaceShard(userId, workspace);
   logEvent(userId, "workspace_initialized", { base: "shared-default" });
   return workspace;
 }
 
-function getWorkspace(userId) {
+function getWorkspace(userId, options = {}) {
   const workspace = initializeWorkspace(userId);
-  ensureWorkspaceStorage(workspace, { userId });
+  if (options?.normalize !== false) {
+    ensureWorkspaceStorage(workspace, { userId });
+  }
   return workspace;
 }
 
 function saveWorkspace(userId, data, changeSummary = "workspace_update") {
-  const payload = readWorkspaces();
-  const nextData = normalizeEditableData(JSON.parse(JSON.stringify(data)));
-  let workspace = (payload.workspaces || []).find((item) => item.userId === userId);
-  if (!workspace) {
-    workspace = initializeWorkspace(userId);
-    return saveWorkspace(userId, nextData, changeSummary);
-  }
-  ensureWorkspaceStorage(workspace, { userId });
-  workspace.data = nextData;
-  workspace.updatedAt = nowIso();
-  workspace.workHistory.unshift({
-    id: crypto.randomUUID(),
-    summary: changeSummary,
-    recordedAt: workspace.updatedAt,
-  });
-  workspace.workHistory = workspace.workHistory.slice(0, 100);
-  writeWorkspaces(payload);
-  logEvent(userId, "workspace_saved", { summary: changeSummary });
-  return workspace;
-}
-
-function incrementLlmUsage(userId, detail = {}) {
-  const payload = readWorkspaces();
-  const workspace = (payload.workspaces || []).find((item) => item.userId === userId) || initializeWorkspace(userId);
-  ensureWorkspaceStorage(workspace, { userId });
-  workspace.llmUsageCount = Number(workspace.llmUsageCount || 0) + 1;
-  workspace.updatedAt = nowIso();
-  writeWorkspaces(payload);
-  logEvent(userId, "llm_usage", detail);
-  return workspace.llmUsageCount;
-}
-
-function updateWorkspaceMeta(userId, mutator, { logType = "", logDetail = {}, historySummary = "" } = {}) {
-  const payload = readWorkspaces();
-  let workspace = (payload.workspaces || []).find((item) => item.userId === userId);
-  if (!workspace) {
-    workspace = initializeWorkspace(userId);
-    return updateWorkspaceMeta(userId, mutator, { logType, logDetail, historySummary });
-  }
-  ensureWorkspaceStorage(workspace, { userId });
-  const result = typeof mutator === "function" ? mutator(workspace) : null;
-  workspace.updatedAt = nowIso();
-  if (historySummary) {
+  return withWorkspaceWriteLock(userId, () => {
+    const nextData = normalizeEditableData(JSON.parse(JSON.stringify(data)));
+    const workspace = initializeWorkspace(userId);
+    ensureWorkspaceStorage(workspace, { userId });
+    workspace.data = nextData;
+    workspace.updatedAt = nowIso();
     workspace.workHistory.unshift({
       id: crypto.randomUUID(),
-      summary: historySummary,
+      summary: changeSummary,
       recordedAt: workspace.updatedAt,
     });
     workspace.workHistory = workspace.workHistory.slice(0, 100);
-  }
-  writeWorkspaces(payload);
-  if (logType) logEvent(userId, logType, logDetail);
-  return { workspace, result };
+    const savedWorkspace = writeWorkspaceShard(userId, workspace) || workspace;
+    logEvent(userId, "workspace_saved", { summary: changeSummary });
+    return savedWorkspace;
+  });
 }
 
-function listRequirementPlans(userId, { pageId = "", viewportProfile = "", limit = 50 } = {}) {
-  const workspace = getWorkspace(userId);
+function incrementLlmUsage(userId, detail = {}) {
+  return withWorkspaceWriteLock(userId, () => {
+    const workspace = initializeWorkspace(userId);
+    ensureWorkspaceStorage(workspace, { userId });
+    workspace.llmUsageCount = Number(workspace.llmUsageCount || 0) + 1;
+    workspace.updatedAt = nowIso();
+    writeWorkspaceShard(userId, workspace);
+    logEvent(userId, "llm_usage", detail);
+    return workspace.llmUsageCount;
+  });
+}
+
+function updateWorkspaceMeta(userId, mutator, { logType = "", logDetail = {}, historySummary = "" } = {}) {
+  return withWorkspaceWriteLock(userId, () => {
+    const workspace = initializeWorkspace(userId);
+    ensureWorkspaceStorage(workspace, { userId });
+    const result = typeof mutator === "function" ? mutator(workspace) : null;
+    workspace.updatedAt = nowIso();
+    if (historySummary) {
+      workspace.workHistory.unshift({
+        id: crypto.randomUUID(),
+        summary: historySummary,
+        recordedAt: workspace.updatedAt,
+      });
+      workspace.workHistory = workspace.workHistory.slice(0, 100);
+    }
+    const savedWorkspace = writeWorkspaceShard(userId, workspace) || workspace;
+    if (logType) logEvent(userId, logType, logDetail);
+    return { workspace: savedWorkspace, result };
+  });
+}
+
+function listRequirementPlans(userId, { pageId = "", viewportProfile = "", limit = 50, summaryOnly = false } = {}) {
+  const sourceItems = summaryOnly
+    ? readWorkspaceCollectionIndex(userId, "requirementPlans")
+    : readWorkspaceCollection(userId, "requirementPlans");
   const normalizedPageId = String(pageId || "").trim();
   const normalizedViewportProfile = String(viewportProfile || "").trim();
-  const items = (workspace.requirementPlans || [])
+  const items = sourceItems
     .filter(
       (item) =>
         (!normalizedPageId || item.pageId === normalizedPageId) &&
@@ -412,15 +1083,29 @@ function listRequirementPlans(userId, { pageId = "", viewportProfile = "", limit
     )
     .sort((a, b) => String(b.updatedAt || "").localeCompare(String(a.updatedAt || "")))
     .slice(0, Math.max(0, Number(limit) || 0));
-  return items;
+  if (!summaryOnly) return items;
+  return items.map((item) => {
+    const userInput = item?.input?.userInput && typeof item.input.userInput === "object" ? item.input.userInput : {};
+    const hasJourneyIntent =
+      String(userInput.journeyMode || "").trim() === "journey" ||
+      String(userInput.journeyId || "").trim() ||
+      String(item?.mode || "").trim() === "journey";
+    const hasJourneyFlow =
+      (item?.journeyFlow && typeof item.journeyFlow === "object") ||
+      (item?.output?.requirementPlan?.journeyFlow && typeof item.output.requirementPlan.journeyFlow === "object");
+    if (!hasJourneyIntent || hasJourneyFlow) return item;
+    const hydrated = readWorkspaceCollectionItem(userId, "requirementPlans", item.id);
+    return hydrated ? summarizeRequirementPlanRecord(hydrated) : item;
+  });
 }
 
 function saveRequirementPlan(userId, planInput = {}) {
   const normalizedInput = normalizeRequirementPlan(planInput);
-  const { workspace, result } = updateWorkspaceMeta(
+  let savedPlan = null;
+  updateWorkspaceMeta(
     userId,
     (draft) => {
-      const items = Array.isArray(draft.requirementPlans) ? draft.requirementPlans : [];
+      const items = readWorkspaceCollection(userId, "requirementPlans");
       const existingIndex = items.findIndex((item) => item.id === normalizedInput.id);
       const existing = existingIndex >= 0 ? items[existingIndex] : null;
       const nextPlan = normalizeRequirementPlan({
@@ -431,7 +1116,9 @@ function saveRequirementPlan(userId, planInput = {}) {
       });
       if (existingIndex >= 0) items.splice(existingIndex, 1);
       items.unshift(nextPlan);
-      draft.requirementPlans = items.slice(0, 200);
+      const nextItems = writeWorkspaceCollection(userId, "requirementPlans", items.slice(0, 200));
+      draft.requirementPlans = nextItems.map(summarizeRequirementPlanRecord);
+      savedPlan = nextPlan;
       return nextPlan;
     },
     {
@@ -440,14 +1127,16 @@ function saveRequirementPlan(userId, planInput = {}) {
       historySummary: `requirement_plan:${normalizedInput.pageId || "unknown"}:${normalizedInput.id}`,
     }
   );
-  return result || (workspace.requirementPlans || [])[0] || null;
+  return savedPlan;
 }
 
-function listDraftBuilds(userId, { pageId = "", viewportProfile = "", limit = 50 } = {}) {
-  const workspace = getWorkspace(userId);
+function listDraftBuilds(userId, { pageId = "", viewportProfile = "", limit = 50, summaryOnly = false } = {}) {
+  const sourceItems = summaryOnly
+    ? readWorkspaceCollectionIndex(userId, "draftBuilds")
+    : readWorkspaceCollection(userId, "draftBuilds");
   const normalizedPageId = String(pageId || "").trim();
   const normalizedViewportProfile = String(viewportProfile || "").trim();
-  return (workspace.draftBuilds || [])
+  return sourceItems
     .filter(
       (item) =>
         (!normalizedPageId || item.pageId === normalizedPageId) &&
@@ -457,12 +1146,21 @@ function listDraftBuilds(userId, { pageId = "", viewportProfile = "", limit = 50
     .slice(0, Math.max(0, Number(limit) || 0));
 }
 
+function findDraftBuildById(userId, draftBuildId = "") {
+  const normalizedDraftBuildId = String(draftBuildId || "").trim();
+  if (!normalizedDraftBuildId) return null;
+  const item = readWorkspaceCollectionItem(userId, "draftBuilds", normalizedDraftBuildId);
+  if (item) return item;
+  return readWorkspaceCollection(userId, "draftBuilds").find((item) => String(item?.id || "").trim() === normalizedDraftBuildId) || null;
+}
+
 function saveDraftBuild(userId, buildInput = {}) {
   const normalizedInput = normalizeDraftBuild(buildInput);
-  const { workspace, result } = updateWorkspaceMeta(
+  let savedBuild = null;
+  updateWorkspaceMeta(
     userId,
     (draft) => {
-      const items = Array.isArray(draft.draftBuilds) ? draft.draftBuilds : [];
+      const items = readWorkspaceCollection(userId, "draftBuilds");
       const existingIndex = items.findIndex((item) => item.id === normalizedInput.id);
       const existing = existingIndex >= 0 ? items[existingIndex] : null;
       const nextBuild = normalizeDraftBuild({
@@ -473,7 +1171,9 @@ function saveDraftBuild(userId, buildInput = {}) {
       });
       if (existingIndex >= 0) items.splice(existingIndex, 1);
       items.unshift(nextBuild);
-      draft.draftBuilds = items.slice(0, 200);
+      const nextItems = writeWorkspaceCollection(userId, "draftBuilds", items.slice(0, 200));
+      draft.draftBuilds = nextItems.map(summarizeDraftBuildRecord);
+      savedBuild = nextBuild;
       return nextBuild;
     },
     {
@@ -482,11 +1182,47 @@ function saveDraftBuild(userId, buildInput = {}) {
       historySummary: `draft_build:${normalizedInput.pageId || "unknown"}:${normalizedInput.id}`,
     }
   );
-  return result || (workspace.draftBuilds || [])[0] || null;
+  return savedBuild;
+}
+
+function attachDraftReplayCheck(userId, draftBuildId, replayCheck = null) {
+  const normalizedDraftBuildId = String(draftBuildId || "").trim();
+  if (!normalizedDraftBuildId) return null;
+  const normalizedReplayCheck =
+    replayCheck && typeof replayCheck === "object" ? JSON.parse(JSON.stringify(replayCheck)) : null;
+  let savedBuild = null;
+  updateWorkspaceMeta(
+    userId,
+    (draft) => {
+      const items = readWorkspaceCollection(userId, "draftBuilds");
+      const existingIndex = items.findIndex((item) => String(item?.id || "").trim() === normalizedDraftBuildId);
+      if (existingIndex < 0) return null;
+      const existing = items[existingIndex];
+      const nextBuild = normalizeDraftBuild({
+        ...existing,
+        snapshotData: {
+          ...(existing?.snapshotData && typeof existing.snapshotData === "object" ? existing.snapshotData : {}),
+          localReplayCheck: normalizedReplayCheck,
+        },
+        updatedAt: existing?.updatedAt || nowIso(),
+      });
+      items[existingIndex] = nextBuild;
+      const nextItems = writeWorkspaceCollection(userId, "draftBuilds", items.slice(0, 200));
+      draft.draftBuilds = nextItems.map(summarizeDraftBuildRecord);
+      savedBuild = nextBuild;
+      return nextBuild;
+    },
+    {
+      logType: "workspace_draft_replay_check_attached",
+      logDetail: { buildId: normalizedDraftBuildId },
+      historySummary: "",
+    }
+  );
+  return savedBuild || findDraftBuildById(userId, normalizedDraftBuildId);
 }
 
 function listSavedVersions(userId, { pageId = "", viewportProfile = "", limit = 50 } = {}) {
-  const workspace = getWorkspace(userId);
+  const workspace = getWorkspace(userId, { normalize: false });
   const normalizedPageId = String(pageId || "").trim();
   const normalizedViewportProfile = String(viewportProfile || "").trim();
   return (workspace.savedVersions || [])
@@ -505,7 +1241,16 @@ function saveSavedVersion(userId, versionInput = {}) {
     userId,
     (draft) => {
       const items = Array.isArray(draft.savedVersions) ? draft.savedVersions : [];
-      const existingIndex = items.findIndex((item) => item.id === normalizedInput.id);
+      const existingIndex = items.findIndex((item) => {
+        if (item.id === normalizedInput.id) return true;
+        return (
+          normalizedInput.buildId &&
+          item.pageId === normalizedInput.pageId &&
+          normalizeViewportProfile(item.viewportProfile, "pc") === normalizeViewportProfile(normalizedInput.viewportProfile, "pc") &&
+          item.planId === normalizedInput.planId &&
+          item.buildId === normalizedInput.buildId
+        );
+      });
       const existing = existingIndex >= 0 ? items[existingIndex] : null;
       const nextVersion = normalizeSavedVersion({
         ...(existing || {}),
@@ -519,7 +1264,13 @@ function saveSavedVersion(userId, versionInput = {}) {
     },
     {
       logType: "workspace_saved_version_saved",
-      logDetail: { pageId: normalizedInput.pageId, versionId: normalizedInput.id, versionLabel: normalizedInput.versionLabel || null },
+      logDetail: {
+        pageId: normalizedInput.pageId,
+        versionId: normalizedInput.id,
+        versionLabel: normalizedInput.versionLabel || null,
+        buildId: normalizedInput.buildId || null,
+        planId: normalizedInput.planId || null,
+      },
       historySummary: `saved_version:${normalizedInput.pageId || "unknown"}:${normalizedInput.id}`,
     }
   );
@@ -575,7 +1326,7 @@ function pinSavedVersion(userId, pageId, versionId, viewportProfile = "") {
 }
 
 function getPinnedView(userId, pageId, viewportProfile = "") {
-  const workspace = getWorkspace(userId);
+  const workspace = getWorkspace(userId, { normalize: false });
   const normalizedPageId = String(pageId || "").trim();
   if (!normalizedPageId) return null;
   const normalizedViewportProfile = normalizeViewportProfile(viewportProfile, "pc");
@@ -600,7 +1351,7 @@ function getPinnedView(userId, pageId, viewportProfile = "") {
 }
 
 function getPageIdentityOverride(userId, pageId) {
-  const workspace = getWorkspace(userId);
+  const workspace = getWorkspace(userId, { normalize: false });
   const normalizedPageId = String(pageId || "").trim();
   if (!normalizedPageId) return null;
   const entry = workspace.pageIdentityOverrides?.[normalizedPageId] || null;
@@ -709,7 +1460,9 @@ module.exports = {
   listRequirementPlans,
   saveRequirementPlan,
   listDraftBuilds,
+  findDraftBuildById,
   saveDraftBuild,
+  attachDraftReplayCheck,
   listSavedVersions,
   saveSavedVersion,
   pinSavedVersion,

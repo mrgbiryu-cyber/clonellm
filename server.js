@@ -3,20 +3,90 @@ const fs = require("fs");
 const path = require("path");
 const { URL } = require("url");
 const crypto = require("crypto");
+const { spawn } = require("child_process");
+const sharp = require("sharp");
+const { PNG } = require("pngjs");
+const pixelmatch = require("pixelmatch").default || require("pixelmatch");
 
 const ENV_PATH = path.join(__dirname, ".env");
 
-if (typeof process.loadEnvFile === "function") {
+function loadEnvOverrides(envPath) {
   try {
-    process.loadEnvFile(ENV_PATH);
+    const raw = fs.readFileSync(envPath, "utf8");
+    raw.split(/\r?\n/).forEach((line) => {
+      const trimmed = String(line || "").trim();
+      if (!trimmed || trimmed.startsWith("#")) return;
+      const eqIndex = trimmed.indexOf("=");
+      if (eqIndex <= 0) return;
+      const key = trimmed.slice(0, eqIndex).trim();
+      const value = trimmed.slice(eqIndex + 1);
+      if (!key) return;
+      process.env[key] = value;
+    });
   } catch (error) {
     if (error?.code !== "ENOENT") {
-      console.warn(`[env] failed to load ${ENV_PATH}: ${error.message}`);
+      console.warn(`[env] failed to load ${envPath}: ${error.message}`);
     }
   }
 }
 
-const { handleLlmChange, handleLlmChangeOnData, handleLlmPlan, handleLlmBuildOnData, normalizeEditableData, readEditableData, writeEditableData } = require("./llm");
+loadEnvOverrides(ENV_PATH);
+
+// TEST MODEL PROFILE (2026-04-29)
+// 디버깅 중 /api/llm/status도 저가 모델 기본값을 보여주도록 맞춘다.
+// flow 검증 완료 후 production/high-quality target은 anthropic/claude-sonnet-4.6 으로 복구한다.
+const DEFAULT_OPENROUTER_TEXT_MODEL = "anthropic/claude-haiku-4.5";
+
+const { buildDemoPlannerResult, handleLlmChange, handleLlmChangeOnData, handleLlmPlan, handleLlmBuildOnData, handleLlmFix, handleLlmVisualCritic, callOpenRouterImageGeneration, applyOperations, enforceBuilderOperations, normalizeEditableData, readEditableData, writeEditableData } = require("./llm");
+const { runBuilderV2 } = require("./builder-v2/orchestrator");
+const { resolveBuilderVersion } = require("./builder-v2/contracts");
+const { runV2Engine } = require("./builder-v2/engine-v2");
+const { finalizeBuilderV2Run } = require("./builder-v2/finalize");
+const {
+  renderHomePrimitiveHeroSection,
+  renderHomePrimitiveQuickmenuSection,
+  renderHomePrimitiveRankingSection,
+  renderHomePrimitiveBannerSection,
+} = require("./builder-v2/renderer/home");
+const {
+  renderHomeTailwindHeroSection,
+  renderHomeTailwindQuickmenuSection,
+} = require("./builder-v2/renderer/home-tailwind");
+const {
+  renderServiceTailwindHeroSection,
+  renderServiceTailwindGridSection,
+  renderServiceTailwindRankingSection,
+  renderServiceTailwindBannerSection,
+  renderServiceTailwindStorySection,
+  renderServiceTailwindCommerceSection,
+} = require("./builder-v2/renderer/service-tailwind");
+const {
+  renderCategoryTailwindBannerSection,
+  renderPdpTailwindSummarySection,
+  renderPdpTailwindStickySection,
+} = require("./builder-v2/renderer/catalog-tailwind");
+const {
+  runLocalPlanningProvider,
+  buildRequirementPlanFromPlanningPreview,
+  inferLocalPlanningScenarioId,
+  buildConceptPackageFromRequirementPlan,
+  buildDesignAuthorInput,
+  buildDesignAuthorInputSnapshot,
+  buildSectionSequencePlan,
+  buildLlmAuthoredSectionHtmlPackage,
+  buildLocalAuthoredSectionHtmlPackage,
+  buildLocalAuthoredSectionMarkdownDocument,
+  enrichAuthoredSectionHtmlPackageWithAuthorInput,
+  normalizeAuthoredAssetUsage,
+  validateDesignAuthorOutput,
+  buildAssetRegistryCatalogForPage,
+  readInteractionComponentRegistry,
+  updateImageAssetVariantStatus,
+  updateInteractionComponentStatus,
+  buildLocalBuildFoundation,
+  buildLocalBuildPreviewItem,
+  renderRuntimeDraft,
+} = require("./design-pipeline");
 const { analyzeReferenceUrls, buildGuardrailBundle } = require("./planner-tools");
 const {
   getUserFromRequest,
@@ -34,7 +104,9 @@ const {
   listRequirementPlans,
   saveRequirementPlan,
   listDraftBuilds,
+  findDraftBuildById,
   saveDraftBuild,
+  attachDraftReplayCheck,
   listSavedVersions,
   saveSavedVersion,
   pinSavedVersion,
@@ -50,10 +122,13 @@ const STATIC_DIR = path.join(ROOT, "web");
 const DATA_PATH = path.join(ROOT, "data", "normalized", "editable-prototype.json");
 const ARCHIVE_INDEX_PATH = path.join(ROOT, "data", "raw", "archive-index.json");
 const ASSET_DIR = path.join(ROOT, "data", "raw", "assets");
+const GENERATED_ASSET_CACHE_PATH = path.join(ROOT, "data", "normalized", "generated-asset-cache.json");
 const ARCHIVE_PAGES_DIR = path.join(ROOT, "data", "raw", "pages");
 const SLOT_SNAPSHOT_DIR = path.join(ROOT, "data", "normalized", "slot-snapshots");
 const INTERACTION_SNAPSHOT_DIR = path.join(ROOT, "data", "normalized", "interaction-snapshots");
 const WORKBENCH_TARGETS_PATH = path.join(ROOT, "data", "normalized", "workbench-targets", "index.json");
+const READINESS_AUDIT_PATH = path.join(ROOT, "data", "normalized", "readiness-audit.json");
+const ARTIFACT_SIDECAR_AUDIT_PATH = path.join(ROOT, "data", "normalized", "artifact-sidecar-audit.json");
 const VISUAL_DIR = path.join(ROOT, "data", "visual");
 const VISUAL_BATCH_SUMMARY_PATH = path.join(VISUAL_DIR, "batch-summary.json");
 const PLP_VISUAL_INDEX_PATH = path.join(VISUAL_DIR, "plp", "index.json");
@@ -66,15 +141,35 @@ const DESIGN_REFERENCE_LIBRARY_PATH = path.join(ROOT, "data", "normalized", "des
 const DESIGN_REFERENCE_SOURCE_SEEDS_PATH = path.join(ROOT, "data", "normalized", "design-reference-source-seeds.json");
 const DESIGN_REFERENCE_COLLECTOR_INDEX_PATH = path.join(ROOT, "data", "design-md", "index.json");
 const PRACTICAL_REFERENCE_SAMPLES_INDEX_PATH = path.join(ROOT, "data", "reference-samples", "practical", "index.json");
+const ASSET_PIPELINE_STARTER_PATH = path.join(ROOT, "data", "normalized", "asset-pipeline-starter.json");
+const COMPONENT_REBUILD_SCHEMA_CATALOG_PATH = path.join(ROOT, "data", "normalized", "component-rebuild-schema-catalog.json");
+const PRIMITIVE_COMPOSITION_CATALOG_PATH = path.join(ROOT, "data", "normalized", "primitive-composition-catalog.json");
+const STYLE_RUNTIME_TOKEN_PRESETS_PATH = path.join(ROOT, "data", "normalized", "style-runtime-token-presets.json");
+const SECTION_FAMILY_CONTRACTS_PATH = path.join(ROOT, "data", "normalized", "section-family-contracts.json");
+const PAGE_BUILDER_PROMPT_BLUEPRINTS_PATH = path.join(ROOT, "data", "normalized", "page-builder-prompt-blueprints.json");
+const FAMILY_RECIPE_PLAN_PATH = path.join(ROOT, "data", "recipe-workbench", "family-recipe-plan.json");
+const FAMILY_TOP_RECIPE_BLUEPRINTS_PATH = path.join(ROOT, "data", "recipe-workbench", "family-top-recipe-blueprints.json");
 const HOME_LINK_COVERAGE_REPORT_PATH = path.join(ROOT, "data", "reports", "home-link-coverage.json");
 const REFERENCE_LIVE_DIR = path.join(ROOT, "data", "raw", "reference-live");
 const REFERENCE_LIVE_FALLBACK_DIR = path.join(ROOT, "data", "reference-live");
 const GNB_STATE_DIR = path.join(ROOT, "data", "debug", "gnb-state");
 const CURRENT_LIVE_HOME_DOM_PATH = path.join(ROOT, "data", "debug", "live-home-current-dom.html");
+const RUNTIME_DIR = path.join(ROOT, "data", "runtime");
+const ROUTE_TRACE_PATH = path.join(RUNTIME_DIR, "route-trace.jsonl");
+const SHARE_LINKS_PATH = path.join(RUNTIME_DIR, "share-links.json");
+const CONCEPT_PACKAGES_PATH = path.join(RUNTIME_DIR, "concept-packages.json");
+const JOURNEY_FLOWS_PATH = path.join(RUNTIME_DIR, "journey-flows.json");
+const JOURNEY_BUILDS_PATH = path.join(RUNTIME_DIR, "journey-builds.json");
+const JOURNEY_DEFINITIONS_PATH = path.join(ROOT, "data", "normalized", "journey-definitions.json");
+const ROUTE_TRACE_ENABLED = String(process.env.ROUTE_TRACE_ENABLED || "1").trim() !== "0";
 const DEFAULT_CANVAS_WIDTH = 1460;
 const DEFAULT_COMPARE_CANVAS_HEIGHT = 2600;
 const LIVE_MEASUREMENTS = new Map();
+const INTERNAL_VISUAL_CRITIC_KEY = String(process.env.INTERNAL_VISUAL_CRITIC_KEY || crypto.randomUUID()).trim();
 const PAGE_COMPUTE_CACHE_TTL_MS = 15000;
+const PAGE_COMPUTE_CACHE_MAX_ENTRIES = 250;
+const RUNTIME_JOB_RETENTION_MS = Math.max(5 * 60 * 1000, Number(process.env.RUNTIME_JOB_RETENTION_MS || 60 * 60 * 1000));
+const RUNTIME_JOB_CACHE_MAX_ENTRIES = Math.max(10, Number(process.env.RUNTIME_JOB_CACHE_MAX_ENTRIES || 80));
 const WORKING_COMPONENT_INVENTORY_CACHE = new Map();
 const WORKING_EDITABILITY_CACHE = new Map();
 const WORKING_SHARE_SECTION_REGISTRY_CACHE = new Map();
@@ -82,6 +177,23 @@ const PRE_LLM_GAP_CACHE = new Map();
 const ACCEPTANCE_RESULTS_CACHE = new Map();
 const LLM_PROGRESS_CACHE = new Map();
 const DESIGN_REFERENCE_LIBRARY_CACHE = new Map();
+const ASSET_PIPELINE_CACHE = new Map();
+const COMPONENT_REBUILD_SCHEMA_CACHE = new Map();
+const PRIMITIVE_COMPOSITION_CATALOG_CACHE = new Map();
+const STYLE_RUNTIME_TOKEN_PRESETS_CACHE = new Map();
+const SECTION_FAMILY_CONTRACTS_CACHE = new Map();
+const PAGE_BUILDER_PROMPT_BLUEPRINTS_CACHE = new Map();
+const FAMILY_RECIPE_PLAN_CACHE = new Map();
+const FAMILY_TOP_RECIPE_BLUEPRINTS_CACHE = new Map();
+const IMAGE_GENERATION_RUNTIME_STATE = {
+  unavailableUntil: 0,
+  lastReason: "",
+};
+const GENERATED_ASSET_CACHE_STATE = {
+  signature: "",
+  payload: null,
+};
+const FULL_COMPLETION_REPORT_CACHE = new Map();
 const HOME_LAYOUT_TOKENS = {
   desktopCanvasWidth: 1460,
   shellNarrowWidth: 1380,
@@ -362,14 +474,30 @@ function isRenderableBuilderSlot(pageId, slotId) {
   return true;
 }
 
+function pruneRuntimeCache(cache, { now = Date.now(), ttlMs = PAGE_COMPUTE_CACHE_TTL_MS, maxEntries = PAGE_COMPUTE_CACHE_MAX_ENTRIES } = {}) {
+  if (!cache || typeof cache.entries !== "function") return;
+  for (const [entryKey, entry] of cache.entries()) {
+    if (entry && Number(entry.at || 0) && now - Number(entry.at || 0) > ttlMs) {
+      cache.delete(entryKey);
+    }
+  }
+  while (cache.size > maxEntries) {
+    const oldestKey = cache.keys().next().value;
+    cache.delete(oldestKey);
+  }
+}
+
 function readCachedValue(cache, key, compute, ttlMs = PAGE_COMPUTE_CACHE_TTL_MS) {
   const now = Date.now();
   const cached = cache.get(key);
   if (cached && now - cached.at <= ttlMs) {
+    cache.delete(key);
+    cache.set(key, cached);
     return cached.value;
   }
   const value = compute();
   cache.set(key, { at: now, value });
+  pruneRuntimeCache(cache, { now, ttlMs });
   return value;
 }
 
@@ -420,9 +548,1983 @@ function sendRawHtml(res, status, html) {
   res.end(html);
 }
 
+function sendStaticWebAsset(res, fileName = "") {
+  const safeName = String(fileName || "").replace(/^\/+/, "");
+  const filePath = path.join(STATIC_DIR, safeName);
+  const normalizedRoot = path.resolve(STATIC_DIR);
+  const normalizedPath = path.resolve(filePath);
+  if (!normalizedPath.startsWith(`${normalizedRoot}${path.sep}`)) {
+    return sendJson(res, 400, { error: "static_path_invalid" });
+  }
+  if (!fs.existsSync(normalizedPath)) {
+    return sendJson(res, 404, { error: "static_asset_not_found", file: safeName });
+  }
+  const ext = path.extname(normalizedPath).toLowerCase();
+  const contentType =
+    ext === ".js"
+      ? "text/javascript; charset=utf-8"
+      : ext === ".css"
+        ? "text/css; charset=utf-8"
+        : ext === ".svg"
+          ? "image/svg+xml"
+          : "application/octet-stream";
+  res.writeHead(200, {
+    "Content-Type": contentType,
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  });
+  fs.createReadStream(normalizedPath).pipe(res);
+}
+
+function sendReviewPackAsset(res, requestPath = "") {
+  const safeName = String(requestPath || "").replace(/^\/+/, "") || "index.html";
+  const root = path.join(ROOT, "docs", "snapshots");
+  const normalizedRoot = path.resolve(root);
+  const normalizedPath = path.resolve(path.join(root, safeName));
+  if (normalizedPath !== normalizedRoot && !normalizedPath.startsWith(`${normalizedRoot}${path.sep}`)) {
+    return sendJson(res, 400, { error: "review_pack_path_invalid" });
+  }
+  const statPath = fs.existsSync(normalizedPath) && fs.statSync(normalizedPath).isDirectory()
+    ? path.join(normalizedPath, "index.html")
+    : normalizedPath;
+  if (!fs.existsSync(statPath)) {
+    return sendJson(res, 404, { error: "review_pack_asset_not_found", file: safeName });
+  }
+  const ext = path.extname(statPath).toLowerCase();
+  const contentType =
+    ext === ".html"
+      ? "text/html; charset=utf-8"
+      : ext === ".json"
+        ? "application/json; charset=utf-8"
+        : ext === ".jpg" || ext === ".jpeg"
+          ? "image/jpeg"
+          : ext === ".png"
+            ? "image/png"
+            : "application/octet-stream";
+  res.writeHead(200, {
+    "Content-Type": contentType,
+    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  });
+  fs.createReadStream(statPath).pipe(res);
+}
+
+function injectComponentSelectionRuntime(html = "", context = {}) {
+  const source = String(html || "");
+  if (!source.trim()) return source;
+  const selectMode = String(context.selectMode || "component").trim().toLowerCase();
+  const selectSource = String(context.source || context.selectSource || "runtime-draft").trim() || "runtime-draft";
+  const contextJson = JSON.stringify({
+    pageId: String(context.pageId || "").trim(),
+    viewportProfile: normalizeViewportProfile(context.viewportProfile || "pc", "pc"),
+    draftBuildId: String(context.draftBuildId || "").trim(),
+    source: selectSource,
+    selectMode: selectMode === "revision" || selectMode === "revise" ? "revision" : "component",
+  });
+  const selectionRuntime = `
+<style data-codex-selection-runtime>
+  .codex-selection-toolbar {
+    position: fixed;
+    left: 50%;
+    top: 14px;
+    z-index: 2147483647;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.94);
+    color: #fff;
+    box-shadow: 0 18px 50px rgba(15, 23, 42, 0.28);
+    font: 700 12px/1.3 Arial, sans-serif;
+  }
+  .codex-selection-toolbar button {
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 5px 9px;
+    font: inherit;
+    cursor: pointer;
+  }
+  .codex-selection-hover {
+    outline: 3px solid #2563eb !important;
+    outline-offset: -3px !important;
+    cursor: crosshair !important;
+  }
+  .codex-selection-picked {
+    outline: 3px solid #16a34a !important;
+    outline-offset: -3px !important;
+  }
+  .codex-selection-hit-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483645;
+    pointer-events: none;
+  }
+  .codex-selection-hit-zone {
+    position: fixed;
+    box-sizing: border-box;
+    border: 2px solid transparent;
+    background: transparent;
+    pointer-events: auto;
+    cursor: crosshair;
+  }
+  .codex-selection-hit-zone:hover,
+  .codex-selection-hit-zone.is-hover {
+    border-color: #2563eb;
+    background: rgba(37, 99, 235, 0.04);
+  }
+  .codex-selection-form {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    z-index: 2147483647;
+    transform: translateX(-50%);
+    width: min(560px, calc(100vw - 28px));
+    border: 1px solid rgba(15, 23, 42, 0.16);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.98);
+    color: #0f172a;
+    box-shadow: 0 22px 70px rgba(15, 23, 42, 0.28);
+    padding: 16px;
+    font: 500 13px/1.45 Arial, sans-serif;
+  }
+  .codex-selection-form[hidden] {
+    display: none !important;
+  }
+  .codex-selection-form strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .codex-selection-form textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 96px;
+    resize: vertical;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 12px;
+    color: #0f172a;
+    font: 500 13px/1.45 Arial, sans-serif;
+  }
+  .codex-selection-form .row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .codex-selection-form button {
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #fff;
+    color: #0f172a;
+    padding: 8px 12px;
+    font: 700 12px/1.2 Arial, sans-serif;
+    cursor: pointer;
+  }
+  .codex-selection-form button.primary {
+    border-color: #0f172a;
+    background: #0f172a;
+    color: #fff;
+  }
+</style>
+<script data-codex-selection-runtime>
+(() => {
+  const context = ${contextJson};
+  const targetSelector = '[data-codex-component-id], [data-codex-slot]';
+  let activeNode = null;
+  let pickedPayload = null;
+  let zoneNodes = [];
+  const toolbar = document.createElement('div');
+  toolbar.className = 'codex-selection-toolbar';
+  toolbar.innerHTML = '<span>' + (context.selectMode === 'revision' ? '수정할 결과 영역을 클릭하세요' : '범위로 지정할 화면 영역을 클릭하세요') + '</span><button type="button" data-codex-selection-close>닫기</button>';
+  document.documentElement.appendChild(toolbar);
+  const form = document.createElement('div');
+  form.className = 'codex-selection-form';
+  form.hidden = true;
+  form.innerHTML = '<strong data-codex-selection-form-title>선택 영역 수정 요청</strong><textarea data-codex-selection-request placeholder="이 영역만 어떻게 바꿀지 입력하세요. 예: 헤드라인을 더 짧게, CTA를 구매 중심으로, 이미지 비중을 줄여줘"></textarea><div class="row"><button type="button" data-codex-selection-cancel>다시 선택</button><button class="primary" type="button" data-codex-selection-submit>바로 빌더 재실행</button></div>';
+  document.documentElement.appendChild(form);
+  const hitLayer = document.createElement('div');
+  hitLayer.className = 'codex-selection-hit-layer';
+  document.documentElement.appendChild(hitLayer);
+
+  function findTarget(node) {
+    return node && node.closest ? node.closest(targetSelector) : null;
+  }
+
+  function clearHover() {
+    if (activeNode) activeNode.classList.remove('codex-selection-hover');
+    activeNode = null;
+  }
+
+  function describeNode(node) {
+    const text = String(node?.innerText || node?.textContent || '')
+      .replace(/\\s+/g, ' ')
+      .trim()
+      .slice(0, 120);
+    return {
+      type: 'adminResearch.componentSelected',
+      source: context.source || 'runtime-draft',
+      pageId: context.pageId,
+      viewportProfile: context.viewportProfile,
+      draftBuildId: context.draftBuildId,
+      componentId: String(node?.getAttribute('data-codex-component-id') || '').trim(),
+      slotId: String(node?.getAttribute('data-codex-slot') || '').trim(),
+      label: text,
+    };
+  }
+
+  function postToOpener(payload) {
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage(payload, window.location.origin);
+      return true;
+    }
+    return false;
+  }
+
+  function pickNode(target) {
+    if (!target) return;
+    document.querySelectorAll('.codex-selection-picked').forEach((node) => node.classList.remove('codex-selection-picked'));
+    target.classList.add('codex-selection-picked');
+    const payload = describeNode(target);
+    if (context.selectMode === 'revision') {
+      pickedPayload = {
+        ...payload,
+        type: 'adminResearch.componentRevisionRequested',
+      };
+      const title = form.querySelector('[data-codex-selection-form-title]');
+      if (title) title.textContent = (payload.slotId || payload.componentId || '선택 영역') + ' 수정 요청';
+      form.hidden = false;
+      form.querySelector('[data-codex-selection-request]')?.focus();
+      toolbar.querySelector('span').textContent = (payload.slotId || payload.componentId || '선택 영역') + ' 선택됨 · 수정 요청을 입력하세요';
+      return;
+    }
+    postToOpener(payload);
+    toolbar.querySelector('span').textContent = (payload.slotId || payload.componentId || '선택 영역') + ' 선택됨';
+    window.setTimeout(() => window.close(), 420);
+  }
+
+  function buildHitZones() {
+    hitLayer.innerHTML = '';
+    zoneNodes = Array.from(document.querySelectorAll(targetSelector))
+      .map((node) => ({ node, rect: node.getBoundingClientRect() }))
+      .filter((item) => item.rect.width >= 24 && item.rect.height >= 24)
+      .sort((a, b) => (Number(b.rect.width) * Number(b.rect.height)) - (Number(a.rect.width) * Number(a.rect.height)));
+    zoneNodes.forEach((item, index) => {
+      const zone = document.createElement('button');
+      zone.type = 'button';
+      zone.className = 'codex-selection-hit-zone';
+      zone.setAttribute('aria-label', item.node.getAttribute('data-codex-slot') || item.node.getAttribute('data-codex-component-id') || 'select area');
+      zone.dataset.codexSelectionIndex = String(index);
+      zone.style.left = Math.round(item.rect.left) + 'px';
+      zone.style.top = Math.round(item.rect.top) + 'px';
+      zone.style.width = Math.round(item.rect.width) + 'px';
+      zone.style.height = Math.round(item.rect.height) + 'px';
+      hitLayer.appendChild(zone);
+    });
+  }
+
+  function getZoneNode(zone) {
+    const index = Number(zone?.dataset?.codexSelectionIndex || -1);
+    return Number.isInteger(index) && index >= 0 ? zoneNodes[index]?.node || null : null;
+  }
+
+  document.addEventListener('mousemove', (event) => {
+    if (event.target && event.target.closest && event.target.closest('.codex-selection-hit-zone')) return;
+    const target = findTarget(event.target);
+    if (target === activeNode) return;
+    clearHover();
+    activeNode = target;
+    if (activeNode) activeNode.classList.add('codex-selection-hover');
+  }, true);
+
+  hitLayer.addEventListener('mousemove', (event) => {
+    const zone = event.target && event.target.closest ? event.target.closest('.codex-selection-hit-zone') : null;
+    const target = getZoneNode(zone);
+    if (target === activeNode) return;
+    clearHover();
+    activeNode = target;
+    if (activeNode) activeNode.classList.add('codex-selection-hover');
+  }, true);
+
+  hitLayer.addEventListener('click', (event) => {
+    const zone = event.target && event.target.closest ? event.target.closest('.codex-selection-hit-zone') : null;
+    if (!zone) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pickNode(getZoneNode(zone));
+  }, true);
+
+  document.addEventListener('click', (event) => {
+    const close = event.target && event.target.closest ? event.target.closest('[data-codex-selection-close]') : null;
+    if (close) {
+      event.preventDefault();
+      window.close();
+      return;
+    }
+    const target = findTarget(event.target);
+    if (!target) return;
+    event.preventDefault();
+    event.stopPropagation();
+    pickNode(target);
+  }, true);
+
+  form.addEventListener('click', (event) => {
+    const cancel = event.target && event.target.closest ? event.target.closest('[data-codex-selection-cancel]') : null;
+    if (cancel) {
+      event.preventDefault();
+      form.hidden = true;
+      pickedPayload = null;
+      document.querySelectorAll('.codex-selection-picked').forEach((node) => node.classList.remove('codex-selection-picked'));
+      toolbar.querySelector('span').textContent = '수정할 결과 영역을 클릭하세요';
+      return;
+    }
+    const submit = event.target && event.target.closest ? event.target.closest('[data-codex-selection-submit]') : null;
+    if (!submit) return;
+    event.preventDefault();
+    const requestText = String(form.querySelector('[data-codex-selection-request]')?.value || '').trim();
+    if (!requestText) {
+      alert('수정 요청을 입력해 주세요.');
+      form.querySelector('[data-codex-selection-request]')?.focus();
+      return;
+    }
+    const ok = postToOpener({
+      ...(pickedPayload || {}),
+      requestText,
+    });
+    toolbar.querySelector('span').textContent = ok ? '빌더 재실행 요청을 보냈습니다' : 'admin 화면을 찾지 못했습니다';
+    window.setTimeout(() => window.close(), ok ? 520 : 1200);
+  }, true);
+  window.addEventListener('scroll', () => window.requestAnimationFrame(buildHitZones), { passive: true });
+  window.addEventListener('resize', () => window.requestAnimationFrame(buildHitZones), { passive: true });
+  window.setTimeout(buildHitZones, 80);
+  window.setTimeout(buildHitZones, 700);
+})();
+</script>`;
+  if (/<\/body>/i.test(source)) return source.replace(/<\/body>/i, `${selectionRuntime}\n</body>`);
+  return `${source}\n${selectionRuntime}`;
+}
+
+function ensureParentDir(filePath) {
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+}
+
+function readShareLinks() {
+  try {
+    return readJsonFile(SHARE_LINKS_PATH);
+  } catch {
+    return { links: [] };
+  }
+}
+
+function writeShareLinks(payload = {}) {
+  ensureParentDir(SHARE_LINKS_PATH);
+  fs.writeFileSync(SHARE_LINKS_PATH, `${JSON.stringify({ links: Array.isArray(payload.links) ? payload.links : [] }, null, 2)}\n`, "utf8");
+}
+
+function readConceptPackages() {
+  try {
+    return readJsonFile(CONCEPT_PACKAGES_PATH);
+  } catch {
+    return { packages: [] };
+  }
+}
+
+function writeConceptPackages(payload = {}) {
+  ensureParentDir(CONCEPT_PACKAGES_PATH);
+  fs.writeFileSync(CONCEPT_PACKAGES_PATH, `${JSON.stringify({ packages: Array.isArray(payload.packages) ? payload.packages : [] }, null, 2)}\n`, "utf8");
+}
+
+function readJourneyDefinitions() {
+  try {
+    const payload = readJsonFile(JOURNEY_DEFINITIONS_PATH);
+    return {
+      journeys: Array.isArray(payload?.journeys) ? payload.journeys : [],
+    };
+  } catch {
+    return { journeys: [] };
+  }
+}
+
+function readJourneyFlows() {
+  try {
+    return readJsonFile(JOURNEY_FLOWS_PATH);
+  } catch {
+    return { flows: [] };
+  }
+}
+
+function writeJourneyFlows(payload = {}) {
+  ensureParentDir(JOURNEY_FLOWS_PATH);
+  fs.writeFileSync(JOURNEY_FLOWS_PATH, `${JSON.stringify({ flows: Array.isArray(payload.flows) ? payload.flows : [] }, null, 2)}\n`, "utf8");
+}
+
+function readJourneyBuilds() {
+  try {
+    return readJsonFile(JOURNEY_BUILDS_PATH);
+  } catch {
+    return { builds: [] };
+  }
+}
+
+function writeJourneyBuilds(payload = {}) {
+  ensureParentDir(JOURNEY_BUILDS_PATH);
+  fs.writeFileSync(JOURNEY_BUILDS_PATH, `${JSON.stringify({ builds: Array.isArray(payload.builds) ? payload.builds : [] }, null, 2)}\n`, "utf8");
+}
+
+function normalizeStoredJourneyBuild(job = {}) {
+  return {
+    id: String(job.id || "").trim(),
+    userId: String(job.userId || "").trim(),
+    loginId: String(job.loginId || "").trim(),
+    sourcePageId: String(job.sourcePageId || job.pageId || "").trim(),
+    planId: String(job.planId || "").trim(),
+    journeyId: String(job.journeyId || "").trim(),
+    viewportProfile: normalizeViewportProfile(job.viewportProfile || "pc", "pc"),
+    status: String(job.status || "unknown").trim(),
+    dryRun: job.dryRun === true,
+    startedAt: job.startedAt || null,
+    finishedAt: job.finishedAt || null,
+    currentPageId: String(job.currentPageId || "").trim(),
+    journeyFlow: job.journeyFlow && typeof job.journeyFlow === "object" ? JSON.parse(JSON.stringify(job.journeyFlow)) : null,
+    results: Array.isArray(job.results) ? JSON.parse(JSON.stringify(job.results)) : [],
+    linkRewrites: Array.isArray(job.linkRewrites) ? JSON.parse(JSON.stringify(job.linkRewrites)) : [],
+    error: String(job.error || "").trim(),
+    updatedAt: String(job.updatedAt || new Date().toISOString()),
+  };
+}
+
+function saveJourneyBuildRecord(job = {}) {
+  const nextRecord = normalizeStoredJourneyBuild({
+    ...job,
+    updatedAt: new Date().toISOString(),
+  });
+  if (!nextRecord.id || !nextRecord.userId) return null;
+  const payload = readJourneyBuilds();
+  const builds = Array.isArray(payload.builds) ? payload.builds : [];
+  const existingIndex = builds.findIndex((item) => String(item?.id || "").trim() === nextRecord.id);
+  if (existingIndex >= 0) builds.splice(existingIndex, 1);
+  builds.unshift(nextRecord);
+  writeJourneyBuilds({ builds: builds.slice(0, 300) });
+  return nextRecord;
+}
+
+function listJourneyBuildRecords(userId = "", { pageId = "", journeyId = "", viewportProfile = "", limit = 20 } = {}) {
+  const normalizedUserId = String(userId || "").trim();
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedJourneyId = String(journeyId || "").trim();
+  const normalizedViewportProfile = String(viewportProfile || "").trim();
+  return (Array.isArray(readJourneyBuilds().builds) ? readJourneyBuilds().builds : [])
+    .filter((item) => String(item?.userId || "").trim() === normalizedUserId)
+    .filter((item) => !normalizedPageId || String(item?.sourcePageId || item?.pageId || "").trim() === normalizedPageId)
+    .filter((item) => !normalizedJourneyId || String(item?.journeyId || "").trim() === normalizedJourneyId)
+    .filter((item) => !normalizedViewportProfile || normalizeViewportProfile(item?.viewportProfile, "pc") === normalizeViewportProfile(normalizedViewportProfile, "pc"))
+    .sort((a, b) => String(b.updatedAt || b.finishedAt || b.startedAt || "").localeCompare(String(a.updatedAt || a.finishedAt || a.startedAt || "")))
+    .slice(0, Math.max(1, Math.min(100, Number(limit) || 20)));
+}
+
+function findJourneyBuildRecord(journeyBuildId = "") {
+  const normalizedId = String(journeyBuildId || "").trim();
+  if (!normalizedId) return null;
+  return (Array.isArray(readJourneyBuilds().builds) ? readJourneyBuilds().builds : [])
+    .find((item) => String(item?.id || "").trim() === normalizedId) || null;
+}
+
+function normalizeJourneyPageRef(ref = {}) {
+  if (typeof ref === "string") {
+    return { pageId: String(ref || "").trim(), viewportProfiles: ["pc", "mo"], role: "" };
+  }
+  return {
+    pageId: String(ref?.pageId || "").trim(),
+    viewportProfiles: Array.isArray(ref?.viewportProfiles) && ref.viewportProfiles.length
+      ? ref.viewportProfiles.map((item) => normalizeViewportProfile(item, "pc"))
+      : ["pc", "mo"],
+    role: String(ref?.role || "").trim(),
+    sourceType: String(ref?.sourceType || "live-clone").trim(),
+  };
+}
+
+function findJourneyDefinition(journeyId = "") {
+  const normalizedJourneyId = String(journeyId || "").trim();
+  if (!normalizedJourneyId) return null;
+  return (readJourneyDefinitions().journeys || [])
+    .find((item) => String(item?.id || "").trim() === normalizedJourneyId) || null;
+}
+
+function buildJourneyFlowFromInput(input = {}, options = {}) {
+  const source = input && typeof input === "object" ? input : {};
+  const viewportProfile = normalizeViewportProfile(source.viewportProfile || options.viewportProfile || "pc", "pc");
+  const journeyId = String(source.journeyId || "").trim();
+  const journeyMode = String(source.journeyMode || (journeyId ? "journey" : "page")).trim() || "page";
+  const allowPresetFlow =
+    source.allowPresetJourneyFlow === true ||
+    String(source.journeyDiscoveryMode || "").trim() === "flow-preset";
+  if (!allowPresetFlow) return null;
+  const journeyDefinition = findJourneyDefinition(journeyId);
+  if (journeyMode !== "journey" || !journeyDefinition) return null;
+  const pages = (Array.isArray(journeyDefinition.pages) ? journeyDefinition.pages : [])
+    .map(normalizeJourneyPageRef)
+    .filter((pageRef) => pageRef.pageId && pageRef.viewportProfiles.includes(viewportProfile))
+    .map((pageRef, index, list) => ({
+      order: index + 1,
+      pageId: pageRef.pageId,
+      viewportProfile,
+      role: pageRef.role || "",
+      sourceType: pageRef.sourceType || "live-clone",
+      goal: pageRef.role ? `${pageRef.role} 역할을 수행합니다.` : "여정 안에서 다음 행동을 명확히 연결합니다.",
+      ctaLabel: index < list.length - 1 ? "다음 단계 보기" : "완료 후 추천 보기",
+      nextPageId: list[index + 1]?.pageId || "",
+    }));
+  if (!pages.length) return null;
+  return {
+    journeyId,
+    journeyLabel: String(journeyDefinition.label || journeyId).trim(),
+    journeyDescription: String(journeyDefinition.description || "").trim(),
+    source: String(source.journeyDiscoveryMode || "preset").trim() || "preset",
+    executionApproved: source.executionApproved === true,
+    viewportProfile,
+    pages,
+  };
+}
+
+function buildJourneyStrategyFromInput(input = {}) {
+  const source = input && typeof input === "object" ? input : {};
+  const journeyId = String(source.journeyId || "").trim();
+  if (!journeyId) return null;
+  const definition = findJourneyDefinition(journeyId);
+  return {
+    id: journeyId,
+    label: String(definition?.label || journeyId).trim(),
+    description: String(definition?.description || "").trim(),
+    mode: "strategy-input",
+  };
+}
+
+function isExecutableJourneyFlow(flow = {}) {
+  if (!flow || typeof flow !== "object" || !Array.isArray(flow.pages) || !flow.pages.length) return false;
+  const source = String(flow.source || "").trim();
+  return flow.executionApproved === true || ["manual", "approved", "llm-approved"].includes(source);
+}
+
+function normalizeJourneyFlowRecord(flowInput = {}, { userId = "" } = {}) {
+  const now = new Date().toISOString();
+  const flow = flowInput?.journeyFlow && typeof flowInput.journeyFlow === "object"
+    ? flowInput.journeyFlow
+    : flowInput;
+  return {
+    id: String(flowInput.id || `journey-flow-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`).trim(),
+    userId: String(userId || flowInput.userId || "").trim(),
+    planId: String(flowInput.planId || "").trim(),
+    sourcePageId: String(flowInput.sourcePageId || flowInput.pageId || "").trim(),
+    viewportProfile: normalizeViewportProfile(flowInput.viewportProfile || flow?.viewportProfile || "pc", "pc"),
+    journeyId: String(flowInput.journeyId || flow?.journeyId || "").trim(),
+    journeyFlow: flow && typeof flow === "object" ? JSON.parse(JSON.stringify(flow)) : {},
+    createdAt: String(flowInput.createdAt || now),
+    updatedAt: now,
+  };
+}
+
+function saveJourneyFlow(userId = "", flowInput = {}) {
+  const payload = readJourneyFlows();
+  const flows = Array.isArray(payload.flows) ? payload.flows : [];
+  const nextFlow = normalizeJourneyFlowRecord(flowInput, { userId });
+  if (!nextFlow.journeyId || !Array.isArray(nextFlow.journeyFlow?.pages) || !nextFlow.journeyFlow.pages.length) {
+    return null;
+  }
+  const existingIndex = flows.findIndex((item) =>
+    String(item?.id || "").trim() === nextFlow.id ||
+    (
+      String(item?.userId || "").trim() === String(userId || "").trim() &&
+      String(item?.planId || "").trim() === nextFlow.planId &&
+      String(item?.sourcePageId || "").trim() === nextFlow.sourcePageId &&
+      String(item?.viewportProfile || "").trim() === nextFlow.viewportProfile
+    )
+  );
+  if (existingIndex >= 0) {
+    nextFlow.id = String(flows[existingIndex]?.id || nextFlow.id).trim();
+    nextFlow.createdAt = String(flows[existingIndex]?.createdAt || nextFlow.createdAt);
+    flows.splice(existingIndex, 1);
+  }
+  flows.unshift(nextFlow);
+  writeJourneyFlows({ flows: flows.slice(0, 500) });
+  return nextFlow;
+}
+
+function findConceptPackageById(packageId = "") {
+  const normalizedPackageId = String(packageId || "").trim();
+  if (!normalizedPackageId) return null;
+  return (readConceptPackages().packages || []).find((item) => String(item?.id || "").trim() === normalizedPackageId) || null;
+}
+
+function calculateConceptPackageConsistency(pkg = {}) {
+  const assignedPages = Array.isArray(pkg?.assignedPages) ? pkg.assignedPages : [];
+  const total = assignedPages.length;
+  const built = assignedPages.filter((item) => String(item?.draftBuildId || item?.versionId || "").trim()).length;
+  const stale = assignedPages.filter((item) => String(item?.status || "").trim() === "stale").length;
+  const missing = Math.max(0, total - built);
+  const score = total ? Math.max(0, Math.round(((built - stale) / total) * 100)) : 0;
+  return { score, total, built, stale, missing };
+}
+
+function saveConceptPackage(userId = "", packageInput = {}) {
+  const payload = readConceptPackages();
+  const packages = Array.isArray(payload.packages) ? payload.packages : [];
+  const now = new Date().toISOString();
+  const id = String(packageInput.id || packageInput.conceptId || `concept-${Date.now()}`).trim();
+  const nextPackage = {
+    id,
+    userId: String(userId || "").trim(),
+    name: String(packageInput.name || packageInput.title || id).trim(),
+    sourcePageId: String(packageInput.sourcePageId || packageInput.createdFrom || "").trim(),
+    viewportProfile: normalizeViewportProfile(packageInput.viewportProfile || "pc", "pc"),
+    journeyId: String(packageInput.journeyId || "").trim(),
+    dna: packageInput.dna && typeof packageInput.dna === "object" ? JSON.parse(JSON.stringify(packageInput.dna)) : {},
+    summary: String(packageInput.summary || "").trim(),
+    assignedPages: Array.isArray(packageInput.assignedPages) ? packageInput.assignedPages.map((item) => ({ ...item })) : [],
+    createdAt: String(packageInput.createdAt || now),
+    updatedAt: now,
+  };
+  const existingIndex = packages.findIndex((item) => String(item?.id || "").trim() === id);
+  if (existingIndex >= 0) packages.splice(existingIndex, 1);
+  packages.unshift(nextPackage);
+  writeConceptPackages({ packages: packages.slice(0, 200) });
+  return nextPackage;
+}
+
+function assignConceptPackage(packageId = "", assignment = {}) {
+  const payload = readConceptPackages();
+  const packages = Array.isArray(payload.packages) ? payload.packages : [];
+  const index = packages.findIndex((item) => String(item?.id || "").trim() === String(packageId || "").trim());
+  if (index < 0) return null;
+  const existing = packages[index];
+  const assignedPages = Array.isArray(assignment.assignedPages)
+    ? assignment.assignedPages
+    : Array.isArray(assignment.pages)
+      ? assignment.pages
+      : [];
+  const next = {
+    ...existing,
+    journeyId: String(assignment.journeyId || existing.journeyId || "").trim(),
+    assignedPages: assignedPages.map((item) => ({
+      pageId: String(item?.pageId || item || "").trim(),
+      viewportProfile: normalizeViewportProfile(item?.viewportProfile || existing.viewportProfile || "pc", "pc"),
+      role: String(item?.role || "").trim(),
+      status: String(item?.status || "assigned").trim() || "assigned",
+      draftBuildId: String(item?.draftBuildId || "").trim(),
+      versionId: String(item?.versionId || "").trim(),
+      assignedAt: String(item?.assignedAt || new Date().toISOString()),
+    })).filter((item) => item.pageId),
+    updatedAt: new Date().toISOString(),
+  };
+  packages[index] = next;
+  writeConceptPackages({ packages });
+  return next;
+}
+
+const batchedComposeJobs = new Map();
+const journeyBuildJobs = new Map();
+
+function pruneRuntimeJobs(jobMap) {
+  if (!jobMap || typeof jobMap.entries !== "function") return;
+  const now = Date.now();
+  for (const [jobId, job] of jobMap.entries()) {
+    const isRunning = String(job?.status || "").trim() === "running";
+    if (isRunning) continue;
+    const finishedAtMs = Date.parse(job?.finishedAt || job?.startedAt || "");
+    if (Number.isFinite(finishedAtMs) && now - finishedAtMs > RUNTIME_JOB_RETENTION_MS) {
+      jobMap.delete(jobId);
+    }
+  }
+  while (jobMap.size > RUNTIME_JOB_CACHE_MAX_ENTRIES) {
+    const oldestKey = jobMap.keys().next().value;
+    const oldestJob = jobMap.get(oldestKey);
+    if (String(oldestJob?.status || "").trim() === "running") break;
+    jobMap.delete(oldestKey);
+  }
+}
+
+function rememberRuntimeJob(jobMap, jobId, job) {
+  pruneRuntimeJobs(jobMap);
+  jobMap.set(jobId, job);
+}
+
+function summarizeBatchedComposeJob(job = {}) {
+  return {
+    id: String(job.id || "").trim(),
+    status: String(job.status || "unknown").trim(),
+    dryRun: job.dryRun === true,
+    pageId: String(job.pageId || "").trim(),
+    viewportProfile: String(job.viewportProfile || "").trim(),
+    startedAt: job.startedAt || null,
+    finishedAt: job.finishedAt || null,
+    exitCode: Number.isFinite(job.exitCode) ? job.exitCode : null,
+    previewUrl: job.previewUrl || "",
+    compareUrl: job.compareUrl || "",
+    draftBuildId: job.draftBuildId || "",
+    stdoutTail: String(job.stdout || "").slice(-6000),
+    stderrTail: String(job.stderr || "").slice(-6000),
+    result: job.result || null,
+    error: job.error || "",
+  };
+}
+
+function summarizeJourneyBuildJob(job = {}) {
+  return {
+    id: String(job.id || "").trim(),
+    status: String(job.status || "unknown").trim(),
+    journeyId: String(job.journeyId || "").trim(),
+    viewportProfile: String(job.viewportProfile || "").trim(),
+    startedAt: job.startedAt || null,
+    finishedAt: job.finishedAt || null,
+    results: Array.isArray(job.results) ? job.results : [],
+    linkRewrites: Array.isArray(job.linkRewrites) ? job.linkRewrites : [],
+    currentPageId: String(job.currentPageId || "").trim(),
+    stdoutTail: String(job.stdout || "").slice(-6000),
+    stderrTail: String(job.stderr || "").slice(-6000),
+    error: job.error || "",
+  };
+}
+
+function summarizeJourneyBuildRecord(record = {}) {
+  return summarizeJourneyBuildJob(record);
+}
+
+function parseLastJsonObject(text = "") {
+  const source = String(text || "");
+  for (let index = source.lastIndexOf("{"); index >= 0; index = source.lastIndexOf("{", index - 1)) {
+    const candidate = source.slice(index).trim();
+    try {
+      return JSON.parse(candidate);
+    } catch {}
+  }
+  return null;
+}
+
+function startBatchedComposeJob({ user, req, payload = {} } = {}) {
+  const pageId = String(payload.pageId || "home").trim() || "home";
+  const viewportProfile = normalizeViewportProfile(payload.viewportProfile || "mo", "mo");
+  const jobId = `batched-compose-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
+  const baseUrl = String(payload.baseUrl || `http://${req.headers.host || `127.0.0.1:${PORT}`}`).replace(/\/$/, "");
+  const args = [
+    path.join(ROOT, "scripts", "run_batched_model_compare_and_compose.mjs"),
+    "--page", pageId,
+    "--viewport", viewportProfile,
+    "--batch-size", String(payload.batchSize || 4),
+    "--base-url", baseUrl,
+    "--login", String(user?.loginId || "").trim(),
+    "--run-id", jobId,
+  ];
+  const passThrough = {
+    request: payload.requestText || payload.request,
+    message: payload.keyMessage || payload.message,
+    direction: payload.preferredDirection || payload.direction,
+    avoid: payload.avoidDirection || payload.avoid,
+    tone: payload.toneAndMood || payload.tone,
+    level: payload.designChangeLevel || payload.level,
+    components: Array.isArray(payload.components) ? payload.components.join(",") : payload.components,
+    "claude-model": payload.claudeModel,
+    "baseline-model": payload.baselineModel,
+  };
+  Object.entries(passThrough).forEach(([key, value]) => {
+    const normalized = String(value || "").trim();
+    if (normalized) args.push(`--${key}`, normalized);
+  });
+  if (payload.dryRun === true) args.push("--dry-run");
+  const job = {
+    id: jobId,
+    userId: user.userId,
+    loginId: user.loginId,
+    pageId,
+    viewportProfile,
+    status: "running",
+    dryRun: payload.dryRun === true,
+    startedAt: new Date().toISOString(),
+    finishedAt: null,
+    stdout: "",
+    stderr: "",
+    result: null,
+    error: "",
+  };
+  rememberRuntimeJob(batchedComposeJobs, jobId, job);
+  const child = spawn(process.execPath, args, {
+    cwd: ROOT,
+    env: process.env,
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  job.pid = child.pid;
+  child.stdout.on("data", (chunk) => {
+    job.stdout += chunk.toString();
+    if (job.stdout.length > 200000) job.stdout = job.stdout.slice(-200000);
+  });
+  child.stderr.on("data", (chunk) => {
+    job.stderr += chunk.toString();
+    if (job.stderr.length > 100000) job.stderr = job.stderr.slice(-100000);
+  });
+  child.on("error", (error) => {
+    job.status = "failed";
+    job.error = String(error?.message || error);
+    job.finishedAt = new Date().toISOString();
+  });
+  child.on("close", (code) => {
+    job.exitCode = Number(code);
+    job.finishedAt = new Date().toISOString();
+    const result = parseLastJsonObject(job.stdout);
+    job.result = result;
+    const compose = result?.compose || result;
+    job.draftBuildId = String(compose?.draftBuildId || "").trim();
+    job.previewUrl = String(compose?.previewUrl || "").trim();
+    job.compareUrl = String(compose?.compareUrl || "").trim();
+    job.status = code === 0 && result?.ok !== false ? "completed" : "failed";
+    if (job.status === "failed" && !job.error) job.error = String(job.stderr || "batched_compose_failed").slice(-2000);
+  });
+  return job;
+}
+
+function runNodeScriptAsync(scriptPath, args = [], { cwd = ROOT, env = process.env } = {}) {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [scriptPath, ...args], {
+      cwd,
+      env,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+      if (stdout.length > 200000) stdout = stdout.slice(-200000);
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+      if (stderr.length > 100000) stderr = stderr.slice(-100000);
+    });
+    child.on("error", (error) => {
+      resolve({ code: 1, stdout, stderr: `${stderr}\n${String(error?.message || error)}`.trim() });
+    });
+    child.on("close", (code) => {
+      resolve({ code: Number(code), stdout, stderr });
+    });
+  });
+}
+
+function escapeRegExp(value = "") {
+  return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function escapeHtmlAttr(value = "") {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function injectJourneyNextLinkIntoHtml(html = "", { ctaLabel = "", targetUrl = "", nextPageId = "" } = {}) {
+  const source = String(html || "");
+  const href = String(targetUrl || "").trim();
+  const label = String(ctaLabel || "다음 단계 보기").trim() || "다음 단계 보기";
+  if (!source || !href) return { html: source, injected: false, strategy: "missing_source_or_target" };
+  const labelPattern = escapeRegExp(label);
+  const anchorPattern = new RegExp(`<a\\b([^>]*)>([\\s\\S]*?${labelPattern}[\\s\\S]*?)<\\/a>`, "i");
+  if (anchorPattern.test(source)) {
+    return {
+      html: source.replace(anchorPattern, (match, attrs, inner) => {
+        const nextAttrs = /href\s*=/i.test(attrs)
+          ? attrs.replace(/href\s*=\s*(['"])[\s\S]*?\1/i, `href="${escapeHtmlAttr(href)}"`)
+          : `${attrs} href="${escapeHtmlAttr(href)}"`;
+        return `<a${nextAttrs} data-journey-next-page="${escapeHtmlAttr(nextPageId)}">${inner}</a>`;
+      }),
+      injected: true,
+      strategy: "rewrite_anchor",
+    };
+  }
+  const buttonPattern = new RegExp(`<button\\b([^>]*)>([\\s\\S]*?${labelPattern}[\\s\\S]*?)<\\/button>`, "i");
+  if (buttonPattern.test(source)) {
+    return {
+      html: source.replace(buttonPattern, (match, attrs, inner) => {
+        const classMatch = String(attrs || "").match(/\bclass\s*=\s*(['"])([\s\S]*?)\1/i);
+        const classAttr = classMatch?.[2] ? ` class="${escapeHtmlAttr(classMatch[2])}"` : "";
+        return `<a href="${escapeHtmlAttr(href)}"${classAttr} data-journey-next-page="${escapeHtmlAttr(nextPageId)}">${inner}</a>`;
+      }),
+      injected: true,
+      strategy: "replace_button",
+    };
+  }
+  const fallbackLink = [
+    `<div class="journey-next-link" data-journey-next-page="${escapeHtmlAttr(nextPageId)}" style="padding:24px;text-align:center">`,
+    `<a href="${escapeHtmlAttr(href)}" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#111;color:#fff;padding:14px 22px;font-weight:700;text-decoration:none">${escapeHtmlAttr(label)}</a>`,
+    `</div>`,
+  ].join("");
+  if (/<\/main>/i.test(source)) {
+    return { html: source.replace(/<\/main>/i, `${fallbackLink}</main>`), injected: true, strategy: "append_to_main" };
+  }
+  if (/<\/body>/i.test(source)) {
+    return { html: source.replace(/<\/body>/i, `${fallbackLink}</body>`), injected: true, strategy: "append_to_body" };
+  }
+  return { html: `${source}${fallbackLink}`, injected: true, strategy: "append_to_document" };
+}
+
+function rewriteJourneyDraftLinks({ userId = "", results = [], flowPages = [] } = {}) {
+  const completedByPageId = new Map(
+    (Array.isArray(results) ? results : [])
+      .filter((item) => item.status === "completed" && item.pageId && item.draftBuildId)
+      .map((item) => [String(item.pageId || "").trim(), item])
+  );
+  return (Array.isArray(flowPages) ? flowPages : []).map((step) => {
+    const pageId = String(step?.pageId || "").trim();
+    const nextPageId = String(step?.nextPageId || "").trim();
+    const ctaLabel = String(step?.ctaLabel || "다음 단계 보기").trim() || "다음 단계 보기";
+    const currentResult = completedByPageId.get(pageId);
+    const nextResult = completedByPageId.get(nextPageId);
+    if (!currentResult?.draftBuildId || !nextResult?.draftBuildId) {
+      return { pageId, nextPageId, status: "skipped", reason: "draft_pair_missing" };
+    }
+    const draftBuild = findDraftBuildById(userId, currentResult.draftBuildId);
+    const renderedHtmlReference =
+      draftBuild?.snapshotData?.renderedHtmlReference && typeof draftBuild.snapshotData.renderedHtmlReference === "object"
+        ? draftBuild.snapshotData.renderedHtmlReference
+        : {};
+    const afterHtml = String(renderedHtmlReference.afterHtml || "").trim();
+    const targetUrl = `/runtime-draft/${encodeURIComponent(nextResult.draftBuildId)}`;
+    const rewrite = injectJourneyNextLinkIntoHtml(afterHtml, { ctaLabel, targetUrl, nextPageId });
+    if (!draftBuild || !rewrite.injected) {
+      return { pageId, nextPageId, status: "skipped", reason: rewrite.strategy || "rewrite_failed" };
+    }
+    saveDraftBuild(userId, {
+      ...draftBuild,
+      snapshotData: {
+        ...(draftBuild.snapshotData && typeof draftBuild.snapshotData === "object" ? draftBuild.snapshotData : {}),
+        renderedHtmlReference: {
+          ...renderedHtmlReference,
+          afterHtml: rewrite.html,
+        },
+        journeyLinkRewrite: {
+          nextPageId,
+          nextDraftBuildId: nextResult.draftBuildId,
+          ctaLabel,
+          targetUrl,
+          strategy: rewrite.strategy,
+          rewrittenAt: new Date().toISOString(),
+        },
+      },
+      report: {
+        ...(draftBuild.report && typeof draftBuild.report === "object" ? draftBuild.report : {}),
+        journeyLinks: [
+          ...(
+            Array.isArray(draftBuild.report?.journeyLinks)
+              ? draftBuild.report.journeyLinks.filter((item) => String(item?.nextPageId || "").trim() !== nextPageId)
+              : []
+          ),
+          { nextPageId, nextDraftBuildId: nextResult.draftBuildId, ctaLabel, targetUrl, strategy: rewrite.strategy },
+        ],
+      },
+    });
+    return { pageId, nextPageId, status: "rewritten", targetUrl, strategy: rewrite.strategy };
+  });
+}
+
+function validateJourneyBuildPayload(payload = {}) {
+  const sourcePageId = String(payload?.pageId || "").trim();
+  const flow = payload?.journeyFlow && typeof payload.journeyFlow === "object" ? payload.journeyFlow : {};
+  const pages = Array.isArray(flow.pages) ? flow.pages : [];
+  const pageIds = pages.map((item) => String(item?.pageId || "").trim()).filter(Boolean);
+  if (!sourcePageId) {
+    return { ok: false, error: "source_page_required" };
+  }
+  if (!pageIds.includes(sourcePageId)) {
+    return {
+      ok: false,
+      error: "journey_source_page_missing",
+      detail: `Current page ${sourcePageId} is not included in this journey flow.`,
+      sourcePageId,
+      journeyId: String(flow?.journeyId || payload?.journeyId || "").trim(),
+      flowPageIds: pageIds,
+    };
+  }
+  return { ok: true };
+}
+
+function validateJourneyFlowForSource({ sourcePageId = "", journeyId = "", journeyFlow = {} } = {}) {
+  const normalizedSourcePageId = String(sourcePageId || "").trim();
+  const normalizedJourneyId = String(journeyId || "").trim();
+  const flow = journeyFlow && typeof journeyFlow === "object" ? journeyFlow : {};
+  const flowJourneyId = String(flow?.journeyId || "").trim();
+  const pageIds = (Array.isArray(flow.pages) ? flow.pages : [])
+    .map((item) => String(item?.pageId || "").trim())
+    .filter(Boolean);
+  if (!normalizedSourcePageId) {
+    return { ok: false, error: "source_page_required" };
+  }
+  if (!pageIds.includes(normalizedSourcePageId)) {
+    return {
+      ok: false,
+      error: "journey_flow_source_page_missing",
+      detail: `Current page ${normalizedSourcePageId} is not included in this journey flow.`,
+      sourcePageId: normalizedSourcePageId,
+      journeyId: flowJourneyId || normalizedJourneyId,
+      flowPageIds: pageIds,
+    };
+  }
+  if (normalizedJourneyId && flowJourneyId && normalizedJourneyId !== flowJourneyId) {
+    return {
+      ok: false,
+      error: "journey_flow_strategy_mismatch",
+      detail: `Plan journey ${normalizedJourneyId} does not match flow journey ${flowJourneyId}.`,
+      sourcePageId: normalizedSourcePageId,
+      journeyId: normalizedJourneyId,
+      flowJourneyId,
+      flowPageIds: pageIds,
+    };
+  }
+  return { ok: true };
+}
+
+function sanitizeInvalidJourneyFlowFromPlanPayload(payload = {}) {
+  if (!payload || typeof payload !== "object") return payload;
+  const requirementPlan = payload?.output?.requirementPlan;
+  const journeyFlow = requirementPlan?.journeyFlow;
+  if (!journeyFlow || typeof journeyFlow !== "object") return payload;
+  const validation = validateJourneyFlowForSource({
+    sourcePageId: payload.pageId,
+    journeyId: payload?.input?.userInput?.journeyId,
+    journeyFlow,
+  });
+  if (validation.ok) return payload;
+  const nextPayload = JSON.parse(JSON.stringify(payload));
+  if (nextPayload?.output?.requirementPlan) {
+    delete nextPayload.output.requirementPlan.journeyFlow;
+  }
+  nextPayload.output = {
+    ...(nextPayload.output || {}),
+    toolContext: {
+      ...((nextPayload.output && nextPayload.output.toolContext) || {}),
+      journeyFlowSanitization: {
+        removedAt: new Date().toISOString(),
+        reason: validation.error,
+        detail: validation.detail,
+        sourcePageId: validation.sourcePageId,
+        journeyId: validation.journeyId,
+        flowJourneyId: validation.flowJourneyId || "",
+        flowPageIds: validation.flowPageIds || [],
+      },
+    },
+  };
+  return nextPayload;
+}
+
+function startJourneyBuildJob({ user, req, payload = {} } = {}) {
+  const flow = payload?.journeyFlow && typeof payload.journeyFlow === "object" ? payload.journeyFlow : {};
+  const pages = (Array.isArray(flow.pages) ? flow.pages : [])
+    .map((item) => ({
+      pageId: String(item?.pageId || "").trim(),
+      role: String(item?.role || "").trim(),
+      sourceType: String(item?.sourceType || "live-clone").trim(),
+      ctaLabel: String(item?.ctaLabel || "").trim(),
+      nextPageId: String(item?.nextPageId || "").trim(),
+    }))
+    .filter((item) => item.pageId);
+  const viewportProfile = normalizeViewportProfile(payload.viewportProfile || flow.viewportProfile || "mo", "mo");
+  const jobId = `journey-build-${Date.now()}-${crypto.randomBytes(4).toString("hex")}`;
+  const baseUrl = String(payload.baseUrl || `http://${req.headers.host || `127.0.0.1:${PORT}`}`).replace(/\/$/, "");
+  const job = {
+    id: jobId,
+    userId: user.userId,
+    loginId: user.loginId,
+    sourcePageId: String(payload.pageId || "").trim(),
+    planId: String(payload.planId || "").trim(),
+    journeyId: String(flow.journeyId || payload.journeyId || "").trim(),
+    viewportProfile,
+    status: "running",
+    startedAt: new Date().toISOString(),
+    finishedAt: null,
+    currentPageId: "",
+    stdout: "",
+    stderr: "",
+    results: [],
+    linkRewrites: [],
+    journeyFlow: flow && typeof flow === "object" ? JSON.parse(JSON.stringify(flow)) : null,
+    error: "",
+  };
+  rememberRuntimeJob(journeyBuildJobs, jobId, job);
+  saveJourneyBuildRecord(job);
+
+  (async () => {
+    const runnablePages = pages.filter((item) => item.sourceType !== "reference-based");
+    const skippedPages = pages.filter((item) => item.sourceType === "reference-based");
+    skippedPages.forEach((item) => {
+      job.results.push({
+        pageId: item.pageId,
+        role: item.role,
+        sourceType: item.sourceType,
+        status: "skipped",
+        reason: "reference_based_page_not_ready",
+      });
+    });
+    if (payload.dryRun === true) {
+      runnablePages.forEach((item) => {
+        job.results.push({
+          pageId: item.pageId,
+          role: item.role,
+          sourceType: item.sourceType,
+          status: "planned",
+        });
+      });
+      job.status = "completed";
+      job.finishedAt = new Date().toISOString();
+      saveJourneyBuildRecord(job);
+      return;
+    }
+    for (const page of runnablePages) {
+      job.currentPageId = page.pageId;
+      const args = [
+        "--page", page.pageId,
+        "--viewport", viewportProfile,
+        "--batch-size", String(payload.batchSize || 4),
+        "--base-url", baseUrl,
+        "--login", String(user?.loginId || "").trim(),
+        "--run-id", `${jobId}-${page.pageId}`,
+      ];
+      if (payload.compareModels !== true) args.push("--single-model");
+      const passThrough = {
+        request: payload.requestText || payload.request,
+        message: payload.keyMessage || payload.message || `${page.role || page.pageId} 단계 디자인 생성`,
+        direction: [
+          payload.preferredDirection || payload.direction || "",
+          page.nextPageId ? `이 페이지의 주요 CTA는 "${page.ctaLabel || "다음 단계 보기"}"이며 다음 단계 ${page.nextPageId}로 이어져야 합니다.` : "",
+        ].filter(Boolean).join("\n"),
+        avoid: payload.avoidDirection || payload.avoid,
+        tone: payload.toneAndMood || payload.tone,
+        level: payload.designChangeLevel || payload.level || "high",
+      };
+      Object.entries(passThrough).forEach(([key, value]) => {
+        const normalized = String(value || "").trim();
+        if (normalized) args.push(`--${key}`, normalized);
+      });
+      const result = await runNodeScriptAsync(path.join(ROOT, "scripts", "run_batched_model_compare_and_compose.mjs"), args);
+      job.stdout += result.stdout || "";
+      job.stderr += result.stderr || "";
+      if (job.stdout.length > 200000) job.stdout = job.stdout.slice(-200000);
+      if (job.stderr.length > 100000) job.stderr = job.stderr.slice(-100000);
+      const parsed = parseLastJsonObject(result.stdout);
+      const compose = parsed?.compose || parsed || {};
+      const ok = result.code === 0 && parsed?.ok !== false;
+      job.results.push({
+        pageId: page.pageId,
+        role: page.role,
+        sourceType: page.sourceType,
+        status: ok ? "completed" : "failed",
+        draftBuildId: String(compose?.draftBuildId || "").trim(),
+        previewUrl: String(compose?.previewUrl || "").trim(),
+        compareUrl: String(compose?.compareUrl || "").trim(),
+        exitCode: result.code,
+        error: ok ? "" : String(result.stderr || "journey_page_build_failed").slice(-2000),
+      });
+      saveJourneyBuildRecord(job);
+    }
+    job.linkRewrites = rewriteJourneyDraftLinks({
+      userId: user.userId,
+      results: job.results,
+      flowPages: pages,
+    });
+    const failedCount = job.results.filter((item) => item.status === "failed").length;
+    job.status = failedCount ? "completed_with_errors" : "completed";
+    job.finishedAt = new Date().toISOString();
+    job.currentPageId = "";
+    saveJourneyBuildRecord(job);
+  })().catch((error) => {
+    job.status = "failed";
+    job.error = String(error?.message || error);
+    job.finishedAt = new Date().toISOString();
+    saveJourneyBuildRecord(job);
+  });
+
+  return job;
+}
+
+function createOrReuseShareLink({ userId = "", pageId = "", viewportProfile = "pc", versionId = "", buildId = "" } = {}) {
+  const normalizedUserId = String(userId || "").trim();
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile = normalizeViewportProfile(viewportProfile, "pc");
+  const normalizedVersionId = String(versionId || "").trim();
+  const normalizedBuildId = String(buildId || "").trim();
+  if (!normalizedUserId || !normalizedPageId || (!normalizedVersionId && !normalizedBuildId)) {
+    throw new Error("share_link_target_required");
+  }
+  const payload = readShareLinks();
+  const links = Array.isArray(payload.links) ? payload.links : [];
+  const existing = links.find(
+    (item) =>
+      String(item?.userId || "").trim() === normalizedUserId &&
+      String(item?.pageId || "").trim() === normalizedPageId &&
+      normalizeViewportProfile(item?.viewportProfile, "pc") === normalizedViewportProfile &&
+      String(item?.versionId || "").trim() === normalizedVersionId &&
+      String(item?.buildId || "").trim() === normalizedBuildId
+  );
+  if (existing?.token) return existing;
+  const now = new Date().toISOString();
+  const link = {
+    token: crypto.randomBytes(18).toString("base64url"),
+    userId: normalizedUserId,
+    pageId: normalizedPageId,
+    viewportProfile: normalizedViewportProfile,
+    versionId: normalizedVersionId,
+    buildId: normalizedBuildId,
+    createdAt: now,
+    updatedAt: now,
+  };
+  links.unshift(link);
+  writeShareLinks({ links: links.slice(0, 1000) });
+  return link;
+}
+
+function createOrReuseJourneyShareLink({ userId = "", journeyBuild = null, req = null } = {}) {
+  const normalizedUserId = String(userId || "").trim();
+  const record = journeyBuild && typeof journeyBuild === "object" ? journeyBuild : null;
+  const journeyBuildId = String(record?.id || "").trim();
+  if (!normalizedUserId || !record || !journeyBuildId) {
+    throw new Error("journey_share_target_required");
+  }
+  const origin = `http://${req?.headers?.host || `127.0.0.1:${PORT}`}`;
+  const completedItems = (Array.isArray(record.results) ? record.results : [])
+    .filter((item) => String(item?.status || "").trim() === "completed" && String(item?.draftBuildId || "").trim())
+    .map((item) => {
+      const pageId = String(item.pageId || "").trim();
+      const draftBuildId = String(item.draftBuildId || "").trim();
+      const draftLink = createOrReuseShareLink({
+        userId: normalizedUserId,
+        pageId,
+        viewportProfile: record.viewportProfile || item.viewportProfile || "pc",
+        versionId: "",
+        buildId: draftBuildId,
+      });
+      return {
+        pageId,
+        role: String(item.role || "").trim(),
+        draftBuildId,
+        shareToken: draftLink.token,
+        shareUrl: `${origin}/share/${encodeURIComponent(draftLink.token)}`,
+        compareUrl: `${origin}/share/${encodeURIComponent(draftLink.token)}/compare`,
+      };
+    });
+  const payload = readShareLinks();
+  const links = Array.isArray(payload.links) ? payload.links : [];
+  const existing = links.find((item) =>
+    String(item?.targetType || "").trim() === "journey-build" &&
+    String(item?.userId || "").trim() === normalizedUserId &&
+    String(item?.journeyBuildId || "").trim() === journeyBuildId
+  );
+  const now = new Date().toISOString();
+  const link = {
+    ...(existing || {}),
+    token: existing?.token || crypto.randomBytes(18).toString("base64url"),
+    targetType: "journey-build",
+    userId: normalizedUserId,
+    pageId: String(record.sourcePageId || "").trim(),
+    viewportProfile: normalizeViewportProfile(record.viewportProfile || "pc", "pc"),
+    journeyId: String(record.journeyId || "").trim(),
+    journeyBuildId,
+    items: completedItems,
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+  };
+  const existingIndex = links.findIndex((item) => String(item?.token || "").trim() === String(link.token || "").trim());
+  if (existingIndex >= 0) links.splice(existingIndex, 1);
+  links.unshift(link);
+  writeShareLinks({ links: links.slice(0, 1000) });
+  return link;
+}
+
+function findShareLink(token = "") {
+  const normalizedToken = String(token || "").trim();
+  if (!normalizedToken) return null;
+  const payload = readShareLinks();
+  return (Array.isArray(payload.links) ? payload.links : []).find((item) => String(item?.token || "").trim() === normalizedToken) || null;
+}
+
+function resolveSharedVersionDraft(token = "") {
+  const link = findShareLink(token);
+  if (!link) return { link: null, version: null, draftBuild: null };
+  const workspace = getWorkspace(String(link.userId || "").trim(), { normalize: false });
+  const versions = Array.isArray(workspace?.savedVersions) ? workspace.savedVersions : [];
+  const linkVersionId = String(link.versionId || "").trim();
+  const version = linkVersionId
+    ? versions.find(
+        (item) =>
+          String(item?.id || "").trim() === linkVersionId &&
+          String(item?.pageId || "").trim() === String(link.pageId || "").trim() &&
+          normalizeViewportProfile(item?.viewportProfile, "pc") === normalizeViewportProfile(link.viewportProfile, "pc")
+      ) || null
+    : null;
+  const buildId = String(version?.buildId || link.buildId || "").trim();
+  const sourceDraftBuild = buildId ? findDraftBuildById(String(link.userId || "").trim(), buildId) : null;
+  const snapshotData = version?.snapshotData && typeof version.snapshotData === "object" ? version.snapshotData : {};
+  const draftBuild = version || sourceDraftBuild
+    ? {
+        ...(sourceDraftBuild || {}),
+        id: buildId || String(version.id || "").trim(),
+        pageId: String(version?.pageId || sourceDraftBuild?.pageId || link.pageId || "").trim(),
+        viewportProfile: normalizeViewportProfile(version?.viewportProfile || sourceDraftBuild?.viewportProfile || link.viewportProfile, "pc"),
+        builderVersion: String(sourceDraftBuild?.builderVersion || snapshotData.builderVersion || "design-runtime-v1").trim(),
+        summary: String(sourceDraftBuild?.summary || version?.summary || version?.versionLabel || "shared draft").trim(),
+        snapshotData: {
+          ...(sourceDraftBuild?.snapshotData && typeof sourceDraftBuild.snapshotData === "object" ? sourceDraftBuild.snapshotData : {}),
+          ...snapshotData,
+        },
+        renderedHtmlReference:
+          sourceDraftBuild?.renderedHtmlReference && typeof sourceDraftBuild.renderedHtmlReference === "object"
+            ? sourceDraftBuild.renderedHtmlReference
+            : snapshotData.renderedHtmlReference || {},
+      }
+    : null;
+  return { link, version, draftBuild };
+}
+
+function renderSharedVersionHtml(token = "", { snapshotState = "after", sectionPreviewSlot = "" } = {}) {
+  const { link, version, draftBuild } = resolveSharedVersionDraft(token);
+  if (!link) {
+    return {
+      status: 404,
+      html: `<!doctype html><html><head><meta charset="utf-8"><title>Share Not Found</title></head><body><h1>Share Not Found</h1></body></html>`,
+    };
+  }
+  if (!draftBuild) {
+    return {
+      status: 404,
+      html: `<!doctype html><html><head><meta charset="utf-8"><title>Shared Version Missing</title></head><body><h1>Shared Version Missing</h1><p>${escapeHtml(String(link.versionId || ""))}</p></body></html>`,
+    };
+  }
+  const normalizedSnapshotState = String(snapshotState || "after").trim().toLowerCase() === "before" ? "before" : "after";
+  const renderedHtmlReference =
+    draftBuild?.snapshotData?.renderedHtmlReference && typeof draftBuild.snapshotData.renderedHtmlReference === "object"
+      ? draftBuild.snapshotData.renderedHtmlReference
+      : draftBuild?.renderedHtmlReference && typeof draftBuild.renderedHtmlReference === "object"
+        ? draftBuild.renderedHtmlReference
+        : {};
+  const lightweightPreviewHtml =
+    normalizedSnapshotState === "after"
+      ? buildLightweightRuntimePreviewHtml(draftBuild, "after", sectionPreviewSlot)
+      : "";
+  const html =
+    lightweightPreviewHtml ||
+    String(normalizedSnapshotState === "before" ? renderedHtmlReference.beforeHtml || "" : renderedHtmlReference.afterHtml || "").trim();
+  if (!html) {
+    return {
+      status: 404,
+      html: `<!doctype html><html><head><meta charset="utf-8"><title>Shared HTML Missing</title></head><body><h1>Shared HTML Missing</h1><p>${escapeHtml(String(version?.id || draftBuild?.id || ""))}</p></body></html>`,
+    };
+  }
+  return { status: 200, html };
+}
+
+function sendShareCompareShell(res, token = "") {
+  const { link, version, draftBuild } = resolveSharedVersionDraft(token);
+  if (!link || !draftBuild) {
+    return sendRawHtml(
+      res,
+      404,
+      `<!doctype html><html><head><meta charset="utf-8"><title>Share Not Found</title></head><body><h1>Share Not Found</h1></body></html>`
+    );
+  }
+  const shareViewportProfile = String(version?.viewportProfile || draftBuild?.viewportProfile || link.viewportProfile || "pc").trim();
+  const normalizedShareViewport = shareViewportProfile === "mo" || shareViewportProfile === "mobile" ? "mo" : "pc";
+  const beforeParams = new URLSearchParams();
+  beforeParams.set("snapshotState", "before");
+  beforeParams.set("viewportProfile", normalizedShareViewport);
+  const afterParams = new URLSearchParams();
+  afterParams.set("snapshotState", "after");
+  afterParams.set("viewportProfile", normalizedShareViewport);
+  const beforeSrc = `/share/${encodeURIComponent(token)}?${beforeParams.toString()}`;
+  const afterSrc = `/share/${encodeURIComponent(token)}?${afterParams.toString()}`;
+  const shareTitle = String(version?.versionLabel || version?.id || draftBuild?.summary || draftBuild?.id || "").trim();
+  const sharePageId = String(version?.pageId || draftBuild?.pageId || link.pageId || "").trim();
+  return sendRawHtml(
+    res,
+    200,
+    `<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Shared Compare | ${escapeHtml(shareTitle)}</title>
+    <style>
+      html, body { margin:0; width:100%; height:100%; background:#0f172a; font-family:Arial,sans-serif; }
+      .share-compare { display:grid; grid-template-rows:48px 1fr; min-height:100vh; }
+      .share-compare-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 14px; background:#111827; color:#fff; border-bottom:1px solid rgba(255,255,255,.12); font:600 12px/1 Arial,sans-serif; }
+      .share-compare-meta { display:flex; align-items:center; gap:10px; min-width:0; overflow:hidden; }
+      .share-compare-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+      .share-compare-actions { display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+      .share-compare-grid { display:grid; grid-template-columns:1fr 1fr; min-height:calc(100vh - 48px); background:#cbd5e1; gap:1px; }
+      .share-compare-pane { display:grid; grid-template-rows:38px 1fr; min-width:0; background:#fff; }
+      .share-compare-label { display:flex; align-items:center; padding:0 12px; border-bottom:1px solid #e5e7eb; color:#111827; font:700 12px/1 Arial,sans-serif; }
+      .share-compare-frame-wrap { min-width:0; min-height:0; overflow:auto; background:#eef2f7; }
+      .share-compare-frame-shell { width:100%; min-width:0; height:100%; margin:0 auto; background:#fff; box-shadow:none; }
+      .share-compare-frame { width:100%; height:100%; border:0; display:block; background:#fff; }
+      .share-compare-bar a { color:#fff; text-decoration:none; }
+      .share-copy-btn { border:1px solid rgba(255,255,255,.28); border-radius:999px; background:rgba(255,255,255,.1); color:#fff; padding:7px 11px; font:700 12px/1 Arial,sans-serif; cursor:pointer; }
+      .share-compare[data-viewport-profile="mo"] .share-compare-frame-wrap { display:flex; justify-content:center; align-items:stretch; padding:18px; }
+      .share-compare[data-viewport-profile="mo"] .share-compare-frame-shell { width:430px; max-width:100%; min-width:360px; border-radius:20px; overflow:hidden; box-shadow:0 18px 50px rgba(15,23,42,.22); }
+    </style>
+  </head>
+  <body>
+    <div class="share-compare" data-viewport-profile="${escapeHtml(normalizedShareViewport)}">
+      <div class="share-compare-bar">
+        <div class="share-compare-meta">
+          <span class="share-compare-title">${escapeHtml(sharePageId)} · ${escapeHtml(normalizedShareViewport)} · ${escapeHtml(shareTitle)}</span>
+        </div>
+        <div class="share-compare-actions">
+          <button class="share-copy-btn" type="button">공유 링크 복사</button>
+          <a href="${afterSrc}">공유 화면만 보기</a>
+        </div>
+      </div>
+      <div class="share-compare-grid">
+        <section class="share-compare-pane"><div class="share-compare-label">원본</div><div class="share-compare-frame-wrap"><div class="share-compare-frame-shell"><iframe class="share-compare-frame" src="${beforeSrc}" title="Before"></iframe></div></div></section>
+        <section class="share-compare-pane"><div class="share-compare-label">저장본</div><div class="share-compare-frame-wrap"><div class="share-compare-frame-shell"><iframe class="share-compare-frame" src="${afterSrc}" title="After"></iframe></div></div></section>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var button = document.querySelector(".share-copy-btn");
+        if (!button) return;
+        function copyText(value) {
+          var text = String(value || "");
+          if (!text) return Promise.reject(new Error("copy_text_empty"));
+          if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+          }
+          return new Promise(function (resolve, reject) {
+            var textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.setAttribute("readonly", "readonly");
+            textarea.style.position = "fixed";
+            textarea.style.left = "-9999px";
+            textarea.style.top = "0";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+            try {
+              var copied = document.execCommand("copy");
+              document.body.removeChild(textarea);
+              copied ? resolve() : reject(new Error("exec_copy_failed"));
+            } catch (error) {
+              document.body.removeChild(textarea);
+              reject(error);
+            }
+          });
+        }
+        button.addEventListener("click", function () {
+          var url = window.location.href;
+          copyText(url).then(function () {
+            alert("공유 비교 링크를 복사했습니다.\\n" + url);
+          }).catch(function () {
+            window.prompt("복사가 차단되었습니다. 아래 링크를 복사하세요.", url);
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>`
+  );
+}
+
+function sendJourneyShareShell(res, token = "") {
+  const link = findShareLink(token);
+  if (!link || String(link.targetType || "").trim() !== "journey-build") {
+    return sendRawHtml(res, 404, `<!doctype html><html><head><meta charset="utf-8"><title>Journey Share Not Found</title></head><body><h1>Journey Share Not Found</h1></body></html>`);
+  }
+  const record = findJourneyBuildRecord(link.journeyBuildId);
+  if (!record) {
+    return sendRawHtml(res, 404, `<!doctype html><html><head><meta charset="utf-8"><title>Journey Build Missing</title></head><body><h1>Journey Build Missing</h1></body></html>`);
+  }
+  const items = Array.isArray(link.items) ? link.items : [];
+  const rows = items.map((item, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td><strong>${escapeHtml(item.pageId || "")}</strong><span>${escapeHtml(item.role || "")}</span></td>
+      <td><a href="${escapeHtml(item.shareUrl || `/share/${encodeURIComponent(item.shareToken || "")}`)}" target="_blank" rel="noreferrer">미리보기</a></td>
+      <td><a href="${escapeHtml(item.compareUrl || `/share/${encodeURIComponent(item.shareToken || "")}/compare`)}" target="_blank" rel="noreferrer">비교</a></td>
+    </tr>
+  `).join("");
+  return sendRawHtml(res, 200, `<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Journey Share | ${escapeHtml(record.journeyId || record.id)}</title>
+    <style>
+      body { margin:0; background:#f4f0e8; color:#171717; font-family:Arial,sans-serif; }
+      main { max-width:1040px; margin:0 auto; padding:40px 20px; }
+      .hero { border-radius:28px; background:#111; color:#fff; padding:30px; }
+      .hero p { color:#d4d4d4; }
+      table { width:100%; border-collapse:collapse; margin-top:24px; background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 16px 48px rgba(20,20,20,.08); }
+      th, td { padding:16px; border-bottom:1px solid #eee; text-align:left; font-size:14px; }
+      th { background:#fafafa; color:#666; font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+      td span { display:block; margin-top:4px; color:#777; font-size:12px; }
+      a { display:inline-flex; align-items:center; border-radius:999px; padding:9px 13px; background:#111; color:#fff; text-decoration:none; font-weight:700; font-size:12px; }
+      .copy { margin-top:16px; border:1px solid rgba(255,255,255,.3); background:rgba(255,255,255,.12); color:#fff; border-radius:999px; padding:10px 14px; cursor:pointer; font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1>${escapeHtml(record.journeyId || "고객여정 공유")}</h1>
+        <p>${escapeHtml(record.viewportProfile || "")} · ${escapeHtml(record.status || "")} · ${escapeHtml(record.finishedAt || record.startedAt || "")}</p>
+        <button class="copy" type="button">공유 링크 복사</button>
+      </section>
+      <table>
+        <thead><tr><th>#</th><th>페이지</th><th>미리보기</th><th>비교</th></tr></thead>
+        <tbody>${rows || `<tr><td colspan="4">공유할 생성 페이지가 없습니다.</td></tr>`}</tbody>
+      </table>
+    </main>
+    <script>
+      document.querySelector(".copy")?.addEventListener("click", function () {
+        var url = window.location.href;
+        function fallback(){ window.prompt("아래 링크를 복사하세요.", url); }
+        if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+          navigator.clipboard.writeText(url).then(function(){ alert("공유 링크를 복사했습니다."); }).catch(fallback);
+        } else {
+          fallback();
+        }
+      });
+    </script>
+  </body>
+</html>`);
+}
+
+function normalizeRouteTraceKey(pathname = "") {
+  const normalized = String(pathname || "").trim();
+  if (!normalized) return "/";
+  if (normalized.startsWith("/clone/")) return "/clone/:pageId";
+  if (normalized.startsWith("/share/")) return "/share/:token";
+  if (normalized.startsWith("/runtime-draft/")) return "/runtime-draft/:draftBuildId";
+  if (normalized.startsWith("/runtime-compare/")) return "/runtime-compare/:draftBuildId";
+  return normalized;
+}
+
+function shouldTraceRoute(pathname = "") {
+  const normalized = String(pathname || "").trim();
+  if (!ROUTE_TRACE_ENABLED || !normalized) return false;
+  if (normalized === "/admin" || normalized === "/admin-legacy" || normalized === "/admin-research") return true;
+  return (
+    normalized.startsWith("/api/workspace/") ||
+    normalized.startsWith("/api/llm/") ||
+    normalized.startsWith("/clone/") ||
+    normalized.startsWith("/share/") ||
+    normalized.startsWith("/runtime-draft/") ||
+    normalized.startsWith("/runtime-compare/")
+  );
+}
+
+function buildRouteTraceQuerySnapshot(requestUrl) {
+  const snapshot = {};
+  [
+    "pageId",
+    "viewportProfile",
+    "view",
+    "draftBuildId",
+    "versionId",
+    "baseline",
+    "snapshotState",
+    "sectionPreviewSlot",
+  ].forEach((key) => {
+    const value = String(requestUrl?.searchParams?.get(key) || "").trim();
+    if (value) snapshot[key] = value;
+  });
+  return snapshot;
+}
+
+function buildRouteTraceDescriptor(req, requestUrl) {
+  const pathname = String(requestUrl?.pathname || "").trim();
+  if (!shouldTraceRoute(pathname)) return null;
+  const user = getUserFromRequest(req);
+  const query = buildRouteTraceQuerySnapshot(requestUrl);
+  const descriptor = {
+    routeKey: normalizeRouteTraceKey(pathname),
+    resolvedTarget: "request",
+    authenticated: Boolean(user),
+    userId: user?.userId || null,
+    loginId: user?.loginId || null,
+    pageId: String(query.pageId || "").trim() || null,
+    viewportProfile: String(query.viewportProfile || query.view || "").trim().toLowerCase() || null,
+    draftBuildId: String(query.draftBuildId || "").trim() || null,
+    versionId: String(query.versionId || "").trim() || null,
+    baseline: String(query.baseline || "").trim() || null,
+    snapshotState: String(query.snapshotState || "").trim() || null,
+    query,
+  };
+  if (pathname === "/admin") {
+    return {
+      ...descriptor,
+      resolvedTarget: user ? "html:admin-research.html" : "redirect:/login",
+    };
+  }
+  if (pathname === "/admin-legacy") {
+    return {
+      ...descriptor,
+      resolvedTarget: user ? "html:admin.html" : "redirect:/login",
+    };
+  }
+  if (pathname === "/admin-research") {
+    return {
+      ...descriptor,
+      resolvedTarget: user ? "html:admin-research.html" : "redirect:/login",
+    };
+  }
+  if (pathname === "/api/llm/plan") {
+    return {
+      ...descriptor,
+      resolvedTarget: "retired-410:/api/workspace/plan-local-preview|/api/workspace/plan",
+    };
+  }
+  if (pathname === "/api/llm/build") {
+    return {
+      ...descriptor,
+      resolvedTarget: "retired-410:/api/workspace/build-local-draft",
+    };
+  }
+  if (pathname.startsWith("/api/workspace/")) {
+    return {
+      ...descriptor,
+      resolvedTarget: user ? "workspace-api" : "auth-required",
+    };
+  }
+  if (pathname.startsWith("/clone/")) {
+    return {
+      ...descriptor,
+      resolvedTarget: "clone-shell",
+      pageId: descriptor.pageId || decodeURIComponent(pathname.slice("/clone/".length) || "").trim() || null,
+      draftBuildId: descriptor.draftBuildId || null,
+    };
+  }
+  if (pathname.startsWith("/share/")) {
+    const sharePath = decodeURIComponent(pathname.slice("/share/".length));
+    const [token, mode] = sharePath.split("/").map((item) => String(item || "").trim()).filter(Boolean);
+    return {
+      ...descriptor,
+      resolvedTarget: mode === "compare" ? "public-share-compare" : "public-share-version",
+      shareToken: token || null,
+    };
+  }
+  if (pathname.startsWith("/runtime-draft/")) {
+    return {
+      ...descriptor,
+      resolvedTarget: user ? "runtime-draft" : "auth-required",
+      draftBuildId: decodeURIComponent(pathname.slice("/runtime-draft/".length) || "").trim() || descriptor.draftBuildId || null,
+    };
+  }
+  if (pathname.startsWith("/runtime-compare/")) {
+    return {
+      ...descriptor,
+      resolvedTarget: user ? "runtime-compare" : "auth-required",
+      draftBuildId: decodeURIComponent(pathname.slice("/runtime-compare/".length) || "").trim() || descriptor.draftBuildId || null,
+    };
+  }
+  return descriptor;
+}
+
+function writeRouteTrace(entry) {
+  if (!entry || !ROUTE_TRACE_ENABLED) return;
+  try {
+    ensureParentDir(ROUTE_TRACE_PATH);
+    fs.appendFile(ROUTE_TRACE_PATH, `${JSON.stringify(entry)}\n`, (error) => {
+      if (error) console.warn(`[route-trace] append failed: ${error.message}`);
+    });
+  } catch (error) {
+    console.warn(`[route-trace] write failed: ${error.message}`);
+  }
+}
+
+function traceRouteRequest(req, requestUrl) {
+  const descriptor = buildRouteTraceDescriptor(req, requestUrl);
+  if (!descriptor) return;
+  writeRouteTrace({
+    id: crypto.randomUUID(),
+    recordedAt: new Date().toISOString(),
+    method: String(req?.method || "GET").toUpperCase(),
+    pathname: String(requestUrl?.pathname || "").trim(),
+    ...descriptor,
+  });
+}
+
+function extractBodyInnerHtml(html = "") {
+  const source = String(html || "");
+  const match = source.match(/<body\b[^>]*>([\s\S]*?)<\/body>/i);
+  return match ? String(match[1] || "").trim() : source.trim();
+}
+
+function buildTailwindRuntimeCollisionCss() {
+  return `
+  /* LG captured shells use the contents class as a wrapper; prevent Tailwind utility collision. */
+  .contents {
+    display: block !important;
+  }`;
+}
+
+function injectTailwindRuntimeIntoHtml(html = "") {
+  const source = String(html || "").trim();
+  if (!source) return "";
+  if (/cdn\.tailwindcss\.com/i.test(source)) return source;
+  const runtimeMarkup = `
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      corePlugins: {
+        preflight: false
+      },
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Noto Sans KR', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    ${buildTailwindRuntimeCollisionCss()}
+  </style>`;
+  if (/<head\b[^>]*>/i.test(source)) {
+    return source.replace(/<\/head>/i, `${runtimeMarkup}\n</head>`);
+  }
+  return `<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  ${runtimeMarkup}
+</head>
+<body>${source}</body>
+</html>`;
+}
+
+function extractReferencedInteractionIds(html = "") {
+  const source = String(html || "");
+  return Array.from(new Set(
+    Array.from(source.matchAll(/\bdata-(?:registry-)?interaction-id=(["'])(.*?)\1/gi))
+      .flatMap((match) => String(match?.[2] || "").split(/[,\s]+/))
+      .map((item) => item.trim())
+      .filter(Boolean)
+  ));
+}
+
+function buildApprovedInteractionRuntimeMap(interactionIds = []) {
+  const wantedIds = new Set(interactionIds.map((item) => String(item || "").trim()).filter(Boolean));
+  if (!wantedIds.size) return {};
+  const registry = readInteractionComponentRegistry();
+  const components = Array.isArray(registry?.components) ? registry.components : [];
+  return components.reduce((acc, component) => {
+    const interactionId = String(component?.interactionId || "").trim();
+    const runtimeModule = String(component?.runtimeModule || "").trim();
+    if (!wantedIds.has(interactionId)) return acc;
+    if (String(component?.status || "").trim() !== "approved") return acc;
+    if (!runtimeModule.startsWith("web/interaction-components/")) return acc;
+    const modulePath = path.join(__dirname, runtimeModule);
+    if (!fs.existsSync(modulePath)) return acc;
+    acc[interactionId] = `/${runtimeModule.replace(/^web\//, "")}`;
+    return acc;
+  }, {});
+}
+
+function injectInteractionComponentRuntimeIntoHtml(html = "") {
+  const source = String(html || "").trim();
+  if (!source) return "";
+  if (/data-clonellm-interaction-runtime/i.test(source)) return source;
+  const interactionIds = extractReferencedInteractionIds(source);
+  const runtimeMap = buildApprovedInteractionRuntimeMap(interactionIds);
+  if (!Object.keys(runtimeMap).length) return source;
+  const runtimeMarkup = `
+<script data-clonellm-interaction-runtime>
+(() => {
+  const runtimeMap = ${JSON.stringify(runtimeMap)};
+  const selector = '[data-registry-interaction-id], [data-interaction-id]';
+  function splitIds(value) {
+    return String(value || '').split(/[,\\s]+/).map((item) => item.trim()).filter(Boolean);
+  }
+  function getRootInteractionIds(root) {
+    return Array.from(new Set([
+      ...splitIds(root.getAttribute('data-registry-interaction-id')),
+      ...splitIds(root.getAttribute('data-interaction-id')),
+    ]));
+  }
+  function loadInteractionModule(interactionId) {
+    const src = runtimeMap[interactionId];
+    if (!src) return Promise.resolve();
+    const existing = Array.from(document.querySelectorAll('script[data-clonellm-interaction-module]'))
+      .find((script) => script.getAttribute('data-clonellm-interaction-module') === interactionId);
+    if (existing) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = src;
+      script.defer = true;
+      script.setAttribute('data-clonellm-interaction-module', interactionId);
+      script.onload = () => resolve();
+      script.onerror = () => reject(new Error('interaction_module_load_failed:' + interactionId));
+      document.head.appendChild(script);
+    });
+  }
+  async function mountInteractionComponents() {
+    const roots = Array.from(document.querySelectorAll(selector));
+    const neededIds = Array.from(new Set(roots.flatMap(getRootInteractionIds))).filter((id) => runtimeMap[id]);
+    await Promise.all(neededIds.map(loadInteractionModule));
+    roots.forEach((root) => {
+      const mounted = root.__cloneLLMMountedInteractions || {};
+      getRootInteractionIds(root).forEach((interactionId) => {
+        if (mounted[interactionId]) return;
+        const adapter = window.CloneLLMInteractions && window.CloneLLMInteractions[interactionId];
+        if (!adapter || typeof adapter.mount !== 'function') return;
+        adapter.mount(root);
+        mounted[interactionId] = true;
+      });
+      root.__cloneLLMMountedInteractions = mounted;
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      mountInteractionComponents().catch((error) => {
+        console.warn(error && error.message ? error.message : error);
+      });
+    }, { once: true });
+  } else {
+    mountInteractionComponents().catch((error) => {
+      console.warn(error && error.message ? error.message : error);
+    });
+  }
+})();
+</script>`;
+  if (/<\/body>/i.test(source)) {
+    return source.replace(/<\/body>/i, `${runtimeMarkup}\n</body>`);
+  }
+  return `${source}\n${runtimeMarkup}`;
+}
+
+function buildLightweightRuntimePreviewHtml(draftBuild = {}, snapshotState = "after", sectionPreviewSlot = "") {
+  const renderedHtmlReference =
+    draftBuild?.snapshotData?.renderedHtmlReference && typeof draftBuild.snapshotData.renderedHtmlReference === "object"
+      ? draftBuild.snapshotData.renderedHtmlReference
+      : draftBuild?.renderedHtmlReference && typeof draftBuild.renderedHtmlReference === "object"
+        ? draftBuild.renderedHtmlReference
+        : {};
+  const authoredPackage =
+    draftBuild?.snapshotData?.authoredSectionHtmlPackage && typeof draftBuild.snapshotData.authoredSectionHtmlPackage === "object"
+      ? draftBuild.snapshotData.authoredSectionHtmlPackage
+      : draftBuild?.authoredSectionHtmlPackage && typeof draftBuild.authoredSectionHtmlPackage === "object"
+        ? draftBuild.authoredSectionHtmlPackage
+        : null;
+  const sections = Array.isArray(authoredPackage?.sections) ? authoredPackage.sections : [];
+  const pageId = String(draftBuild?.pageId || authoredPackage?.pageId || "page").trim() || "page";
+  const title = escapeHtml(String(draftBuild?.summary || `${pageId} runtime preview`).trim() || `${pageId} runtime preview`);
+  const requestedSlotIds = String(sectionPreviewSlot || "")
+    .split(",")
+    .map((value) => String(value || "").trim())
+    .filter(Boolean);
+  if (snapshotState !== "after") return "";
+  const renderedAfterHtml = String(renderedHtmlReference.afterHtml || "").trim();
+  if (renderedAfterHtml) {
+    const previewHtml = requestedSlotIds.length
+      ? buildLightweightSectionPreviewHtml(renderedAfterHtml, sectionPreviewSlot)
+      : renderedAfterHtml;
+    return injectTailwindRuntimeIntoHtml(previewHtml);
+  }
+  if (!sections.length) return "";
+  const previewSections = requestedSlotIds.length
+    ? sections.filter((section) => requestedSlotIds.includes(String(section?.slotId || "").trim()))
+    : sections;
+  if (!previewSections.length) return "";
+  const mainHtml = previewSections
+    .map((section) => String(section?.html || "").trim())
+    .filter(Boolean)
+    .join("\n");
+  if (!mainHtml) return "";
+  return `<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${title}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Noto Sans KR', 'system-ui', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    html, body { margin: 0; padding: 0; background: #ffffff; color: #111827; }
+    body { font-family: 'Noto Sans KR', system-ui, sans-serif; }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; }
+    ${buildTailwindRuntimeCollisionCss()}
+    main { min-height: 100vh; }
+    .runtime-section-shell { min-height: 100vh; background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%); }
+    .runtime-section-shell[data-focus='true'] { padding: 24px; }
+    .runtime-section-frame { max-width: 1440px; margin: 0 auto; background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08); }
+    .runtime-section-bar { display:flex; align-items:center; justify-content:space-between; gap: 16px; padding: 12px 16px; border-bottom: 1px solid #e5e7eb; background:#f8fafc; font: 600 12px/1.4 Arial, sans-serif; color:#334155; }
+    .runtime-section-body { overflow: hidden; }
+  </style>
+</head>
+<body>
+  <main id="runtime-preview-root" class="runtime-section-shell" data-focus="${requestedSlotIds.length ? "true" : "false"}">
+    <div class="runtime-section-frame">
+      ${requestedSlotIds.length ? `<div class="runtime-section-bar"><span>${escapeHtml(requestedSlotIds.join(", "))}</span><span>${title}</span></div>` : ""}
+      <div class="runtime-section-body">
+${mainHtml}
+      </div>
+    </div>
+  </main>
+</body>
+</html>`;
+}
+
 function sendRedirect(res, location) {
   res.writeHead(302, { Location: location });
   res.end();
+}
+
+const ACTIVE_BUILDER_RUNS = new Map();
+const BUILDER_RUN_LOCK_TTL_MS = 10 * 60 * 1000;
+
+function buildActiveBuilderRunKey(userId = "", pageId = "", viewportProfile = "") {
+  return [String(userId || "").trim(), String(pageId || "").trim(), normalizeViewportProfile(viewportProfile, "pc"), "builder"].join("::");
+}
+
+function acquireActiveBuilderRun(key = "") {
+  const normalizedKey = String(key || "").trim();
+  if (!normalizedKey) return { acquired: true, release: () => {} };
+  const now = Date.now();
+  const existing = ACTIVE_BUILDER_RUNS.get(normalizedKey);
+  if (existing && now - Number(existing.startedAt || 0) < BUILDER_RUN_LOCK_TTL_MS) {
+    return { acquired: false, existing };
+  }
+  const entry = { startedAt: now };
+  ACTIVE_BUILDER_RUNS.set(normalizedKey, entry);
+  return {
+    acquired: true,
+    entry,
+    release: () => {
+      const current = ACTIVE_BUILDER_RUNS.get(normalizedKey);
+      if (current === entry) ACTIVE_BUILDER_RUNS.delete(normalizedKey);
+    },
+  };
+}
+
+function hasInternalVisualCriticAccess(req) {
+  return Boolean(getInternalVisualCriticUser(req));
+}
+
+function createPerfTimer(label = "", enabled = false) {
+  const startedAt = Date.now();
+  return {
+    mark(stage = "") {
+      if (!enabled) return;
+      const elapsedMs = Date.now() - startedAt;
+      console.log(`[perf] ${label} stage=${stage} elapsedMs=${elapsedMs}`);
+    },
+  };
 }
 
 function requireAuthenticatedUser(req, res) {
@@ -434,16 +2536,37 @@ function requireAuthenticatedUser(req, res) {
   return user;
 }
 
-function readDataForRequest(req) {
-  const user = getUserFromRequest(req);
+function getInternalVisualCriticUser(req) {
+  try {
+    const requestUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+    const criticKey = String(requestUrl.searchParams.get("criticKey") || "").trim();
+    const criticUserId = String(requestUrl.searchParams.get("criticUserId") || "").trim();
+    if (!criticKey || !criticUserId) return null;
+    if (criticKey !== INTERNAL_VISUAL_CRITIC_KEY) return null;
+    const workspace = getWorkspace(criticUserId, { normalize: false });
+    if (!workspace) return null;
+    return {
+      userId: criticUserId,
+      loginId: "internal-visual-critic",
+      displayName: "internal-visual-critic",
+    };
+  } catch {
+    return null;
+  }
+}
+
+function readDataForRequest(req, options = {}) {
+  const fastWorkspaceRead = options?.fastWorkspaceRead === true;
+  const user = getUserFromRequest(req) || getInternalVisualCriticUser(req);
   if (!user) {
     return { user: null, data: readEditableData(), workspace: null, source: "shared-default" };
   }
-  const workspace = getWorkspace(user.userId);
+  const workspace = getWorkspace(user.userId, { normalize: !fastWorkspaceRead });
+  const workspaceData = workspace.data || readEditableData();
   return {
     user,
     workspace,
-    data: normalizeEditableData(JSON.parse(JSON.stringify(workspace.data || readEditableData()))),
+    data: fastWorkspaceRead ? workspaceData : normalizeEditableData(JSON.parse(JSON.stringify(workspaceData))),
     source: "user-workspace",
   };
 }
@@ -454,6 +2577,77 @@ function clonePlain(value, fallback) {
     return JSON.parse(JSON.stringify(value));
   } catch {
     return fallback;
+  }
+}
+
+function looksInternalAuthoringSnapshotText(value = "") {
+  const text = String(value || "").trim();
+  if (!text) return false;
+  return [
+    /운영 카피 확인용/,
+    /현재 원본 구조/,
+    /재구성한다/,
+    /보존하면서\s*재구성한다/,
+    /Bestshop Mobile Fallback/i,
+    /fallback coverage validation/i,
+    /target group layout system/i,
+    /must change internal text/i,
+    /must keep internal text/i,
+  ].some((pattern) => pattern.test(text));
+}
+
+function sanitizeAuthoringSnapshotForStorage(value) {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => sanitizeAuthoringSnapshotForStorage(item))
+      .filter((item) => {
+        if (typeof item === "undefined" || item === null) return false;
+        if (typeof item === "string" && !item.trim()) return false;
+        if (Array.isArray(item) && !item.length) return false;
+        return true;
+      });
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value)
+        .map(([key, item]) => [key, sanitizeAuthoringSnapshotForStorage(item)])
+        .filter(([, item]) => typeof item !== "undefined")
+    );
+  }
+  if (typeof value === "string") {
+    if (!looksInternalAuthoringSnapshotText(value)) return value;
+    if (value.length > 500 || value.includes("\n")) {
+      return value
+        .split(/\r?\n/)
+        .filter((line) => !looksInternalAuthoringSnapshotText(line))
+        .join("\n")
+        .trim();
+    }
+    return "";
+  }
+  return value;
+}
+
+async function withTemporaryEnv(overrides = {}, callback) {
+  const entries = Object.entries(overrides || {});
+  const previous = new Map(entries.map(([key]) => [key, process.env[key]]));
+  entries.forEach(([key, value]) => {
+    if (typeof value === "undefined" || value === null) {
+      delete process.env[key];
+    } else {
+      process.env[key] = String(value);
+    }
+  });
+  try {
+    return await callback();
+  } finally {
+    previous.forEach((value, key) => {
+      if (typeof value === "undefined") {
+        delete process.env[key];
+      } else {
+        process.env[key] = value;
+      }
+    });
   }
 }
 
@@ -470,8 +2664,7 @@ function normalizeHomeViewportProfile(value, fallback = "ta") {
 function resolveWorkspaceViewportKey(pageId, viewportProfile = "pc") {
   const normalizedPageId = String(pageId || "").trim();
   if (!normalizedPageId) return "";
-  if (normalizedPageId !== "home") return normalizedPageId;
-  return `${normalizedPageId}@${normalizeHomeViewportProfile(viewportProfile, "pc")}`;
+  return `${normalizedPageId}@${normalizeViewportProfile(viewportProfile, "pc")}`;
 }
 
 function extractPageScopedSnapshot(editableData, pageId, viewportProfile = "") {
@@ -523,7 +2716,45 @@ function applyPageScopedSnapshot(editableData, snapshot, pageId) {
   return normalizeEditableData(next);
 }
 
-function resolveDraftSnapshotOverrideForPage(req, payload, pageId, viewportProfile = "") {
+function applyPageScopedSnapshotLightweight(editableData, snapshot, pageId) {
+  const normalizedPageId = String(pageId || snapshot?.pageId || "").trim();
+  if (!normalizedPageId || !snapshot || typeof snapshot !== "object") {
+    return editableData || {};
+  }
+  const normalizedViewportProfile =
+    normalizedPageId === "home" ? normalizeHomeViewportProfile(snapshot?.viewportProfile, "pc") : "";
+  const source = editableData && typeof editableData === "object" ? editableData : {};
+  const next = { ...source };
+  const pages = Array.isArray(source.pages) ? [...source.pages] : [];
+  const slotRegistries = Array.isArray(source.slotRegistries) ? [...source.slotRegistries] : [];
+  const componentPatches = Array.isArray(source.componentPatches) ? [...source.componentPatches] : [];
+  if (snapshot.page && typeof snapshot.page === "object") {
+    const pageIndex = pages.findIndex((item) => item?.id === normalizedPageId);
+    if (pageIndex >= 0) pages[pageIndex] = clonePlain(snapshot.page, pages[pageIndex]);
+    else pages.push(clonePlain(snapshot.page, null));
+  }
+  if (snapshot.slotRegistry && typeof snapshot.slotRegistry === "object") {
+    const registryIndex = slotRegistries.findIndex((item) => item?.pageId === normalizedPageId);
+    if (registryIndex >= 0) slotRegistries[registryIndex] = clonePlain(snapshot.slotRegistry, slotRegistries[registryIndex]);
+    else slotRegistries.push(clonePlain(snapshot.slotRegistry, null));
+  }
+  if (Array.isArray(snapshot.componentPatches)) {
+    next.componentPatches = componentPatches.filter((item) => {
+      if (String(item?.pageId || "").trim() !== normalizedPageId) return true;
+      if (normalizedPageId !== "home") return false;
+      return normalizeHomeViewportProfile(item?.viewportProfile, "pc") !== normalizedViewportProfile;
+    }).concat(clonePlain(snapshot.componentPatches, []));
+  } else {
+    next.componentPatches = componentPatches;
+  }
+  next.pages = pages;
+  next.slotRegistries = slotRegistries;
+  return next;
+}
+
+function resolveDraftSnapshotOverrideForPage(req, payload, pageId, viewportProfile = "", options = {}) {
+  const perfTimer = options?.perfTimer || null;
+  perfTimer?.mark("resolveDraftSnapshotOverride:start");
   const normalizedPageId = String(pageId || "").trim();
   const draftBuildId = String(new URL(req.url, `http://${req.headers.host || "localhost"}`).searchParams.get("draftBuildId") || "").trim();
   const snapshotState = String(
@@ -534,40 +2765,59 @@ function resolveDraftSnapshotOverrideForPage(req, payload, pageId, viewportProfi
   if (!draftBuildId || !payload?.user || !payload?.workspace || !normalizedPageId) return null;
   const normalizedViewportProfile =
     normalizedPageId === "home" ? normalizeHomeViewportProfile(viewportProfile, "pc") : normalizeViewportProfile(viewportProfile, "pc");
-  const siblingDraftBuilds = (payload.workspace.draftBuilds || [])
+  const siblingDraftBuilds = listDraftBuilds(payload.user.userId, {
+    pageId: normalizedPageId,
+    viewportProfile: normalizedViewportProfile,
+    limit: 200,
+    summaryOnly: true,
+  })
     .filter((item) => {
       if (String(item?.pageId || "").trim() !== normalizedPageId) return false;
       if (normalizeViewportProfile(item?.viewportProfile, "pc") !== normalizedViewportProfile) return false;
       return true;
     })
     .sort((a, b) => String(b?.updatedAt || "").localeCompare(String(a?.updatedAt || "")));
-  const draftBuild = siblingDraftBuilds.find((item) => String(item?.id || "").trim() === draftBuildId) || null;
+  perfTimer?.mark("resolveDraftSnapshotOverride:drafts-filtered");
+  const draftBuildSummary = siblingDraftBuilds.find((item) => String(item?.id || "").trim() === draftBuildId) || null;
+  const draftBuild = draftBuildSummary ? findDraftBuildById(payload.user.userId, draftBuildId) || draftBuildSummary : null;
   if (!draftBuild) return null;
+  const isFixtureDraft = Boolean(draftBuild?.snapshotData?.fixture?.enabled);
   const currentDraftIndex = siblingDraftBuilds.findIndex((item) => String(item?.id || "").trim() === draftBuildId);
-  const previousDraftBuild = currentDraftIndex >= 0 ? siblingDraftBuilds[currentDraftIndex + 1] || null : null;
+  const previousDraftBuildSummary = currentDraftIndex >= 0 ? siblingDraftBuilds[currentDraftIndex + 1] || null : null;
+  const previousDraftBuild = previousDraftBuildSummary?.id
+    ? findDraftBuildById(payload.user.userId, previousDraftBuildSummary.id) || previousDraftBuildSummary
+    : null;
   const requestedSnapshot =
     snapshotState === "before"
-      ? draftBuild?.snapshotData?.beforePageSnapshot ||
-        previousDraftBuild?.snapshotData?.pageSnapshot ||
-        previousDraftBuild?.snapshotData?.beforePageSnapshot ||
-        null
+      ? isFixtureDraft
+        ? null
+        : draftBuild?.snapshotData?.beforePageSnapshot ||
+          previousDraftBuild?.snapshotData?.pageSnapshot ||
+          previousDraftBuild?.snapshotData?.beforePageSnapshot ||
+          null
       : draftBuild?.snapshotData?.pageSnapshot || null;
   const fallbackSnapshot =
-    draftBuild?.snapshotData?.pageSnapshot ||
-    draftBuild?.snapshotData?.beforePageSnapshot ||
-    null;
+    snapshotState === "before" && isFixtureDraft
+      ? null
+      : draftBuild?.snapshotData?.pageSnapshot ||
+        draftBuild?.snapshotData?.beforePageSnapshot ||
+        null;
   const snapshot = requestedSnapshot || fallbackSnapshot;
   if (!snapshot) {
+    perfTimer?.mark("resolveDraftSnapshotOverride:no-snapshot");
     return {
       draftBuild,
       snapshotState,
       data: payload.data,
     };
   }
+  perfTimer?.mark("resolveDraftSnapshotOverride:apply-snapshot");
   return {
     draftBuild,
     snapshotState,
-    data: applyPageScopedSnapshot(payload.data, snapshot, normalizedPageId),
+    data: options?.fastWorkspaceRead
+      ? applyPageScopedSnapshotLightweight(payload.data, snapshot, normalizedPageId)
+      : applyPageScopedSnapshot(payload.data, snapshot, normalizedPageId),
   };
 }
 
@@ -578,17 +2828,26 @@ function resolveDraftBuildContextForRequest(req, pageId, viewportProfile = "") {
   if (!payload?.user || !payload?.workspace || !normalizedPageId || !draftBuildId) return null;
   const normalizedViewportProfile =
     normalizedPageId === "home" ? normalizeHomeViewportProfile(viewportProfile, "pc") : normalizeViewportProfile(viewportProfile, "pc");
-  const siblingDraftBuilds = (payload.workspace.draftBuilds || [])
+  const siblingDraftBuilds = listDraftBuilds(payload.user.userId, {
+    pageId: normalizedPageId,
+    viewportProfile: normalizedViewportProfile,
+    limit: 200,
+    summaryOnly: true,
+  })
     .filter((item) => {
       if (String(item?.pageId || "").trim() !== normalizedPageId) return false;
       if (normalizeViewportProfile(item?.viewportProfile, "pc") !== normalizedViewportProfile) return false;
       return true;
     })
     .sort((a, b) => String(b?.updatedAt || "").localeCompare(String(a?.updatedAt || "")));
-  const draftBuild = siblingDraftBuilds.find((item) => String(item?.id || "").trim() === draftBuildId) || null;
+  const draftBuildSummary = siblingDraftBuilds.find((item) => String(item?.id || "").trim() === draftBuildId) || null;
+  const draftBuild = draftBuildSummary ? findDraftBuildById(payload.user.userId, draftBuildId) || draftBuildSummary : null;
   if (!draftBuild) return null;
   const currentDraftIndex = siblingDraftBuilds.findIndex((item) => String(item?.id || "").trim() === draftBuildId);
-  const previousDraftBuild = currentDraftIndex >= 0 ? siblingDraftBuilds[currentDraftIndex + 1] || null : null;
+  const previousDraftBuildSummary = currentDraftIndex >= 0 ? siblingDraftBuilds[currentDraftIndex + 1] || null : null;
+  const previousDraftBuild = previousDraftBuildSummary?.id
+    ? findDraftBuildById(payload.user.userId, previousDraftBuildSummary.id) || previousDraftBuildSummary
+    : null;
   const beforePageSnapshot =
     draftBuild?.snapshotData?.beforePageSnapshot ||
     previousDraftBuild?.snapshotData?.pageSnapshot ||
@@ -603,22 +2862,51 @@ function resolveDraftBuildContextForRequest(req, pageId, viewportProfile = "") {
   };
 }
 
-function resolvePinnedDataForPage(req, pageId, viewportProfile = "") {
-  const payload = readDataForRequest(req);
+function resolvePinnedDataForPage(req, pageId, viewportProfile = "", options = {}) {
+  const perfTimer = options?.perfTimer || null;
+  perfTimer?.mark("resolvePinnedData:start");
+  const requestUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+  const baselineMode = String(requestUrl.searchParams.get("baseline") || "").trim().toLowerCase();
+  if (baselineMode === "origin") {
+    return {
+      user: null,
+      data: readEditableData(),
+      workspace: null,
+      source: "shared-default",
+      pinnedView: null,
+      effectiveSource: "shared-default:origin-baseline",
+    };
+  }
+  const payload = readDataForRequest(req, { fastWorkspaceRead: options?.fastWorkspaceRead === true });
+  perfTimer?.mark("resolvePinnedData:read-data");
   const normalizedPageId = String(pageId || "").trim();
   if (!payload.user || !normalizedPageId) return payload;
-  const draftSnapshotOverride = resolveDraftSnapshotOverrideForPage(req, payload, normalizedPageId, viewportProfile);
+  const forceLiveBaseline = String(requestUrl.searchParams.get("baseline") || "").trim().toLowerCase() === "live";
+  if (forceLiveBaseline) {
+    return {
+      ...payload,
+      pinnedView: null,
+      effectiveSource: `${payload.source}:live-baseline`,
+    };
+  }
+  const draftSnapshotOverride = resolveDraftSnapshotOverrideForPage(req, payload, normalizedPageId, viewportProfile, {
+    fastWorkspaceRead: options?.fastWorkspaceRead === true,
+    perfTimer,
+  });
+  perfTimer?.mark("resolvePinnedData:draft-override");
   if (draftSnapshotOverride?.data) {
     return {
       ...payload,
       data: draftSnapshotOverride.data,
       draftBuild: draftSnapshotOverride.draftBuild || null,
+      draftSnapshotState: draftSnapshotOverride.snapshotState || "after",
       effectiveSource: `${payload.source}:draft-${draftSnapshotOverride.snapshotState || "after"}`,
     };
   }
   const normalizedViewportProfile =
     normalizedPageId === "home" ? normalizeHomeViewportProfile(viewportProfile, "pc") : normalizeViewportProfile(viewportProfile, "pc");
   const pinned = getPinnedView(payload.user.userId, normalizedPageId, normalizedViewportProfile);
+  perfTimer?.mark("resolvePinnedData:get-pinned-view");
   const pageSnapshot = pinned?.version?.snapshotData?.pageSnapshot || null;
   if (!pageSnapshot) {
     return {
@@ -645,6 +2933,83 @@ function extractSlotImageSourcesFromHtml(html, slotId) {
   return Array.from(slotBlock.matchAll(/<img\b[^>]*src="([^"]+)"/gi))
     .map((match) => String(match?.[1] || "").trim())
     .filter(Boolean);
+}
+
+function buildRuntimeReferenceArtifacts(pageId, viewportProfile = "pc", slotIds = []) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(viewportProfile, "pc")
+      : normalizeViewportProfile(viewportProfile, "pc");
+  const rawHtml = readCloneSourceHtmlByPageId(normalizedPageId, normalizedViewportProfile);
+  if (!rawHtml) return null;
+  const referenceHtml = rewriteReferenceHtml(rawHtml, normalizedPageId, normalizedViewportProfile);
+  if (!referenceHtml) return null;
+  const normalizedSlotIds = Array.from(new Set(
+    (Array.isArray(slotIds) ? slotIds : [])
+      .map((slotId) => String(slotId || "").trim())
+      .filter(Boolean)
+  ));
+  const currentSectionHtmlMap = {};
+  const sectionBoundaryMap = {};
+  const currentPageAssetMap = {};
+  const currentSectionAssetMap = {};
+  normalizedSlotIds.forEach((slotId) => {
+    const selectorCandidates = Array.from(new Set([
+      `[data-codex-slot="${slotId}"]`,
+      ...buildReplacementSelectorCandidates(normalizedPageId, slotId, "", normalizedViewportProfile),
+    ].filter(Boolean)));
+    const sectionHtml =
+      extractFirstAvailableSelectorBlock(referenceHtml, selectorCandidates) ||
+      extractArtifactSectionMarkup(normalizedPageId, slotId, normalizedViewportProfile);
+    if (!sectionHtml) return;
+    currentSectionHtmlMap[slotId] = sectionHtml;
+    sectionBoundaryMap[slotId] = {
+      currentHtml: sectionHtml,
+      selectorCandidates,
+    };
+    const imageEntries = Array.from(sectionHtml.matchAll(/<img\b([^>]+)>/gi))
+      .map((match) => {
+        const attrs = String(match?.[1] || "");
+        const srcMatch = attrs.match(/\bsrc="([^"]+)"/i);
+        const altMatch = attrs.match(/\balt="([^"]*)"/i);
+        const src = String(srcMatch?.[1] || "").trim();
+        const altText = String(altMatch?.[1] || "").trim();
+        return src ? { source: src, altText } : null;
+      })
+      .filter(Boolean);
+    const normalizedAssets = [];
+    if (imageEntries[0]) {
+      const mainAsset = {
+        assetSlotId: `${slotId}-main`,
+        source: imageEntries[0].source,
+        altText: imageEntries[0].altText,
+      };
+      currentPageAssetMap[mainAsset.assetSlotId] = mainAsset.source;
+      normalizedAssets.push(mainAsset);
+    }
+    imageEntries.slice(1, 6).forEach((entry, index) => {
+      const asset = {
+        assetSlotId: `${slotId}-image-${index + 1}`,
+        source: entry.source,
+        altText: entry.altText,
+      };
+      currentPageAssetMap[asset.assetSlotId] = asset.source;
+      normalizedAssets.push(asset);
+    });
+    if (normalizedAssets.length) {
+      currentSectionAssetMap[slotId] = normalizedAssets;
+    }
+  });
+  return {
+    pageId: normalizedPageId,
+    viewportProfile: normalizedViewportProfile,
+    rawShellHtml: referenceHtml,
+    currentSectionHtmlMap,
+    currentSectionAssetMap,
+    sectionBoundaryMap,
+    currentPageAssetMap,
+  };
 }
 
 function buildSectionPreviewImageDiffMeta({
@@ -688,8 +3053,13 @@ function buildSectionPreviewImageDiffMeta({
 }
 
 function applySectionPreviewMode(html, slotId, options = {}) {
-  const normalizedSlotId = String(slotId || "").trim();
-  if (!normalizedSlotId) return String(html || "");
+  const normalizedSlotIds = String(slotId || "")
+    .split(",")
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  if (!normalizedSlotIds.length) return String(html || "");
+  const normalizedSlotId = normalizedSlotIds.join(",");
+  const isHomeTopStageSlot = normalizedSlotIds.every((item) => item === "hero" || item === "quickmenu");
   const imageDiffEnabled = options?.imageDiff?.enabled === true;
   const changedImageIndexes = Array.isArray(options?.imageDiff?.changedImageIndexes) ? options.imageDiff.changedImageIndexes : [];
   let next = String(html || "");
@@ -712,8 +3082,22 @@ function applySectionPreviewMode(html, slotId, options = {}) {
         padding: 0;
         background: #fff;
       }
+      .codex-section-preview-root[data-preview-layout="header-stack"],
+      .codex-section-preview-root[data-preview-layout="header-shell"] {
+        width: min(1440px, calc(100vw - 32px));
+        margin: 0 auto;
+        padding: 8px 0 24px;
+      }
       .codex-section-preview-root > [data-codex-slot] {
         margin: 0 !important;
+      }
+      .codex-section-preview-root[data-preview-layout="header-stack"] > [data-codex-slot="header-top"],
+      .codex-section-preview-root[data-preview-layout="header-stack"] > [data-codex-slot="header-bottom"] {
+        margin: 0 !important;
+      }
+      .codex-section-preview-root[data-preview-layout="header-shell"] > header {
+        margin: 0 !important;
+        width: 100% !important;
       }
       .codex-section-preview-image-changed {
         outline: 3px solid #ef4444 !important;
@@ -740,21 +3124,101 @@ function applySectionPreviewMode(html, slotId, options = {}) {
     /<\/body>/i,
     `<script>
       (() => {
-        const targetSlotId = ${JSON.stringify(normalizedSlotId)};
+        const targetSlotIds = ${JSON.stringify(normalizedSlotIds)};
+        const targetSlotId = targetSlotIds.join(',');
         const imageDiffEnabled = ${imageDiffEnabled ? "true" : "false"};
         const changedImageIndexes = ${JSON.stringify(changedImageIndexes)};
+        const isHeaderPreview = targetSlotIds.every((slotId) => slotId === 'header-top' || slotId === 'header-bottom');
+        const isHomeTopStagePreview = ${isHomeTopStageSlot ? "true" : "false"};
+        const forceSharedShellOnly = ${normalizedSlotIds.length > 1 ? "true" : "false"};
+        const contextualSlots = isHeaderPreview
+          ? ['header-top', 'header-bottom']
+          : (isHomeTopStagePreview
+            ? ['home-top-composition-shell', 'hero', 'quickmenu']
+            : targetSlotIds);
+        const findSharedShell = (slots) => {
+          if (!slots.length) return null;
+          const slotAncestors = slots.map((slot) => {
+            const list = [];
+            let current = slot.closest ? slot.closest('[data-codex-slot]') : null;
+            while (current) {
+              list.push(current);
+              const parent = current.parentElement;
+              current = parent && parent.closest ? parent.closest('[data-codex-slot]') : null;
+            }
+            return list;
+          });
+          if (!slotAncestors.length) return null;
+          const [first, ...rest] = slotAncestors;
+          return first.find((candidate) => {
+            const candidateSlot = candidate.getAttribute ? candidate.getAttribute('data-codex-slot') : '';
+            if (!candidateSlot) return false;
+            if (targetSlotIds.includes(candidateSlot) && targetSlotIds.length === 1) return true;
+            return rest.every((list) => list.includes(candidate));
+          }) || null;
+        };
         const run = () => {
-          const slot = document.querySelector('[data-codex-slot="' + targetSlotId + '"]');
           const root = document.createElement('div');
           root.className = 'codex-section-preview-root';
+          if (isHeaderPreview) {
+            root.setAttribute('data-preview-layout', 'header-shell');
+          } else if (isHomeTopStagePreview) {
+            root.setAttribute('data-preview-layout', 'cluster-stack');
+          } else if (contextualSlots.length > 1) {
+            root.setAttribute('data-preview-layout', 'header-stack');
+          }
           document.body.classList.add('codex-section-preview-body');
-          if (!slot) {
+          const foundSlots = contextualSlots
+            .map((slotId) => document.querySelector('[data-codex-slot="' + slotId + '"]'))
+            .filter(Boolean);
+          if (!foundSlots.length) {
             root.innerHTML = '<div class="codex-section-preview-empty">선택한 섹션을 찾을 수 없습니다.</div>';
             document.body.innerHTML = '';
             document.body.appendChild(root);
             return;
           }
-          root.appendChild(slot.cloneNode(true));
+          if (isHeaderPreview) {
+            const headerShell = foundSlots[0]?.closest('header');
+            if (headerShell) {
+              root.appendChild(headerShell.cloneNode(true));
+            } else {
+              foundSlots.forEach((slot) => {
+                root.appendChild(slot.cloneNode(true));
+              });
+            }
+          } else if (isHomeTopStagePreview) {
+            const clusterShell =
+              foundSlots.find((slot) => slot.getAttribute && slot.getAttribute('data-codex-slot') === 'home-top-composition-shell') ||
+              foundSlots.find((slot) => slot.closest && slot.closest('[data-codex-slot="home-top-composition-shell"]'))?.closest('[data-codex-slot="home-top-composition-shell"]');
+            if (clusterShell) {
+              root.appendChild(clusterShell.cloneNode(true));
+            } else {
+              foundSlots
+                .filter((slot) => {
+                  const slotKey = slot.getAttribute ? slot.getAttribute('data-codex-slot') : '';
+                  return slotKey === 'hero' || slotKey === 'quickmenu';
+                })
+                .forEach((slot) => {
+                  root.appendChild(slot.cloneNode(true));
+                });
+            }
+          } else if (targetSlotIds.length > 1) {
+            const selectedSlots = targetSlotIds
+              .map((slotKey) => document.querySelector('[data-codex-slot="' + slotKey + '"]'))
+              .filter(Boolean);
+            const sharedShell = findSharedShell(selectedSlots);
+            if (sharedShell) {
+              root.appendChild(sharedShell.cloneNode(true));
+            } else {
+              selectedSlots.forEach((slot) => {
+                root.appendChild(slot.cloneNode(true));
+              });
+            }
+          } else {
+            foundSlots.forEach((slot) => {
+              root.appendChild(slot.cloneNode(true));
+            });
+          }
           if (imageDiffEnabled) {
             const images = Array.from(root.querySelectorAll('img[src]'));
             let changedCount = 0;
@@ -785,6 +3249,70 @@ function applySectionPreviewMode(html, slotId, options = {}) {
   return next;
 }
 
+function buildLightweightSectionPreviewHtml(html, slotId = "") {
+  const normalizedSlotIds = String(slotId || "")
+    .split(",")
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  if (!normalizedSlotIds.length) return String(html || "");
+  const isHeaderPreview = normalizedSlotIds.every((item) => item === "header-top" || item === "header-bottom");
+  const isHomeTopStagePreview = normalizedSlotIds.every((item) => item === "hero" || item === "quickmenu");
+  let blocks = [];
+  if (isHeaderPreview) {
+    const headerBlock = extractFirstSelectorBlock(String(html || ""), "header");
+    if (headerBlock) blocks = [headerBlock];
+  } else if (isHomeTopStagePreview) {
+    const clusterBlock = extractFirstSelectorBlock(String(html || ""), `[data-codex-slot="home-top-composition-shell"]`);
+    if (clusterBlock) {
+      blocks = [clusterBlock];
+    } else {
+      blocks = normalizedSlotIds
+        .map((slotKey) => extractFirstSelectorBlock(String(html || ""), `[data-codex-slot="${slotKey}"]`))
+        .filter(Boolean);
+    }
+  } else {
+    blocks = normalizedSlotIds
+      .map((slotKey) => extractFirstSelectorBlock(String(html || ""), `[data-codex-slot="${slotKey}"]`))
+      .filter(Boolean);
+  }
+  const bodyMarkup = blocks.length
+    ? blocks.join("\n")
+    : `<div class="codex-section-preview-empty">선택한 섹션을 찾을 수 없습니다.</div>`;
+  let next = String(html || "");
+  next = next.replace(
+    /<\/head>/i,
+    `<style>
+      html, body {
+        margin: 0 !important;
+        min-height: auto !important;
+        height: auto !important;
+        background: #fff !important;
+        overflow: auto !important;
+      }
+      body {
+        padding: 0 !important;
+      }
+      .codex-section-preview-root {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 0;
+        background: #fff;
+      }
+      .codex-section-preview-empty {
+        padding: 24px;
+        font: 600 13px/1.5 Arial, sans-serif;
+        color: #334155;
+        background: #fff;
+      }
+    </style></head>`
+  );
+  next = next.replace(
+    /<body[^>]*>[\s\S]*<\/body>/i,
+    `<body><div class="codex-section-preview-root" data-preview-slot="${escapeHtml(normalizedSlotIds.join(","))}">${bodyMarkup}</div></body>`
+  );
+  return next.replace(/<script\b[\s\S]*?<\/script>/gi, "");
+}
+
 function readWorkspaceData(userId) {
   return normalizeEditableData(JSON.parse(JSON.stringify(getWorkspace(userId).data || readEditableData())));
 }
@@ -807,6 +3335,295 @@ function buildWorkspaceMetaSummary(workspace) {
     pageIdentityOverrideCount: workspace.pageIdentityOverrides ? Object.keys(workspace.pageIdentityOverrides).length : 0,
     pageIdentityOverrides: workspace.pageIdentityOverrides || {},
   };
+}
+
+function uniqueNonEmptyLines(values = []) {
+  const lines = Array.isArray(values) ? values : [];
+  const seen = new Set();
+  const next = [];
+  for (const item of lines) {
+    const normalized = String(item || "").replace(/\s+/g, " ").trim();
+    if (!normalized) continue;
+    const dedupeKey = normalized.toLowerCase();
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+    next.push(normalized);
+  }
+  return next;
+}
+
+function buildAdminPageWorkSummaryMap(workspace, pages = []) {
+  const result = {};
+  if (!workspace) return result;
+
+  const plans = Array.isArray(workspace.requirementPlans) ? workspace.requirementPlans : [];
+  const draftBuilds = Array.isArray(workspace.draftBuilds) ? workspace.draftBuilds : [];
+  const savedVersions = Array.isArray(workspace.savedVersions) ? workspace.savedVersions : [];
+  const identityOverrides = workspace.pageIdentityOverrides && typeof workspace.pageIdentityOverrides === "object"
+    ? workspace.pageIdentityOverrides
+    : {};
+  const hasMeaningfulIdentity = (identity) =>
+    Boolean(
+      String(identity?.role || "").trim() ||
+      String(identity?.purpose || "").trim() ||
+      String(identity?.designIntent || "").trim() ||
+      (Array.isArray(identity?.mustPreserve) && identity.mustPreserve.length) ||
+      (Array.isArray(identity?.shouldAvoid) && identity.shouldAvoid.length) ||
+      (Array.isArray(identity?.visualGuardrails) && identity.visualGuardrails.length)
+    );
+
+  const ensureSummary = (pageId, viewportProfile = "") => {
+    const normalizedPageId = String(pageId || "").trim();
+    if (!normalizedPageId) return null;
+    const normalizedViewport = normalizeViewportProfile(viewportProfile || "pc", "pc");
+    const key = buildFullCompletionPageKey(normalizedPageId, normalizedViewport);
+    if (!result[key]) {
+      result[key] = {
+        key,
+        pageId: normalizedPageId,
+        viewportProfile: normalizedViewport,
+        identityReady: false,
+        requirementReady: false,
+        prdReady: false,
+        builderReady: false,
+        lastWorkedAt: "",
+        lastWorkedSection: "",
+        lastGeneratedAt: "",
+        lastGeneratedSection: "",
+      };
+    }
+    return result[key];
+  };
+
+  const recordLatest = (summary, sectionLabel, timestamp, kind = "work") => {
+    const value = String(timestamp || "").trim();
+    if (!summary || !sectionLabel || !value) return;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return;
+    const currentDate = new Date(summary.lastWorkedAt || 0);
+    if (!summary.lastWorkedAt || date.getTime() > currentDate.getTime()) {
+      summary.lastWorkedAt = value;
+      summary.lastWorkedSection = sectionLabel;
+    }
+    if (kind === "builder") {
+      const currentGeneratedDate = new Date(summary.lastGeneratedAt || 0);
+      if (!summary.lastGeneratedAt || date.getTime() > currentGeneratedDate.getTime()) {
+        summary.lastGeneratedAt = value;
+        summary.lastGeneratedSection = sectionLabel;
+      }
+    }
+  };
+
+  const knownPageIds = new Set(
+    (Array.isArray(pages) ? pages : [])
+      .map((item) => String(item?.id || "").trim())
+      .filter(Boolean)
+  );
+  Object.keys(identityOverrides).forEach((pageId) => knownPageIds.add(pageId));
+  knownPageIds.forEach((pageId) => {
+    const override = identityOverrides[pageId] || {};
+    const effectiveIdentity = mergePageIdentityBrief(
+      buildPageIdentityBrief(pageId, {
+        pageTitle: pageId === "home" ? "LGE.COM | LG전자" : "",
+      }),
+      override
+    );
+    const baseSummary = ensureSummary(pageId, "pc");
+    if (!baseSummary) return;
+    baseSummary.identityReady = hasMeaningfulIdentity(effectiveIdentity);
+    if (pageId === "home") {
+      const tabletSummary = ensureSummary(pageId, "ta");
+      tabletSummary.identityReady = hasMeaningfulIdentity(effectiveIdentity);
+    }
+    if (override?.updatedAt || override?.createdAt) {
+      recordLatest(baseSummary, "페이지 정체성", override.updatedAt || override.createdAt || "");
+      if (pageId === "home") {
+        recordLatest(ensureSummary(pageId, "ta"), "페이지 정체성", override.updatedAt || override.createdAt || "");
+      }
+    }
+  });
+
+  plans.forEach((item) => {
+    const summary = ensureSummary(item.pageId, item.viewportProfile);
+    if (!summary) return;
+    const input = item?.input?.userInput || {};
+    const requirementReady = Boolean(
+      String(input.requestText || "").trim() ||
+      String(input.keyMessage || "").trim() ||
+      String(input.preferredDirection || "").trim() ||
+      String(input.avoidDirection || "").trim() ||
+      String(input.toneAndMood || "").trim() ||
+      (Array.isArray(input.referenceUrls) && input.referenceUrls.length)
+    );
+    const prdReady = Boolean(item?.output?.requirementPlan);
+    summary.requirementReady = summary.requirementReady || requirementReady || prdReady;
+    summary.prdReady = summary.prdReady || prdReady;
+    recordLatest(summary, prdReady ? "기획서" : "요구사항", item.updatedAt || item.createdAt || "");
+  });
+
+  draftBuilds.forEach((item) => {
+    const summary = ensureSummary(item.pageId, item.viewportProfile);
+    if (!summary) return;
+    summary.builderReady = true;
+    recordLatest(summary, "디자인 빌더", item.updatedAt || item.createdAt || "", "builder");
+  });
+
+  savedVersions.forEach((item) => {
+    const summary = ensureSummary(item.pageId, item.viewportProfile);
+    if (!summary) return;
+    summary.builderReady = true;
+    recordLatest(summary, "디자인 빌더", item.createdAt || "", "builder");
+  });
+
+  return result;
+}
+
+function buildFullCompletionPageKey(pageId = "", viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return "";
+  const normalizedViewport = normalizedPageId === "home"
+    ? normalizeHomeViewportProfile(viewportProfile, "pc")
+    : normalizeViewportProfile(viewportProfile, "pc");
+  return `${normalizedPageId}:${normalizedViewport}`;
+}
+
+function readReadinessAudit() {
+  return readCachedValue(FULL_COMPLETION_REPORT_CACHE, "readiness-audit", () => {
+    try {
+      return readJsonFile(READINESS_AUDIT_PATH);
+    } catch {
+      return { generatedAt: null, pages: [] };
+    }
+  });
+}
+
+function readArtifactSidecarAudit() {
+  return readCachedValue(FULL_COMPLETION_REPORT_CACHE, "artifact-sidecar-audit", () => {
+    try {
+      return readJsonFile(ARTIFACT_SIDECAR_AUDIT_PATH);
+    } catch {
+      return { generatedAt: null, results: [] };
+    }
+  });
+}
+
+function resolvePlanDocsState(planDocs = {}) {
+  const planCount = Number(planDocs?.count || 0);
+  const latestPlanId = String(planDocs?.latestPlanId || "").trim();
+  const builderMarkdownLength = Number(planDocs?.builderMarkdownLength || 0);
+  const layoutMockupMarkdownLength = Number(planDocs?.layoutMockupMarkdownLength || 0);
+  const designSpecMarkdownLength = Number(planDocs?.designSpecMarkdownLength || 0);
+  const sectionBlueprintCount = Number(planDocs?.sectionBlueprintCount || 0);
+  if (designSpecMarkdownLength > 0 && sectionBlueprintCount > 0) return "latest";
+  if (planCount > 0 || latestPlanId || builderMarkdownLength > 0 || layoutMockupMarkdownLength > 0 || designSpecMarkdownLength > 0) {
+    return "legacy";
+  }
+  return "none";
+}
+
+function computeFullCompletionScore(readinessPage = {}, sidecarPage = null) {
+  const cloneScore = Number(readinessPage?.cloneStatus || 0) === 200 ? 20 : 0;
+  const sidecarStatus = String(sidecarPage?.status || "fail").trim() || "fail";
+  const sidecarScore = sidecarStatus === "pass" ? 25 : sidecarStatus === "warning" ? 15 : 0;
+  const repeaterCount = Number(readinessPage?.sidecar?.repeaterCount || 0);
+  const totalRepeaterItems = Number(readinessPage?.sidecar?.totalRepeaterItems || 0);
+  const repeaterScore = repeaterCount === 0 || totalRepeaterItems > 0 ? 15 : 0;
+  const docsState = resolvePlanDocsState(readinessPage?.planDocs || {});
+  const docsScore = docsState === "latest" ? 20 : docsState === "legacy" ? 8 : 0;
+  const builderIssueCount = Number(readinessPage?.builder?.issueCount || 0);
+  const emptyPatchSchemaCount = Number(readinessPage?.builder?.emptyPatchSchemaCount || 0);
+  const renderableComponentCount = Number(readinessPage?.builder?.renderableComponentCount || 0);
+  const builderScore = builderIssueCount === 0 && emptyPatchSchemaCount === 0 && renderableComponentCount > 0 ? 10 : builderIssueCount > 0 ? 6 : 0;
+  return cloneScore + sidecarScore + repeaterScore + docsScore + builderScore;
+}
+
+function buildFullCompletionBlockers(readinessPage = {}, sidecarPage = null) {
+  const blockers = [];
+  const cloneStatus = Number(readinessPage?.cloneStatus || 0);
+  if (cloneStatus !== 200) blockers.push(`clone ${cloneStatus || "n/a"}`);
+  const sidecarStatus = String(sidecarPage?.status || "").trim();
+  if (sidecarStatus && sidecarStatus !== "pass") blockers.push(`sidecar ${sidecarStatus}`);
+  const missingReferenceMarkupCount = Number(sidecarPage?.missingReferenceMarkupCount || 0);
+  if (missingReferenceMarkupCount > 0) blockers.push(`reference markup ${missingReferenceMarkupCount} missing`);
+  const missingReferenceGeometryCount = Number(sidecarPage?.missingReferenceGeometryCount || 0);
+  if (missingReferenceGeometryCount > 0) blockers.push(`reference geometry ${missingReferenceGeometryCount} missing`);
+  const docsState = resolvePlanDocsState(readinessPage?.planDocs || {});
+  if (docsState !== "latest") blockers.push(`docs ${docsState}`);
+  const builderIssueCount = Number(readinessPage?.builder?.issueCount || 0);
+  if (builderIssueCount > 0) blockers.push(`builder issues ${builderIssueCount}`);
+  const repeaterCount = Number(readinessPage?.sidecar?.repeaterCount || 0);
+  const totalRepeaterItems = Number(readinessPage?.sidecar?.totalRepeaterItems || 0);
+  if (repeaterCount > 0 && totalRepeaterItems === 0) blockers.push("repeater items empty");
+  return uniqueNonEmptyLines(blockers);
+}
+
+function buildFullCompletionReport() {
+  return readCachedValue(FULL_COMPLETION_REPORT_CACHE, "full-completion-report", () => {
+    const readinessAudit = readReadinessAudit();
+    const sidecarAudit = readArtifactSidecarAudit();
+    const readinessPages = Array.isArray(readinessAudit?.pages) ? readinessAudit.pages : [];
+    const sidecarResults = Array.isArray(sidecarAudit?.results) ? sidecarAudit.results : [];
+    const sidecarMap = new Map(
+      sidecarResults.map((item) => [
+        buildFullCompletionPageKey(item?.pageId, item?.viewportProfile),
+        item,
+      ])
+    );
+    const pages = readinessPages
+      .map((item) => {
+        const key = buildFullCompletionPageKey(item?.pageId, item?.viewportProfile);
+        const sidecar = sidecarMap.get(key) || null;
+        const docsState = resolvePlanDocsState(item?.planDocs || {});
+        const blockers = buildFullCompletionBlockers(item, sidecar);
+        const score = computeFullCompletionScore(item, sidecar);
+        const weakSections = Array.isArray(sidecar?.weakSections)
+          ? sidecar.weakSections.map((section) => String(section?.slotId || "").trim()).filter(Boolean)
+          : [];
+        return {
+          key,
+          pageId: String(item?.pageId || "").trim(),
+          viewportProfile: item?.pageId === "home"
+            ? normalizeHomeViewportProfile(item?.viewportProfile, "pc")
+            : normalizeViewportProfile(item?.viewportProfile, "pc"),
+          score,
+          cloneStatus: Number(item?.cloneStatus || 0),
+          docsState,
+          builderIssueCount: Number(item?.builder?.issueCount || 0),
+          emptyPatchSchemaCount: Number(item?.builder?.emptyPatchSchemaCount || 0),
+          renderableComponentCount: Number(item?.builder?.renderableComponentCount || 0),
+          sidecarStatus: String(sidecar?.status || "fail").trim() || "fail",
+          repeaterCount: Number(item?.sidecar?.repeaterCount || 0),
+          totalRepeaterItems: Number(item?.sidecar?.totalRepeaterItems || 0),
+          missingReferenceMarkupCount: Number(sidecar?.missingReferenceMarkupCount || 0),
+          missingReferenceGeometryCount: Number(sidecar?.missingReferenceGeometryCount || 0),
+          weakSections,
+          blockers,
+          blockerCount: blockers.length,
+          completionState: blockers.length ? "incomplete" : "complete",
+        };
+      })
+      .sort((left, right) => {
+        const scoreDiff = Number(left.score || 0) - Number(right.score || 0);
+        if (scoreDiff !== 0) return scoreDiff;
+        const blockerDiff = Number(right.blockerCount || 0) - Number(left.blockerCount || 0);
+        if (blockerDiff !== 0) return blockerDiff;
+        return String(left.key || "").localeCompare(String(right.key || ""), "ko");
+      });
+
+    return {
+      generatedAt: readinessAudit?.generatedAt || sidecarAudit?.generatedAt || null,
+      pages,
+      summary: {
+        totalPages: pages.length,
+        completeCount: pages.filter((item) => item.completionState === "complete").length,
+        incompleteCount: pages.filter((item) => item.completionState !== "complete").length,
+        sidecarBlockedCount: pages.filter((item) => item.sidecarStatus !== "pass").length,
+        docsBlockedCount: pages.filter((item) => item.docsState !== "latest").length,
+        builderBlockedCount: pages.filter((item) => item.builderIssueCount > 0).length,
+        repeaterBlockedCount: pages.filter((item) => item.repeaterCount > 0 && item.totalRepeaterItems === 0).length,
+      },
+    };
+  });
 }
 
 function escapeHtml(value) {
@@ -1088,6 +3905,10 @@ function safeArray(values, limit = 20) {
   );
 }
 
+function safeObjectArray(values, limit = 20) {
+  return (Array.isArray(values) ? values : []).filter(Boolean).slice(0, limit);
+}
+
 function archiveSlugFromUrl(rawUrl) {
   const digest = crypto.createHash("sha1").update(rawUrl).digest("hex").slice(0, 12);
   const parsed = new URL(rawUrl);
@@ -1164,6 +3985,563 @@ function readDesignReferenceLibrary() {
       };
     }
   }, 60000);
+}
+
+function readAssetPipelineStarter() {
+  return readCachedValue(ASSET_PIPELINE_CACHE, "asset-pipeline-starter", () => {
+    try {
+      return readJsonFile(ASSET_PIPELINE_STARTER_PATH);
+    } catch {
+      return {
+        generatedAt: null,
+        assetCatalog: [],
+        geometrySpecs: {},
+        iconFamilyContracts: {},
+        iconSets: [],
+        badgePresets: [],
+        visualSets: [],
+        thumbnailPresets: [],
+        pageDefaults: {},
+        familyDefaults: {},
+        componentDefaults: {},
+      };
+    }
+  });
+}
+
+function normalizeStarterAssetCatalogEntry(item = {}) {
+  const source = item && typeof item === "object" ? item : {};
+  const width = Number.parseInt(source.width, 10);
+  const height = Number.parseInt(source.height, 10);
+  return {
+    id: String(source.id || "").trim(),
+    label: String(source.label || "").trim(),
+    assetUrl: String(source.assetUrl || "").trim(),
+    format: String(source.format || "").trim(),
+    width: Number.isFinite(width) ? width : null,
+    height: Number.isFinite(height) ? height : null,
+    aspectRatio: String(source.aspectRatio || "").trim(),
+    role: String(source.role || "").trim(),
+    tags: toStringArray(source.tags),
+  };
+}
+
+function buildAssetPipelineStarterLookup(payload = {}) {
+  const assetCatalog = (Array.isArray(payload?.assetCatalog) ? payload.assetCatalog : [])
+    .map((item) => normalizeStarterAssetCatalogEntry(item))
+    .filter((item) => item.id && item.assetUrl);
+  const assetMap = new Map(assetCatalog.map((item) => [item.id, item]));
+  const resolveCollection = (items = []) =>
+    (Array.isArray(items) ? items : [])
+      .map((item) => {
+        const entry = item && typeof item === "object" ? item : {};
+        const assetIds = toStringArray(entry.assetIds);
+        return {
+          ...entry,
+          id: String(entry.id || "").trim(),
+          assetIds,
+          assets: assetIds.map((assetId) => assetMap.get(assetId)).filter(Boolean),
+        };
+      })
+      .filter((item) => item.id);
+  return {
+    assetCatalog,
+    assetMap,
+    iconSets: resolveCollection(payload?.iconSets),
+    badgePresets: resolveCollection(payload?.badgePresets),
+    visualSets: resolveCollection(payload?.visualSets),
+    thumbnailPresets: resolveCollection(payload?.thumbnailPresets),
+    geometrySpecs:
+      payload?.geometrySpecs && typeof payload.geometrySpecs === "object"
+        ? payload.geometrySpecs
+        : {},
+    iconFamilyContracts:
+      payload?.iconFamilyContracts && typeof payload.iconFamilyContracts === "object"
+        ? payload.iconFamilyContracts
+        : {},
+  };
+}
+
+function buildAssetPipelineStarterContext(pageId = "") {
+  const payload = readAssetPipelineStarter();
+  const lookup = buildAssetPipelineStarterLookup(payload);
+  const normalizedPageId = String(pageId || "").trim();
+  const pageDefaults =
+    payload?.pageDefaults && typeof payload.pageDefaults === "object"
+      ? payload.pageDefaults[normalizedPageId] || null
+      : null;
+  return {
+    generatedAt: payload?.generatedAt || null,
+    pageId: normalizedPageId,
+    assetCatalog: lookup.assetCatalog.slice(0, 80),
+    geometrySpecs: lookup.geometrySpecs,
+    iconFamilyContracts: lookup.iconFamilyContracts,
+    iconSets: lookup.iconSets.slice(0, 20),
+    badgePresets: lookup.badgePresets.slice(0, 20),
+    visualSets: lookup.visualSets.slice(0, 20),
+    thumbnailPresets: lookup.thumbnailPresets.slice(0, 20),
+    pageDefaults,
+    familyDefaults:
+      payload?.familyDefaults && typeof payload.familyDefaults === "object"
+        ? payload.familyDefaults
+        : {},
+    componentDefaults:
+      payload?.componentDefaults && typeof payload.componentDefaults === "object"
+        ? payload.componentDefaults
+        : {},
+  };
+}
+
+function readPrimitiveCompositionCatalog() {
+  return readCachedValue(PRIMITIVE_COMPOSITION_CATALOG_CACHE, "primitive-composition-catalog", () => {
+    try {
+      return readJsonFile(PRIMITIVE_COMPOSITION_CATALOG_PATH);
+    } catch {
+      return { generatedAt: null, version: 0, primitives: [], templateMappings: {}, pageAssignments: {} };
+    }
+  });
+}
+
+function buildPrimitiveCompositionCatalogContext(pageId = "", options = {}) {
+  const payload = readPrimitiveCompositionCatalog();
+  const normalizedPageId = String(pageId || "").trim();
+  const targetComponentIds = new Set(
+    safeArray(options.targetComponentIds, 40).map((item) => String(item || "").trim()).filter(Boolean)
+  );
+  const pageAssignment =
+    payload?.pageAssignments && typeof payload.pageAssignments === "object"
+      ? payload.pageAssignments[normalizedPageId] || {}
+      : {};
+  const componentAssignments = Object.entries(
+    pageAssignment?.components && typeof pageAssignment.components === "object" ? pageAssignment.components : {}
+  )
+    .filter(([componentId]) => !targetComponentIds.size || targetComponentIds.has(String(componentId || "").trim()))
+    .map(([componentId, primitiveIds]) => ({
+      componentId: String(componentId || "").trim(),
+      primitiveIds: toStringArray(primitiveIds),
+    }));
+  const usedPrimitiveIds = new Set(
+    componentAssignments.flatMap((item) => item.primitiveIds).concat([
+      String(pageAssignment?.pageShell?.primitiveId || "").trim(),
+      ...Object.values(pageAssignment?.groupShells && typeof pageAssignment.groupShells === "object" ? pageAssignment.groupShells : {})
+        .map((item) => String(item?.primitiveId || "").trim())
+        .filter(Boolean),
+    ]).filter(Boolean)
+  );
+  const primitives = safeArray(payload?.primitives, 30)
+    .filter((item) => !usedPrimitiveIds.size || usedPrimitiveIds.has(String(item?.id || "").trim()))
+    .map((item) => ({
+      id: String(item?.id || "").trim(),
+      category: String(item?.category || "").trim(),
+      description: String(item?.description || "").trim(),
+      allowedVariants: toStringArray(item?.allowedVariants),
+      allowedProps: item?.allowedProps && typeof item.allowedProps === "object" ? item.allowedProps : {},
+    }))
+    .filter((item) => item.id);
+  const templateMappings = payload?.templateMappings && typeof payload.templateMappings === "object"
+    ? payload.templateMappings
+    : {};
+  return {
+    generatedAt: payload?.generatedAt || null,
+    version: Number(payload?.version || 0),
+    pageId: normalizedPageId,
+    primitives,
+    templateMappings,
+    pageShell: pageAssignment?.pageShell || null,
+    groupShells: pageAssignment?.groupShells && typeof pageAssignment.groupShells === "object" ? pageAssignment.groupShells : {},
+    componentAssignments,
+  };
+}
+
+function readStyleRuntimeTokenPresets() {
+  return readCachedValue(STYLE_RUNTIME_TOKEN_PRESETS_CACHE, "style-runtime-token-presets", () => {
+    try {
+      return readJsonFile(STYLE_RUNTIME_TOKEN_PRESETS_PATH);
+    } catch {
+      return { generatedAt: null, version: 0, presets: [] };
+    }
+  });
+}
+
+function buildStyleRuntimeTokenPresetContext() {
+  const payload = readStyleRuntimeTokenPresets();
+  return {
+    generatedAt: payload?.generatedAt || null,
+    version: Number(payload?.version || 0) || 0,
+    presets: safeArray(payload?.presets, 32)
+      .map((item) => (item && typeof item === "object" ? item : {}))
+      .filter((item) => String(item?.id || "").trim()),
+  };
+}
+
+function readSectionFamilyContracts() {
+  return readCachedValue(SECTION_FAMILY_CONTRACTS_CACHE, "section-family-contracts", () => {
+    try {
+      return readJsonFile(SECTION_FAMILY_CONTRACTS_PATH);
+    } catch {
+      return { generatedAt: null, version: 0, global: {}, clusters: {}, families: {} };
+    }
+  });
+}
+
+function buildSectionFamilyContractContext(pageId = "", options = {}) {
+  const payload = readSectionFamilyContracts();
+  const normalizedPageId = String(pageId || "").trim();
+  const interventionLayer = normalizeInterventionLayer(options.interventionLayer, "page");
+  const targetComponentIds = new Set(
+    safeArray(options.targetComponentIds, 40).map((item) => String(item || "").trim()).filter(Boolean)
+  );
+  const targetSlotIds = new Set(
+    Array.from(targetComponentIds)
+      .map((item) => inferSlotIdFromComponentId(item) || item)
+      .map((item) => String(item || "").trim())
+      .filter(Boolean)
+  );
+  const familiesSource = payload?.families && typeof payload.families === "object" ? payload.families : {};
+  const familyEntries = Object.entries(familiesSource)
+    .filter(([, item]) => {
+      const slots = toStringArray(item?.targetSlots);
+      if (!targetSlotIds.size) return true;
+      return slots.some((slotId) => targetSlotIds.has(String(slotId || "").trim()));
+    })
+    .map(([familyId, item]) => ({
+      familyId: String(familyId || "").trim(),
+      label: String(item?.label || familyId).trim(),
+      targetSlots: toStringArray(item?.targetSlots),
+      requiredOutcomes: safeArray(item?.requiredOutcomes, 6),
+      visualRules: safeArray(item?.visualRules, 6),
+      avoid: safeArray(item?.avoid, 6),
+      criticRules: safeArray(item?.criticRules, 6),
+    }))
+    .filter((item) => item.familyId);
+  const clusterEntries = Object.entries(payload?.clusters && typeof payload.clusters === "object" ? payload.clusters : {})
+    .filter(([clusterId, item]) => {
+      if (clusterId === "home.top-stage" && normalizedPageId !== "home") return false;
+      const slots = toStringArray(item?.targetSlots);
+      if (!targetSlotIds.size) return true;
+      return slots.some((slotId) => targetSlotIds.has(String(slotId || "").trim()));
+    })
+    .map(([clusterId, item]) => ({
+      clusterId: String(clusterId || "").trim(),
+      label: String(item?.label || clusterId).trim(),
+      targetSlots: toStringArray(item?.targetSlots),
+      goal: String(item?.goal || "").trim(),
+      rules: safeArray(item?.rules, 6),
+      criticRules: safeArray(item?.criticRules, 6),
+    }))
+    .filter((item) => item.clusterId);
+  const globalSource = payload?.global && typeof payload.global === "object" ? payload.global : {};
+  const identityProfiles = globalSource?.identityProfiles && typeof globalSource.identityProfiles === "object"
+    ? globalSource.identityProfiles
+    : {};
+  const pageIdentityHints = globalSource?.pageIdentityHints && typeof globalSource.pageIdentityHints === "object"
+    ? globalSource.pageIdentityHints
+    : {};
+  const activeIdentityProfile = identityProfiles[interventionLayer] && typeof identityProfiles[interventionLayer] === "object"
+    ? identityProfiles[interventionLayer]
+    : {};
+  const pageIdentityHint = pageIdentityHints[normalizedPageId] && typeof pageIdentityHints[normalizedPageId] === "object"
+    ? pageIdentityHints[normalizedPageId]
+    : pageIdentityHints.default && typeof pageIdentityHints.default === "object"
+      ? pageIdentityHints.default
+      : {};
+  return {
+    generatedAt: payload?.generatedAt || null,
+    version: Number(payload?.version || 0) || 0,
+    pageId: normalizedPageId,
+    interventionLayer,
+    global: {
+      principles: safeArray(globalSource?.principles, 8),
+      successSignals: safeArray(globalSource?.successSignals, 6),
+    },
+    identityEnvelope: {
+      interventionLayer,
+      band: String(activeIdentityProfile?.band || "balanced").trim() || "balanced",
+      label: String(activeIdentityProfile?.label || "Identity Guardrail").trim(),
+      intent: String(activeIdentityProfile?.intent || "").trim(),
+      preserve: safeArray(activeIdentityProfile?.preserve, 6),
+      allow: safeArray(activeIdentityProfile?.allow, 6),
+      avoid: safeArray(activeIdentityProfile?.avoid, 6),
+      pagePreserve: safeArray(pageIdentityHint?.preserve, 4),
+      pageAvoid: safeArray(pageIdentityHint?.avoid, 4),
+    },
+    clusters: clusterEntries,
+    families: familyEntries,
+  };
+}
+
+function readFamilyRecipePlan() {
+  return readCachedValue(FAMILY_RECIPE_PLAN_CACHE, "family-recipe-plan", () => {
+    try {
+      return readJsonFile(FAMILY_RECIPE_PLAN_PATH);
+    } catch {
+      return { generatedAt: null, families: [] };
+    }
+  });
+}
+
+function readFamilyTopRecipeBlueprints() {
+  return readCachedValue(FAMILY_TOP_RECIPE_BLUEPRINTS_CACHE, "family-top-recipe-blueprints", () => {
+    try {
+      return readJsonFile(FAMILY_TOP_RECIPE_BLUEPRINTS_PATH);
+    } catch {
+      return { generatedAt: null, authoringRules: [], families: [] };
+    }
+  });
+}
+
+function inferRecipeFamilyIdsForSlots(pageId = "", slotIds = [], targetGroupId = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedTargetGroupId = String(targetGroupId || "").trim().toLowerCase();
+  const ids = new Set();
+  const slots = safeArray(slotIds, 24).map((item) => String(item || "").trim().toLowerCase()).filter(Boolean);
+  if (!slots.length && normalizedPageId) ids.add("page-shell");
+  if (normalizedTargetGroupId.includes("top")) ids.add("page-shell");
+  for (const slotId of slots) {
+    if (slotId === "hero") ids.add("hero");
+    if (slotId === "quickmenu") ids.add("quickmenu");
+    if (slotId === "quickmenu" || slotId === "tabs") ids.add("service-tabs");
+    if (slotId.includes("ranking")) ids.add("ranking");
+    if (slotId.includes("banner")) ids.add("banner");
+    if (slotId.includes("choice") || slotId.includes("timedeal") || slotId.includes("subscription") || slotId.includes("renewal") || slotId.includes("news") || slotId.includes("showroom") || slotId.includes("marketing")) ids.add("commerce");
+    if (slotId.includes("story")) ids.add("story");
+    if (slotId.includes("benefit")) ids.add("benefit");
+  }
+  if (normalizedPageId === "home" && (slots.includes("hero") || slots.includes("quickmenu") || normalizedTargetGroupId.includes("home-top"))) {
+    ids.add("page-shell");
+    ids.add("hero");
+    ids.add("quickmenu");
+  }
+  const planPayload = readFamilyRecipePlan();
+  const familyPlanMap = new Map(
+    safeArray(planPayload?.families, 32)
+      .map((item) => (item && typeof item === "object" ? item : {}))
+      .filter((item) => String(item?.familyId || "").trim())
+      .map((item) => [String(item.familyId || "").trim(), item])
+  );
+  return Array.from(ids).filter((familyId) => {
+    const plan = familyPlanMap.get(familyId) || {};
+    const pageTargets = safeArray(plan?.pageTargets, 6).map((item) => String(item || "").trim().toLowerCase()).filter(Boolean);
+    if (!pageTargets.length) return true;
+    if (pageTargets.includes("all")) return true;
+    if (normalizedPageId === "home") return pageTargets.includes("home");
+    if (/service|care|solutions|homestyle/.test(normalizedPageId)) return pageTargets.includes("service");
+    if (/product|pdp/.test(normalizedPageId)) return pageTargets.includes("product");
+    return pageTargets.includes(normalizedPageId.toLowerCase());
+  });
+}
+
+function buildRecipeHierarchyContext(pageId = "", options = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const planPayload = readFamilyRecipePlan();
+  const blueprintPayload = readFamilyTopRecipeBlueprints();
+  const targetComponentIds = new Set(
+    safeArray(options.targetComponentIds, 40).map((item) => String(item || "").trim()).filter(Boolean)
+  );
+  const targetSlotIds = Array.from(targetComponentIds)
+    .map((item) => inferSlotIdFromComponentId(item) || item)
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  const familyIds = inferRecipeFamilyIdsForSlots(normalizedPageId, targetSlotIds, options.targetGroupId);
+  const familyPlanMap = new Map(
+    safeArray(planPayload?.families, 32)
+      .map((item) => (item && typeof item === "object" ? item : {}))
+      .filter((item) => String(item?.familyId || "").trim())
+      .map((item) => [String(item.familyId || "").trim(), item])
+  );
+  const blueprintFamilyMap = new Map(
+    safeArray(blueprintPayload?.families, 32)
+      .map((item) => (item && typeof item === "object" ? item : {}))
+      .filter((item) => String(item?.familyId || "").trim())
+      .map((item) => [String(item.familyId || "").trim(), item])
+  );
+  const families = familyIds
+    .map((familyId) => {
+      const plan = familyPlanMap.get(familyId) || {};
+      const blueprint = blueprintFamilyMap.get(familyId) || {};
+      return {
+        familyId,
+        status: String(plan?.status || "").trim(),
+        priority: Number(plan?.priority || 0) || 0,
+        pageTargets: safeArray(plan?.pageTargets, 4),
+        focus: safeArray(plan?.focus, 6),
+        qualityGateFocus: safeArray(plan?.qualityGateFocus, 6),
+        topRecipeCandidates: safeArray(plan?.topRecipeCandidates, 6),
+        selectionRule: String(blueprint?.selectionRule || "").trim(),
+        topRecipes: safeArray(blueprint?.topRecipes, 4).map((item) => ({
+          recipeId: item?.recipeId || "",
+          priority: Number(item?.priority || 0) || 0,
+          pageRoles: safeArray(item?.pageRoles, 4),
+          suggestedPrimitive: item?.suggestedPrimitive || "",
+          qualityObjective: item?.qualityObjective || "",
+          structureRules: safeArray(item?.structureRules, 4),
+          qualitySignals: safeArray(item?.qualitySignals, 4),
+          avoid: safeArray(item?.avoid, 4),
+        })),
+      };
+    })
+    .filter((item) => item.familyId);
+  const topStageCluster =
+    normalizedPageId === "home" && (familyIds.includes("hero") || familyIds.includes("quickmenu"))
+      ? {
+          clusterId: "home.top-stage",
+          sequence: ["page-shell", "hero", "quickmenu"],
+          goal: "Treat hero + quickmenu as one connected top-stage cluster before local section detail.",
+          rules: [
+            "Choose page shell / cluster rhythm first, then hero dominance, then quickmenu support rhythm.",
+            "Do not let quickmenu flatten the top stage into equal-weight utilities.",
+          ],
+        }
+      : null;
+  return {
+    generatedAt: blueprintPayload?.generatedAt || planPayload?.generatedAt || null,
+    pageId: normalizedPageId,
+    authoringRules: safeArray(blueprintPayload?.authoringRules, 6),
+    targetFamilyIds: familyIds,
+    topStageCluster,
+    families,
+  };
+}
+
+function readPageBuilderPromptBlueprints() {
+  return readCachedValue(PAGE_BUILDER_PROMPT_BLUEPRINTS_CACHE, "page-builder-prompt-blueprints", () => {
+    try {
+      return readJsonFile(PAGE_BUILDER_PROMPT_BLUEPRINTS_PATH);
+    } catch {
+      return { generatedAt: null, version: 0, global: {}, pageBlueprints: [] };
+    }
+  });
+}
+
+function buildPagePromptBlueprintContext(pageId = "", options = {}) {
+  const payload = readPageBuilderPromptBlueprints();
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile = String(options.viewportProfile || "").trim().toLowerCase();
+  const normalizedTargetGroupId = String(options.targetGroupId || "").trim();
+  const normalizedTargetKind = String(options.targetKind || "").trim();
+  const blueprints = safeArray(payload?.pageBlueprints, 32).map((item) => (item && typeof item === "object" ? item : {}));
+  const exactMatch = blueprints.find((item) =>
+    String(item?.pageId || "").trim() === normalizedPageId &&
+    String(item?.viewportProfile || "").trim().toLowerCase() === normalizedViewportProfile
+  ) || null;
+  const fallbackMatch = blueprints.find((item) =>
+    String(item?.pageId || "").trim() === normalizedPageId &&
+    !String(item?.viewportProfile || "").trim()
+  ) || null;
+  const activeBlueprint = exactMatch || fallbackMatch;
+  const global = payload?.global && typeof payload.global === "object" ? payload.global : {};
+  return {
+    generatedAt: payload?.generatedAt || null,
+    version: Number(payload?.version || 0) || 0,
+    pageCount: blueprints.length,
+    global: {
+      promptOrder: safeArray(global?.promptOrder, 6),
+      executionModel: safeArray(global?.executionModel, 6),
+      rendererPolicy: safeArray(global?.rendererPolicy, 6),
+      qualityChecks: safeArray(global?.qualityChecks, 6),
+    },
+    activeBlueprint: activeBlueprint
+      ? {
+          blueprintId: String(activeBlueprint?.blueprintId || "").trim(),
+          pageId: String(activeBlueprint?.pageId || "").trim(),
+          viewportProfile: String(activeBlueprint?.viewportProfile || "").trim() || null,
+          targetKind: String(activeBlueprint?.targetKind || normalizedTargetKind || "").trim(),
+          label: String(activeBlueprint?.label || normalizedPageId).trim(),
+          implementationStatus: String(activeBlueprint?.implementationStatus || "blueprint-only").trim(),
+          pagePrompt: activeBlueprint?.pagePrompt && typeof activeBlueprint.pagePrompt === "object" ? activeBlueprint.pagePrompt : {},
+          clusters: safeArray(activeBlueprint?.clusters, 8)
+            .filter((item) => {
+              const targetGroupId = String(item?.targetGroupId || "").trim();
+              if (!normalizedTargetGroupId || !targetGroupId) return true;
+              return targetGroupId === normalizedTargetGroupId;
+            })
+            .map((item) => ({
+              clusterId: String(item?.clusterId || "").trim(),
+              targetGroupId: String(item?.targetGroupId || "").trim(),
+              goal: String(item?.goal || "").trim(),
+              rules: safeArray(item?.rules, 6),
+            })),
+          sectionPrompts: safeArray(activeBlueprint?.sectionPrompts, 12).map((item) => ({
+            familyId: String(item?.familyId || "").trim(),
+            role: String(item?.role || "").trim(),
+            rules: safeArray(item?.rules, 6),
+          })),
+          rendererStrategy: activeBlueprint?.rendererStrategy && typeof activeBlueprint.rendererStrategy === "object"
+            ? activeBlueprint.rendererStrategy
+            : {},
+        }
+      : null,
+  };
+}
+
+function resolvePrimitiveShellVariant(pageId = "", shellKind = "page", targetGroupId = "") {
+  const payload = readPrimitiveCompositionCatalog();
+  const normalizedPageId = String(pageId || "").trim();
+  const pageAssignment =
+    payload?.pageAssignments && typeof payload.pageAssignments === "object"
+      ? payload.pageAssignments[normalizedPageId] || {}
+      : {};
+  if (shellKind === "top") {
+    const groupShells = pageAssignment?.groupShells && typeof pageAssignment.groupShells === "object"
+      ? pageAssignment.groupShells
+      : {};
+    const key = String(targetGroupId || "top").trim() || "top";
+    return String((groupShells[key] || groupShells.top || {}).variant || "").trim();
+  }
+  return String(pageAssignment?.pageShell?.variant || "").trim();
+}
+
+function readComponentRebuildSchemaCatalog() {
+  return readCachedValue(COMPONENT_REBUILD_SCHEMA_CACHE, "component-rebuild-schema-catalog", () => {
+    try {
+      return readJsonFile(COMPONENT_REBUILD_SCHEMA_CATALOG_PATH);
+    } catch {
+      return { generatedAt: null, families: [], assignments: [] };
+    }
+  });
+}
+
+function buildComponentRebuildSchemaContext(pageId = "", options = {}) {
+  const payload = readComponentRebuildSchemaCatalog();
+  const viewportProfile = String(options.viewportProfile || "pc").trim() || "pc";
+  const targetComponentIds = new Set(
+    (Array.isArray(options.targetComponentIds) ? options.targetComponentIds : [])
+      .map((item) => String(item || "").trim())
+      .filter(Boolean)
+  );
+  const familyMap = new Map(
+    (Array.isArray(payload?.families) ? payload.families : [])
+      .map((item) => [String(item?.id || "").trim(), item])
+      .filter(([id]) => id)
+  );
+  const assignments = (Array.isArray(payload?.assignments) ? payload.assignments : [])
+    .filter((item) => {
+      const componentId = String(item?.componentId || "").trim();
+      if (!componentId) return false;
+      if (targetComponentIds.size && !targetComponentIds.has(componentId)) return false;
+      if (!targetComponentIds.size) {
+        const prefix = `${String(pageId || "").trim()}.`;
+        return componentId.startsWith(prefix);
+      }
+      return true;
+    })
+    .map((item) => {
+      const familyId = String(item?.familyId || "").trim();
+      return {
+        componentId: String(item?.componentId || "").trim(),
+        familyId,
+        family: familyMap.get(familyId) || null,
+      };
+    });
+  return {
+    generatedAt: payload?.generatedAt || null,
+    pageId: String(pageId || "").trim(),
+    viewportProfile,
+    families: Array.from(new Set(assignments.map((item) => item.familyId)))
+      .map((familyId) => familyMap.get(familyId))
+      .filter(Boolean),
+    assignments,
+  };
 }
 
 function readDesignReferenceSourceSeeds() {
@@ -1333,6 +4711,812 @@ function extractReferenceIdentitySignals(entry = {}) {
   return extractIdentitySignalsFromText(text);
 }
 
+function inferReferenceSourceClass(entry = {}, options = {}) {
+  const source = entry && typeof entry === "object" ? entry : {};
+  const referenceType = String(source.referenceType || "").trim();
+  const bucket = String(source.bucket || "").trim();
+  const tags = normalizeReferenceCollectTags(source.collectFor || source.tags || source.recommendedFor || []);
+  const recommendedFor = Array.isArray(source.recommendedFor) ? source.recommendedFor.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const interventionLayer = normalizeInterventionLayer(options.interventionLayer, "page");
+  if (referenceType === "design-md" || bucket === "design_md" || bucket === "design-md") return "system-reference";
+  if (tags.some((tag) => ["checkout", "onboarding", "search", "filter", "cart"].includes(tag))) return "flow-pattern";
+  if (interventionLayer === "component" || interventionLayer === "element") return "component-pattern";
+  if (recommendedFor.some((item) => ["hero", "cta", "banner", "navigation", "card", "quickmenu", "ranking"].includes(item))) {
+    return interventionLayer === "page" ? "page-mood" : "component-pattern";
+  }
+  return interventionLayer === "page" ? "page-mood" : "component-pattern";
+}
+
+function buildReferenceAvoidNotes(sourceClass = "", pageType = "") {
+  const notes = [];
+  if (sourceClass === "page-mood") {
+    notes.push("exact layout copy 금지");
+    notes.push("서비스 정보 구조를 그대로 복제하지 않는다");
+  }
+  if (sourceClass === "component-pattern") {
+    notes.push("컴포넌트 외부 페이지 구조까지 따라가지 않는다");
+    notes.push("현재 페이지 정체성과 맞지 않는 과한 장식은 제외한다");
+  }
+  if (sourceClass === "flow-pattern") {
+    notes.push("모바일 앱 플로우를 데스크톱 레이아웃에 그대로 이식하지 않는다");
+  }
+  if (sourceClass === "system-reference") {
+    notes.push("디자인 언어 참고용이며 카피/레이아웃 직접 복제 금지");
+  }
+  if (pageType === "home") {
+    notes.push("브랜드 홈을 쇼케이스 랜딩처럼 과장하지 않는다");
+  }
+  return Array.from(new Set(notes));
+}
+
+function buildDesignReferenceAnchors(entries = [], options = {}) {
+  const sourceSeedEntries = buildDesignReferenceSourceSeedContext(options.pageId || "", options).entries || [];
+  const sourceSeedMap = new Map(sourceSeedEntries.map((item) => [String(item.url || "").trim(), item]));
+  const targetComponents = Array.isArray(options.targetComponents) ? options.targetComponents.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const interventionLayer = normalizeInterventionLayer(options.interventionLayer, "page");
+  const viewportProfile = String(options.viewportProfile || "pc").trim() || "pc";
+  const pageId = String(options.pageId || "").trim();
+  const pageType = classifyPageTypeForDesignRefs(pageId, options.pageGroup || "");
+  const curatedEntryAnchors = (Array.isArray(entries) ? entries : [])
+    .map((entry, index) => {
+      const normalizedUrl = String(entry?.url || "").trim();
+      const seed = sourceSeedMap.get(normalizedUrl) || null;
+      const sourceClass = inferReferenceSourceClass({
+        ...seed,
+        ...entry,
+        collectFor: seed?.collectFor || entry?.tags || [],
+      }, { interventionLayer });
+      const sampleUrls = Array.isArray(entry?.sampleUrls) ? entry.sampleUrls.map((item) => String(item || "").trim()).filter(Boolean) : [];
+      return {
+        id: String(entry?.id || seed?.id || `reference-${index + 1}`).trim(),
+        label: String(entry?.title || seed?.name || entry?.provider || entry?.id || `Reference ${index + 1}`).trim(),
+        sourceUrl: normalizedUrl,
+        sourceName: String(seed?.name || entry?.provider || "reference").trim(),
+        sourceClass,
+        targetLayer: interventionLayer,
+        targetPageIds: pageId ? [pageId] : [],
+        targetComponents: interventionLayer === "page" ? [] : targetComponents,
+        targetGroupId: String(options.targetGroupId || "").trim(),
+        viewportProfile,
+        intentTags: uniqueNonEmptyLines([
+          ...(Array.isArray(entry?.styleSignals) ? entry.styleSignals : []),
+          ...(Array.isArray(entry?.recommendedFor) ? entry.recommendedFor : []),
+          ...(Array.isArray(seed?.collectFor) ? seed.collectFor : []),
+        ]).slice(0, 8),
+        why: uniqueNonEmptyLines([
+          ...(Array.isArray(entry?.usageNotes) ? entry.usageNotes : []),
+          String(seed?.role || "").trim(),
+          String(seed?.note || "").trim(),
+        ]).slice(0, 4),
+        avoid: buildReferenceAvoidNotes(sourceClass, pageType).slice(0, 4),
+        captureMode: sampleUrls.length ? "screenshot" : "url-only",
+        priority: index === 0 ? "high" : index === 1 ? "medium" : "low",
+        screenshotUrls: sampleUrls.slice(0, 3),
+        referenceType: String(entry?.referenceType || "").trim() || null,
+      };
+    });
+  const seedAnchors = sourceSeedEntries.map((seed, index) => {
+    const sourceClass = inferReferenceSourceClass(seed, { interventionLayer });
+    return {
+      id: String(seed?.id || `seed-reference-${index + 1}`).trim(),
+      label: String(seed?.name || `Seed reference ${index + 1}`).trim(),
+      sourceUrl: String(seed?.url || "").trim(),
+      sourceName: String(seed?.name || "reference").trim(),
+      sourceClass,
+      targetLayer: interventionLayer,
+      targetPageIds: pageId ? [pageId] : [],
+      targetComponents: interventionLayer === "page" ? [] : targetComponents,
+      targetGroupId: String(options.targetGroupId || "").trim(),
+      viewportProfile,
+      intentTags: uniqueNonEmptyLines([
+        ...(Array.isArray(seed?.normalizedTags) ? seed.normalizedTags : []),
+        String(seed?.bucket || "").trim(),
+      ]).slice(0, 8),
+      why: uniqueNonEmptyLines([
+        String(seed?.role || "").trim(),
+        String(seed?.note || "").trim(),
+      ]).slice(0, 4),
+      avoid: buildReferenceAvoidNotes(sourceClass, pageType).slice(0, 4),
+      captureMode: String(seed?.url || "").trim() ? "screenshot" : "url-only",
+      priority: index === 0 ? "high" : index === 1 ? "medium" : "low",
+      screenshotUrls: String(seed?.url || "").trim() ? [String(seed.url || "").trim()] : [],
+      referenceType: "source-seed",
+    };
+  });
+  return [...curatedEntryAnchors, ...seedAnchors]
+    .filter((item) => item?.id && item?.sourceUrl)
+    .filter((item, index, list) => list.findIndex((candidate) => String(candidate?.id || "").trim() === String(item?.id || "").trim()) === index)
+    .slice(0, Math.max(1, Math.min(Number(options.limit || 4) || 4, 8)));
+}
+
+function isProbablyImageUrl(rawUrl = "") {
+  const source = String(rawUrl || "").trim().toLowerCase();
+  if (!source) return false;
+  return /\.(png|jpe?g|webp|gif|svg)(?:[?#].*)?$/.test(source);
+}
+
+async function captureReferenceAssetDataUrl(referenceUrl = "", viewportProfile = "pc") {
+  const source = String(referenceUrl || "").trim();
+  if (!source) return null;
+  const rawDataUrl = isProbablyImageUrl(source)
+    ? await fetchImageAsDataUrl(source).catch(() => null)
+    : await captureUrlAsScreenshotDataUrl(source, viewportProfile).catch(() => null);
+  if (!rawDataUrl) return null;
+  return normalizeDataUrlForVisionInput(rawDataUrl, {
+    maxWidth: 1200,
+    maxHeight: 1200,
+    format: "jpeg",
+  }).catch(() => rawDataUrl);
+}
+
+function pickBuildReferenceAnchors(builderInput = {}, limit = 2) {
+  const anchors = Array.isArray(builderInput?.systemContext?.designReferenceLibrary?.referenceAnchors)
+    ? builderInput.systemContext.designReferenceLibrary.referenceAnchors
+    : [];
+  if (!anchors.length) return [];
+  const targetComponents = new Set(toStringArray(builderInput?.generationOptions?.targetComponents));
+  const interventionLayer = String(builderInput?.generationOptions?.interventionLayer || "").trim();
+  return anchors
+    .map((anchor, index) => {
+      const anchorTargets = Array.isArray(anchor?.targetComponents) ? anchor.targetComponents.map((item) => String(item || "").trim()) : [];
+      let score = 0;
+      if (anchor?.captureMode === "screenshot") score += 20;
+      if (String(anchor?.targetLayer || "").trim() === interventionLayer) score += 15;
+      if (anchorTargets.some((item) => targetComponents.has(item))) score += 35;
+      if (String(anchor?.priority || "").trim() === "high") score += 20;
+      else if (String(anchor?.priority || "").trim() === "medium") score += 10;
+      if (String(anchor?.sourceClass || "").trim() === "component-pattern") score += 15;
+      if (String(anchor?.sourceClass || "").trim() === "page-mood" && interventionLayer === "page") score += 10;
+      return { anchor, score, index };
+    })
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .slice(0, Math.max(1, Math.min(Number(limit || 2) || 2, 4)))
+    .map((item) => item.anchor);
+}
+
+async function materializeReferenceVisualAssets(builderInput = {}) {
+  const anchors = pickBuildReferenceAnchors(builderInput, 2);
+  if (!anchors.length) return [];
+  const viewportProfile = String(builderInput?.pageContext?.viewportProfile || "pc").trim() || "pc";
+  const assets = await Promise.all(
+    anchors.map(async (anchor) => {
+      const candidateUrls = toStringArray(anchor?.screenshotUrls).concat(String(anchor?.sourceUrl || "").trim()).filter(Boolean);
+      const captureUrl = candidateUrls[0] || "";
+      const imageDataUrl = await captureReferenceAssetDataUrl(captureUrl, viewportProfile);
+      if (!imageDataUrl) return null;
+      return {
+        id: String(anchor?.id || "").trim(),
+        label: String(anchor?.label || "").trim(),
+        sourceName: String(anchor?.sourceName || "").trim(),
+        sourceClass: String(anchor?.sourceClass || "").trim(),
+        targetLayer: String(anchor?.targetLayer || "").trim(),
+        targetComponents: toStringArray(anchor?.targetComponents).slice(0, 8),
+        why: toStringArray(anchor?.why).slice(0, 4),
+        avoid: toStringArray(anchor?.avoid).slice(0, 4),
+        captureMode: String(anchor?.captureMode || "url-only").trim(),
+        sourceUrl: String(anchor?.sourceUrl || "").trim(),
+        imageDataUrl,
+      };
+    })
+  );
+  const normalizedAssets = assets.filter(Boolean);
+  if (normalizedAssets.length) {
+    const dims = await Promise.all(
+      normalizedAssets.map(async (asset) => {
+        const size = await readDataUrlDimensions(asset.imageDataUrl).catch(() => null);
+        return `${asset.id}:${size ? `${size.width}x${size.height}` : "unknown"}`;
+      })
+    );
+    console.log(`[reference-assets] builder dims=${dims.join(",")}`);
+  }
+  return normalizedAssets;
+}
+
+async function materializePlannerReferenceVisualAssets(plannerInput = {}) {
+  const anchors = Array.isArray(plannerInput?.referenceSummary?.designReferenceLibrary?.referenceAnchors)
+    ? plannerInput.referenceSummary.designReferenceLibrary.referenceAnchors
+    : [];
+  if (!anchors.length) return [];
+  const targetComponents = new Set(toStringArray(plannerInput?.userInput?.targetComponents));
+  const interventionLayer = String(plannerInput?.userInput?.interventionLayer || "").trim();
+  const viewportProfile = String(plannerInput?.pageContext?.viewportProfile || "pc").trim() || "pc";
+  const ranked = anchors
+    .map((anchor, index) => {
+      const anchorTargets = Array.isArray(anchor?.targetComponents) ? anchor.targetComponents.map((item) => String(item || "").trim()) : [];
+      let score = 0;
+      if (anchor?.captureMode === "screenshot") score += 20;
+      if (String(anchor?.targetLayer || "").trim() === interventionLayer) score += 15;
+      if (anchorTargets.some((item) => targetComponents.has(item))) score += 35;
+      if (String(anchor?.priority || "").trim() === "high") score += 20;
+      else if (String(anchor?.priority || "").trim() === "medium") score += 10;
+      return { anchor, score, index };
+    })
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .slice(0, 2)
+    .map((item) => item.anchor);
+  const assets = await Promise.all(
+    ranked.map(async (anchor) => {
+      const candidateUrls = toStringArray(anchor?.screenshotUrls).concat(String(anchor?.sourceUrl || "").trim()).filter(Boolean);
+      const captureUrl = candidateUrls[0] || "";
+      const imageDataUrl = await captureReferenceAssetDataUrl(captureUrl, viewportProfile);
+      if (!imageDataUrl) return null;
+      return {
+        id: String(anchor?.id || "").trim(),
+        label: String(anchor?.label || "").trim(),
+        sourceName: String(anchor?.sourceName || "").trim(),
+        sourceClass: String(anchor?.sourceClass || "").trim(),
+        targetLayer: String(anchor?.targetLayer || "").trim(),
+        targetComponents: toStringArray(anchor?.targetComponents).slice(0, 8),
+        why: toStringArray(anchor?.why).slice(0, 4),
+        avoid: toStringArray(anchor?.avoid).slice(0, 4),
+        sourceUrl: String(anchor?.sourceUrl || "").trim(),
+        imageDataUrl,
+      };
+    })
+  );
+  const normalizedAssets = assets.filter(Boolean);
+  if (normalizedAssets.length) {
+    const dims = await Promise.all(
+      normalizedAssets.map(async (asset) => {
+        const size = await readDataUrlDimensions(asset.imageDataUrl).catch(() => null);
+        return `${asset.id}:${size ? `${size.width}x${size.height}` : "unknown"}`;
+      })
+    );
+    console.log(`[reference-assets] planner dims=${dims.join(",")}`);
+  }
+  return normalizedAssets;
+}
+
+function readWholePageContextTargetComponents(input = {}) {
+  const plannerComponents = input?.userInput?.targetComponents;
+  const builderComponents = input?.generationOptions?.targetComponents;
+  return toStringArray(Array.isArray(builderComponents) ? builderComponents : plannerComponents).slice(0, 20);
+}
+
+function readWholePageContextTargetMetadata(input = {}) {
+  const plannerTargeting = input?.pageSummary?.targeting || {};
+  const builderTargeting = input?.systemContext?.targeting || {};
+  const generationOptions = input?.generationOptions || {};
+  const userInput = input?.userInput || {};
+  return {
+    interventionLayer: String(
+      generationOptions?.interventionLayer ||
+      userInput?.interventionLayer ||
+      builderTargeting?.interventionLayer ||
+      plannerTargeting?.interventionLayer ||
+      "page"
+    ).trim() || "page",
+    targetGroupId: String(
+      generationOptions?.targetGroupId ||
+      userInput?.targetGroupId ||
+      builderTargeting?.targetGroupId ||
+      plannerTargeting?.targetGroupId ||
+      ""
+    ).trim(),
+    targetGroupLabel: String(
+      generationOptions?.targetGroupLabel ||
+      userInput?.targetGroupLabel ||
+      builderTargeting?.targetGroupLabel ||
+      plannerTargeting?.targetGroupLabel ||
+      ""
+    ).trim(),
+  };
+}
+
+function pickWholePageContextSectionRect(section = null) {
+  const rect =
+    section?.geometry?.workingRect ||
+    section?.geometry?.referenceRect ||
+    section?.geometry?.plannedContentRect ||
+    section?.geometry?.plannedSectionRect ||
+    null;
+  if (!rect || typeof rect !== "object") return null;
+  const width = Number(rect.width || 0);
+  const height = Number(rect.height || 0);
+  if (!width || !height) return null;
+  return {
+    x: Number(rect.x || 0),
+    y: Number(rect.y || 0),
+    width,
+    height,
+  };
+}
+
+function unionWholePageContextRects(rects = []) {
+  const safeRects = safeObjectArray(rects, 30).filter((item) => Number(item?.width || 0) > 0 && Number(item?.height || 0) > 0);
+  if (!safeRects.length) return null;
+  const minX = Math.min(...safeRects.map((item) => Number(item.x || 0)));
+  const minY = Math.min(...safeRects.map((item) => Number(item.y || 0)));
+  const maxX = Math.max(...safeRects.map((item) => Number(item.x || 0) + Number(item.width || 0)));
+  const maxY = Math.max(...safeRects.map((item) => Number(item.y || 0) + Number(item.height || 0)));
+  return {
+    x: minX,
+    y: minY,
+    width: Math.max(0, maxX - minX),
+    height: Math.max(0, maxY - minY),
+  };
+}
+
+function chooseWholePageContextRegistry(pageId, viewportProfile, editableData, input = {}, targetComponentCount = 0) {
+  const inlineRegistry =
+    input?.systemContext?.artifactSidecarRegistry && Array.isArray(input.systemContext.artifactSidecarRegistry.sections)
+      ? input.systemContext.artifactSidecarRegistry
+      : null;
+  const rebuiltRegistry = buildArtifactSidecarRegistry(pageId, {
+    editableData,
+    viewportProfile,
+  });
+  const inlineCount = Array.isArray(inlineRegistry?.sections) ? inlineRegistry.sections.length : 0;
+  const rebuiltCount = Array.isArray(rebuiltRegistry?.sections) ? rebuiltRegistry.sections.length : 0;
+  const minimumExpected = Math.max(1, Number(targetComponentCount || 0));
+  console.log(
+    `[whole-page-context] registry-source page=${String(pageId || "").trim()} inlineSections=${inlineCount} rebuiltSections=${rebuiltCount} targetComponents=${minimumExpected} inlineSample=${(Array.isArray(inlineRegistry?.sections) ? inlineRegistry.sections : []).slice(0, 6).map((section) => String(section?.componentId || section?.slotId || "null")).join(",")} rebuiltSample=${(Array.isArray(rebuiltRegistry?.sections) ? rebuiltRegistry.sections : []).slice(0, 6).map((section) => String(section?.componentId || section?.slotId || "null")).join(",")}`
+  );
+  if (!inlineRegistry) return rebuiltRegistry;
+  if (inlineCount >= rebuiltCount && inlineCount >= minimumExpected) return inlineRegistry;
+  console.log(
+    `[whole-page-context] registry-rebuild page=${String(pageId || "").trim()} inlineSections=${inlineCount} rebuiltSections=${rebuiltCount} targetComponents=${minimumExpected}`
+  );
+  return rebuiltCount ? rebuiltRegistry : inlineRegistry;
+}
+
+function buildWholePageContextSections(pageId, viewportProfile, editableData, input = {}) {
+  const targetComponentIds = new Set(readWholePageContextTargetComponents(input));
+  const registry = chooseWholePageContextRegistry(
+    pageId,
+    viewportProfile,
+    editableData,
+    input,
+    targetComponentIds.size
+  );
+  const targetSlotIds = new Set(
+    readWholePageContextTargetComponents(input)
+      .map((item) => inferSlotIdFromComponentId(item) || String(item || "").trim())
+      .filter(Boolean)
+  );
+  toStringArray(input?.approvedPlan?.builderBrief?.suggestedFocusSlots).forEach((item) => targetSlotIds.add(String(item || "").trim()));
+  toStringArray(input?.pageSummary?.editableSlots).forEach((item) => targetSlotIds.add(String(item || "").trim()));
+  const allSections = safeObjectArray(registry?.sections || [], 100);
+  const targetMeta = readWholePageContextTargetMetadata(input);
+  const normalizedPageId = String(pageId || "").trim();
+  const isPageLayer = targetMeta.interventionLayer === "page";
+  let sections = allSections;
+  if (!isPageLayer && targetComponentIds.size) {
+    sections = sections.filter((section) => targetComponentIds.has(String(section?.componentId || "").trim()));
+  }
+  if (!isPageLayer && !sections.length && targetSlotIds.size) {
+    sections = allSections.filter((section) => targetSlotIds.has(String(section?.slotId || "").trim()));
+  }
+  if (!sections.length && targetMeta.targetGroupId) {
+    const fallbackSpec = resolveInterventionRequest(normalizedPageId, editableData, {
+      viewportProfile,
+      interventionLayer: targetMeta.interventionLayer,
+      patchDepth: "medium",
+      targetGroupId: targetMeta.targetGroupId,
+    });
+    const fallbackSet = new Set(toStringArray(fallbackSpec?.targetComponents).slice(0, 50));
+    if (fallbackSet.size) {
+      sections = allSections.filter((section) =>
+        fallbackSet.has(String(section?.componentId || "").trim()) ||
+        fallbackSet.has(String(section?.slotId || "").trim())
+      );
+    }
+  }
+  if (!sections.length && !isPageLayer && targetSlotIds.size) {
+    sections = allSections.filter((section) => targetSlotIds.has(String(section?.slotId || "").trim()));
+  }
+  console.log(
+    `[whole-page-context] match page=${normalizedPageId} registrySections=${allSections.length} targetComponents=${Array.from(targetComponentIds).join(",") || "none"} targetSlots=${Array.from(targetSlotIds).join(",") || "none"} matchedSections=${sections.length}`
+  );
+  return sections
+    .map((section) => {
+      const rect = pickWholePageContextSectionRect(section);
+      if (!rect) return null;
+      return {
+        componentId: String(section?.componentId || "").trim(),
+        slotId: String(section?.slotId || "").trim(),
+        label: String(section?.label || section?.slotId || section?.componentId || "").trim(),
+        rect,
+      };
+    })
+    .filter(Boolean)
+    .slice(0, 20);
+}
+
+async function buildWholePageContextOverlayDataUrl(baseImageDataUrl = "", sections = [], metadata = {}) {
+  const decoded = decodeDataUrlToBuffer(baseImageDataUrl);
+  if (!decoded?.buffer) return null;
+  const image = sharp(decoded.buffer);
+  const imageMeta = await image.metadata();
+  const width = Math.max(1, Number(imageMeta.width || 0));
+  const height = Math.max(1, Number(imageMeta.height || 0));
+  if (!width || !height) return null;
+  const rects = safeObjectArray(sections, 20).map((item) => item?.rect).filter(Boolean);
+  const unionRect = unionWholePageContextRects(rects);
+  const targetLabel = String(metadata?.targetLabel || "").trim() || "Target region";
+  const sectionLines = safeArray(
+    safeObjectArray(sections, 4).map((item) => String(item?.label || item?.slotId || item?.componentId || "").trim()).filter(Boolean),
+    4
+  );
+  const titleX = unionRect ? Math.max(32, Math.min(width - 440, unionRect.x + 18)) : 32;
+  const titleY = unionRect ? Math.max(56, unionRect.y - 64) : 56;
+  const cardX = unionRect ? Math.max(16, Math.min(width - 456, unionRect.x)) : 16;
+  const cardY = unionRect ? Math.max(16, unionRect.y - 104) : 16;
+  const cardHeight = 64 + sectionLines.length * 22;
+  const svg = [
+    `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`,
+    `<rect x="0" y="0" width="${width}" height="${height}" fill="rgba(5, 12, 20, 0.18)"/>`,
+    ...safeObjectArray(sections, 20).map((item) => {
+      const rect = item?.rect;
+      if (!rect) return "";
+      return `<rect x="${rect.x}" y="${rect.y}" width="${rect.width}" height="${rect.height}" rx="18" fill="rgba(37, 99, 235, 0.16)" stroke="rgba(37, 99, 235, 0.92)" stroke-width="6"/>`;
+    }),
+    unionRect
+      ? `<rect x="${unionRect.x}" y="${unionRect.y}" width="${unionRect.width}" height="${unionRect.height}" rx="22" fill="none" stroke="rgba(245, 158, 11, 0.96)" stroke-width="8" stroke-dasharray="18 14"/>`
+      : "",
+    `<rect x="${cardX}" y="${cardY}" width="440" height="${cardHeight}" rx="18" fill="rgba(15, 23, 42, 0.92)"/>`,
+    `<text x="${titleX}" y="${titleY}" fill="#ffffff" font-size="28" font-family="Arial, sans-serif" font-weight="700">${escapeHtml(targetLabel)}</text>`,
+    ...sectionLines.map((line, index) => {
+      const textY = titleY + 30 + index * 22;
+      return `<text x="${titleX}" y="${textY}" fill="rgba(226,232,240,0.96)" font-size="18" font-family="Arial, sans-serif">${escapeHtml(line)}</text>`;
+    }),
+    `</svg>`,
+  ].filter(Boolean).join("");
+  const composed = await image
+    .composite([{ input: Buffer.from(svg), top: 0, left: 0 }])
+    .png()
+    .toBuffer();
+  return `data:image/png;base64,${composed.toString("base64")}`;
+}
+
+async function buildWholePageContextFocusDataUrl(baseImageDataUrl = "", sections = []) {
+  const decoded = decodeDataUrlToBuffer(baseImageDataUrl);
+  if (!decoded?.buffer) return null;
+  const image = sharp(decoded.buffer);
+  const imageMeta = await image.metadata();
+  const imageWidth = Math.max(1, Number(imageMeta.width || 0));
+  const imageHeight = Math.max(1, Number(imageMeta.height || 0));
+  if (!imageWidth || !imageHeight) return null;
+  const unionRect = unionWholePageContextRects(
+    safeObjectArray(sections, 20).map((item) => item?.rect).filter(Boolean)
+  );
+  if (!unionRect) return null;
+  const paddingX = Math.max(32, Math.round(unionRect.width * 0.12));
+  const paddingY = Math.max(32, Math.round(unionRect.height * 0.18));
+  const left = Math.max(0, Math.floor(unionRect.x - paddingX));
+  const top = Math.max(0, Math.floor(unionRect.y - paddingY));
+  const width = Math.min(imageWidth - left, Math.ceil(unionRect.width + paddingX * 2));
+  const height = Math.min(imageHeight - top, Math.ceil(unionRect.height + paddingY * 2));
+  if (width <= 0 || height <= 0) return null;
+  try {
+    const cropped = await image.extract({ left, top, width, height }).png().toBuffer();
+    return `data:image/png;base64,${cropped.toString("base64")}`;
+  } catch (error) {
+    console.warn(
+      `[whole-page-context] focus-crop-failed left=${left} top=${top} width=${width} height=${height} reason=${String(error)}`
+    );
+    return null;
+  }
+}
+
+async function buildWholePageFallbackSectionsFromImage(pageId = "", input = {}, baseImageDataUrl = "") {
+  const decoded = decodeDataUrlToBuffer(baseImageDataUrl);
+  if (!decoded?.buffer) return [];
+  const image = sharp(decoded.buffer);
+  const meta = await image.metadata();
+  const width = Math.max(1, Number(meta.width || 0));
+  const height = Math.max(1, Number(meta.height || 0));
+  if (!width || !height) return [];
+  const slotIds = Array.from(
+    new Set(
+      readWholePageContextTargetComponents(input)
+        .map((item) => inferSlotIdFromComponentId(item) || String(item || "").trim())
+        .concat(toStringArray(input?.approvedPlan?.builderBrief?.suggestedFocusSlots))
+        .concat(toStringArray(input?.pageSummary?.editableSlots))
+        .filter(Boolean)
+    )
+  );
+  if (!slotIds.length) return [];
+  const normalizedPageId = String(pageId || "").trim();
+  if (normalizedPageId === "home") {
+    const sectionMap = {
+      "header-top": { x: width * 0.02, y: height * 0.01, width: width * 0.96, height: Math.max(90, height * 0.035) },
+      "header-bottom": { x: width * 0.02, y: height * 0.045, width: width * 0.96, height: Math.max(100, height * 0.04) },
+      hero: { x: width * 0.02, y: height * 0.085, width: width * 0.96, height: Math.max(920, height * 0.24) },
+      quickmenu: { x: width * 0.08, y: height * 0.31, width: width * 0.84, height: Math.max(280, height * 0.08) },
+      "md-choice": { x: width * 0.06, y: height * 0.40, width: width * 0.88, height: Math.max(420, height * 0.10) },
+      timedeal: { x: width * 0.06, y: height * 0.52, width: width * 0.88, height: Math.max(420, height * 0.10) },
+      "best-ranking": { x: width * 0.06, y: height * 0.63, width: width * 0.88, height: Math.max(420, height * 0.10) },
+    };
+    const sections = slotIds
+      .map((slotId) => {
+        const rect = sectionMap[slotId];
+        if (!rect) return null;
+        return {
+          componentId: `home.${slotId}`,
+          slotId,
+          label: slotId,
+          rect: {
+            x: Math.round(rect.x),
+            y: Math.round(rect.y),
+            width: Math.round(rect.width),
+            height: Math.round(rect.height),
+          },
+        };
+      })
+      .filter(Boolean);
+    if (sections.length) return sections;
+  }
+  if (normalizedPageId === "homestyle-home") {
+    const sectionMap = {
+      quickMenu: { x: width * 0.06, y: height * 0.10, width: width * 0.88, height: Math.max(280, height * 0.12) },
+      labelBanner: { x: width * 0.06, y: height * 0.27, width: width * 0.88, height: Math.max(360, height * 0.16) },
+      brandStory: { x: width * 0.06, y: height * 0.48, width: width * 0.88, height: Math.max(520, height * 0.22) },
+      hero: { x: width * 0.04, y: height * 0.04, width: width * 0.92, height: Math.max(560, height * 0.20) },
+    };
+    const sections = slotIds
+      .map((slotId) => {
+        const rect = sectionMap[slotId];
+        if (!rect) return null;
+        return {
+          componentId: `homestyle-home.${slotId}`,
+          slotId,
+          label: slotId,
+          rect: {
+            x: Math.round(rect.x),
+            y: Math.round(rect.y),
+            width: Math.round(rect.width),
+            height: Math.round(rect.height),
+          },
+        };
+      })
+      .filter(Boolean);
+    if (sections.length) return sections;
+  }
+  if (normalizedPageId === "care-solutions") {
+    const sectionMap = {
+      hero: { x: width * 0.04, y: height * 0.05, width: width * 0.92, height: Math.max(600, height * 0.22) },
+      tabs: { x: width * 0.10, y: height * 0.29, width: width * 0.80, height: Math.max(180, height * 0.07) },
+      ranking: { x: width * 0.06, y: height * 0.39, width: width * 0.88, height: Math.max(420, height * 0.14) },
+      benefit: { x: width * 0.06, y: height * 0.56, width: width * 0.88, height: Math.max(420, height * 0.14) },
+      careBanner: { x: width * 0.08, y: height * 0.74, width: width * 0.84, height: Math.max(280, height * 0.10) },
+    };
+    const sections = slotIds
+      .map((slotId) => {
+        const rect = sectionMap[slotId];
+        if (!rect) return null;
+        return {
+          componentId: `care-solutions.${slotId}`,
+          slotId,
+          label: slotId,
+          rect: {
+            x: Math.round(rect.x),
+            y: Math.round(rect.y),
+            width: Math.round(rect.width),
+            height: Math.round(rect.height),
+          },
+        };
+      })
+      .filter(Boolean);
+    if (sections.length) return sections;
+  }
+  const bandHeight = Math.max(320, Math.round(height * 0.18));
+  const inferredBand =
+    slotIds.some((slotId) => /header|hero|quickmenu|top/i.test(slotId))
+      ? { x: Math.round(width * 0.04), y: Math.round(height * 0.06), width: Math.round(width * 0.92), height: bandHeight }
+      : slotIds.some((slotId) => /middle|ranking|product|grid|list|card|banner/i.test(slotId))
+        ? { x: Math.round(width * 0.05), y: Math.round(height * 0.36), width: Math.round(width * 0.90), height: bandHeight }
+        : { x: Math.round(width * 0.05), y: Math.round(height * 0.62), width: Math.round(width * 0.90), height: bandHeight };
+  return [{
+    componentId: `${normalizedPageId}.focus-band`,
+    slotId: "focus-band",
+    label: "focus-band",
+    rect: inferredBand,
+  }];
+}
+
+async function materializeCloneTargetReferenceAssets(input = {}, options = {}) {
+  const pageId = String(options.pageId || input?.pageContext?.workspacePageId || "").trim();
+  const viewportProfile = String(options.viewportProfile || input?.pageContext?.viewportProfile || "pc").trim() || "pc";
+  const userId = String(options.userId || "").trim();
+  if (!pageId || !userId) return [];
+  const baseUrl = buildInternalVisualCriticPreviewUrl(pageId, {
+    userId,
+    viewportProfile,
+  });
+  const fallbackCloneUrl = `http://127.0.0.1:${PORT}/clone/${encodeURIComponent(pageId)}?viewportProfile=${encodeURIComponent(viewportProfile)}`;
+  let rawFullPageImageDataUrl = await captureUrlAsScreenshotDataUrl(baseUrl, viewportProfile, { fullPage: true }).catch(() => null);
+  if (!rawFullPageImageDataUrl) {
+    rawFullPageImageDataUrl = await captureUrlAsScreenshotDataUrl(fallbackCloneUrl, viewportProfile, { fullPage: true }).catch(() => null);
+  }
+  const fullPageImageDataUrl = rawFullPageImageDataUrl
+    ? await normalizeWholePageDataUrlForVisionInput(rawFullPageImageDataUrl, {
+        targetWidth: 1400,
+        minimumWidth: 1000,
+        baseMaxHeight: 4200,
+        hardMaxHeight: 7200,
+        quality: 80,
+      }).catch(() => rawFullPageImageDataUrl)
+    : null;
+  if (!fullPageImageDataUrl) return [];
+  let sections = buildWholePageContextSections(pageId, viewportProfile, options.editableData, input);
+  if (!sections.length) {
+    sections = await buildWholePageFallbackSectionsFromImage(pageId, input, fullPageImageDataUrl).catch(() => []);
+  }
+  const pickedSections = safeObjectArray(sections, 4).slice(0, 3);
+  const assets = [];
+  for (const section of pickedSections) {
+    const focusImageDataUrl = await buildWholePageContextFocusDataUrl(fullPageImageDataUrl, [section]).catch(() => null);
+    const normalizedImageDataUrl = focusImageDataUrl
+      ? await normalizeDataUrlForVisionInput(focusImageDataUrl, {
+          maxWidth: 1200,
+          maxHeight: 1200,
+          format: "jpeg",
+        }).catch(() => focusImageDataUrl)
+      : null;
+    if (!normalizedImageDataUrl) continue;
+    const slotId = String(section?.slotId || "").trim();
+    const componentId = String(section?.componentId || "").trim();
+    assets.push({
+      id: `clone-reference-${slotId || assets.length + 1}`,
+      label: `${String(section?.label || slotId || componentId || "section").trim()} reference crop`,
+      sourceName: "clone-target-reference",
+      sourceClass: "system-reference",
+      targetLayer: normalizeInterventionLayer(input?.generationOptions?.interventionLayer, "page"),
+      targetComponents: [componentId, slotId].filter(Boolean),
+      why: ["Use this original clone crop as local component reference before changing structure or assets."],
+      avoid: ["Do not overfit local styling if it breaks full-page hierarchy."],
+      sourceUrl: baseUrl,
+      imageDataUrl: normalizedImageDataUrl,
+    });
+  }
+  return assets;
+}
+
+async function materializeWholePageContextVisualAssets(input = {}, options = {}) {
+  const pageId = String(options.pageId || input?.pageContext?.workspacePageId || "").trim();
+  const viewportProfile = String(options.viewportProfile || input?.pageContext?.viewportProfile || "pc").trim() || "pc";
+  const userId = String(options.userId || "").trim();
+  if (!pageId || !userId) return [];
+  const baseUrl = buildInternalVisualCriticPreviewUrl(pageId, {
+    userId,
+    viewportProfile,
+  });
+  const fallbackCloneUrl = `http://127.0.0.1:${PORT}/clone/${encodeURIComponent(pageId)}?viewportProfile=${encodeURIComponent(viewportProfile)}`;
+  let rawFullPageImageDataUrl = await captureUrlAsScreenshotDataUrl(baseUrl, viewportProfile, { fullPage: true }).catch((error) => {
+    console.warn(`[whole-page-context] capture-failed page=${pageId} source=internal-preview reason=${String(error?.message || error || "")}`);
+    return null;
+  });
+  if (!rawFullPageImageDataUrl) {
+    rawFullPageImageDataUrl = await captureUrlAsScreenshotDataUrl(fallbackCloneUrl, viewportProfile, { fullPage: true }).catch((error) => {
+      console.warn(`[whole-page-context] capture-failed page=${pageId} source=public-clone reason=${String(error?.message || error || "")}`);
+      return null;
+    });
+  }
+  const fullPageImageDataUrl = rawFullPageImageDataUrl
+    ? await normalizeWholePageDataUrlForVisionInput(rawFullPageImageDataUrl, {
+        targetWidth: 1400,
+        minimumWidth: 1000,
+        baseMaxHeight: 4200,
+        hardMaxHeight: 7200,
+        quality: 80,
+      }).catch(() => rawFullPageImageDataUrl)
+    : null;
+  if (!fullPageImageDataUrl) return [];
+  let sections = buildWholePageContextSections(pageId, viewportProfile, options.editableData, input);
+  if (!sections.length) {
+    sections = await buildWholePageFallbackSectionsFromImage(pageId, input, fullPageImageDataUrl).catch(() => []);
+    if (sections.length) {
+      console.log(`[whole-page-context] fallback page=${pageId} sections=${sections.length}`);
+    }
+  }
+  const targetMeta = readWholePageContextTargetMetadata(input);
+  const targetLabel =
+    targetMeta.targetGroupLabel ||
+    (targetMeta.interventionLayer === "page" ? "Whole page context" : "Target region");
+  console.log(
+    `[whole-page-context] prepare page=${pageId} viewport=${viewportProfile} layer=${targetMeta.interventionLayer} targetGroup=${targetMeta.targetGroupId || "none"} targetComponents=${readWholePageContextTargetComponents(input).length} sections=${sections.length}`
+  );
+  const rawOverlayImageDataUrl = sections.length
+    ? await buildWholePageContextOverlayDataUrl(fullPageImageDataUrl, sections, { targetLabel }).catch(() => null)
+    : null;
+  const overlayImageDataUrl = rawOverlayImageDataUrl
+    ? await normalizeWholePageDataUrlForVisionInput(rawOverlayImageDataUrl, {
+        targetWidth: 1400,
+        minimumWidth: 1000,
+        baseMaxHeight: 4200,
+        hardMaxHeight: 7200,
+        quality: 80,
+      }).catch(() => rawOverlayImageDataUrl)
+    : null;
+  const rawDirectFocusImageDataUrl = sections.length
+    ? await buildWholePageContextFocusDataUrl(fullPageImageDataUrl, sections).catch(() => null)
+    : null;
+  const directFocusImageDataUrl = rawDirectFocusImageDataUrl
+    ? await normalizeDataUrlForVisionInput(rawDirectFocusImageDataUrl, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        format: "jpeg",
+      }).catch(() => rawDirectFocusImageDataUrl)
+    : null;
+  const rawOverlayFocusImageDataUrl =
+    !directFocusImageDataUrl && overlayImageDataUrl
+      ? await buildWholePageContextFocusDataUrl(overlayImageDataUrl, sections).catch(() => null)
+      : null;
+  const overlayFocusImageDataUrl = rawOverlayFocusImageDataUrl
+    ? await normalizeDataUrlForVisionInput(rawOverlayFocusImageDataUrl, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        format: "jpeg",
+      }).catch(() => rawOverlayFocusImageDataUrl)
+    : null;
+  const focusImageDataUrl = directFocusImageDataUrl || overlayFocusImageDataUrl || overlayImageDataUrl || null;
+  const targetComponents = readWholePageContextTargetComponents(input);
+  const assets = [
+    {
+      id: "clone-original-fullpage",
+      label: "Original full-page clone",
+      sourceName: "clone-original",
+      sourceClass: "system-reference",
+      targetLayer: targetMeta.interventionLayer,
+      targetComponents,
+      why: ["Use the whole page first so hierarchy, rhythm, and surrounding sections stay coherent."],
+      avoid: ["Do not redesign the target region in isolation from the full page."],
+      sourceUrl: baseUrl,
+      imageDataUrl: fullPageImageDataUrl,
+    },
+    overlayImageDataUrl
+      ? {
+          id: "clone-target-overlay",
+          label: "Target-region overlay",
+          sourceName: "clone-target-overlay",
+          sourceClass: "system-reference",
+          targetLayer: targetMeta.interventionLayer,
+          targetComponents,
+          why: ["The highlighted area is the exact scope that may move inside the original clone."],
+          avoid: ["Do not let the target break the page rhythm around it."],
+          sourceUrl: baseUrl,
+          imageDataUrl: overlayImageDataUrl,
+        }
+      : null,
+    focusImageDataUrl
+      ? {
+          id: "clone-target-focus",
+          label: "Target focus crop",
+          sourceName: "clone-target-focus",
+          sourceClass: "system-reference",
+          targetLayer: targetMeta.interventionLayer,
+          targetComponents,
+          why: ["Inspect local detail only after checking the full-page composition."],
+          avoid: ["Do not over-optimize the crop against the full-page hierarchy."],
+          sourceUrl: baseUrl,
+          imageDataUrl: focusImageDataUrl,
+        }
+      : null,
+  ].filter(Boolean).slice(0, 3);
+  const dimensionSummary = await Promise.all(
+    assets.map(async (asset) => {
+      const size = await readDataUrlDimensions(asset.imageDataUrl).catch(() => null);
+      return `${asset.id}:${size ? `${size.width}x${size.height}` : "unknown"}`;
+    })
+  );
+  const narrowAssets = await Promise.all(
+    assets.map(async (asset) => {
+      const size = await readDataUrlDimensions(asset.imageDataUrl).catch(() => null);
+      if (!size || size.width >= 1000) return null;
+      return `${asset.id}:${size.width}x${size.height}`;
+    })
+  );
+  const narrowAssetSummary = narrowAssets.filter(Boolean);
+  console.log(
+    `[whole-page-context] assets page=${pageId} full=${fullPageImageDataUrl ? "yes" : "no"} overlay=${overlayImageDataUrl ? "yes" : "no"} focus=${focusImageDataUrl ? "yes" : "no"} assetCount=${assets.length} dims=${dimensionSummary.join(",")}`
+  );
+  if (narrowAssetSummary.length) {
+    console.warn(`[whole-page-context] narrow-assets page=${pageId} dims=${narrowAssetSummary.join(",")}`);
+  }
+  return assets;
+}
+
 function buildDesignReferenceLibraryContext(pageId = "", options = {}) {
   const pageType = classifyPageTypeForDesignRefs(pageId, options.pageGroup || "");
   const viewportProfile = String(options.viewportProfile || "pc").trim() || "pc";
@@ -1388,6 +5572,15 @@ function buildDesignReferenceLibraryContext(pageId = "", options = {}) {
     score: item.score,
   }));
   const sourceSeeds = buildDesignReferenceSourceSeedContext(pageId, options);
+  const referenceAnchors = buildDesignReferenceAnchors(entries, {
+    pageId,
+    pageGroup: options.pageGroup,
+    viewportProfile,
+    interventionLayer: options.interventionLayer,
+    targetComponents: options.targetComponents,
+    targetGroupId: options.targetGroupId,
+    limit,
+  });
   return {
     generatedAt: library.generatedAt || null,
     pageType,
@@ -1396,6 +5589,7 @@ function buildDesignReferenceLibraryContext(pageId = "", options = {}) {
     count: entries.length,
     entries,
     sourceSeeds,
+    referenceAnchors,
   };
 }
 
@@ -3041,8 +7235,564 @@ function findPage(data, pageId) {
   return (data.pages || []).find((page) => page.id === pageId) || null;
 }
 
+function normalizeViewportAuthoringMeta(viewportProfile = "pc") {
+  const normalized = String(viewportProfile || "pc").trim().toLowerCase() || "pc";
+  if (normalized === "mo" || normalized === "mobile") {
+    return {
+      viewportProfile: "mo",
+      viewportMode: "mobile",
+      viewportLabel: "Mobile",
+      assetVariantPolicy: "use-mo-variants-only",
+      viewportGuidance: [
+        "Current authoring target is mobile; do not reuse PC layout or PC-only asset approval as final output.",
+        "Prioritize one-column flow, touch targets, mobile safe areas, and vertical scroll rhythm.",
+        "Use mo asset variants for final image/banner/icon choices when registry variants are available.",
+      ],
+    };
+  }
+  if (normalized === "ta" || normalized === "tablet") {
+    return {
+      viewportProfile: "ta",
+      viewportMode: "tablet",
+      viewportLabel: "Tablet",
+      assetVariantPolicy: "use-tablet-variants-or-pc-fallback",
+      viewportGuidance: [
+        "Current authoring target is tablet; balance PC hierarchy with narrower viewport behavior.",
+        "Use tablet asset variants first; use approved pc fallback only when tablet variants are absent.",
+      ],
+    };
+  }
+  return {
+    viewportProfile: "pc",
+    viewportMode: "desktop",
+    viewportLabel: "PC",
+    assetVariantPolicy: "use-pc-variants-only",
+    viewportGuidance: [
+      "Current authoring target is PC; do not use mobile-only layout or mobile-only asset approval as final output.",
+      "Use wide viewport hierarchy, multi-column opportunities, and large hero safe areas.",
+      "Use pc asset variants for final image/banner/icon choices when registry variants are available.",
+    ],
+  };
+}
+
+function buildLocalPlanningProviderInput(payload = {}, options = {}) {
+  const source = payload && typeof payload === "object" ? payload : {};
+  const context = options && typeof options === "object" ? options : {};
+  const identity = context.effectiveIdentity && typeof context.effectiveIdentity === "object" ? context.effectiveIdentity : {};
+  const viewportMeta = normalizeViewportAuthoringMeta(source.viewportProfile || source.viewportMode || "pc");
+  return {
+    pageId: String(source.pageId || "").trim(),
+    viewportProfile: viewportMeta.viewportProfile,
+    viewportMode: viewportMeta.viewportMode,
+    viewportLabel: viewportMeta.viewportLabel,
+    journeyMode: String(source.journeyMode || "page").trim() || "page",
+    journeyId: String(source.journeyId || "").trim(),
+    journeyDiscoveryMode: String(source.journeyDiscoveryMode || "").trim(),
+    assetVariantPolicy: viewportMeta.assetVariantPolicy,
+    viewportGuidance: viewportMeta.viewportGuidance,
+    rendererSurface: String(source.rendererSurface || "tailwind").trim() || "tailwind",
+    targetGroup: {
+      groupId: String(source.targetGroupId || source.scopePreset || "group").trim() || "group",
+      groupLabel: String(source.targetGroupLabel || "Target Group").trim() || "Target Group",
+      componentIds: Array.isArray(source.targetComponents) ? source.targetComponents : [],
+      slotIds: Array.isArray(source.targetComponents)
+        ? source.targetComponents.map((componentId) => String(componentId || "").trim().split(".").pop()).filter(Boolean)
+        : [],
+      layoutIntent: [
+        String(source.keyMessage || "").trim(),
+        ...toStringArray(source.preferredDirection || ""),
+      ].filter(Boolean),
+    },
+    pageIdentity: {
+      character: String(identity.role || "").trim(),
+      visualLanguage: String(identity.designIntent || "").trim(),
+      userGoal: String(identity.purpose || "").trim(),
+      sectionFlow: "",
+    },
+    designPolicy: {
+      problemStatement: [
+        `Viewport target: ${viewportMeta.viewportLabel} (${viewportMeta.viewportProfile})`,
+        String(source.requestText || "").trim(),
+        String(source.keyMessage || "").trim(),
+      ].filter(Boolean),
+      hierarchyGoals: [
+        ...viewportMeta.viewportGuidance,
+        ...toStringArray(source.preferredDirection || ""),
+        ...toStringArray(source.toneAndMood || ""),
+      ].filter(Boolean),
+      mustKeep: Array.isArray(identity.mustPreserve) ? identity.mustPreserve : [],
+      mustChange: [
+        String(source.keyMessage || "").trim(),
+        ...toStringArray(source.preferredDirection || ""),
+      ].filter(Boolean),
+      guardrails: [
+        `Asset variant policy: ${viewportMeta.assetVariantPolicy}`,
+        ...(Array.isArray(identity.visualGuardrails) ? identity.visualGuardrails : []),
+        ...toStringArray(source.avoidDirection || ""),
+      ].filter(Boolean),
+    },
+  };
+}
+
+function summarizeRequirementPlanForWorkspaceList(item = {}) {
+  const input = item?.input && typeof item.input === "object" ? item.input : {};
+  const output = item?.output && typeof item.output === "object" ? item.output : {};
+  const journeyFlow =
+    item?.journeyFlow && typeof item.journeyFlow === "object"
+      ? JSON.parse(JSON.stringify(item.journeyFlow))
+      : (output?.requirementPlan?.journeyFlow && typeof output.requirementPlan.journeyFlow === "object"
+        ? JSON.parse(JSON.stringify(output.requirementPlan.journeyFlow))
+        : null);
+  const journeyStrategy =
+    item?.journeyStrategy && typeof item.journeyStrategy === "object"
+      ? JSON.parse(JSON.stringify(item.journeyStrategy))
+      : (output?.requirementPlan?.journeyStrategy && typeof output.requirementPlan.journeyStrategy === "object"
+        ? JSON.parse(JSON.stringify(output.requirementPlan.journeyStrategy))
+        : null);
+  const requirementPlan =
+    output?.requirementPlan && typeof output.requirementPlan === "object"
+      ? JSON.parse(JSON.stringify(output.requirementPlan))
+      : {};
+  if (journeyFlow) requirementPlan.journeyFlow = journeyFlow;
+  if (journeyStrategy) requirementPlan.journeyStrategy = journeyStrategy;
+  return {
+    id: item?.id || "",
+    pageId: item?.pageId || "",
+    viewportProfile: item?.viewportProfile || "",
+    title: item?.title || "",
+    summary: item?.summary || "",
+    createdAt: item?.createdAt || "",
+    updatedAt: item?.updatedAt || "",
+    originType: item?.originType || "",
+    generatedBy: item?.generatedBy || "",
+    ...(journeyFlow ? { journeyFlow } : {}),
+    ...(journeyStrategy ? { journeyStrategy } : {}),
+    input: {
+      mode: input?.mode || "",
+      userInput: input?.userInput && typeof input.userInput === "object" ? input.userInput : {},
+    },
+    output: {
+      requirementPlan,
+    },
+  };
+}
+
+function summarizeDraftBuildForWorkspaceList(item = {}) {
+  const report = item?.report && typeof item.report === "object" ? item.report : {};
+  const snapshotData = item?.snapshotData && typeof item.snapshotData === "object" ? item.snapshotData : {};
+  return {
+    id: item?.id || "",
+    pageId: item?.pageId || "",
+    viewportProfile: item?.viewportProfile || "",
+    planId: item?.planId || "",
+    summary: item?.summary || "",
+    createdAt: item?.createdAt || "",
+    updatedAt: item?.updatedAt || "",
+    status: item?.status || "",
+    previewOnly: Boolean(item?.previewOnly),
+    builderVersion: item?.builderVersion || "",
+    builderProvider: item?.builderProvider || "",
+    rendererSurface: item?.rendererSurface || "",
+    targetGroupId: item?.targetGroupId || "",
+    proposedVersionLabel: item?.proposedVersionLabel || "",
+    executionStrategy: item?.executionStrategy && typeof item.executionStrategy === "object" ? item.executionStrategy : {},
+    operations: Array.isArray(item?.operations) ? item.operations : [],
+    report: report,
+    snapshotData: {
+      changedComponentIds: Array.isArray(snapshotData?.changedComponentIds) ? snapshotData.changedComponentIds : [],
+      criticReport: snapshotData?.criticReport && typeof snapshotData.criticReport === "object" ? snapshotData.criticReport : null,
+      qualityGate: snapshotData?.qualityGate && typeof snapshotData.qualityGate === "object" ? snapshotData.qualityGate : null,
+      localReplayCheck: snapshotData?.localReplayCheck && typeof snapshotData.localReplayCheck === "object" ? snapshotData.localReplayCheck : null,
+    },
+  };
+}
+
+function buildLocalPlanningPreviewPlan(preview = {}, payload = {}) {
+  const viewportMeta = normalizeViewportAuthoringMeta(payload.viewportProfile || payload.viewportMode || "pc");
+  const journeyFlow = buildJourneyFlowFromInput(payload, { viewportProfile: viewportMeta.viewportProfile });
+  const journeyStrategy = buildJourneyStrategyFromInput(payload);
+  const requirementPlan = buildRequirementPlanFromPlanningPreview(preview, {
+    title: String(payload.keyMessage || payload.title || "").trim(),
+    viewportProfile: viewportMeta.viewportProfile,
+    viewportMode: viewportMeta.viewportMode,
+    viewportLabel: viewportMeta.viewportLabel,
+    assetVariantPolicy: viewportMeta.assetVariantPolicy,
+    viewportGuidance: viewportMeta.viewportGuidance,
+    designChangeLevel: payload.designChangeLevel,
+    interventionLayer: payload.interventionLayer,
+    patchDepth: payload.patchDepth,
+    targetGroupId: payload.targetGroupId,
+    targetGroupLabel: payload.targetGroupLabel,
+  });
+  if (journeyFlow) {
+    requirementPlan.journeyFlow = journeyFlow;
+  }
+  if (journeyStrategy) {
+    requirementPlan.journeyStrategy = journeyStrategy;
+  }
+  const nowIso = new Date().toISOString();
+  return {
+    id: `local-preview-${crypto.randomUUID()}`,
+    pageId: String(payload.pageId || "").trim(),
+    viewportProfile: viewportMeta.viewportProfile,
+    viewportMode: viewportMeta.viewportMode,
+    viewportLabel: viewportMeta.viewportLabel,
+    assetVariantPolicy: viewportMeta.assetVariantPolicy,
+    viewportGuidance: viewportMeta.viewportGuidance,
+    mode: "local-provider-preview",
+    status: "preview",
+    originType: "local-provider-preview",
+    generatedBy: "design-pipeline-local",
+    createdAt: nowIso,
+    updatedAt: nowIso,
+    title: requirementPlan.title || "",
+    summary: Array.isArray(requirementPlan.requestSummary) ? requirementPlan.requestSummary[0] || "" : "",
+    input: {
+      userInput: {
+        viewportProfile: viewportMeta.viewportProfile,
+        viewportMode: viewportMeta.viewportMode,
+        viewportLabel: viewportMeta.viewportLabel,
+        journeyMode: String(payload.journeyMode || (payload.journeyId ? "strategy" : "page")).trim() || "page",
+        journeyId: String(payload.journeyId || "").trim(),
+        journeyDiscoveryMode: String(payload.journeyDiscoveryMode || (payload.journeyId ? "strategy-input" : "")).trim(),
+        assetVariantPolicy: viewportMeta.assetVariantPolicy,
+        viewportGuidance: viewportMeta.viewportGuidance,
+        requestText: String(payload.requestText || "").trim(),
+        keyMessage: String(payload.keyMessage || "").trim(),
+        preferredDirection: String(payload.preferredDirection || "").trim(),
+        avoidDirection: String(payload.avoidDirection || "").trim(),
+        toneAndMood: String(payload.toneAndMood || "").trim(),
+        referenceUrls: Array.isArray(payload.referenceUrls) ? payload.referenceUrls : [],
+        designChangeLevel: String(payload.designChangeLevel || "medium").trim() || "medium",
+        interventionLayer: String(payload.interventionLayer || "section").trim() || "section",
+        patchDepth: String(payload.patchDepth || "medium").trim() || "medium",
+        rendererSurface: String(payload.rendererSurface || "tailwind").trim() || "tailwind",
+        builderProvider: String(payload.builderProvider || "local").trim() || "local",
+        targetScope: String(payload.targetScope || "section").trim() || "section",
+        targetComponents: Array.isArray(payload.targetComponents) ? payload.targetComponents : [],
+        targetGroupId: String(payload.targetGroupId || "").trim(),
+        targetGroupLabel: String(payload.targetGroupLabel || "").trim(),
+        scopePreset: String(payload.scopePreset || "").trim(),
+      },
+    },
+    output: {
+      requirementPlan,
+      providerResult: preview,
+    },
+  };
+}
+
+function buildOpenRouterPlanningPreviewPlan(plannerResult = {}, payload = {}) {
+  const viewportMeta = normalizeViewportAuthoringMeta(payload.viewportProfile || payload.viewportMode || "pc");
+  const journeyFlow = buildJourneyFlowFromInput(payload, { viewportProfile: viewportMeta.viewportProfile });
+  const journeyStrategy = buildJourneyStrategyFromInput(payload);
+  const requirementPlanSource =
+    plannerResult?.requirementPlan && typeof plannerResult.requirementPlan === "object"
+      ? plannerResult.requirementPlan
+      : {};
+  const requirementPlan = {
+    ...requirementPlanSource,
+    viewportProfile: requirementPlanSource.viewportProfile || viewportMeta.viewportProfile,
+    viewportMode: requirementPlanSource.viewportMode || viewportMeta.viewportMode,
+    viewportLabel: requirementPlanSource.viewportLabel || viewportMeta.viewportLabel,
+    assetVariantPolicy: requirementPlanSource.assetVariantPolicy || viewportMeta.assetVariantPolicy,
+    viewportGuidance: Array.isArray(requirementPlanSource.viewportGuidance)
+      ? requirementPlanSource.viewportGuidance
+      : viewportMeta.viewportGuidance,
+    designChangeLevel: requirementPlanSource.designChangeLevel || String(payload.designChangeLevel || "medium").trim() || "medium",
+    interventionLayer: requirementPlanSource.interventionLayer || String(payload.interventionLayer || "page").trim() || "page",
+    patchDepth: requirementPlanSource.patchDepth || String(payload.patchDepth || "medium").trim() || "medium",
+    rendererSurface: requirementPlanSource.rendererSurface || String(payload.rendererSurface || "custom").trim() || "custom",
+    builderProvider: requirementPlanSource.builderProvider || "openrouter",
+    targetGroupId: requirementPlanSource.targetGroupId || String(payload.targetGroupId || "").trim(),
+    targetGroupLabel: requirementPlanSource.targetGroupLabel || String(payload.targetGroupLabel || "").trim(),
+    targetComponents: Array.isArray(requirementPlanSource.targetComponents)
+      ? requirementPlanSource.targetComponents
+      : (Array.isArray(payload.targetComponents) ? payload.targetComponents : []),
+  };
+  if (journeyFlow) {
+    requirementPlan.journeyFlow = journeyFlow;
+  }
+  if (journeyStrategy) {
+    requirementPlan.journeyStrategy = journeyStrategy;
+  }
+  const nowIso = new Date().toISOString();
+  return {
+    id: `openrouter-preview-${crypto.randomUUID()}`,
+    pageId: String(payload.pageId || "").trim(),
+    viewportProfile: viewportMeta.viewportProfile,
+    viewportMode: viewportMeta.viewportMode,
+    viewportLabel: viewportMeta.viewportLabel,
+    assetVariantPolicy: viewportMeta.assetVariantPolicy,
+    viewportGuidance: viewportMeta.viewportGuidance,
+    mode: "openrouter-provider-preview",
+    status: "preview",
+    originType: "openrouter-provider-preview",
+    generatedBy: "openrouter-planner",
+    createdAt: nowIso,
+    updatedAt: nowIso,
+    title: requirementPlan.title || String(payload.title || payload.keyMessage || "").trim(),
+    summary:
+      String(plannerResult?.summary || "").trim() ||
+      (Array.isArray(requirementPlan.requestSummary) ? requirementPlan.requestSummary[0] || "" : ""),
+    input: {
+      userInput: {
+        viewportProfile: viewportMeta.viewportProfile,
+        viewportMode: viewportMeta.viewportMode,
+        viewportLabel: viewportMeta.viewportLabel,
+        journeyMode: String(payload.journeyMode || (payload.journeyId ? "strategy" : "page")).trim() || "page",
+        journeyId: String(payload.journeyId || "").trim(),
+        journeyDiscoveryMode: String(payload.journeyDiscoveryMode || (payload.journeyId ? "strategy-input" : "")).trim(),
+        assetVariantPolicy: viewportMeta.assetVariantPolicy,
+        viewportGuidance: viewportMeta.viewportGuidance,
+        requestText: String(payload.requestText || "").trim(),
+        keyMessage: String(payload.keyMessage || "").trim(),
+        preferredDirection: String(payload.preferredDirection || "").trim(),
+        avoidDirection: String(payload.avoidDirection || "").trim(),
+        toneAndMood: String(payload.toneAndMood || "").trim(),
+        referenceUrls: Array.isArray(payload.referenceUrls) ? payload.referenceUrls : [],
+        designChangeLevel: String(payload.designChangeLevel || "medium").trim() || "medium",
+        interventionLayer: String(payload.interventionLayer || "page").trim() || "page",
+        patchDepth: String(payload.patchDepth || "medium").trim() || "medium",
+        rendererSurface: String(payload.rendererSurface || "custom").trim() || "custom",
+        builderProvider: "openrouter",
+        targetScope: String(payload.targetScope || "page").trim() || "page",
+        targetComponents: Array.isArray(payload.targetComponents) ? payload.targetComponents : [],
+        targetGroupId: String(payload.targetGroupId || "").trim(),
+        targetGroupLabel: String(payload.targetGroupLabel || "").trim(),
+        scopePreset: String(payload.scopePreset || "").trim(),
+      },
+    },
+    output: {
+      requirementPlan,
+      providerResult: {
+        providerMeta: {
+          provider: "openrouter",
+          model: process.env.PLANNER_MODEL || process.env.OPENROUTER_MODEL || "",
+        },
+        rawResult: plannerResult,
+      },
+    },
+  };
+}
+
+function buildLocalBuildProviderInput(payload = {}, options = {}) {
+  const source = payload && typeof payload === "object" ? payload : {};
+  const context = options && typeof options === "object" ? options : {};
+  const approvedPlan = source.approvedPlan && typeof source.approvedPlan === "object" ? source.approvedPlan : {};
+  const viewportMeta = normalizeViewportAuthoringMeta(
+    source.viewportProfile ||
+    approvedPlan.viewportProfile ||
+    approvedPlan.builderBrief?.viewportProfile ||
+    "pc"
+  );
+  const planningPackage = approvedPlan.planningPackage && typeof approvedPlan.planningPackage === "object"
+    ? approvedPlan.planningPackage
+    : {};
+  const effectiveIdentity = context.effectiveIdentity && typeof context.effectiveIdentity === "object"
+    ? context.effectiveIdentity
+    : {};
+  const explicitTargetComponents = Array.isArray(source.targetComponents)
+    ? source.targetComponents.filter(Boolean)
+    : (Array.isArray(approvedPlan.targetComponents) ? approvedPlan.targetComponents.filter(Boolean) : []);
+  const payloadEditableComponents = Array.isArray(source.editableComponents)
+    ? source.editableComponents
+    : [];
+  const fallbackEditableComponents = payloadEditableComponents.length
+    ? payloadEditableComponents
+    : (Array.isArray(context.pageEditableComponents) ? context.pageEditableComponents : []);
+  const fallbackTargetComponents = Array.isArray(fallbackEditableComponents)
+    ? fallbackEditableComponents
+        .map((item) => String(item?.componentId || "").trim())
+        .filter(Boolean)
+    : [];
+  const targetScope = String(source.targetScope || approvedPlan.targetScope || "").trim().toLowerCase();
+  const targetComponents =
+    explicitTargetComponents.length
+      ? explicitTargetComponents
+      : ((targetScope === "page" || String(source.targetGroupId || approvedPlan.targetGroupId || "").trim() === "page")
+        ? fallbackTargetComponents
+        : []);
+  const slotIds = Array.isArray(approvedPlan.sectionBlueprints)
+    ? approvedPlan.sectionBlueprints
+        .map((item) => String(item?.slotId || "").trim())
+        .filter(Boolean)
+    : targetComponents.map((componentId) => String(componentId || "").trim().split(".").pop()).filter(Boolean);
+  const conceptPlans = Array.isArray(approvedPlan.conceptPlans) ? approvedPlan.conceptPlans.filter(Boolean) : [];
+  const selectedConcept = approvedPlan.selectedConcept && typeof approvedPlan.selectedConcept === "object"
+    ? approvedPlan.selectedConcept
+    : (conceptPlans[0] || null);
+  return {
+    pageId: String(source.pageId || "").trim(),
+    viewportProfile: viewportMeta.viewportProfile,
+    viewportMode: viewportMeta.viewportMode,
+    viewportLabel: viewportMeta.viewportLabel,
+    assetVariantPolicy: viewportMeta.assetVariantPolicy,
+    viewportGuidance: viewportMeta.viewportGuidance,
+    rendererSurface: String(source.rendererSurface || "tailwind").trim() || "tailwind",
+    targetGroup: {
+      groupId: String(source.targetGroupId || approvedPlan.targetGroupId || "group").trim() || "group",
+      groupLabel: String(source.targetGroupLabel || approvedPlan.targetGroupLabel || "Target Group").trim() || "Target Group",
+      componentIds: targetComponents,
+      slotIds,
+      layoutIntent: toStringArray(approvedPlan.planningDirection || []),
+      replacementMode: String(source.targetGroupReplacementMode || approvedPlan.targetGroupReplacementMode || "").trim(),
+    },
+    pageIdentity: {
+      character: String(
+        planningPackage?.pageIdentity?.character ||
+        effectiveIdentity.role ||
+        ""
+      ).trim(),
+      visualLanguage: String(
+        planningPackage?.pageIdentity?.visualLanguage ||
+        effectiveIdentity.designIntent ||
+        ""
+      ).trim(),
+      userGoal: String(
+        planningPackage?.pageIdentity?.userGoal ||
+        effectiveIdentity.purpose ||
+        ""
+      ).trim(),
+      sectionFlow: String(planningPackage?.pageIdentity?.sectionFlow || "").trim(),
+    },
+    designPolicy: {
+      problemStatement: toStringArray(
+        planningPackage?.designPolicy?.problemStatement ||
+        approvedPlan.requestSummary ||
+        []
+      ),
+      hierarchyGoals: toStringArray(
+        [
+          ...viewportMeta.viewportGuidance,
+          ...toStringArray(planningPackage?.designPolicy?.hierarchyGoals || approvedPlan.planningDirection || []),
+        ]
+      ),
+      mustKeep: toStringArray(
+        planningPackage?.designPolicy?.mustKeep ||
+        approvedPlan?.builderBrief?.mustKeep ||
+        []
+      ),
+      mustChange: toStringArray(
+        planningPackage?.designPolicy?.mustChange ||
+        approvedPlan?.builderBrief?.mustChange ||
+        []
+      ),
+      guardrails: toStringArray(
+        [
+          `Asset variant policy: ${viewportMeta.assetVariantPolicy}`,
+          ...toStringArray(planningPackage?.designPolicy?.guardrails || approvedPlan.guardrails || []),
+        ]
+      ),
+      layoutDirections: conceptPlans.length
+        ? conceptPlans.map((item) => String(item?.conceptLabel || item?.layoutSystem || "").trim()).filter(Boolean)
+        : (selectedConcept?.conceptLabel ? [selectedConcept.conceptLabel] : []),
+      exclusions: Array.isArray(planningPackage?.designPolicy?.exclusions)
+        ? planningPackage.designPolicy.exclusions
+        : [],
+    },
+    selectedConcept,
+    executionBrief: planningPackage?.executionBrief && typeof planningPackage.executionBrief === "object"
+      ? planningPackage.executionBrief
+      : null,
+    sectionBlueprints: Array.isArray(approvedPlan.sectionBlueprints) ? approvedPlan.sectionBlueprints : [],
+  };
+}
+
+function normalizeDesignAuthorProvider(value = "", fallback = "local") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "openrouter" || normalized === "llm") return "openrouter";
+  if (normalized === "local") return "local";
+  return fallback === "openrouter" ? "openrouter" : "local";
+}
+
+const HOME_REQUIRED_SLOT_FALLBACKS = [
+  { slotId: "header-top", componentType: "header-top" },
+  { slotId: "header-bottom", componentType: "header-bottom" },
+  { slotId: "hero", componentType: "hero" },
+  { slotId: "quickmenu", componentType: "quickmenu" },
+  { slotId: "timedeal", componentType: "product-section" },
+  { slotId: "md-choice", componentType: "product-section" },
+  { slotId: "best-ranking", componentType: "product-section" },
+  {
+    slotId: "marketing-area",
+    componentType: "home-lower",
+    activeSourceId: "custom-renderer",
+    sources: [
+      { sourceId: "custom-renderer", sourceType: "custom", renderer: "component", status: "active" },
+      { sourceId: "custom-live-current", sourceType: "custom", renderer: "component", status: "draft" },
+      { sourceId: "figma-home-marketing-area-v1", sourceType: "figma-derived", renderer: "component", status: "draft" },
+    ],
+  },
+  { slotId: "subscription", componentType: "home-lower" },
+  { slotId: "space-renewal", componentType: "home-lower" },
+  { slotId: "brand-showroom", componentType: "home-lower" },
+  { slotId: "latest-product-news", componentType: "home-lower" },
+  { slotId: "smart-life", componentType: "home-lower" },
+  { slotId: "summary-banner-2", componentType: "banner" },
+  { slotId: "missed-benefits", componentType: "home-lower" },
+  { slotId: "lg-best-care", componentType: "home-lower" },
+  { slotId: "bestshop-guide", componentType: "home-lower" },
+];
+
+function buildServerDefaultSlotRegistry(pageId) {
+  const normalizedPageId = String(pageId || "").trim();
+  if (normalizedPageId !== "home") return null;
+  return {
+    pageId: normalizedPageId,
+    slots: HOME_REQUIRED_SLOT_FALLBACKS.map((slot) => ({
+      ...slot,
+      ...(Array.isArray(slot.sources)
+        ? {
+            sources: slot.sources.map((source) => ({ ...source })),
+          }
+        : {}),
+    })),
+  };
+}
+
 function findSlotRegistry(data, pageId) {
-  return (data.slotRegistries || []).find((item) => item.pageId === pageId) || null;
+  const current = (data.slotRegistries || []).find((item) => item.pageId === pageId) || null;
+  const page = (data.pages || []).find((item) => item.id === pageId) || null;
+  const defaultRegistry = buildServerDefaultSlotRegistry(pageId);
+  const fallbackSlots = (page?.sections || [])
+    .map((section) => {
+      const slotId = String(section?.props?.slotId || section?.slotId || "").trim();
+      if (!slotId) return null;
+      return {
+        slotId,
+        componentType: String(section?.componentType || "section").trim() || "section",
+      };
+    })
+    .filter(Boolean);
+  const fallback = fallbackSlots.length ? { pageId, slots: fallbackSlots } : defaultRegistry;
+  if (!fallback) return current;
+  const fallbackMap = new Map(
+    (fallback.slots || []).map((slot) => [String(slot?.slotId || "").trim(), slot]).filter(([slotId]) => Boolean(slotId))
+  );
+  (defaultRegistry?.slots || []).forEach((slot) => {
+    const slotId = String(slot?.slotId || "").trim();
+    if (!slotId || fallbackMap.has(slotId)) return;
+    fallbackMap.set(slotId, slot);
+  });
+  const normalizedFallbackSlots = Array.from(fallbackMap.values());
+  const currentSlots = Array.isArray(current?.slots) ? current.slots : [];
+  const currentMap = new Map(currentSlots.map((slot) => [String(slot?.slotId || "").trim(), slot]).filter(([slotId]) => Boolean(slotId)));
+  const mergedSlots = normalizedFallbackSlots.map((slot) => ({
+    ...slot,
+    ...(currentMap.get(String(slot?.slotId || "").trim()) || {}),
+  }));
+  currentSlots.forEach((slot) => {
+    const slotId = String(slot?.slotId || "").trim();
+    if (!slotId || mergedSlots.some((item) => String(item?.slotId || "").trim() === slotId)) return;
+    mergedSlots.push(slot);
+  });
+  return {
+    ...(fallback || {}),
+    ...(current || {}),
+    pageId,
+    slots: mergedSlots,
+  };
 }
 
 function findSlotConfig(data, pageId, slotId) {
@@ -4135,6 +8885,1683 @@ function toVisualUrl(filePath) {
   if (!normalizedFolded.startsWith(visualRootFolded)) return null;
   const relativePath = normalized.slice(visualRoot.length).replace(/\\/g, "/");
   return `/visual/${relativePath.split("/").map(encodeURIComponent).join("/")}`;
+}
+
+function getVisualCriticViewport(viewportProfile = "pc") {
+  const normalized = normalizeViewportProfile(viewportProfile, "pc");
+  if (normalized === "mo") return { width: 430, height: 1600 };
+  if (normalized === "ta") return { width: 1024, height: 1600 };
+  return { width: 1460, height: 1600 };
+}
+
+function buildInternalVisualCriticPreviewUrl(pageId, options = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return "";
+  const params = new URLSearchParams();
+  params.set("viewportProfile", String(options.viewportProfile || "pc").trim() || "pc");
+  params.set("criticKey", INTERNAL_VISUAL_CRITIC_KEY);
+  params.set("criticUserId", String(options.userId || "").trim());
+  if (options.draftBuildId) params.set("draftBuildId", String(options.draftBuildId || "").trim());
+  if (options.snapshotState) params.set("snapshotState", String(options.snapshotState || "").trim());
+  if (options.sectionPreviewSlot) params.set("sectionPreviewSlot", String(options.sectionPreviewSlot || "").trim());
+  return `http://127.0.0.1:${PORT}/clone-content/${encodeURIComponent(normalizedPageId)}?${params.toString()}`;
+}
+
+async function waitForVisualCaptureSettled(page, settleMs = 800) {
+  try {
+    await page.waitForFunction(
+      () => document.readyState === "interactive" || document.readyState === "complete",
+      { timeout: 10_000 }
+    );
+  } catch {}
+  try {
+    await page.waitForLoadState("load", { timeout: 5_000 });
+  } catch {}
+  try {
+    await page.waitForLoadState("networkidle", { timeout: 3_000 });
+  } catch {}
+  try {
+    await page.evaluate(async () => {
+      if (!document.fonts?.ready) return;
+      await Promise.race([
+        document.fonts.ready.catch(() => null),
+        new Promise((resolve) => setTimeout(resolve, 3_000)),
+      ]);
+    });
+  } catch {}
+  await page.waitForTimeout(Math.max(0, Number(settleMs || 0) || 0));
+}
+
+async function gotoForVisualCapture(page, url, options = {}) {
+  const timeoutMs = Math.max(5_000, Number(options.timeoutMs || 45_000) || 45_000);
+  const settleMs = Math.max(200, Number(options.settleMs || 800) || 800);
+  const attempts = [
+    { waitUntil: "domcontentloaded", timeout: Math.min(timeoutMs, 20_000) },
+    { waitUntil: "load", timeout: Math.min(timeoutMs, 30_000) },
+  ];
+  let lastError = null;
+  for (const attempt of attempts) {
+    try {
+      await page.goto(url, attempt);
+      await waitForVisualCaptureSettled(page, settleMs);
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+  throw lastError || new Error("visual_capture_navigation_failed");
+}
+
+async function captureUrlAsScreenshotDataUrl(targetUrl, viewportProfile = "pc", options = {}) {
+  const url = String(targetUrl || "").trim();
+  if (!url) return null;
+  const { chromium } = require("playwright");
+  const viewport = getVisualCriticViewport(viewportProfile);
+  const baseTimeoutMs = Math.max(5_000, Number(options.timeoutMs || 45_000) || 45_000);
+  const baseSettleMs = Math.max(200, Number(options.settleMs || 800) || 800);
+  const attempts = [
+    { timeoutMs: baseTimeoutMs, settleMs: baseSettleMs },
+    { timeoutMs: baseTimeoutMs + 15_000, settleMs: baseSettleMs + 400 },
+  ];
+  let lastError = null;
+  for (const attempt of attempts) {
+    const browser = await chromium.launch({ headless: true });
+    try {
+      const page = await browser.newPage({ viewport });
+      await gotoForVisualCapture(page, url, {
+        ...options,
+        timeoutMs: attempt.timeoutMs,
+        settleMs: attempt.settleMs,
+      });
+      const buffer = await page.screenshot({
+        type: "png",
+        fullPage: Boolean(options?.fullPage),
+      });
+      return `data:image/png;base64,${buffer.toString("base64")}`;
+    } catch (error) {
+      lastError = error;
+    } finally {
+      await browser.close();
+    }
+  }
+  throw lastError || new Error("visual_capture_failed");
+}
+
+async function fetchUrlTextWithTimeout(targetUrl = "", timeoutMs = 15_000) {
+  const url = String(targetUrl || "").trim();
+  if (!url) return "";
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error("fetch_timeout")), Math.max(1_000, Number(timeoutMs || 15_000) || 15_000));
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new Error(`fetch_failed:${response.status}`);
+    return await response.text();
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function summarizeVisualPreviewHtml(html = "") {
+  const source = String(html || "");
+  const rendererSurface = source.includes("codex-v2-home-surface--tailwind")
+    ? "tailwind"
+    : source.includes("codex-v2-home-surface")
+      ? "custom-v2"
+      : source.includes("codex-home-composition-")
+        ? "legacy-composition"
+        : source.includes("data-codex-slot=\"hero\"") || source.includes("data-codex-slot=\"quickmenu\"")
+          ? "slot-preview"
+          : "unknown";
+  return {
+    rendererSurface,
+    hasHero: source.includes("data-codex-slot=\"hero\""),
+    hasQuickmenu: source.includes("data-codex-slot=\"quickmenu\""),
+    hasTopShell: source.includes("data-codex-slot=\"home-top-composition-shell\""),
+    hasTailwindSurface: source.includes("codex-v2-home-surface--tailwind"),
+    hasV2Surface: source.includes("codex-v2-home-surface"),
+    hasLegacyComposition: source.includes("codex-home-composition-"),
+  };
+}
+
+function inferVisualCriticTargetSlots(builderInput = {}, buildResult = {}) {
+  const targetComponents = toStringArray(builderInput?.generationOptions?.targetComponents);
+  const explicitSlots = targetComponents
+    .map((item) => inferSlotIdFromComponentId(item) || String(item || "").trim())
+    .filter(Boolean);
+  if (explicitSlots.length) {
+    return Array.from(new Set(explicitSlots));
+  }
+  const reportSlots = safeObjectArray(buildResult?.report?.componentComposition, 40)
+    .map((item) => String(item?.slotId || inferSlotIdFromComponentId(item?.componentId) || "").trim())
+    .filter(Boolean);
+  return Array.from(new Set(reportSlots));
+}
+
+async function captureVisualCriticPreviewBundle({
+  userId = "",
+  pageId = "",
+  viewportProfile = "pc",
+  draftBuildId = "",
+  builderInput = {},
+  buildResult = {},
+  includeHtmlSummary = false,
+} = {}) {
+  const targetSlots = inferVisualCriticTargetSlots(builderInput, buildResult);
+  const sectionPreviewSlot = targetSlots.length ? targetSlots.join(",") : "";
+  const focusTargetSlots = sectionPreviewSlot ? targetSlots : [];
+  const focusLabel =
+    targetSlots.length > 1
+      ? "selected cluster focus"
+      : (sectionPreviewSlot ? "focus area" : "");
+  const referenceAnchor = pickVisualCriticReferenceAnchor(builderInput, buildResult);
+  const referenceImageUrl = referenceAnchor?.screenshotUrls?.[0] || null;
+  const beforeUrl = buildInternalVisualCriticPreviewUrl(pageId, {
+    userId,
+    viewportProfile,
+    draftBuildId,
+    snapshotState: "before",
+  });
+  const afterUrl = buildInternalVisualCriticPreviewUrl(pageId, {
+    userId,
+    viewportProfile,
+    draftBuildId,
+    snapshotState: "after",
+  });
+  const focusBeforeUrl = sectionPreviewSlot
+    ? buildInternalVisualCriticPreviewUrl(pageId, {
+        userId,
+        viewportProfile,
+        draftBuildId,
+        snapshotState: "before",
+        sectionPreviewSlot,
+      })
+    : "";
+  const focusAfterUrl = sectionPreviewSlot
+    ? buildInternalVisualCriticPreviewUrl(pageId, {
+        userId,
+        viewportProfile,
+        draftBuildId,
+        snapshotState: "after",
+        sectionPreviewSlot,
+      })
+    : "";
+  console.log(
+    `[visual-capture] request user=${userId} page=${pageId} viewport=${viewportProfile} build=${draftBuildId} slot=${sectionPreviewSlot || "full"} referenceAnchor=${referenceAnchor?.id || "none"}`
+  );
+  const capture = async (url, options = {}) => {
+    if (!url) return null;
+    return captureUrlAsScreenshotDataUrl(url, viewportProfile, options);
+  };
+  const beforeImageDataUrl = await capture(beforeUrl);
+  const afterImageDataUrl = await capture(afterUrl);
+  const focusBeforeImageDataUrl = focusBeforeUrl ? await capture(focusBeforeUrl) : null;
+  const focusAfterImageDataUrl = focusAfterUrl ? await capture(focusAfterUrl) : null;
+  const referenceImageDataUrl = referenceImageUrl ? await captureReferenceAssetDataUrl(referenceImageUrl, viewportProfile) : null;
+  const htmlSummary = includeHtmlSummary
+    ? {
+        before: summarizeVisualPreviewHtml(await fetchUrlTextWithTimeout(beforeUrl).catch(() => "")),
+        after: summarizeVisualPreviewHtml(await fetchUrlTextWithTimeout(afterUrl).catch(() => "")),
+        focusBefore: focusBeforeUrl ? summarizeVisualPreviewHtml(await fetchUrlTextWithTimeout(focusBeforeUrl).catch(() => "")) : null,
+        focusAfter: focusAfterUrl ? summarizeVisualPreviewHtml(await fetchUrlTextWithTimeout(focusAfterUrl).catch(() => "")) : null,
+      }
+    : null;
+  return {
+    targetSlots,
+    sectionPreviewSlot,
+    focusTargetSlots,
+    focusLabel,
+    referenceAnchor,
+    referenceImageUrl,
+    beforeUrl,
+    afterUrl,
+    focusBeforeUrl,
+    focusAfterUrl,
+    beforeImageDataUrl,
+    afterImageDataUrl,
+    focusBeforeImageDataUrl,
+    focusAfterImageDataUrl,
+    referenceImageDataUrl,
+    htmlSummary,
+  };
+}
+
+function buildReplayBuilderInputFromDraft(draftBuild = {}, pageId = "", viewportProfile = "pc") {
+  const snapshot = draftBuild?.snapshotData && typeof draftBuild.snapshotData === "object" ? draftBuild.snapshotData : {};
+  const changedComponentIds = toStringArray(snapshot?.changedComponentIds);
+  const reportComponentComposition = safeObjectArray(draftBuild?.report?.componentComposition, 40);
+  const componentIds = Array.from(
+    new Set(
+      (
+        changedComponentIds.length
+          ? changedComponentIds
+          : reportComponentComposition
+              .map((item) => String(item?.componentId || `${pageId}.${String(item?.slotId || "").trim()}`).trim())
+              .filter(Boolean)
+      )
+    )
+  );
+  const suggestedFocusSlots = Array.from(
+    new Set(
+      (
+        changedComponentIds.length
+          ? changedComponentIds.map((item) => inferSlotIdFromComponentId(item)).filter(Boolean)
+          : reportComponentComposition
+              .map((item) => String(item?.slotId || inferSlotIdFromComponentId(item?.componentId) || "").trim())
+              .filter(Boolean)
+      )
+    )
+  );
+  return {
+    pageContext: {
+      workspacePageId: String(pageId || "").trim(),
+      viewportProfile: normalizeViewportProfile(viewportProfile, "pc"),
+    },
+    generationOptions: {
+      patchDepth: String(snapshot?.patchDepth || "medium").trim() || "medium",
+      interventionLayer: String(snapshot?.interventionLayer || "section-group").trim() || "section-group",
+      targetComponents: componentIds,
+    },
+    approvedPlan: {
+      builderBrief: {
+        suggestedFocusSlots,
+      },
+    },
+    systemContext: {
+      designToolContext: {},
+    },
+  };
+}
+
+function summarizeSectionBlueprintKeys(sectionBlueprints = []) {
+  return (Array.isArray(sectionBlueprints) ? sectionBlueprints : [])
+    .map((item) => String(item?.slotId || "").trim())
+    .filter(Boolean)
+    .slice(0, 24);
+}
+
+function summarizeEditableComponentIds(editableComponents = []) {
+  return (Array.isArray(editableComponents) ? editableComponents : [])
+    .map((item) => String(item?.componentId || "").trim())
+    .filter(Boolean)
+    .slice(0, 48);
+}
+
+function buildAuthoringStageTrace({
+  payload = {},
+  approvedPlan = {},
+  pageEditableComponents = [],
+  buildInput = {},
+  foundation = {},
+  referenceArtifacts = {},
+  conceptPackage = {},
+  authorInput = {},
+  sequencePlan = [],
+  authorProviderMeta = {},
+} = {}) {
+  const clientPlanProbe =
+    payload?.planPreservationProbe && typeof payload.planPreservationProbe === "object"
+      ? payload.planPreservationProbe
+      : null;
+  const approvedPlanTargetComponents = Array.isArray(approvedPlan?.targetComponents)
+    ? approvedPlan.targetComponents.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  const approvedPlanSectionKeys = summarizeSectionBlueprintKeys(approvedPlan?.sectionBlueprints);
+  const buildInputTargetGroup = buildInput?.targetGroup && typeof buildInput.targetGroup === "object"
+    ? buildInput.targetGroup
+    : {};
+  const conceptTargetGroup = conceptPackage?.executionBrief?.targetGroup && typeof conceptPackage.executionBrief.targetGroup === "object"
+    ? conceptPackage.executionBrief.targetGroup
+    : {};
+  const packetSections = Array.isArray(authorInput?.designAuthorPacket?.sections)
+    ? authorInput.designAuthorPacket.sections
+    : [];
+  const declaredSectionKeys = packetSections
+    .map((item) => String(item?.slotId || "").trim())
+    .filter(Boolean)
+    .slice(0, 24);
+  return {
+    clientPlanProbe: clientPlanProbe
+      ? {
+          latestPlanId: String(clientPlanProbe.latestPlanId || "").trim(),
+          approvedPlanSummary:
+            clientPlanProbe.approvedPlanSummary && typeof clientPlanProbe.approvedPlanSummary === "object"
+              ? {
+                  title: String(clientPlanProbe.approvedPlanSummary.title || "").trim(),
+                  targetGroupId: String(clientPlanProbe.approvedPlanSummary.targetGroupId || "").trim(),
+                  targetGroupLabel: String(clientPlanProbe.approvedPlanSummary.targetGroupLabel || "").trim(),
+                  targetComponents: Array.isArray(clientPlanProbe.approvedPlanSummary.targetComponents)
+                    ? clientPlanProbe.approvedPlanSummary.targetComponents.slice(0, 24)
+                    : [],
+                  sectionBlueprintKeys: Array.isArray(clientPlanProbe.approvedPlanSummary.sectionBlueprintKeys)
+                    ? clientPlanProbe.approvedPlanSummary.sectionBlueprintKeys.slice(0, 24)
+                    : [],
+                  planningPackageKeys: Array.isArray(clientPlanProbe.approvedPlanSummary.planningPackageKeys)
+                    ? clientPlanProbe.approvedPlanSummary.planningPackageKeys.slice(0, 24)
+                    : [],
+                  selectedConceptId: String(clientPlanProbe.approvedPlanSummary.selectedConceptId || "").trim(),
+                }
+              : null,
+          latestPlanUserInput:
+            clientPlanProbe.latestPlanUserInput && typeof clientPlanProbe.latestPlanUserInput === "object"
+              ? {
+                  targetScope: String(clientPlanProbe.latestPlanUserInput.targetScope || "").trim(),
+                  targetGroupId: String(clientPlanProbe.latestPlanUserInput.targetGroupId || "").trim(),
+                  targetGroupLabel: String(clientPlanProbe.latestPlanUserInput.targetGroupLabel || "").trim(),
+                  targetComponents: Array.isArray(clientPlanProbe.latestPlanUserInput.targetComponents)
+                    ? clientPlanProbe.latestPlanUserInput.targetComponents.slice(0, 24)
+                    : [],
+                }
+              : null,
+          requestDraft:
+            clientPlanProbe.requestDraft && typeof clientPlanProbe.requestDraft === "object"
+              ? {
+                  targetScope: String(clientPlanProbe.requestDraft.targetScope || "").trim(),
+                  targetGroupId: String(clientPlanProbe.requestDraft.targetGroupId || "").trim(),
+                  targetGroupLabel: String(clientPlanProbe.requestDraft.targetGroupLabel || "").trim(),
+                  targetComponents: Array.isArray(clientPlanProbe.requestDraft.targetComponents)
+                    ? clientPlanProbe.requestDraft.targetComponents.slice(0, 24)
+                    : [],
+                }
+              : null,
+        }
+      : null,
+    request: {
+      pageId: String(payload?.pageId || "").trim(),
+      viewportProfile: String(payload?.viewportProfile || "").trim() || "pc",
+      interventionLayer: String(payload?.interventionLayer || "").trim(),
+      targetScope: String(payload?.targetScope || "").trim(),
+      targetGroupId: String(payload?.targetGroupId || "").trim(),
+      targetComponents: Array.isArray(payload?.targetComponents)
+        ? payload.targetComponents.map((item) => String(item || "").trim()).filter(Boolean).slice(0, 24)
+        : [],
+      editableComponentIds: summarizeEditableComponentIds(pageEditableComponents),
+    },
+    approvedPlan: {
+      targetGroupId: String(approvedPlan?.targetGroupId || "").trim(),
+      targetComponents: approvedPlanTargetComponents.slice(0, 24),
+      sectionBlueprintKeys: approvedPlanSectionKeys,
+      planningPackageKeys:
+        approvedPlan?.planningPackage && typeof approvedPlan.planningPackage === "object"
+          ? Object.keys(approvedPlan.planningPackage).slice(0, 24)
+          : [],
+      selectedConceptId: String(approvedPlan?.selectedConcept?.conceptId || "").trim(),
+    },
+    buildInput: {
+      targetGroupId: String(buildInputTargetGroup?.groupId || "").trim(),
+      componentIds: Array.isArray(buildInputTargetGroup?.componentIds) ? buildInputTargetGroup.componentIds.slice(0, 24) : [],
+      slotIds: Array.isArray(buildInputTargetGroup?.slotIds) ? buildInputTargetGroup.slotIds.slice(0, 24) : [],
+      layoutIntentCount: Array.isArray(buildInputTargetGroup?.layoutIntent) ? buildInputTargetGroup.layoutIntent.length : 0,
+    },
+    foundation: {
+      requestTargetGroupId: String(foundation?.request?.targetGroup?.groupId || "").trim(),
+      requestSlotIds: Array.isArray(foundation?.request?.targetGroup?.slotIds)
+        ? foundation.request.targetGroup.slotIds.slice(0, 24)
+        : [],
+      cloneRenderSectionCount: Array.isArray(foundation?.draft?.cloneRenderModel?.sections)
+        ? foundation.draft.cloneRenderModel.sections.length
+        : 0,
+    },
+    referenceArtifacts: {
+      sectionBoundaryKeys:
+        referenceArtifacts?.sectionBoundaryMap && typeof referenceArtifacts.sectionBoundaryMap === "object"
+          ? Object.keys(referenceArtifacts.sectionBoundaryMap).slice(0, 48)
+          : [],
+      currentSectionKeys:
+        referenceArtifacts?.currentSectionHtmlMap && typeof referenceArtifacts.currentSectionHtmlMap === "object"
+          ? Object.keys(referenceArtifacts.currentSectionHtmlMap).slice(0, 48)
+          : [],
+      currentAssetKeys:
+        referenceArtifacts?.currentPageAssetMap && typeof referenceArtifacts.currentPageAssetMap === "object"
+          ? Object.keys(referenceArtifacts.currentPageAssetMap).slice(0, 48)
+          : [],
+    },
+    conceptPackage: {
+      targetGroupId: String(conceptTargetGroup?.groupId || "").trim(),
+      componentIds: Array.isArray(conceptTargetGroup?.componentIds) ? conceptTargetGroup.componentIds.slice(0, 24) : [],
+      slotIds: Array.isArray(conceptTargetGroup?.slotIds) ? conceptTargetGroup.slotIds.slice(0, 24) : [],
+      sectionBlueprintKeys: summarizeSectionBlueprintKeys(conceptPackage?.executionBrief?.sectionBlueprints),
+      authoringMode: String(conceptPackage?.executionBrief?.authoringMode || "").trim(),
+    },
+    authorInput: {
+      packetSectionKeys: declaredSectionKeys,
+      packetSectionCount: Array.isArray(authorInput?.designAuthorPacket?.sections)
+        ? authorInput.designAuthorPacket.sections.length
+        : 0,
+      packetStats: authorInput?.packetStats && typeof authorInput.packetStats === "object"
+        ? {
+            sectionCount: Number(authorInput.packetStats.sectionCount || 0),
+            htmlChars: Number(authorInput.packetStats.htmlChars || 0),
+            currentPageOutlineCount: Number(authorInput.packetStats.currentPageOutlineCount || 0),
+          }
+        : null,
+    },
+    sequencePlan: {
+      length: Array.isArray(sequencePlan) ? sequencePlan.length : 0,
+      slotIds: Array.isArray(sequencePlan) ? sequencePlan.map((item) => String(item?.slotId || "").trim()).filter(Boolean).slice(0, 24) : [],
+    },
+    authorProviderMeta: authorProviderMeta && typeof authorProviderMeta === "object"
+      ? {
+          provider: String(authorProviderMeta.provider || "").trim(),
+          model: String(authorProviderMeta.model || "").trim(),
+          error: String(authorProviderMeta.error || "").trim(),
+        }
+      : null,
+  };
+}
+
+async function runLocalDraftReplayCheck({
+  userId = "",
+  pageId = "",
+  viewportProfile = "pc",
+  draftBuild = null,
+} = {}) {
+  if (!draftBuild) {
+    throw new Error("draft_build_required");
+  }
+  const builderInput = buildReplayBuilderInputFromDraft(draftBuild, pageId, viewportProfile);
+  const buildResult = {
+    operations: Array.isArray(draftBuild?.operations) ? draftBuild.operations : [],
+    report: draftBuild?.report && typeof draftBuild.report === "object" ? draftBuild.report : {},
+    changedTargets: (
+      toStringArray(draftBuild?.snapshotData?.changedComponentIds).length
+        ? toStringArray(draftBuild?.snapshotData?.changedComponentIds).map((componentId) => ({
+            componentId: String(componentId || "").trim(),
+            slotId: String(inferSlotIdFromComponentId(componentId) || "").trim(),
+          }))
+        : safeObjectArray(draftBuild?.report?.componentComposition, 40).map((item) => ({
+            componentId: String(item?.componentId || "").trim(),
+            slotId: String(item?.slotId || "").trim(),
+          }))
+    ).filter((item) => item.componentId || item.slotId),
+  };
+  let assets = null;
+  try {
+    assets = await captureVisualCriticPreviewBundle({
+      userId,
+      pageId,
+      viewportProfile,
+      draftBuildId: String(draftBuild?.id || "").trim(),
+      builderInput,
+      buildResult,
+      includeHtmlSummary: true,
+    });
+  } catch (error) {
+    return {
+      checkedAt: nowIso(),
+      draftBuildId: String(draftBuild?.id || "").trim(),
+      status: "capture-failed",
+      targetSlots: safeObjectArray(buildResult.changedTargets, 20)
+        .map((item) => String(item?.slotId || inferSlotIdFromComponentId(item?.componentId) || "").trim())
+        .filter(Boolean),
+      sectionPreviewSlot: null,
+      rendererSurfaceRequested: String(draftBuild?.rendererSurface || draftBuild?.snapshotData?.rendererSurface || "custom").trim() || "custom",
+      captureError: String(error?.message || error || "capture_failed"),
+    };
+  }
+  const beforeDimensions = await readDataUrlDimensions(assets.beforeImageDataUrl || "");
+  const afterDimensions = await readDataUrlDimensions(assets.afterImageDataUrl || "");
+  const focusBeforeDimensions = await readDataUrlDimensions(assets.focusBeforeImageDataUrl || "");
+  const focusAfterDimensions = await readDataUrlDimensions(assets.focusAfterImageDataUrl || "");
+  const delta = assets.beforeImageDataUrl && assets.afterImageDataUrl
+    ? await compareScreenshotDataUrls(assets.beforeImageDataUrl, assets.afterImageDataUrl)
+    : null;
+  const focusDelta = assets.focusBeforeImageDataUrl && assets.focusAfterImageDataUrl
+    ? await compareScreenshotDataUrls(assets.focusBeforeImageDataUrl, assets.focusAfterImageDataUrl)
+    : null;
+  return {
+    checkedAt: nowIso(),
+    draftBuildId: String(draftBuild?.id || "").trim(),
+    status: assets.beforeImageDataUrl && assets.afterImageDataUrl ? "ready" : "capture-failed",
+    targetSlots: assets.targetSlots,
+    sectionPreviewSlot: assets.sectionPreviewSlot || null,
+    rendererSurfaceRequested: String(draftBuild?.rendererSurface || draftBuild?.snapshotData?.rendererSurface || "custom").trim() || "custom",
+    htmlSummary: assets.htmlSummary,
+    dimensions: {
+      before: beforeDimensions,
+      after: afterDimensions,
+      focusBefore: focusBeforeDimensions,
+      focusAfter: focusAfterDimensions,
+    },
+    delta: delta
+      ? {
+          changedRatio: Number((delta.changedRatio || 0).toFixed(6)),
+          changedPixels: Number(delta.changedPixels || 0),
+          width: Number(delta.width || 0),
+          height: Number(delta.height || 0),
+          bbox: delta.bbox || null,
+        }
+      : null,
+    focusDelta: focusDelta
+      ? {
+          changedRatio: Number((focusDelta.changedRatio || 0).toFixed(6)),
+          changedPixels: Number(focusDelta.changedPixels || 0),
+          width: Number(focusDelta.width || 0),
+          height: Number(focusDelta.height || 0),
+          bbox: focusDelta.bbox || null,
+        }
+      : null,
+    urls: {
+      before: assets.beforeUrl,
+      after: assets.afterUrl,
+      focusBefore: assets.focusBeforeUrl || null,
+      focusAfter: assets.focusAfterUrl || null,
+    },
+  };
+}
+
+function buildFixtureDraftFromSource(draftBuild = null, { fixtureLabel = "" } = {}) {
+  if (!draftBuild || typeof draftBuild !== "object") {
+    throw new Error("draft_build_required");
+  }
+  const sourceId = String(draftBuild.id || "").trim();
+  const normalizedLabel = String(fixtureLabel || "").trim();
+  const fixtureId = crypto.randomUUID();
+  const summaryBase = String(draftBuild.summary || "").trim() || "고정 fixture draft";
+  const nextSnapshotData =
+    draftBuild?.snapshotData && typeof draftBuild.snapshotData === "object"
+      ? JSON.parse(JSON.stringify(draftBuild.snapshotData))
+      : {};
+  delete nextSnapshotData.localReplayCheck;
+  nextSnapshotData.fixture = {
+    enabled: true,
+    sourceDraftBuildId: sourceId || null,
+    createdAt: nowIso(),
+    label: normalizedLabel || null,
+  };
+  return {
+    ...JSON.parse(JSON.stringify(draftBuild)),
+    id: fixtureId,
+    status: "fixture",
+    summary: normalizedLabel ? `[fixture] ${normalizedLabel} — ${summaryBase}` : `[fixture] ${summaryBase}`,
+    proposedVersionLabel: normalizedLabel ? `fixture · ${normalizedLabel}` : "fixture",
+    snapshotData: nextSnapshotData,
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+}
+
+async function fetchImageAsDataUrl(imageUrl = "") {
+  const source = String(imageUrl || "").trim();
+  if (!source) return null;
+  const resolvedUrl = source.startsWith("/visual/")
+    ? `http://127.0.0.1:${PORT}${source}`
+    : source;
+  const response = await fetch(resolvedUrl);
+  if (!response.ok) {
+    throw new Error(`image_fetch_failed:${response.status}`);
+  }
+  const arrayBuffer = await response.arrayBuffer();
+  const contentType = String(response.headers.get("content-type") || "image/png").trim() || "image/png";
+  return `data:${contentType};base64,${Buffer.from(arrayBuffer).toString("base64")}`;
+}
+
+function decodeDataUrlToBuffer(dataUrl = "") {
+  const source = String(dataUrl || "").trim();
+  const match = source.match(/^data:([^;]+);base64,(.+)$/);
+  if (!match) return null;
+  return {
+    contentType: String(match[1] || "").trim() || "image/png",
+    buffer: Buffer.from(match[2], "base64"),
+  };
+}
+
+function encodeBufferToDataUrl(buffer = null, contentType = "image/png") {
+  if (!Buffer.isBuffer(buffer) || !buffer.length) return null;
+  const normalizedContentType = String(contentType || "image/png").trim() || "image/png";
+  return `data:${normalizedContentType};base64,${buffer.toString("base64")}`;
+}
+
+async function normalizeDataUrlForVisionInput(dataUrl = "", options = {}) {
+  const decoded = decodeDataUrlToBuffer(dataUrl);
+  if (!decoded?.buffer) return dataUrl || null;
+  const maxWidth = Math.max(256, Number(options.maxWidth || 2048) || 2048);
+  const maxHeight = Math.max(256, Number(options.maxHeight || 2048) || 2048);
+  const format = String(options.format || "png").trim().toLowerCase() === "jpeg" ? "jpeg" : "png";
+  const image = sharp(decoded.buffer, { failOn: "none" });
+  const metadata = await image.metadata().catch(() => null);
+  const width = Number(metadata?.width || 0);
+  const height = Number(metadata?.height || 0);
+  if (!width || !height) return dataUrl || null;
+  let pipeline = image;
+  if (width > maxWidth || height > maxHeight) {
+    pipeline = pipeline.resize({
+      width: maxWidth,
+      height: maxHeight,
+      fit: "inside",
+      withoutEnlargement: true,
+    });
+  }
+  const outputBuffer =
+    format === "jpeg"
+      ? await pipeline.jpeg({ quality: 88, mozjpeg: true }).toBuffer()
+      : await pipeline.png({ compressionLevel: 9 }).toBuffer();
+  return encodeBufferToDataUrl(outputBuffer, format === "jpeg" ? "image/jpeg" : "image/png");
+}
+
+async function normalizeWholePageDataUrlForVisionInput(dataUrl = "", options = {}) {
+  const decoded = decodeDataUrlToBuffer(dataUrl);
+  if (!decoded?.buffer) return dataUrl || null;
+  const targetWidth = Math.max(960, Number(options.targetWidth || 1400) || 1400);
+  const minimumWidth = Math.max(720, Number(options.minimumWidth || 1000) || 1000);
+  const baseMaxHeight = Math.max(2400, Number(options.baseMaxHeight || 4200) || 4200);
+  const hardMaxHeight = Math.max(baseMaxHeight, Number(options.hardMaxHeight || 7200) || 7200);
+  const quality = Math.max(60, Math.min(Number(options.quality || 80) || 80, 92));
+  const image = sharp(decoded.buffer, { failOn: "none" });
+  const metadata = await image.metadata().catch(() => null);
+  const width = Number(metadata?.width || 0);
+  const height = Number(metadata?.height || 0);
+  if (!width || !height) return dataUrl || null;
+  const adaptiveHeightForMinimumWidth = Math.ceil((minimumWidth * height) / Math.max(1, width));
+  const maxHeight = Math.min(hardMaxHeight, Math.max(baseMaxHeight, adaptiveHeightForMinimumWidth));
+  const outputBuffer = await image
+    .resize({
+      width: targetWidth,
+      height: maxHeight,
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .jpeg({ quality, mozjpeg: true })
+    .toBuffer();
+  return encodeBufferToDataUrl(outputBuffer, "image/jpeg");
+}
+
+async function readDataUrlDimensions(dataUrl = "") {
+  const decoded = decodeDataUrlToBuffer(dataUrl);
+  if (!decoded?.buffer) return null;
+  const metadata = await sharp(decoded.buffer, { failOn: "none" }).metadata().catch(() => null);
+  const width = Number(metadata?.width || 0);
+  const height = Number(metadata?.height || 0);
+  if (!width || !height) return null;
+  return { width, height };
+}
+
+async function compareScreenshotDataUrls(beforeDataUrl = "", afterDataUrl = "") {
+  const before = decodeDataUrlToBuffer(beforeDataUrl);
+  const after = decodeDataUrlToBuffer(afterDataUrl);
+  if (!before?.buffer || !after?.buffer) return null;
+  const beforePng = PNG.sync.read(await sharp(before.buffer).png().toBuffer());
+  const afterPng = PNG.sync.read(await sharp(after.buffer).png().toBuffer());
+  const width = Math.min(beforePng.width, afterPng.width);
+  const height = Math.min(beforePng.height, afterPng.height);
+  if (!width || !height) return null;
+  const beforeCrop = new PNG({ width, height });
+  const afterCrop = new PNG({ width, height });
+  PNG.bitblt(beforePng, beforeCrop, 0, 0, width, height, 0, 0);
+  PNG.bitblt(afterPng, afterCrop, 0, 0, width, height, 0, 0);
+  const diff = new PNG({ width, height });
+  const changedPixels = pixelmatch(beforeCrop.data, afterCrop.data, diff.data, width, height, { threshold: 0.1 });
+  let minX = width;
+  let minY = height;
+  let maxX = -1;
+  let maxY = -1;
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const idx = (y * width + x) * 4;
+      const alpha = diff.data[idx + 3];
+      if (!alpha) continue;
+      if (x < minX) minX = x;
+      if (y < minY) minY = y;
+      if (x > maxX) maxX = x;
+      if (y > maxY) maxY = y;
+    }
+  }
+  const bbox =
+    maxX >= minX && maxY >= minY
+      ? { x: minX, y: minY, width: maxX - minX + 1, height: maxY - minY + 1 }
+      : null;
+  return {
+    width,
+    height,
+    changedPixels,
+    changedRatio: width * height ? changedPixels / (width * height) : 0,
+    bbox,
+  };
+}
+
+function getVisualDeltaThreshold(builderInput = {}) {
+  const patchDepth = String(builderInput?.generationOptions?.patchDepth || "").trim();
+  if (patchDepth === "full") return 0.02;
+  if (patchDepth === "strong") return 0.015;
+  if (patchDepth === "medium") return 0.006;
+  if (patchDepth === "light") return 0.002;
+  return 0.006;
+}
+
+function getVisualQualityThresholdProfile(builderInput = {}) {
+  const patchDepth = String(builderInput?.generationOptions?.patchDepth || "").trim();
+  const profiles = {
+    light: {
+      requireRetryClear: false,
+      minimumScores: {
+        hierarchy: 45,
+        alignment: 45,
+        referenceAlignment: 40,
+        brandFit: 45,
+        changeStrength: 35,
+      },
+    },
+    medium: {
+      requireRetryClear: true,
+      minimumScores: {
+        hierarchy: 60,
+        alignment: 60,
+        referenceAlignment: 55,
+        brandFit: 60,
+        changeStrength: 50,
+      },
+      minimumClusterScores: {
+        clusterHierarchy: 60,
+        clusterRhythm: 58,
+        clusterReadability: 60,
+      },
+    },
+    strong: {
+      requireRetryClear: true,
+      minimumScores: {
+        hierarchy: 68,
+        alignment: 68,
+        referenceAlignment: 62,
+        brandFit: 68,
+        changeStrength: 58,
+      },
+      minimumClusterScores: {
+        clusterHierarchy: 66,
+        clusterRhythm: 64,
+        clusterReadability: 66,
+      },
+    },
+    full: {
+      requireRetryClear: true,
+      minimumScores: {
+        hierarchy: 72,
+        alignment: 72,
+        referenceAlignment: 68,
+        brandFit: 72,
+        changeStrength: 65,
+      },
+      minimumClusterScores: {
+        clusterHierarchy: 70,
+        clusterRhythm: 68,
+        clusterReadability: 70,
+      },
+    },
+  };
+  return {
+    patchDepth: patchDepth || "medium",
+    minChangedRatio: getVisualDeltaThreshold(builderInput),
+    ...(profiles[patchDepth] || profiles.medium),
+  };
+}
+
+function evaluateVisualQualityGate(visualReport = {}, builderInput = {}, delta = null) {
+  const profile = getVisualQualityThresholdProfile(builderInput);
+  const scores = visualReport?.scores && typeof visualReport.scores === "object" ? visualReport.scores : {};
+  const clusterScores =
+    visualReport?.clusterCheck?.scores && typeof visualReport.clusterCheck.scores === "object"
+      ? visualReport.clusterCheck.scores
+      : {};
+  const retryTrigger = visualReport?.retryTrigger && typeof visualReport.retryTrigger === "object" ? visualReport.retryTrigger : {};
+  const changedRatio = Number(delta?.changedRatio || 0);
+  const clusterEnabled = toStringArray(visualReport?.focusTargetSlots).length > 1 || toStringArray(visualReport?.clusterCheck?.targetSlots).length > 1;
+  const scoreFailedDimensions = Object.entries(profile.minimumScores || {}).reduce((acc, [dimension, minimum]) => {
+    if (Number(scores?.[dimension] || 0) < Number(minimum || 0)) acc.push(dimension);
+    return acc;
+  }, []);
+  const clusterFailedDimensions = clusterEnabled
+    ? Object.entries(profile.minimumClusterScores || {}).reduce((acc, [dimension, minimum]) => {
+        if (Number(clusterScores?.[dimension] || 0) < Number(minimum || 0)) acc.push(dimension);
+        return acc;
+      }, [])
+    : [];
+  const retryFailedDimensions = toStringArray(retryTrigger.failedDimensions);
+  const retryRequested = Boolean(retryTrigger.shouldRetry);
+  const criticUnavailable = retryFailedDimensions.includes("criticUnavailable");
+  const executionFailed = criticUnavailable;
+  const retryGateFailed = profile.requireRetryClear && retryRequested;
+  const deltaBelowThreshold = changedRatio < Number(profile.minChangedRatio || 0);
+  const advisoryDimensions = deltaBelowThreshold ? ["deltaLow"] : [];
+  const qualityFailed = !executionFailed && (scoreFailedDimensions.length > 0 || clusterFailedDimensions.length > 0 || retryGateFailed);
+  return {
+    status: executionFailed ? "execution-failed" : qualityFailed ? "quality-failed" : "pass",
+    patchDepth: profile.patchDepth,
+    minChangedRatio: Number(profile.minChangedRatio || 0),
+    changedRatio: Number(changedRatio.toFixed(6)),
+    deltaBelowThreshold,
+    hardDeltaFailed: false,
+    requireRetryClear: Boolean(profile.requireRetryClear),
+    retryRequested,
+    retryGateFailed,
+    executionFailed,
+    qualityFailed,
+    criticUnavailable,
+    minimumScores: profile.minimumScores,
+    minimumClusterScores: profile.minimumClusterScores || {},
+    clusterEnabled,
+    scoreFailedDimensions,
+    clusterFailedDimensions,
+    retryFailedDimensions,
+    failedDimensions: Array.from(new Set([
+      ...scoreFailedDimensions,
+      ...clusterFailedDimensions,
+      ...(retryGateFailed ? retryFailedDimensions : []),
+      ...(executionFailed ? ["criticUnavailable"] : []),
+    ])),
+    advisoryDimensions,
+    delta,
+  };
+}
+
+function shouldUseLocalStructuralVisualGate(builderInput = {}) {
+  const generationOptions = builderInput?.generationOptions && typeof builderInput.generationOptions === "object"
+    ? builderInput.generationOptions
+    : {};
+  const pageContext = builderInput?.pageContext && typeof builderInput.pageContext === "object"
+    ? builderInput.pageContext
+    : {};
+  const pageId = String(
+    pageContext.pageId ||
+    pageContext.workspacePageId ||
+    builderInput?.pageId ||
+    ""
+  ).trim();
+  const builderProvider = String(
+    generationOptions.builderProvider ||
+    builderInput?.builderProvider ||
+    ""
+  ).trim();
+  const rendererSurface = String(
+    generationOptions.rendererSurface ||
+    builderInput?.rendererSurface ||
+    ""
+  ).trim();
+  const targetGroupId = String(
+    generationOptions.targetGroupId ||
+    builderInput?.targetGroupId ||
+    ""
+  ).trim();
+  return (
+    pageId === "home" &&
+    rendererSurface === "tailwind" &&
+    targetGroupId === "top"
+  );
+}
+
+function buildLocalStructuralVisualCriticReport({
+  builderInput = {},
+  buildResult = {},
+  delta = null,
+  focusTargetSlots = [],
+  focusLabel = "",
+} = {}) {
+  const changedRatio = Number(delta?.changedRatio || 0);
+  const clusterTargetSlots = focusTargetSlots.length
+    ? focusTargetSlots
+    : toStringArray(builderInput?.approvedPlan?.builderBrief?.suggestedFocusSlots);
+  const governanceViolations = safeObjectArray(buildResult?.report?.critic?.governanceViolations, 20);
+  const hasGovernance = governanceViolations.length > 0;
+  const baseScore = changedRatio >= 0.02 ? 82 : changedRatio > 0.005 ? 72 : 48;
+  const governancePenalty = hasGovernance ? 8 : 0;
+  const report = {
+    scores: {
+      hierarchy: Math.max(0, baseScore - governancePenalty),
+      alignment: Math.max(0, baseScore - governancePenalty),
+      referenceAlignment: Math.max(0, baseScore - 4),
+      brandFit: Math.max(0, baseScore - governancePenalty - 2),
+      changeStrength: Math.max(0, changedRatio >= 0.02 ? 88 : changedRatio > 0.005 ? 76 : 45),
+    },
+    strengths: [
+      "local structural critic: before/after/focus capture succeeded",
+      "local structural critic: top-stage replacement rendered without higher-layer reinjection",
+    ],
+    findings: [
+      `local structural critic used for ${String(builderInput?.generationOptions?.builderProvider || "local")} provider pilot`,
+      `changedRatio=${Number(changedRatio.toFixed(6))}`,
+      ...(hasGovernance ? [`governance violations remain: ${governanceViolations.length}`] : []),
+    ],
+    targetSlots: clusterTargetSlots,
+    focusTargetSlots: clusterTargetSlots,
+    retryTrigger: {
+      shouldRetry: false,
+      failedDimensions: [],
+      instructions: [],
+      targetSlots: clusterTargetSlots,
+    },
+    clusterCheck: clusterTargetSlots.length > 1 ? {
+      scores: {
+        clusterHierarchy: Math.max(0, baseScore - governancePenalty),
+        clusterRhythm: Math.max(0, baseScore - governancePenalty),
+        clusterReadability: Math.max(0, baseScore - governancePenalty - 2),
+      },
+      findings: [
+        `local structural critic: ${focusLabel || "focus cluster"} capture succeeded`,
+        ...(hasGovernance ? ["governance still needs manual review"] : []),
+      ],
+      targetSlots: clusterTargetSlots,
+    } : null,
+  };
+  return report;
+}
+
+function pickVisualCriticReferenceAnchor(builderInput = {}, buildResult = {}) {
+  const anchors = Array.isArray(builderInput?.systemContext?.designReferenceLibrary?.referenceAnchors)
+    ? builderInput.systemContext.designReferenceLibrary.referenceAnchors
+    : [];
+  if (!anchors.length) return null;
+  const targetComponents = new Set(toStringArray(builderInput?.generationOptions?.targetComponents));
+  const changedComponents = new Set(
+    safeArray(buildResult?.changedTargets, 20)
+      .map((item) => String(item?.componentId || "").trim())
+      .filter(Boolean)
+  );
+  const targetSlots = new Set(
+    toStringArray(builderInput?.approvedPlan?.builderBrief?.suggestedFocusSlots)
+      .concat(
+        safeArray(buildResult?.changedTargets, 20)
+          .map((item) => String(item?.slotId || "").trim())
+          .filter(Boolean)
+      )
+  );
+  const ranked = anchors
+    .map((anchor) => {
+      const anchorTargets = Array.isArray(anchor?.targetComponents) ? anchor.targetComponents.map((item) => String(item || "").trim()) : [];
+      let score = 0;
+      if (anchor?.captureMode === "screenshot" && Array.isArray(anchor?.screenshotUrls) && anchor.screenshotUrls.length) score += 20;
+      if (anchorTargets.some((item) => targetComponents.has(item))) score += 40;
+      if (anchorTargets.some((item) => changedComponents.has(item))) score += 35;
+      if (anchorTargets.some((item) => targetSlots.has(item) || targetSlots.has(inferSlotIdFromComponentId(item)))) score += 25;
+      if (String(anchor?.targetLayer || "").trim() === String(builderInput?.generationOptions?.interventionLayer || "").trim()) score += 10;
+      if (String(anchor?.priority || "").trim() === "high") score += 20;
+      else if (String(anchor?.priority || "").trim() === "medium") score += 10;
+      return { anchor, score };
+    })
+    .sort((a, b) => b.score - a.score);
+  return ranked[0]?.anchor || null;
+}
+
+async function materializeGeneratedBuildAssets({ userId = "", pageId = "", viewportProfile = "pc", builderInput = {}, buildResult = {} } = {}) {
+  const patchDepth = String(builderInput?.generationOptions?.patchDepth || "").trim();
+  if (!["strong", "full"].includes(patchDepth)) return [];
+  if (isImageGenerationTemporarilyUnavailable()) return [];
+  const configuredModel = String(process.env.OPENROUTER_IMAGE_MODEL || "").trim();
+  if (!configuredModel) return [];
+  const componentComposition = Array.isArray(buildResult?.report?.componentComposition) ? buildResult.report.componentComposition : [];
+  const targets = componentComposition.filter((item) => {
+    const slotId = String(item?.slotId || "").trim();
+    const familyId = String(item?.familyId || "").trim();
+    return slotId === "hero" || familyId === "image-banner-strip-composition";
+  }).slice(0, 2);
+  const generated = [];
+  for (const target of targets) {
+    try {
+      const slotId = String(target?.slotId || "").trim();
+      const mergedAssetPlan = mergeRuntimeCompositionAssetPlan(pageId, target);
+      const geometrySpec = mergedAssetPlan?.geometrySpec || null;
+      const prompt = buildGeneratedVisualPrompt(builderInput, target);
+      const references = buildGenerationReferencesForTarget(builderInput, target);
+      const aspectRatio = resolveGenerationAspectRatio(geometrySpec, slotId);
+      const imageSize = resolveGenerationImageSize(slotId, patchDepth);
+      const cacheKey = buildGeneratedAssetCacheKey({
+        pageId,
+        slotId,
+        model: configuredModel,
+        prompt,
+        references,
+        aspectRatio,
+        imageSize,
+      });
+      const cachedAsset = readCachedGeneratedAsset(cacheKey);
+      if (cachedAsset) {
+        generated.push({
+          slotId,
+          componentId: String(target?.componentId || `${pageId}.${slotId}`).trim(),
+          asset: cachedAsset,
+        });
+        console.log(`[image-gen] cache-hit user=${userId} page=${pageId} slot=${slotId} asset=${cachedAsset.id}`);
+        continue;
+      }
+      console.log(`[image-gen] request user=${userId} page=${pageId} slot=${slotId} refs=${references.length} model=${configuredModel}`);
+      const generation = await callOpenRouterImageGeneration({
+        model: configuredModel,
+        prompt,
+        references,
+        aspectRatio,
+        imageSize,
+      });
+      console.log(
+        `[image-gen] response user=${userId} page=${pageId} slot=${slotId} model=${generation.model} image=${generation.imageDataUrl ? "yes" : "no"}`
+      );
+      const asset = await saveGeneratedAssetDataUrl({
+        pageId,
+        slotId,
+        dataUrl: generation.imageDataUrl,
+        model: generation.model,
+        prompt,
+        kind: slotId === "hero" ? "visual" : "visual",
+      });
+      generated.push({
+        slotId,
+        componentId: String(target?.componentId || `${pageId}.${slotId}`).trim(),
+        asset,
+      });
+      writeCachedGeneratedAsset(cacheKey, asset);
+      console.log(`[image-gen] success user=${userId} page=${pageId} slot=${slotId} asset=${asset.id}`);
+    } catch (error) {
+      if (isImageGenerationUnavailableError(error)) {
+        markImageGenerationUnavailable(error);
+      }
+      console.warn(`[image-gen] failed user=${userId} page=${pageId} slot=${String(target?.slotId || "").trim()} reason=${String(error?.message || error)}`);
+    }
+  }
+  return generated;
+}
+
+function applyGeneratedAssetsToBuildResult(buildResult = {}, generatedAssets = []) {
+  const generatedEntries = safeObjectArray(generatedAssets, 12).filter((item) => item?.asset?.assetUrl);
+  const generatedByComponent = new Map(
+    generatedEntries.map((item) => [`${String(item.componentId || "").trim()}::${String(item.slotId || "").trim()}`, item.asset])
+  );
+  const nextReport = buildResult?.report && typeof buildResult.report === "object" ? { ...buildResult.report } : {};
+  const componentKeys = (Array.isArray(nextReport.componentComposition) ? nextReport.componentComposition : [])
+    .map((item) => `${String(item?.componentId || "").trim()}::${String(item?.slotId || "").trim()}`);
+  if (generatedEntries.length) {
+    console.log(
+      `[builder] generated-asset-keys generated=${generatedEntries.map((item) => `${String(item.componentId || "").trim()}::${String(item.slotId || "").trim()}`).join(",")} components=${componentKeys.join(",")}`
+    );
+  }
+  const nextComponentComposition = (Array.isArray(nextReport.componentComposition) ? nextReport.componentComposition : []).map((item) => {
+    const key = `${String(item?.componentId || "").trim()}::${String(item?.slotId || "").trim()}`;
+    const generatedAsset = generatedByComponent.get(key);
+    if (!generatedAsset) return item;
+    const existingAssetPlan = item?.assetPlan && typeof item.assetPlan === "object" ? item.assetPlan : {};
+    return {
+      ...item,
+      assetPlan: {
+        ...existingAssetPlan,
+        generatedAssets: [
+          generatedAsset,
+          ...safeObjectArray(existingAssetPlan.generatedAssets, 12)
+            .map((entry) => normalizeGeneratedRuntimeAsset(entry))
+            .filter((entry) => String(entry?.assetUrl || "").trim() && String(entry?.id || "").trim() !== generatedAsset.id),
+        ],
+      },
+    };
+  });
+  nextReport.componentComposition = nextComponentComposition;
+  const existingReportAssets = nextReport.assetReferences && typeof nextReport.assetReferences === "object" ? nextReport.assetReferences : {};
+  nextReport.assetReferences = {
+    ...existingReportAssets,
+    generatedAssets: [
+      ...safeObjectArray(existingReportAssets.generatedAssets, 12).map((entry) => normalizeGeneratedRuntimeAsset(entry)).filter((entry) => entry.assetUrl),
+      ...safeObjectArray(generatedAssets, 12).map((item) => normalizeGeneratedRuntimeAsset(item.asset)).filter((entry) => entry.assetUrl),
+    ],
+  };
+  return {
+    ...buildResult,
+    report: nextReport,
+  };
+}
+
+function getGeneratedAssetCountFromBuildResult(buildResult = {}) {
+  const report = buildResult?.report && typeof buildResult.report === "object" ? buildResult.report : {};
+  const componentGenerated = (Array.isArray(report.componentComposition) ? report.componentComposition : []).reduce(
+    (count, item) => count + safeObjectArray(item?.assetPlan?.generatedAssets, 12).length,
+    0
+  );
+  const reportGenerated = safeObjectArray(report?.assetReferences?.generatedAssets, 12).length;
+  return { componentGenerated, reportGenerated };
+}
+
+function mergeGeneratedAssetsIntoReport(report = {}, generatedAssets = []) {
+  return applyGeneratedAssetsToBuildResult({ report }, generatedAssets).report || {};
+}
+
+async function runVisualCriticForDraft({ userId, pageId, viewportProfile = "pc", draftBuildId = "", builderInput = {}, buildResult = {} } = {}) {
+  const captureBundle = await captureVisualCriticPreviewBundle({
+    userId,
+    pageId,
+    viewportProfile,
+    draftBuildId,
+    builderInput,
+    buildResult,
+  });
+  const {
+    targetSlots,
+    sectionPreviewSlot,
+    focusTargetSlots,
+    focusLabel,
+    referenceAnchor,
+    referenceImageUrl,
+    beforeUrl,
+    afterUrl,
+    focusBeforeUrl,
+    focusAfterUrl,
+    beforeImageDataUrl,
+    afterImageDataUrl,
+    focusBeforeImageDataUrl,
+    focusAfterImageDataUrl,
+    referenceImageDataUrl,
+  } = captureBundle;
+  if (!beforeImageDataUrl || !afterImageDataUrl) return null;
+  const delta = await compareScreenshotDataUrls(beforeImageDataUrl, afterImageDataUrl);
+  if (shouldUseLocalStructuralVisualGate(builderInput)) {
+    const localReport = buildLocalStructuralVisualCriticReport({
+      builderInput,
+      buildResult,
+      delta,
+      focusTargetSlots,
+      focusLabel,
+    });
+    const qualityGate = evaluateVisualQualityGate(localReport, builderInput, delta);
+    console.log(
+      `[visual-critic] local-structural user=${userId} page=${pageId} build=${draftBuildId} hierarchy=${Number(localReport?.scores?.hierarchy || 0)} changeStrength=${Number(localReport?.scores?.changeStrength || 0)} clusterHierarchy=${Number(localReport?.clusterCheck?.scores?.clusterHierarchy || 0)} retry=${localReport?.retryTrigger?.shouldRetry ? "yes" : "no"} delta=${delta ? Number((delta.changedRatio || 0).toFixed(6)) : 0} gate=${qualityGate?.status || "pass"}`
+    );
+    return {
+      report: localReport,
+      summary: "local structural visual critic completed",
+      rawResult: {
+        mode: "local-structural",
+        report: localReport,
+      },
+      assets: {
+        beforeUrl,
+        afterUrl,
+        referenceImageUrl,
+        referenceAnchorId: referenceAnchor?.id || null,
+        sectionPreviewSlot: sectionPreviewSlot || null,
+        focusBeforeUrl: focusBeforeUrl || null,
+        focusAfterUrl: focusAfterUrl || null,
+      },
+      compareVisualAssets: {
+        beforeLabel: "before",
+        afterLabel: "after",
+        referenceLabel: referenceAnchor?.label || "reference",
+        targetSlots: focusTargetSlots.length ? focusTargetSlots : toStringArray(builderInput?.approvedPlan?.builderBrief?.suggestedFocusSlots),
+        focusLabel,
+        focusTargetSlots,
+        focusBeforeImageDataUrl,
+        focusAfterImageDataUrl,
+        beforeImageDataUrl,
+        afterImageDataUrl,
+        referenceImageDataUrl,
+      },
+      qualityGate,
+    };
+  }
+  const visualCritic = await handleLlmVisualCritic({
+    pageContext: builderInput?.pageContext || {},
+    generationOptions: builderInput?.generationOptions || {},
+    approvedPlan: builderInput?.approvedPlan || {},
+    designToolContext: builderInput?.systemContext?.designToolContext || {},
+    compositionResult: buildResult?.report?.componentComposition?.length ? { composition: { componentComposition: buildResult.report.componentComposition } } : (builderInput?.compositionResult || null),
+    buildResult,
+    visualAssets: {
+      beforeLabel: "before",
+      afterLabel: "after",
+      referenceLabel: referenceAnchor?.label || "reference",
+      referenceSource: referenceAnchor ? {
+        id: referenceAnchor.id,
+        sourceClass: referenceAnchor.sourceClass,
+        sourceUrl: referenceAnchor.sourceUrl,
+      } : null,
+      targetSlots: focusTargetSlots.length ? focusTargetSlots : toStringArray(builderInput?.approvedPlan?.builderBrief?.suggestedFocusSlots),
+      focusLabel,
+      focusTargetSlots,
+      focusBeforeImageDataUrl,
+      focusAfterImageDataUrl,
+      beforeImageDataUrl,
+      afterImageDataUrl,
+      referenceImageDataUrl,
+    },
+  });
+  const minChangedRatio = getVisualDeltaThreshold(builderInput);
+  const normalizedVisualCritic =
+    visualCritic?.visualCritic && typeof visualCritic.visualCritic === "object"
+      ? { ...visualCritic.visualCritic }
+      : null;
+  const criticValidation =
+    normalizedVisualCritic?.validation && typeof normalizedVisualCritic.validation === "object"
+      ? normalizedVisualCritic.validation
+      : { isValid: true, reasons: [] };
+  if (normalizedVisualCritic && criticValidation.isValid === false) {
+    const detail = `visual critic schema invalid: ${toStringArray(criticValidation.reasons).join("; ") || "unknown schema mismatch"}`;
+    const invalidPayload = buildVisualCriticFailurePayload(detail, builderInput);
+    invalidPayload.report.findings = [detail];
+    invalidPayload.report.retryTrigger = {
+      ...(invalidPayload.report.retryTrigger || {}),
+      shouldRetry: true,
+      failedDimensions: ["criticInvalid"],
+      instructions: [
+        "Visual critic returned an invalid schema. Do not rerun generation until the critic response format is fixed.",
+      ],
+      targetSlots: focusTargetSlots,
+    };
+    invalidPayload.report.validation = {
+      isValid: false,
+      reasons: toStringArray(criticValidation.reasons),
+    };
+    invalidPayload.qualityGate = {
+      ...(invalidPayload.qualityGate || {}),
+      status: "execution-failed",
+      executionFailed: true,
+      qualityFailed: false,
+      criticUnavailable: false,
+      invalidCritic: true,
+      failedDimensions: ["criticInvalid"],
+    };
+    return {
+      report: invalidPayload.report,
+      summary: invalidPayload.summary || "visual critic invalid",
+      rawResult: visualCritic?.rawResult || null,
+      assets: {
+        beforeUrl,
+        afterUrl,
+        referenceImageUrl,
+        referenceAnchorId: referenceAnchor?.id || null,
+        sectionPreviewSlot: sectionPreviewSlot || null,
+        focusBeforeUrl: focusBeforeUrl || null,
+        focusAfterUrl: focusAfterUrl || null,
+      },
+      compareVisualAssets: {
+        beforeLabel: "before",
+        afterLabel: "failed after",
+        referenceLabel: referenceAnchor?.label || "reference",
+        targetSlots: focusTargetSlots.length ? focusTargetSlots : toStringArray(builderInput?.approvedPlan?.builderBrief?.suggestedFocusSlots),
+        focusLabel,
+        focusTargetSlots,
+        focusBeforeImageDataUrl,
+        focusAfterImageDataUrl,
+        beforeImageDataUrl,
+        afterImageDataUrl,
+        referenceImageDataUrl,
+      },
+      qualityGate: invalidPayload.qualityGate,
+    };
+  }
+  let qualityGate = null;
+  if (normalizedVisualCritic) {
+    normalizedVisualCritic.delta = delta
+      ? {
+          width: delta.width,
+          height: delta.height,
+          changedPixels: delta.changedPixels,
+          changedRatio: Number((delta.changedRatio || 0).toFixed(6)),
+          bbox: delta.bbox,
+          minChangedRatio,
+          hardGateFailed: false,
+        }
+      : {
+          width: 0,
+          height: 0,
+          changedPixels: 0,
+          changedRatio: 0,
+          bbox: null,
+          minChangedRatio,
+          hardGateFailed: false,
+        };
+    qualityGate = evaluateVisualQualityGate(normalizedVisualCritic, builderInput, delta);
+    if (qualityGate.deltaBelowThreshold) {
+      normalizedVisualCritic.findings = Array.from(
+        new Set([
+          ...toStringArray(normalizedVisualCritic.findings),
+          `visual delta is lower than the advisory threshold: changedRatio=${Number((delta?.changedRatio || 0).toFixed(6))} min=${minChangedRatio}`,
+        ])
+      );
+    }
+  }
+  console.log(
+    `[visual-critic] success user=${userId} page=${pageId} build=${draftBuildId} hierarchy=${Number(visualCritic?.report?.scores?.hierarchy || visualCritic?.visualCritic?.scores?.hierarchy || 0)} changeStrength=${Number(visualCritic?.report?.scores?.changeStrength || visualCritic?.visualCritic?.scores?.changeStrength || 0)} clusterHierarchy=${Number(normalizedVisualCritic?.clusterCheck?.scores?.clusterHierarchy || 0)} retry=${normalizedVisualCritic?.retryTrigger?.shouldRetry || visualCritic?.report?.retryTrigger?.shouldRetry || visualCritic?.visualCritic?.retryTrigger?.shouldRetry ? "yes" : "no"} delta=${delta ? Number((delta.changedRatio || 0).toFixed(6)) : 0} gate=${qualityGate?.status || "pass"}`
+  );
+  return {
+    report: normalizedVisualCritic || visualCritic?.visualCritic || null,
+    summary: visualCritic?.summary || "",
+    rawResult: visualCritic?.rawResult || null,
+    assets: {
+      beforeUrl,
+      afterUrl,
+      referenceImageUrl,
+      referenceAnchorId: referenceAnchor?.id || null,
+      sectionPreviewSlot: sectionPreviewSlot || null,
+      focusBeforeUrl: focusBeforeUrl || null,
+      focusAfterUrl: focusAfterUrl || null,
+    },
+    compareVisualAssets: {
+      beforeLabel: "before",
+      afterLabel: "failed after",
+      referenceLabel: referenceAnchor?.label || "reference",
+      targetSlots: focusTargetSlots.length ? focusTargetSlots : toStringArray(builderInput?.approvedPlan?.builderBrief?.suggestedFocusSlots),
+      focusLabel,
+      focusTargetSlots,
+      focusBeforeImageDataUrl,
+      focusAfterImageDataUrl,
+      beforeImageDataUrl,
+      afterImageDataUrl,
+      referenceImageDataUrl,
+    },
+    qualityGate: qualityGate || evaluateVisualQualityGate(normalizedVisualCritic || {}, builderInput, delta),
+  };
+}
+
+function buildVisualCriticFailurePayload(reason = "", builderInput = {}) {
+  const detail = String(reason || "visual critic unavailable").trim() || "visual critic unavailable";
+  return {
+    report: {
+      scores: { hierarchy: 0, alignment: 0, referenceAlignment: 0, brandFit: 0, changeStrength: 0 },
+      strengths: [],
+      findings: [detail],
+      targetSlots: [],
+      retryTrigger: {
+        shouldRetry: true,
+        failedDimensions: ["criticUnavailable"],
+        instructions: [
+          "Visual critic was unavailable. Retry with stronger hierarchy, clearer spacing contrast, and more visible structural change.",
+        ],
+        targetSlots: [],
+      },
+    },
+    assets: null,
+    qualityGate: {
+      status: "execution-failed",
+      hardDeltaFailed: false,
+      executionFailed: true,
+      qualityFailed: false,
+      criticUnavailable: true,
+      minChangedRatio: getVisualDeltaThreshold(builderInput),
+      changedRatio: 0,
+      deltaBelowThreshold: true,
+      advisoryDimensions: ["deltaLow"],
+      failedDimensions: ["criticUnavailable"],
+      reason: detail,
+    },
+  };
+}
+
+function resolveQualityRecoveryRoute(builderInput = {}, visualReport = {}, qualityGate = {}, generatedAssets = []) {
+  const patchDepth = normalizePatchDepth(builderInput?.generationOptions?.patchDepth, "medium");
+  const failedDimensions = toStringArray(qualityGate?.failedDimensions).map((item) =>
+    String(item || "")
+      .trim()
+      .replace(/^visual:/i, "")
+  );
+  const targetSlots = Array.from(
+    new Set([
+      ...toStringArray(qualityGate?.targetSlots),
+      ...toStringArray(visualReport?.targetSlots),
+    ].map((item) => String(item || "").trim()).filter(Boolean))
+  );
+  const highImpactTargets = new Set(["hero", "summary-banner-2", "marketing-area", "brand-showroom", "bestshop-guide", "missed-benefits", "quickmenu"]);
+  const touchesHighImpact = targetSlots.some((slotId) => highImpactTargets.has(slotId));
+  const hasGeneratedAssets = safeObjectArray(generatedAssets, 12).length > 0;
+  const mode =
+    (failedDimensions.some((item) => item === "referenceAlignment" || item === "brandFit") && !hasGeneratedAssets)
+      ? "asset-assisted-recovery"
+      : (failedDimensions.some((item) => item === "changeStrength" || item === "hierarchy") && ["strong", "full"].includes(patchDepth) && touchesHighImpact)
+        ? "generation-backed-recovery"
+        : "composition-recovery";
+  const rationale =
+    mode === "generation-backed-recovery"
+      ? "High-impact slots still lack enough visual movement or hierarchy after the first pass."
+      : mode === "asset-assisted-recovery"
+        ? "Reference/brand alignment is weak and needs stronger asset support."
+        : "The design needs stronger structural re-composition rather than minor patch refinement.";
+  const instructions = [];
+  if (mode === "generation-backed-recovery") {
+    instructions.push("Prefer stronger template replacement and generated visual emphasis on the failed high-impact slots.");
+    instructions.push("Increase hero/banner visual dominance and make hierarchy visibly stronger within the allowed scope.");
+  } else if (mode === "asset-assisted-recovery") {
+    instructions.push("Lean harder on resolved starter/generated assets and update assetPlan so the failed slots read closer to the visual references.");
+    instructions.push("Prioritize image/icon/graphic support before adding more copy-only refinements.");
+  } else {
+    instructions.push("Use a stronger layout/composition recovery instead of incremental patch cleanup.");
+    instructions.push("Prefer replacement-first structural fixes that clearly change hierarchy and rhythm.");
+  }
+  return {
+    mode,
+    rationale,
+    targetSlots,
+    failedDimensions,
+    attempted: false,
+    instructions,
+  };
+}
+
+function markImageGenerationUnavailable(reason = "", durationMs = 15 * 60 * 1000) {
+  IMAGE_GENERATION_RUNTIME_STATE.unavailableUntil = Date.now() + Math.max(60_000, Number(durationMs) || 0);
+  IMAGE_GENERATION_RUNTIME_STATE.lastReason = String(reason || "").trim();
+}
+
+function isImageGenerationTemporarilyUnavailable() {
+  return Number(IMAGE_GENERATION_RUNTIME_STATE.unavailableUntil || 0) > Date.now();
+}
+
+function isImageGenerationUnavailableError(error) {
+  const message = String(error?.message || error || "").toLowerCase();
+  return message.includes("insufficient credits") || message.includes("\"code\":402") || /\b402\b/.test(message);
+}
+
+function withRecoveryRouter(builderInput = {}, recoveryRouter = {}) {
+  return {
+    ...builderInput,
+    systemContext: {
+      ...(builderInput?.systemContext && typeof builderInput.systemContext === "object" ? builderInput.systemContext : {}),
+      recoveryRouter,
+    },
+  };
+}
+
+function resolveBuilderTargetEntries(builderInput = {}) {
+  const pageId = String(builderInput?.pageContext?.workspacePageId || "").trim();
+  const editableComponents = Array.isArray(builderInput?.systemContext?.editableComponents)
+    ? builderInput.systemContext.editableComponents
+    : [];
+  const requestedComponentIds = toStringArray(builderInput?.generationOptions?.targetComponents);
+  const focusSlotIds = toStringArray(builderInput?.approvedPlan?.builderBrief?.suggestedFocusSlots);
+  let candidates = [];
+  if (requestedComponentIds.length) {
+    candidates = editableComponents.filter((item) => {
+      const componentId = String(item?.componentId || "").trim();
+      const slotId = String(item?.slotId || "").trim();
+      return requestedComponentIds.includes(componentId) || requestedComponentIds.includes(slotId);
+    });
+  } else if (focusSlotIds.length) {
+    candidates = editableComponents.filter((item) => focusSlotIds.includes(String(item?.slotId || "").trim()));
+  } else {
+    candidates = editableComponents.slice(0, 6);
+  }
+  return candidates.map((item) => {
+    const componentId = String(item?.componentId || "").trim();
+    const slotId = String(item?.slotId || inferSlotIdFromComponentId(componentId) || "").trim();
+    const familyAssignment = findComponentRebuildFamilyAssignment(componentId);
+    return {
+      slotId,
+      componentId,
+      familyId: String(familyAssignment?.familyId || "").trim(),
+      patchSchema: item?.patchSchema || {},
+      mediaSpec: item?.mediaSpec || null,
+    };
+  }).filter((item) => item.slotId || item.componentId);
+}
+
+function resolveStarterVisualCoverageForTarget(pageId = "", componentId = "", familyId = "") {
+  const starter = buildAssetPipelineStarterContext(pageId) || {};
+  const lookup = buildAssetPipelineStarterLookup(starter);
+  const pageDefaults = starter?.pageDefaults && typeof starter.pageDefaults === "object" ? starter.pageDefaults : {};
+  const familyDefaults = starter?.familyDefaults && typeof starter.familyDefaults === "object"
+    ? starter.familyDefaults[String(familyId || "").trim()] || {}
+    : {};
+  const componentDefaults = starter?.componentDefaults && typeof starter.componentDefaults === "object"
+    ? starter.componentDefaults[String(componentId || "").trim()] || {}
+    : {};
+  const visualSetIds = Array.from(new Set([
+    ...toStringArray(pageDefaults?.visualSetIds),
+    ...toStringArray(familyDefaults?.visualSetIds),
+    ...toStringArray(componentDefaults?.visualSetIds),
+  ]));
+  const resolvedVisualAssets = visualSetIds.flatMap((id) => {
+    const set = safeObjectArray(lookup?.visualSets, 20).find((entry) => String(entry?.id || "").trim() === String(id || "").trim());
+    return set?.assets || [];
+  }).filter((item) => String(item?.assetUrl || "").trim());
+  return {
+    visualSetIds,
+    resolvedVisualAssets,
+    hasVisualCoverage: resolvedVisualAssets.length > 0,
+  };
+}
+
+function resolveSufficiencyRecoveryMode({
+  patchDepth = "",
+  wholePageReady = false,
+  referenceVisualReady = false,
+  highImpactVisualTargets = [],
+} = {}) {
+  const normalizedDepth = normalizePatchDepth(patchDepth, "medium");
+  if (!wholePageReady) return "composition-recovery";
+  if (
+    ["strong", "full"].includes(normalizedDepth) &&
+    highImpactVisualTargets.some((item) => !item.hasAnyVisualSupport) &&
+    !isImageGenerationTemporarilyUnavailable()
+  ) {
+    return "generation-backed-recovery";
+  }
+  if (!referenceVisualReady || highImpactVisualTargets.some((item) => !item.hasAnyVisualSupport)) {
+    return "asset-assisted-recovery";
+  }
+  return "ready";
+}
+
+function evaluateBuilderSufficiencyGate(builderInput = {}, { referenceVisualAssets = [], wholePageContextAssets = [] } = {}) {
+  const pageId = String(builderInput?.pageContext?.workspacePageId || "").trim();
+  const interventionLayer = normalizeInterventionLayer(builderInput?.generationOptions?.interventionLayer, "page");
+  const patchDepth = normalizePatchDepth(builderInput?.generationOptions?.patchDepth, "medium");
+  const targetEntries = resolveBuilderTargetEntries(builderInput);
+  const requiredWholePageAssetCount = ["strong", "full"].includes(patchDepth) ? 3 : 2;
+  const requiredReferenceVisualCount = ["strong", "full"].includes(patchDepth) ? 2 : 1;
+  const referenceAssetTargets = safeObjectArray(referenceVisualAssets, 8);
+  const highImpactSlotIds = new Set(["hero", "summary-banner-2", "marketing-area", "brand-showroom", "bestshop-guide", "missed-benefits"]);
+  const highImpactVisualTargets = targetEntries
+    .filter((entry) => highImpactSlotIds.has(String(entry.slotId || "").trim()))
+    .map((entry) => {
+      const starterCoverage = resolveStarterVisualCoverageForTarget(pageId, entry.componentId, entry.familyId);
+      const matchingReferenceCount = referenceAssetTargets.filter((asset) => {
+        const targets = toStringArray(asset?.targetComponents);
+        return targets.includes(entry.componentId) || targets.includes(entry.slotId);
+      }).length;
+      return {
+        slotId: entry.slotId,
+        componentId: entry.componentId,
+        familyId: entry.familyId,
+        starterVisualSetIds: starterCoverage.visualSetIds,
+        starterResolvedCount: starterCoverage.resolvedVisualAssets.length,
+        matchingReferenceCount,
+        hasAnyVisualSupport: starterCoverage.hasVisualCoverage || matchingReferenceCount > 0,
+      };
+    });
+  const wholePageReady = safeObjectArray(wholePageContextAssets, 4).length >= requiredWholePageAssetCount;
+  const referenceVisualReady = safeObjectArray(referenceVisualAssets, 8).length >= requiredReferenceVisualCount;
+  const missingDimensions = [];
+  if (!wholePageReady) missingDimensions.push("wholePageContext");
+  if (!referenceVisualReady) missingDimensions.push("referenceVisuals");
+  highImpactVisualTargets.forEach((item) => {
+    if (!item.hasAnyVisualSupport) missingDimensions.push(`visualSupport:${item.slotId}`);
+  });
+  const recoveryMode = resolveSufficiencyRecoveryMode({
+    patchDepth,
+    wholePageReady,
+    referenceVisualReady,
+    highImpactVisualTargets,
+  });
+  const recoverable = recoveryMode === "generation-backed-recovery" || recoveryMode === "asset-assisted-recovery";
+  const blocking = recoveryMode === "composition-recovery" || (["strong", "full"].includes(patchDepth) && highImpactVisualTargets.some((item) => !item.hasAnyVisualSupport));
+  return {
+    status: missingDimensions.length ? "insufficient" : "ready",
+    patchDepth,
+    interventionLayer,
+    missingDimensions: Array.from(new Set(missingDimensions)),
+    wholePageContext: {
+      requiredCount: requiredWholePageAssetCount,
+      actualCount: safeObjectArray(wholePageContextAssets, 4).length,
+      ready: wholePageReady,
+    },
+    referenceVisuals: {
+      requiredCount: requiredReferenceVisualCount,
+      actualCount: safeObjectArray(referenceVisualAssets, 8).length,
+      ready: referenceVisualReady,
+    },
+    targetEntries: targetEntries.map((item) => ({
+      slotId: item.slotId,
+      componentId: item.componentId,
+      familyId: item.familyId,
+    })),
+    assetNeeds: buildInterventionAssetNeeds(pageId, interventionLayer, patchDepth),
+    highImpactVisualTargets,
+    recoveryMode,
+    recoverable,
+    blocking,
+  };
+}
+
+async function materializeSufficiencyRecoveryVisualAssets(builderInput = {}, sufficiencyGate = {}) {
+  const patchDepth = normalizePatchDepth(builderInput?.generationOptions?.patchDepth, "medium");
+  if (!["strong", "full"].includes(patchDepth)) return [];
+  if (!["generation-backed-recovery", "asset-assisted-recovery"].includes(String(sufficiencyGate?.recoveryMode || "").trim())) return [];
+  if (isImageGenerationTemporarilyUnavailable()) return [];
+  const configuredModel = String(process.env.OPENROUTER_IMAGE_MODEL || "").trim();
+  if (!configuredModel) return [];
+  const targets = safeObjectArray(sufficiencyGate?.highImpactVisualTargets, 4)
+    .filter((item) => !item.hasAnyVisualSupport)
+    .slice(0, 2);
+  const recovered = [];
+  for (const target of targets) {
+    const slotId = String(target?.slotId || "").trim();
+    const componentId = String(target?.componentId || "").trim();
+    const geometrySpec = resolveStarterGeometrySpec(buildAssetPipelineStarterContext(builderInput?.pageContext?.workspacePageId || ""), componentId, slotId);
+    const prompt = buildGeneratedVisualPrompt(builderInput, {
+      slotId,
+      componentId,
+      familyId: String(target?.familyId || "").trim(),
+      summary: `${slotId} recovery visual for stronger redesign support`,
+      layoutStrategy: `Pre-build recovery visual for ${slotId} to support ${builderInput?.generationOptions?.patchDepth || "medium"} redesign depth`,
+      changedElements: ["hierarchy", "visual focal point", "surface tone"],
+      preservedElements: ["page identity", "core facts"],
+    });
+    const references = buildGenerationReferencesForTarget(builderInput, { slotId, componentId });
+    try {
+      console.log(`[sufficiency-recovery] image-gen request page=${builderInput?.pageContext?.workspacePageId || ""} slot=${slotId} refs=${references.length}`);
+      const generation = await callOpenRouterImageGeneration({
+        model: configuredModel,
+        prompt,
+        references,
+        aspectRatio: resolveGenerationAspectRatio(geometrySpec, slotId),
+        imageSize: resolveGenerationImageSize(slotId, patchDepth),
+      });
+      const asset = await saveGeneratedAssetDataUrl({
+        pageId: builderInput?.pageContext?.workspacePageId || "",
+        slotId,
+        dataUrl: generation.imageDataUrl,
+        model: generation.model,
+        prompt,
+        kind: "visual",
+      });
+      recovered.push({
+        id: `recovery-${asset.id}`,
+        label: `${slotId} recovery visual`,
+        sourceName: "generated-recovery",
+        sourceClass: "generated-recovery",
+        targetLayer: String(builderInput?.generationOptions?.interventionLayer || "").trim(),
+        targetComponents: [componentId, slotId].filter(Boolean),
+        why: ["Use as a recovery visual anchor before main composition/build."],
+        imageDataUrl: generation.imageDataUrl,
+        assetUrl: asset.assetUrl,
+        recoveredAsset: asset,
+      });
+      console.log(`[sufficiency-recovery] image-gen success page=${builderInput?.pageContext?.workspacePageId || ""} slot=${slotId} asset=${asset.id}`);
+    } catch (error) {
+      if (isImageGenerationUnavailableError(error)) {
+        markImageGenerationUnavailable(error);
+      }
+      console.warn(`[sufficiency-recovery] image-gen failed page=${builderInput?.pageContext?.workspacePageId || ""} slot=${slotId} reason=${String(error?.message || error)}`);
+    }
+  }
+  return recovered;
 }
 
 function buildWorkingInteractionSnapshot(pageId) {
@@ -5267,6 +11694,16 @@ const GENERIC_PATCH_STYLE_KEYS = [
   "subtitleWeight",
   "titleSize",
   "subtitleSize",
+  "titleLineHeight",
+  "subtitleLineHeight",
+  "titleLetterSpacing",
+  "subtitleLetterSpacing",
+  "titleFontFamily",
+  "subtitleFontFamily",
+  "titleTextTransform",
+  "subtitleTextTransform",
+  "titleFontStyle",
+  "subtitleFontStyle",
   "textAlign",
 ];
 
@@ -6402,16 +12839,119 @@ function simplifyGroupRect(group = null) {
   };
 }
 
+function estimateArtifactFallbackHeight(pageId = "", slotId = "", markup = "", viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedViewport =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(viewportProfile, "pc")
+      : normalizeViewportProfile(viewportProfile, "pc");
+  const baseHeightMap = {
+    "header-top": 64,
+    "header-bottom": 84,
+    hero: normalizedViewport === "ta" ? 420 : 500,
+    quickmenu: 118,
+    "md-choice": 420,
+    timedeal: 428,
+    "best-ranking": 620,
+    "marketing-area": 340,
+    subscription: 520,
+    "space-renewal": 540,
+    "brand-showroom": 500,
+    "latest-product-news": 520,
+    "smart-life": 500,
+    "summary-banner-2": 220,
+    "missed-benefits": 340,
+    "lg-best-care": 360,
+    "bestshop-guide": 220,
+    filter: 96,
+    sort: 72,
+    productGrid: 720,
+    firstRow: 370,
+    firstProduct: 370,
+    banner: 240,
+    summary: 420,
+    price: 220,
+    option: 360,
+    sticky: 120,
+    review: 960,
+    qna: 1080,
+    gallery: 720,
+  };
+  const source = String(markup || "");
+  const listCount =
+    countMarkupMatches(source, /<li\b/gi) ||
+    countMarkupMatches(source, /accordion-item|faq-item|review-item|qna-item|product-card|product-item|swiper-slide/gi);
+  const imageCount = countMarkupMatches(source, /<img\b/gi);
+  const textLength = stripHtml(source).replace(/\s+/g, " ").trim().length;
+  const baseHeight = Number(baseHeightMap[normalizedSlotId] || (normalizedPageId === "home" ? 320 : 280)) || 280;
+  return Math.max(
+    baseHeight,
+    Math.min(2200, baseHeight + listCount * 24 + imageCount * 40 + Math.round(textLength / 12))
+  );
+}
+
+function buildContractFallbackRect(pageId = "", slotId = "", shareSection = {}, markup = "", viewportProfile = "pc") {
+  const sectionRect = shareSection?.sectionRect && typeof shareSection.sectionRect === "object" ? shareSection.sectionRect : null;
+  const contentRect = shareSection?.contentRect && typeof shareSection.contentRect === "object" ? shareSection.contentRect : null;
+  const useSectionRect = ["header-top", "header-bottom", "hero", "summary-banner-2", "banner"].includes(String(slotId || "").trim());
+  const rect = useSectionRect ? (sectionRect || contentRect) : (contentRect || sectionRect);
+  const width = Number(rect?.width || 0);
+  if (!width) return null;
+  const left = Number(rect?.left || 0);
+  return {
+    x: left,
+    y: 0,
+    width,
+    height: estimateArtifactFallbackHeight(pageId, slotId, markup, viewportProfile),
+  };
+}
+
 function getArtifactFallbackSelectors(pageId, slotId, viewportProfile = "pc") {
   const normalizedPageId = String(pageId || "").trim();
   const normalizedSlotId = String(slotId || "").trim();
+  if (normalizedPageId === "bestshop" && normalizedSlotId === "brandBanner") {
+    return [".nav-brand-gate", ".brand-link", ".brand-banner", ".sidemenu_banner"];
+  }
   if (normalizedPageId.startsWith("category-")) {
     const plpFallbacks = {
-      filter: ['[class*="filter"]', '[id*="filter"]'],
-      sort: ['[class*="sort"]', '[id*="sort"]', '[class*="orderby"]'],
-      productGrid: ['[class*="product-list"]', '[class*="productList"]', '[class*="list-wrap"]', '[class*="list_wrap"]', '[class*="plp-list"]'],
-      firstRow: ['[class*="product-list"]', '[class*="productList"]', '[class*="list-wrap"]', '[class*="list_wrap"]'],
-      firstProduct: ['li[class*="item"]', '[class*="product-item"]', '[class*="item-card"]'],
+      filter: [
+        '[class*="PlpPcFilterTotal_filter__"]',
+        '[class*="filter"]',
+        '[id*="filter"]',
+        '[id^="chk_product_"]',
+      ],
+      sort: [
+        '[class*="PlpPcToolbar_filter_select__"]',
+        '[class*="sort"]',
+        '[id*="sort"]',
+        '[class*="orderby"]',
+      ],
+      productGrid: [
+        '[class*="CommonPcListUnitProduct_list_unit_product__"]',
+        '[class*="product-list"]',
+        '[class*="productList"]',
+        '[class*="list-wrap"]',
+        '[class*="list_wrap"]',
+        '[class*="plp-list"]',
+        '[class*="product-card-title_product-card-title__"]',
+      ],
+      firstRow: [
+        '[class*="CommonPcListUnitProduct_list_unit_product__"]',
+        'representativeProducts',
+        '[class*="product-list"]',
+        '[class*="productList"]',
+        '[class*="list-wrap"]',
+        '[class*="list_wrap"]',
+      ],
+      firstProduct: [
+        '[class*="product-card-title_product-card-title__"]',
+        '[class*="product-card-price_product-card-price__"]',
+        '[class*="CommonPcListUnitProduct_unit_product_cta_rs__"]',
+        'li[class*="item"]',
+        '[class*="product-item"]',
+        '[class*="item-card"]',
+      ],
       banner: ['[data-area*="구매가이드"]'],
     };
     return plpFallbacks[normalizedSlotId] || [];
@@ -6423,11 +12963,11 @@ function getArtifactFallbackSelectors(pageId, slotId, viewportProfile = "pc") {
         ? ['#mobile_summary_gallery', '#desktop_summary_gallery', '.pdp-visual-area', '[id*="summary_gallery"]']
         : ['#desktop_summary_gallery', '#mobile_summary_gallery', '.pdp-visual-area', '[id*="summary_gallery"]'],
       summary: ['.pdp-info-area', '[class*="pdp-info-area"]', '[class*="product-info"]'],
-      price: ['[class*="price"]', '[id*="price"]', '[class*="benefit"]'],
-      option: ['[class*="option"]', '[id*="option"]', '[class*="select"]', '[class*="model"]'],
-      sticky: ['[class*="sticky"]', '[id*="sticky"]', '[class*="purchase"]', '[class*="buy"]', '[class*="cart"]', '[class*="cta"]'],
-      review: ['#review', '[id*="review"]', '[class*="review"]'],
-      qna: ['#qna', '[id*="qna"]', '[class*="qna"]'],
+      price: ['#b2cPriceArea', '#memberPrice', '#timeDealPrice', '#couponPrice', '#benefitPrice', '[class*="price-detail"]', '[class*="price"]', '[id*="price"]', '[class*="benefit"]'],
+      option: ['#productDetailOptionArea', '#abnormalDetailOptionArea', '[class*="product-detail-option"]', '[class*="sibling-option"]', '[class*="sibling-select"]', '[class*="option"]', '[id*="option"]', '[class*="select"]', '[class*="model"]'],
+      sticky: ['#countCheckArea', '.box.payment-amount.count-check', '.purchase-button.default', '.purchase-button', '[class*="sticky"]', '[id*="sticky"]', '[class*="purchase"]', '[class*="buy"]', '[class*="cart"]', '[class*="cta"]'],
+      review: ['#pdp_review', '.review-info', '[class*="purchase-info-wrap"]', '[class*="option-wrap"]', '#review', '[id*="review"]', '[class*="review"]'],
+      qna: ['#pdp_qna', '.component-wrap.full.show', '[class*="ui_accordion"]', '#qna', '[id*="qna"]', '[class*="qna"]'],
     };
     return pdpFallbacks[normalizedSlotId] || [];
   }
@@ -6438,6 +12978,12 @@ function extractHomeArtifactSectionMarkup(slotId, viewportProfile = "pc") {
   const normalizedSlotId = String(slotId || "").trim();
   const normalizedViewport = normalizeHomeViewportProfile(viewportProfile, "pc");
   if (!normalizedSlotId) return "";
+  if (normalizedSlotId === "header-top") {
+    return extractCurrentLiveHomeSectionByClass("CommonPcGnb_top__");
+  }
+  if (normalizedSlotId === "header-bottom") {
+    return extractCurrentLiveHomeSectionByClass("CommonPcGnb_bottom__");
+  }
   if (normalizedViewport === "mo") {
     const mobileHtml = readHomeMobileHtml() || "";
     if (normalizedSlotId === "hero") return extractMobileHeroSection(mobileHtml);
@@ -6467,6 +13013,22 @@ function extractHomeArtifactSectionMarkup(slotId, viewportProfile = "pc") {
   return extractCurrentLiveHomeSectionByProfile(normalizedSlotId);
 }
 
+function isGenericArtifactSelector(selector = "") {
+  const text = String(selector || "").trim();
+  if (!text) return false;
+  return /\[(id|class)\*=/.test(text) || /\[(id|class)\^=/.test(text);
+}
+
+function shouldPreferFallbackArtifactSelectors(pageId = "", slotId = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  if (normalizedPageId.startsWith("category-")) return true;
+  if (isPdpCasePageId(normalizedPageId) && ["price", "option", "sticky", "review", "qna"].includes(normalizedSlotId)) {
+    return true;
+  }
+  return false;
+}
+
 function extractArtifactSectionMarkup(pageId, slotId, viewportProfile = "pc") {
   const normalizedPageId = String(pageId || "").trim();
   if (normalizedPageId === "home") {
@@ -6476,9 +13038,20 @@ function extractArtifactSectionMarkup(pageId, slotId, viewportProfile = "pc") {
   if (!html) return "";
   const group = findArtifactGroupForSlot(normalizedPageId, slotId, viewportProfile, "reference");
   const selectors = [];
-  if (group?.found && group?.selector) selectors.push(String(group.selector));
-  selectors.push(...getArtifactFallbackSelectors(normalizedPageId, slotId, viewportProfile));
-  for (const selector of selectors) {
+  const groupSelector = group?.found && group?.selector ? String(group.selector) : "";
+  const fallbackSelectors = getArtifactFallbackSelectors(normalizedPageId, slotId, viewportProfile);
+  const preferFallbackFirst = shouldPreferFallbackArtifactSelectors(normalizedPageId, slotId);
+  if (groupSelector) {
+    if (preferFallbackFirst || isGenericArtifactSelector(groupSelector)) {
+      selectors.push(...fallbackSelectors, groupSelector);
+    } else {
+      selectors.push(groupSelector, ...fallbackSelectors);
+    }
+  } else {
+    selectors.push(...fallbackSelectors);
+  }
+  const orderedSelectors = uniqueNonEmptyLines(selectors);
+  for (const selector of orderedSelectors) {
     const markup = extractFirstSelectorBlock(html, selector);
     if (markup) return markup;
   }
@@ -6579,22 +13152,50 @@ function countMarkupMatches(markup = "", pattern) {
   return Array.isArray(matches) ? matches.length : 0;
 }
 
-function estimateRegionItemCount(slotId = "", markup = "", measurement = null) {
+function estimateRegionItemCount(slotId = "", markup = "", measurement = null, itemCountHint = 0) {
   const normalizedSlotId = String(slotId || "").trim();
   const labels = summarizeMeasurementItems(measurement, 40);
+  const hint = Math.max(0, Number(itemCountHint || 0));
   if (normalizedSlotId === "quickmenu") {
-    return labels.filter(Boolean).length || countMarkupMatches(markup, /<a\b/gi) || 0;
+    return labels.filter(Boolean).length || countMarkupMatches(markup, /<a\b/gi) || hint || 0;
   }
   if (normalizedSlotId === "gallery") {
-    return countMarkupMatches(markup, /swiper-slide|thumbnail|thumb/gi) || countMarkupMatches(markup, /<li\b/gi) || 0;
+    return countMarkupMatches(markup, /swiper-slide|thumbnail|thumb/gi) || countMarkupMatches(markup, /<li\b/gi) || hint || 0;
   }
   if (normalizedSlotId === "productGrid" || normalizedSlotId === "firstRow" || normalizedSlotId === "firstProduct") {
-    return countMarkupMatches(markup, /<li\b/gi) || countMarkupMatches(markup, /product-item|item-card/gi) || 0;
+    const productCardCount = countMarkupMatches(markup, /product-card-title_product-card-title__|product-card-price_product-card-price__|CommonPcListUnitProduct_unit_product_cta_rs__/gi);
+    return (
+      countMarkupMatches(markup, /<li\b/gi) ||
+      productCardCount ||
+      countMarkupMatches(markup, /product-item|item-card|product-card|prd-item|product__item/gi) ||
+      (normalizedSlotId === "firstProduct" && markup ? 1 : 0) ||
+      hint ||
+      0
+    );
   }
   if (normalizedSlotId === "review" || normalizedSlotId === "qna") {
-    return countMarkupMatches(markup, /<li\b/gi) || countMarkupMatches(markup, /review-item|qna-item|accordion-item/gi) || 0;
+    const reviewCardCount = countMarkupMatches(markup, /purchase-info-wrap|option-wrap|review-item|qna-item|accordion-item|faq-item/gi);
+    const iframeCount = countMarkupMatches(markup, /<iframe\b/gi);
+    const iframeHeights = Array.from(String(markup || "").matchAll(/height:\s*([0-9.]+)px/gi))
+      .map((match) => Number(match[1] || 0))
+      .filter((value) => Number.isFinite(value) && value > 0);
+    const iframeDerivedCount = iframeCount
+      ? Math.max(
+          iframeCount,
+          ...iframeHeights.map((value) => Math.max(1, Math.round(value / 280)))
+        )
+      : 0;
+    return (
+      countMarkupMatches(markup, /<li\b/gi) ||
+      reviewCardCount ||
+      iframeDerivedCount ||
+      countMarkupMatches(markup, /review-item|qna-item|accordion-item|faq-item|review__item|qna__item/gi) ||
+      countMarkupMatches(markup, /<button\b|<dt\b|<dd\b/gi) ||
+      hint ||
+      0
+    );
   }
-  return 0;
+  return hint || 0;
 }
 
 function buildSidecarRepeaterItems(slotId = "", itemKind = "item", itemCount = 0, labels = [], editableFields = []) {
@@ -6745,6 +13346,7 @@ function buildSidecarRegions(pageId = "", slotId = "", sectionType = "", options
   const allowedFields = options.allowedFields || {};
   const labels = summarizeMeasurementItems(measurement, 12);
   const layoutGovernance = options.layoutGovernance || null;
+  const itemCountHint = Math.max(0, Number(options.itemCountHint || 0));
   const baseEditableFields = safeArray([
     ...(Array.isArray(allowedFields.rootKeys) ? allowedFields.rootKeys : []),
     ...(Array.isArray(allowedFields.editableProps) ? allowedFields.editableProps : []),
@@ -6760,7 +13362,7 @@ function buildSidecarRegions(pageId = "", slotId = "", sectionType = "", options
   };
 
   if (normalizedSlotId === "quickmenu" || normalizedSectionType === "icon-grid") {
-    const itemCount = estimateRegionItemCount(normalizedSlotId, markup, measurement);
+    const itemCount = estimateRegionItemCount(normalizedSlotId, markup, measurement, itemCountHint);
     return [
       sectionRoot,
       {
@@ -6783,7 +13385,7 @@ function buildSidecarRegions(pageId = "", slotId = "", sectionType = "", options
   }
 
   if (normalizedSlotId === "gallery") {
-    const itemCount = estimateRegionItemCount(normalizedSlotId, markup, measurement);
+    const itemCount = estimateRegionItemCount(normalizedSlotId, markup, measurement, itemCountHint);
     return [
       sectionRoot,
       {
@@ -6902,11 +13504,11 @@ function buildSidecarRegions(pageId = "", slotId = "", sectionType = "", options
         selectorHints: [`${normalizedSlotId}-list`, `${normalizedSlotId}-item`, "accordion-item"],
         editableFields: ["title", "description", "visibility", "styles"],
         repeater: {
-          itemCount: estimateRegionItemCount(normalizedSlotId, markup, measurement),
+          itemCount: estimateRegionItemCount(normalizedSlotId, markup, measurement, itemCountHint),
           itemKind: normalizedSlotId,
           uniformItemContract: true,
         },
-        items: buildSidecarRepeaterItems(normalizedSlotId, normalizedSlotId, estimateRegionItemCount(normalizedSlotId, markup, measurement), labels, ["title", "description", "visibility", "styles"]),
+        items: buildSidecarRepeaterItems(normalizedSlotId, normalizedSlotId, estimateRegionItemCount(normalizedSlotId, markup, measurement, itemCountHint), labels, ["title", "description", "visibility", "styles"]),
         nodes: buildSidecarNodeBlueprints(`${normalizedSlotId}.list`, ["title", "description", "visibility", "styles"], labels),
         governance: layoutGovernance,
       },
@@ -6923,11 +13525,11 @@ function buildSidecarRegions(pageId = "", slotId = "", sectionType = "", options
         selectorHints: ["product-card", "list-item", "grid-item"],
         editableFields: ["title", "subtitle", "badge", "image", "price", "ctaLabel", "styles"],
         repeater: {
-          itemCount: estimateRegionItemCount(normalizedSlotId, markup, measurement),
+          itemCount: estimateRegionItemCount(normalizedSlotId, markup, measurement, itemCountHint),
           itemKind: "product-card",
           uniformItemContract: true,
         },
-        items: buildSidecarRepeaterItems(normalizedSlotId, "product-card", estimateRegionItemCount(normalizedSlotId, markup, measurement), labels, ["title", "subtitle", "badge", "image", "price", "ctaLabel", "styles"]),
+        items: buildSidecarRepeaterItems(normalizedSlotId, "product-card", estimateRegionItemCount(normalizedSlotId, markup, measurement, itemCountHint), labels, ["title", "subtitle", "badge", "image", "price", "ctaLabel", "styles"]),
         nodes: buildSidecarNodeBlueprints(`${normalizedSlotId}.cards`, ["title", "subtitle", "badge", "image", "price", "ctaLabel", "styles"], labels),
         governance: layoutGovernance,
       },
@@ -6987,13 +13589,30 @@ function buildArtifactSidecarRegistry(pageId, options = {}) {
     const workingMeasurement = workingMeasurementMap[slotId] || null;
     const referenceGroup = referenceGroupMap[slotId] || null;
     const workingGroup = workingGroupMap[slotId] || null;
-    const referenceRect = simplifyMeasurementRect(referenceMeasurement) || simplifyGroupRect(referenceGroup);
-    const workingRect = simplifyMeasurementRect(workingMeasurement) || simplifyGroupRect(workingGroup);
+    const itemCountHint = Math.max(
+      0,
+      Number(
+        workingGroup?.itemCount ||
+        referenceGroup?.itemCount ||
+        Number(workingGroup?.imageCount || 0) + Number(workingGroup?.linkCount || 0) ||
+        Number(referenceGroup?.imageCount || 0) + Number(referenceGroup?.linkCount || 0) ||
+        0
+      )
+    );
+    const artifactMarkup = extractArtifactSectionMarkup(normalizedPageId, slotId, viewportProfile);
+    const workingRect =
+      simplifyMeasurementRect(workingMeasurement) ||
+      simplifyGroupRect(workingGroup) ||
+      buildContractFallbackRect(normalizedPageId, slotId, shareSection, artifactMarkup, viewportProfile);
+    const referenceRect =
+      simplifyMeasurementRect(referenceMeasurement) ||
+      simplifyGroupRect(referenceGroup) ||
+      (workingRect ? { ...workingRect } : null) ||
+      buildContractFallbackRect(normalizedPageId, slotId, shareSection, artifactMarkup, viewportProfile);
     const measuredImageZones = inferMeasurementImageZones(workingMeasurement || referenceMeasurement);
     const allowedFields = shareSection.allowedFields || section.allowedFields || null;
     const patchBridge = editable.patchBridge || shareSection.patchBridge || section.patchBridge || null;
     const mediaSpec = editable.mediaSpec || shareSection.mediaSpec || section.mediaSpec || null;
-    const artifactMarkup = extractArtifactSectionMarkup(normalizedPageId, slotId, viewportProfile);
     const layoutGovernance = buildSidecarLayoutGovernance(
       normalizedPageId,
       slotId,
@@ -7007,6 +13626,7 @@ function buildArtifactSidecarRegistry(pageId, options = {}) {
       measurement: workingMeasurement || referenceMeasurement,
       allowedFields,
       layoutGovernance,
+      itemCountHint,
     });
     return {
       sectionId,
@@ -7310,6 +13930,204 @@ function normalizeDesignChangeLevel(value, fallback = "medium") {
   return fallback;
 }
 
+function normalizeInterventionLayer(value, fallback = "page") {
+  const normalized = String(value || fallback).trim().toLowerCase();
+  if (["page", "section-group", "component", "element"].includes(normalized)) return normalized;
+  return fallback;
+}
+
+function normalizePatchDepth(value, fallback = "medium") {
+  const normalized = String(value || fallback).trim().toLowerCase();
+  if (["light", "medium", "strong", "full"].includes(normalized)) return normalized;
+  if (normalized === "low") return "light";
+  if (normalized === "high") return "strong";
+  return fallback;
+}
+
+function deriveDesignChangeLevelFromPatchDepth(value, fallback = "medium") {
+  const normalized = normalizePatchDepth(value, fallback === "low" ? "light" : fallback === "high" ? "strong" : "medium");
+  if (normalized === "light") return "low";
+  if (normalized === "strong" || normalized === "full") return "high";
+  return "medium";
+}
+
+function sliceComponentIdsIntoRegions(componentIds = []) {
+  const ids = componentIds.filter(Boolean);
+  if (!ids.length) return [];
+  const baseSize = Math.ceil(ids.length / 3);
+  return [
+    { id: "top", label: "상단", componentIds: ids.slice(0, baseSize) },
+    { id: "middle", label: "중단", componentIds: ids.slice(baseSize, baseSize * 2) },
+    { id: "bottom", label: "하단", componentIds: ids.slice(baseSize * 2) },
+  ].filter((item) => item.componentIds.length);
+}
+
+function buildInterventionGroupPresets(pageId, editableData, options = {}) {
+  const editableList = buildLlmEditableList(pageId, { editableData, viewportProfile: options.viewportProfile || "pc" });
+  const componentIds = (editableList.components || []).map((item) => String(item?.componentId || "").trim()).filter(Boolean);
+  const componentBySlot = new Map(
+    (editableList.components || []).map((item) => [String(item?.slotId || "").trim(), String(item?.componentId || "").trim()])
+  );
+  const slotGroup = (slotIds = []) =>
+    slotIds
+      .map((slotId) => componentBySlot.get(String(slotId || "").trim()))
+      .filter(Boolean);
+  const presets = [
+    {
+      id: "page",
+      label: "페이지 전체",
+      kind: "page",
+      componentIds,
+    },
+  ];
+  if (!componentIds.length) return presets;
+  if (String(pageId || "").trim() === "home") {
+    return presets.concat([
+      { id: "home-top", label: "상단", kind: "section-group", componentIds: slotGroup(["header-top", "header-bottom", "hero", "quickmenu"]) },
+      { id: "home-middle", label: "중단", kind: "section-group", componentIds: slotGroup(["timedeal", "md-choice", "best-ranking"]) },
+      { id: "home-lower-primary", label: "하단 1", kind: "section-group", componentIds: slotGroup(["space-renewal", "subscription", "brand-showroom", "latest-product-news", "smart-life"]) },
+      { id: "home-lower-secondary", label: "하단 2", kind: "section-group", componentIds: slotGroup(["summary-banner-2", "missed-benefits", "lg-best-care", "bestshop-guide"]) },
+    ].filter((item) => item.componentIds.length));
+  }
+  return presets.concat(
+    sliceComponentIdsIntoRegions(componentIds).map((item) => ({
+      id: item.id,
+      label: item.label,
+      kind: "section-group",
+      componentIds: item.componentIds,
+    }))
+  );
+}
+
+function buildInterventionAssetNeeds(pageId, interventionLayer, patchDepth) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedLayer = normalizeInterventionLayer(interventionLayer, "page");
+  const normalizedDepth = normalizePatchDepth(patchDepth, "medium");
+  const needs = [];
+  const isHighDepth = ["strong", "full"].includes(normalizedDepth);
+  if (!isHighDepth) return needs;
+  if (normalizedLayer === "page" || normalizedLayer === "section-group") {
+    needs.push("section rhythm guidance");
+    needs.push("background / surface direction");
+  }
+  if (["home", "homestyle-home", "care-solutions"].includes(normalizedPageId)) {
+    needs.push("hero visual direction");
+    needs.push("icon set refresh");
+  }
+  if (normalizedPageId === "home") {
+    needs.push("ranking / badge graphics");
+    needs.push("quickmenu icon strategy");
+  }
+  return Array.from(new Set(needs));
+}
+
+function buildInterventionCapabilityProfile(pageId, options = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const interventionLayer = normalizeInterventionLayer(options.interventionLayer, "page");
+  const patchDepth = normalizePatchDepth(options.patchDepth, "medium");
+  const fullRedesignPageIds = new Set(["home", "homestyle-home", "care-solutions"]);
+  const primitivePreviewPageIds = new Set(["home", "homestyle-home", "care-solutions"]);
+  const supportsPrimitivePreview = primitivePreviewPageIds.has(normalizedPageId);
+  const supportsFullPageProposal = fullRedesignPageIds.has(normalizedPageId);
+  const requestedMode =
+    interventionLayer === "page"
+      ? (patchDepth === "full" ? "page-composition" : "page-patch")
+      : interventionLayer === "section-group"
+        ? (["strong", "full"].includes(patchDepth) ? "section-composition" : "section-patch")
+        : interventionLayer === "component"
+          ? (["strong", "full"].includes(patchDepth) ? "component-rebuild" : "component-patch")
+          : "element-patch";
+  const executionMode =
+    requestedMode === "page-composition" && supportsFullPageProposal
+      ? "page-composition-plan"
+      : requestedMode === "section-composition"
+        ? "section-composition-plan"
+        : requestedMode === "component-rebuild"
+          ? "component-rebuild-plan"
+          : "patch-execution";
+  const directCompositionPreview =
+    supportsPrimitivePreview &&
+    executionMode !== "patch-execution";
+  let directPreviewCoverage = "none";
+  if (executionMode === "patch-execution") {
+    directPreviewCoverage = "full";
+  } else if (directCompositionPreview && executionMode === "component-rebuild-plan") {
+    directPreviewCoverage = "full";
+  } else if (directCompositionPreview && (executionMode === "section-composition-plan" || executionMode === "page-composition-plan")) {
+    directPreviewCoverage = "partial";
+  } else if (executionMode !== "patch-execution") {
+    directPreviewCoverage = "partial";
+  }
+  const missingCapabilities = [];
+  if (executionMode !== "patch-execution" && !directCompositionPreview) {
+    missingCapabilities.push("composition renderer");
+  }
+  if ((executionMode === "section-composition-plan" || executionMode === "page-composition-plan") && directPreviewCoverage !== "full") {
+    missingCapabilities.push("layout composition operation schema");
+  }
+  if (patchDepth === "full") {
+    missingCapabilities.push("new asset pipeline");
+  }
+  return {
+    requestedMode,
+    executionMode,
+    supports: {
+      elementPatch: true,
+      componentPatch: true,
+      sectionPatch: true,
+      pagePatch: true,
+      componentRebuildPlan: true,
+      sectionCompositionPlan: true,
+      pageCompositionPlan: supportsFullPageProposal,
+      directCompositionPreview,
+      assetBriefing: true,
+    },
+    directPreviewCoverage,
+    requiresAdditionalAssets: buildInterventionAssetNeeds(pageId, interventionLayer, patchDepth).length > 0,
+    assetNeeds: buildInterventionAssetNeeds(pageId, interventionLayer, patchDepth),
+    missingCapabilities,
+  };
+}
+
+function resolveInterventionRequest(pageId, editableData, options = {}) {
+  const interventionLayer = normalizeInterventionLayer(options.interventionLayer, "page");
+  const patchDepth = normalizePatchDepth(options.patchDepth, "medium");
+  const editableList = buildLlmEditableList(pageId, { editableData, viewportProfile: options.viewportProfile || "pc" });
+  const editableComponentSet = new Set(
+    (editableList.components || []).map((item) => String(item?.componentId || "").trim()).filter(Boolean)
+  );
+  const groupPresets = buildInterventionGroupPresets(pageId, editableData, { viewportProfile: options.viewportProfile || "pc" });
+  const presetMap = new Map(groupPresets.map((item) => [String(item.id || "").trim(), item]));
+  const targetGroupId = String(options.targetGroupId || "").trim();
+  const explicitTargetComponents = safeArray(options.targetComponents || [], 50)
+    .map((item) => String(item || "").trim())
+    .filter(Boolean)
+    .filter((componentId) => editableComponentSet.has(componentId));
+  const presetComponents = presetMap.get(targetGroupId)?.componentIds || [];
+  const targetComponents =
+    interventionLayer === "page"
+      ? []
+      : (explicitTargetComponents.length ? explicitTargetComponents : presetComponents).filter((componentId) => editableComponentSet.has(componentId));
+  const targetScope = interventionLayer === "page" ? "page" : "components";
+  const targetGroupLabel =
+    String(options.targetGroupLabel || "").trim() ||
+    String(presetMap.get(targetGroupId)?.label || "").trim();
+  const capabilityProfile = buildInterventionCapabilityProfile(pageId, {
+    interventionLayer,
+    patchDepth,
+  });
+  return {
+    interventionLayer,
+    patchDepth,
+    targetScope,
+    targetComponents,
+    targetGroupId,
+    targetGroupLabel,
+    groupPresets,
+    capabilityProfile,
+  };
+}
+
 function buildComponentMediaSpec(pageId, slotId, inventoryItem = {}) {
   const normalizedPageId = String(pageId || "").trim();
   const normalizedSlotId = String(slotId || "").trim();
@@ -7401,10 +14219,9 @@ function buildComponentMediaSpec(pageId, slotId, inventoryItem = {}) {
 
 function buildPlannerPageSummary(pageId, editableData, options = {}) {
   const editableList = buildLlmEditableList(pageId, { editableData, viewportProfile: options.viewportProfile || "pc" });
-  const targetScope = String(options.targetScope || "page").trim() || "page";
-  const targetComponents = safeArray(options.targetComponents || [], 50)
-    .map((item) => String(item || "").trim())
-    .filter(Boolean);
+  const interventionSpec = resolveInterventionRequest(pageId, editableData, options);
+  const targetScope = interventionSpec.targetScope;
+  const targetComponents = interventionSpec.targetComponents;
   const targetComponentSet = new Set(targetComponents);
   const filteredComponents =
     targetScope === "components" && targetComponentSet.size
@@ -7426,8 +14243,308 @@ function buildPlannerPageSummary(pageId, editableData, options = {}) {
     targeting: {
       scope: targetScope,
       componentIds: targetComponents,
+      interventionLayer: interventionSpec.interventionLayer,
+      patchDepth: interventionSpec.patchDepth,
+      targetGroupId: interventionSpec.targetGroupId,
+      targetGroupLabel: interventionSpec.targetGroupLabel,
+    },
+    groupPresets: interventionSpec.groupPresets,
+    capabilityProfile: interventionSpec.capabilityProfile,
+    assetPipelineStarter: buildAssetPipelineStarterContext(pageId),
+    pagePromptBlueprints: buildPagePromptBlueprintContext(pageId, {
+      viewportProfile: options.viewportProfile || "pc",
+      targetGroupId: interventionSpec.targetGroupId,
+      targetKind: options.pageGroup || "",
+    }),
+    componentRebuildSchemaCatalog: buildComponentRebuildSchemaContext(pageId, {
+      viewportProfile: options.viewportProfile || "pc",
+      targetComponentIds: targetComponents,
+    }),
+  };
+}
+
+function buildBuilderPageIdentityContext(pageType = "generic") {
+  const pageIdentityByType = {
+    home: {
+      character: "LG전자 공식몰의 브랜드 첫 접점. 감도 있는 비주얼과 프리미엄 톤으로 첫 인상을 만든다.",
+      visualLanguage: "큰 이미지, 여백 활용, 간결한 카피를 우선한다. 과도한 할인 강조나 정보 과잉은 피한다.",
+      userGoal: "방문자가 브랜드와 연결되고 자연스럽게 카테고리나 큐레이션 영역으로 이동하도록 만든다.",
+      sectionFlow: "헤더 -> 히어로 -> 퀵메뉴 -> 타임딜 -> MD추천 -> 랭킹 -> 브랜드 큐레이션",
+    },
+    plp: {
+      character: "카테고리 탐색과 비교를 돕는 탐색 중심 페이지. 프로모션보다 상품 스캔 경험이 먼저다.",
+      visualLanguage: "상품 카드의 스캔성, 필터/정렬의 명료함, 프로모션과 제품 정보의 균형을 유지한다.",
+      userGoal: "방문자가 빠르게 필터링하고 대표 상품을 비교해 다음 클릭 대상을 결정하도록 만든다.",
+      sectionFlow: "헤더 -> 카테고리 배너 -> 필터/정렬 -> 상품 그리드 -> 보조 프로모션/추천",
+    },
+    pdp: {
+      character: "상품을 확신시키고 구매를 유도하는 신뢰 중심 페이지.",
+      visualLanguage: "갤러리 중심의 시각 임팩트, 짧은 요약, 명확한 가격/CTA, 군더더기 없는 정보 위계를 유지한다.",
+      userGoal: "방문자가 핵심 가치를 빠르게 이해하고 가격/옵션을 확인한 뒤 구매 결정을 내리도록 돕는다.",
+      sectionFlow: "헤더 -> 갤러리 -> 핵심 요약 -> 가격/혜택 -> 옵션 -> 고정 구매 영역 -> 후기/Q&A",
+    },
+    generic: {
+      character: "기존 정보 구조와 사용자 흐름을 유지하면서도 시각 설득력을 높여야 하는 페이지.",
+      visualLanguage: "페이지의 원래 역할과 정보 밀도를 유지하되, 핵심 메시지와 행동 유도만 더 또렷하게 만든다.",
+      userGoal: "사용자가 현재 페이지의 핵심 작업을 더 적은 인지 부하로 완료하도록 돕는다.",
+      sectionFlow: "기존 정보 구조를 유지하되 핵심 진입부 -> 주요 콘텐츠 -> 보조 정보 흐름을 더 명확하게 정리한다.",
     },
   };
+  return pageIdentityByType[pageType] || pageIdentityByType.generic;
+}
+
+function buildBuilderSlotGuidanceCatalog(pageType = "generic") {
+  const genericCatalog = {
+    hero: {
+      role: "첫 인상을 결정하는 대표 섹션.",
+      direction: "헤드라인과 대표 비주얼의 우선순위를 먼저 세우고, 핵심 행동 유도는 1개 축으로 정리한다.",
+      priority: "high",
+    },
+    banner: {
+      role: "짧은 메시지나 프로모션을 전달하는 보조 배너.",
+      direction: "한 메시지에 집중하고 카피를 과하게 늘리지 않는다.",
+      priority: "medium",
+    },
+    gallery: {
+      role: "대표 이미지나 시각 증거를 보여주는 핵심 미디어 섹션.",
+      direction: "이미지의 존재감, 여백, 대비를 먼저 보고 텍스트는 보조로 둔다.",
+      priority: "high",
+    },
+    summary: {
+      role: "핵심 가치와 요약 메시지를 전달하는 섹션.",
+      direction: "핵심 메시지를 1~2줄로 압축하고 장점의 우선순위를 분명히 한다.",
+      priority: "high",
+    },
+    price: {
+      role: "가격과 혜택 정보를 전달하는 신뢰 섹션.",
+      direction: "가격 수치와 사실 정보는 그대로 유지하고, 혜택/보조 카피만 정리한다.",
+      priority: "high",
+    },
+    sticky: {
+      role: "항상 노출되는 구매/행동 유도 영역.",
+      direction: "CTA 라벨과 핵심 요약만 강화하고 구조 자체는 크게 흔들지 않는다.",
+      priority: "high",
+    },
+  };
+  const pageCatalog = {
+    home: {
+      "header-top": {
+        role: "홈의 전역 유틸리티와 신뢰 정보를 보여주는 상단 헤더.",
+        direction: "정보를 늘리기보다 정돈과 가독성을 우선하고, 과한 시각 실험은 피한다.",
+        priority: "medium",
+      },
+      "header-bottom": {
+        role: "브랜드 홈에서 주요 탐색을 여는 네비게이션 브리지.",
+        direction: "카테고리 탐색 흐름을 해치지 않도록 구조는 유지하고 시각적 정돈만 강화한다.",
+        priority: "high",
+      },
+      hero: {
+        role: "홈 첫 화면. 브랜드 임팩트와 전체 톤을 결정하는 핵심 섹션.",
+        direction: "headline은 1줄 중심으로 압축하고 CTA는 1개 주행동으로 정리한다.",
+        priority: "high",
+      },
+      quickmenu: {
+        role: "아이콘 기반 카테고리 탐색을 여는 보조 진입 섹션.",
+        direction: "라벨은 간결하게 줄이고 그리드 밀도와 리듬을 정리한다.",
+        priority: "medium",
+      },
+      timedeal: {
+        role: "즉시 반응을 유도하는 프로모션 상품 섹션.",
+        direction: "대표 상품 1~2개의 우선순위를 세우고 혜택 강조는 하되 숫자 사실은 바꾸지 않는다.",
+        priority: "high",
+      },
+      "md-choice": {
+        role: "큐레이션 의도가 드러나야 하는 추천 상품 섹션.",
+        direction: "대표 카드와 보조 카드의 위계를 분명히 하고 추천 이유가 먼저 읽히게 만든다.",
+        priority: "high",
+      },
+      "best-ranking": {
+        role: "인기 상품에 대한 신뢰 근거를 주는 랭킹 섹션.",
+        direction: "순위 정보와 비교 흐름은 유지하고 카드 스캔성과 타이틀 밀도만 정리한다.",
+        priority: "high",
+      },
+      "marketing-area": {
+        role: "브랜드 큐레이션이나 캠페인 메시지를 연결하는 중단 섹션.",
+        direction: "한 개의 스토리 축으로 정리하고 다른 섹션과 톤 충돌이 나지 않게 맞춘다.",
+        priority: "medium",
+      },
+      subscription: {
+        role: "구독/멤버십 성격의 혜택을 전달하는 정보 섹션.",
+        direction: "혜택 구조는 유지하고 가입 이유가 먼저 보이도록 문장과 강조점을 정리한다.",
+        priority: "medium",
+      },
+      "space-renewal": {
+        role: "공간/라이프스타일 제안을 보여주는 영감 섹션.",
+        direction: "이미지와 짧은 카피의 균형을 맞추고, 카드 간 리듬을 일정하게 유지한다.",
+        priority: "medium",
+      },
+      "brand-showroom": {
+        role: "브랜드 큐레이션과 체험 맥락을 보여주는 쇼룸 섹션.",
+        direction: "브랜드 감도는 유지하되 카드 정보량을 줄이고 시각 리듬을 먼저 정리한다.",
+        priority: "medium",
+      },
+      "latest-product-news": {
+        role: "신제품이나 소식을 전달하는 피드형 섹션.",
+        direction: "리스트/카드 스캔성을 우선하고 헤드라인 길이를 짧게 유지한다.",
+        priority: "medium",
+      },
+      "smart-life": {
+        role: "라이프스타일 제안과 활용 사례를 전달하는 보조 큐레이션 섹션.",
+        direction: "복잡한 설명보다 핵심 효익이 먼저 보이게 정리한다.",
+        priority: "medium",
+      },
+      "summary-banner-2": {
+        role: "중간 리듬을 잡는 요약형 배너 섹션.",
+        direction: "한 메시지와 한 행동만 남기고 장식적 요소는 줄인다.",
+        priority: "medium",
+      },
+      "missed-benefits": {
+        role: "놓치기 쉬운 혜택을 보완하는 안내 섹션.",
+        direction: "혜택 항목 수를 늘리기보다 핵심 혜택이 먼저 읽히도록 정리한다.",
+        priority: "medium",
+      },
+      "lg-best-care": {
+        role: "사후관리/안심 요소를 전달하는 신뢰 섹션.",
+        direction: "서비스 신뢰 신호를 먼저 보여주고 과한 프로모션 톤은 피한다.",
+        priority: "medium",
+      },
+      "bestshop-guide": {
+        role: "오프라인 상담/매장 연결을 보조하는 안내 섹션.",
+        direction: "행동 유도는 분명하게, 정보량은 짧게 유지한다.",
+        priority: "medium",
+      },
+    },
+    plp: {
+      hero: {
+        role: "카테고리 페이지 첫 인상을 만드는 대표 배너.",
+        direction: "프로모션 메시지는 한 축으로 압축하고 상품 탐색 흐름을 방해하지 않게 정리한다.",
+        priority: "high",
+      },
+      banner: {
+        role: "카테고리 컨텍스트를 설명하는 보조 배너.",
+        direction: "탐색보다 앞서지 않도록 메시지를 짧게 유지하고 CTA는 최소화한다.",
+        priority: "medium",
+      },
+      filter: {
+        role: "탐색 범위를 좁히는 핵심 제어 영역.",
+        direction: "선택 상태와 우선 필터를 더 명확하게 보이게 하되 구조 자체는 바꾸지 않는다.",
+        priority: "high",
+      },
+      sort: {
+        role: "상품 정렬 기준을 조절하는 보조 제어 영역.",
+        direction: "정렬 기준을 한눈에 읽히게 정리하고 주변 정보보다 튀지 않게 유지한다.",
+        priority: "medium",
+      },
+      firstProduct: {
+        role: "상품 그리드의 첫 진입 인상을 만드는 대표 카드.",
+        direction: "대표 상품의 이미지 존재감과 핵심 혜택 라인만 강화하고 비교 가능성은 유지한다.",
+        priority: "high",
+      },
+      productGrid: {
+        role: "상품 비교와 스캔을 담당하는 핵심 그리드.",
+        direction: "카드 밀도, 타이틀 길이, 가격/혜택의 읽기 순서를 먼저 정리한다.",
+        priority: "high",
+      },
+      "category-nav": {
+        role: "카테고리 이동을 돕는 보조 네비게이션 섹션.",
+        direction: "활성 상태와 이동 리듬을 분명히 하고 장식은 줄인다.",
+        priority: "medium",
+      },
+      "benefit-highlight": {
+        role: "카테고리 혜택을 보조 설명하는 카드/배너 섹션.",
+        direction: "혜택 메시지를 2~3개 이내로 정리하고 카드 간 균형을 맞춘다.",
+        priority: "medium",
+      },
+      "promo-banner": {
+        role: "탐색 중간에 프로모션 톤을 보강하는 섹션.",
+        direction: "상품 탐색성을 해치지 않는 선에서 한 메시지에 집중한다.",
+        priority: "medium",
+      },
+    },
+    pdp: {
+      gallery: {
+        role: "상품 갤러리. 첫 인상과 시각 신뢰를 결정하는 핵심 섹션.",
+        direction: "이미지 여백과 대비를 강화하고 대표 컷의 주도권을 분명히 한다.",
+        priority: "high",
+      },
+      summary: {
+        role: "상품 핵심 요약과 가치 제안을 보여주는 섹션.",
+        direction: "헤드라인과 핵심 효익을 1~2줄 축으로 압축한다.",
+        priority: "high",
+      },
+      price: {
+        role: "가격 및 혜택 정보를 전달하는 핵심 구매 판단 섹션.",
+        direction: "가격 수치는 절대 유지하고 혜택 카피의 정돈과 우선순위만 조정한다.",
+        priority: "high",
+      },
+      option: {
+        role: "옵션 선택과 재고/구매 조건을 확인하는 섹션.",
+        direction: "선택 흐름과 현재 상태를 더 또렷하게 보이게 하되 사실 값은 변경하지 않는다.",
+        priority: "high",
+      },
+      sticky: {
+        role: "고정 구매 영역. 최종 CTA와 핵심 요약을 유지하는 섹션.",
+        direction: "CTA 라벨과 핵심 행동 우선순위만 강화하고 구조 변경은 금지한다.",
+        priority: "high",
+      },
+      review: {
+        role: "사회적 증거와 사용 경험을 보여주는 섹션.",
+        direction: "평점과 핵심 후기 요약이 먼저 읽히게 정리하고 과장된 표현은 피한다.",
+        priority: "medium",
+      },
+      qna: {
+        role: "구매 전 확인이 필요한 질문/답변 섹션.",
+        direction: "질문 탐색성과 중요 정보의 스캔성을 우선하고 불필요한 장식은 줄인다.",
+        priority: "medium",
+      },
+    },
+  };
+  return {
+    ...genericCatalog,
+    ...(pageCatalog[pageType] || {}),
+  };
+}
+
+function buildBuilderSlotGuidanceMap(pageType = "generic", slotIds = []) {
+  const catalog = buildBuilderSlotGuidanceCatalog(pageType);
+  const fallbackByType = {
+    home: {
+      role: "홈 내 보조 섹션. 전체 리듬과 브랜드 인상을 이어주는 영역.",
+      direction: "독립적으로 튀지 않게 전체 리듬 안에서 메시지와 카드 위계만 정리한다.",
+      priority: "medium",
+    },
+    plp: {
+      role: "탐색을 돕는 보조 섹션.",
+      direction: "상품 스캔 흐름을 방해하지 않도록 정보량과 강조 순서를 정리한다.",
+      priority: "medium",
+    },
+    pdp: {
+      role: "구매 판단을 보조하는 상세 정보 섹션.",
+      direction: "사실 정보는 유지한 채 핵심 신호와 탐색 순서만 정리한다.",
+      priority: "medium",
+    },
+    generic: {
+      role: "현재 페이지 흐름을 보조하는 일반 섹션.",
+      direction: "기존 역할을 유지하면서 메시지와 시각 우선순위만 더 또렷하게 만든다.",
+      priority: "medium",
+    },
+  };
+  const fallback = fallbackByType[pageType] || fallbackByType.generic;
+  return Object.fromEntries(
+    Array.from(new Set(slotIds.map((slotId) => String(slotId || "").trim()).filter(Boolean)))
+      .map((slotId) => {
+        const guidance = catalog[slotId] || fallback;
+        return [
+          slotId,
+          {
+            slotId,
+            role: String(guidance?.role || fallback.role).trim(),
+            direction: String(guidance?.direction || fallback.direction).trim(),
+            priority: String(guidance?.priority || fallback.priority).trim() || "medium",
+          },
+        ];
+      })
+  );
 }
 
 function buildBuilderDesignGuidance(pageId, editableComponents = [], options = {}) {
@@ -7447,6 +14564,8 @@ function buildBuilderDesignGuidance(pageId, editableComponents = [], options = {
   const isPdp = isPdpCasePageId(normalizedPageId);
   const isPlp = normalizedPageId.startsWith("category-");
   const pageType = isPdp ? "pdp" : isPlp ? "plp" : normalizedPageId === "home" ? "home" : "generic";
+  const pageIdentityContext = buildBuilderPageIdentityContext(pageType);
+  const slotGuidanceMap = buildBuilderSlotGuidanceMap(pageType, slotIds);
   const visualFocusByType = {
     home: [
       "첫 인상과 브랜드 톤을 우선한다.",
@@ -7528,6 +14647,8 @@ function buildBuilderDesignGuidance(pageId, editableComponents = [], options = {
   return {
     pageType,
     pageIdentity,
+    pageIdentityContext,
+    slotGuidanceMap,
     layoutTokens: normalizedPageId === "home" ? HOME_LAYOUT_TOKENS : null,
     patchRules,
     slotRenderProfiles:
@@ -7559,10 +14680,14 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
   const pageContext = buildPlannerPageContext(pageId, options.viewportProfile || "pc", editableData, {
     pageIdentityOverride: options.pageIdentityOverride,
   });
+  const interventionSpec = resolveInterventionRequest(pageId, editableData, options);
   const designReferenceLibrary = buildDesignReferenceLibraryContext(pageId, {
     pageGroup: pageContext.pageGroup,
     viewportProfile: options.viewportProfile || "pc",
     pageIdentity: pageContext.pageIdentity,
+    interventionLayer: interventionSpec.interventionLayer,
+    targetComponents: interventionSpec.targetComponents,
+    targetGroupId: interventionSpec.targetGroupId,
     limit: 8,
   });
   const slotRegistry = findSlotRegistry(editableData || {}, pageId) || { pageId, slots: [] };
@@ -7575,15 +14700,17 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
     editableData,
     viewportProfile: options.viewportProfile || "pc",
   });
+  const assetPipelineStarter = buildAssetPipelineStarterContext(pageId);
   const artifactSidecarRegistry = buildArtifactSidecarRegistry(pageId, {
     editableData,
     viewportProfile: options.viewportProfile || "pc",
   });
-  const targetScope = String(options.targetScope || "page").trim() || "page";
-  const targetComponents = safeArray(options.targetComponents || [], 50)
-    .map((item) => String(item || "").trim())
-    .filter(Boolean);
-  const designChangeLevel = normalizeDesignChangeLevel(options.designChangeLevel, "medium");
+  const targetScope = interventionSpec.targetScope;
+  const targetComponents = interventionSpec.targetComponents;
+  const designChangeLevel = normalizeDesignChangeLevel(
+    options.designChangeLevel,
+    deriveDesignChangeLevelFromPatchDepth(interventionSpec.patchDepth, "medium")
+  );
   const targetComponentSet = new Set(targetComponents);
   const editableComponents =
     targetScope === "components" && targetComponentSet.size
@@ -7592,6 +14719,26 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
   const renderableEditableComponents = editableComponents.filter((item) =>
     isRenderableBuilderSlot(pageId, String(item?.slotId || "").trim())
   );
+  const componentRebuildSchemaCatalog = buildComponentRebuildSchemaContext(pageId, {
+    viewportProfile: options.viewportProfile || "pc",
+    targetComponentIds: renderableEditableComponents.map((item) => String(item?.componentId || "").trim()).filter(Boolean),
+  });
+  const primitiveCompositionCatalog = buildPrimitiveCompositionCatalogContext(pageId, {
+    targetComponentIds: renderableEditableComponents.map((item) => String(item?.componentId || "").trim()).filter(Boolean),
+  });
+  const sectionFamilyContracts = buildSectionFamilyContractContext(pageId, {
+    interventionLayer: interventionSpec.interventionLayer,
+    targetComponentIds: renderableEditableComponents.map((item) => String(item?.componentId || "").trim()).filter(Boolean),
+  });
+  const recipeHierarchy = buildRecipeHierarchyContext(pageId, {
+    targetComponentIds: renderableEditableComponents.map((item) => String(item?.componentId || "").trim()).filter(Boolean),
+    targetGroupId: interventionSpec.targetGroupId,
+  });
+  const pagePromptBlueprints = buildPagePromptBlueprintContext(pageId, {
+    viewportProfile: options.viewportProfile || "pc",
+    targetGroupId: interventionSpec.targetGroupId,
+    targetKind: pageContext.pageGroup,
+  });
   const allowedSlotIds = new Set(renderableEditableComponents.map((item) => String(item.slotId || "").trim()).filter(Boolean));
   const currentPatches = listComponentPatches(editableData || {}, pageId, options.viewportProfile || "")
     .filter((item) => {
@@ -7625,11 +14772,16 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
     targeting: {
       scope: targetScope,
       componentIds: targetComponents,
+      interventionLayer: interventionSpec.interventionLayer,
+      patchDepth: interventionSpec.patchDepth,
+      targetGroupId: interventionSpec.targetGroupId,
+      targetGroupLabel: interventionSpec.targetGroupLabel,
       excludedComponentIds: editableComponents
         .filter((item) => !isRenderableBuilderSlot(pageId, String(item?.slotId || "").trim()))
         .map((item) => String(item.componentId || "").trim())
         .filter(Boolean),
     },
+    interventionSpec,
     designToolContext: {
       designChangeLevel,
       availableTools: [
@@ -7657,6 +14809,16 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
           id: "view_pin",
           category: "versioning",
           whenToUse: "저장된 버전을 clone에 실제로 노출할 대표 View로 고정할 때",
+        },
+        {
+          id: "composition_plan",
+          category: "planning",
+          whenToUse: "강한/전면 요청이 현재 patch surface를 넘어설 때 report.compositionPlan 과 missingCapabilities 로 제안 구조를 남길 때",
+        },
+        {
+          id: "asset_brief",
+          category: "planning",
+          whenToUse: "추가 아이콘/이미지/그래픽 자산이 필요할 때 assetNeeds 를 정리할 때",
         },
       ],
       workflowOrder: [
@@ -7703,6 +14865,24 @@ function buildBuilderSystemContext(pageId, editableData, options = {}) {
         "브랜드 정체성을 벗어나는 과한 실험적 패턴만 금지한다.",
         "가격/스펙/상품 사실 정보는 바꾸지 않는다.",
       ],
+      executionStrategy: {
+        builderVersion: String(options.builderVersion || "v2").trim() || "v2",
+        builderMode: String(options.builderMode || "standard").trim() || "standard",
+        builderProvider: String(options.builderProvider || "openrouter").trim() || "openrouter",
+        rendererSurface: String(options.rendererSurface || "custom").trim() || "custom",
+        interventionLayer: interventionSpec.interventionLayer,
+        patchDepth: interventionSpec.patchDepth,
+        targetGroupId: interventionSpec.targetGroupId,
+        targetGroupLabel: interventionSpec.targetGroupLabel,
+        ...interventionSpec.capabilityProfile,
+      },
+      assetPipelineStarter,
+      styleRuntimeTokenPresets: buildStyleRuntimeTokenPresetContext(),
+      sectionFamilyContracts,
+      recipeHierarchy,
+      pagePromptBlueprints,
+      componentRebuildSchemaCatalog,
+      primitiveCompositionCatalog,
       designReferenceLibrary,
       visualPrinciples: buildBuilderDesignGuidance(pageId, editableComponents, {
         targetScope,
@@ -7738,13 +14918,30 @@ function buildBuilderInputPayload({
   intensity,
   versionLabelHint,
   designChangeLevel,
+  interventionLayer,
+  patchDepth,
   targetScope,
   targetComponents,
+  targetGroupId,
+  targetGroupLabel,
+  builderVersion,
+  builderMode,
+  builderProvider,
+  rendererSurface,
 }) {
   const pageContext = buildPlannerPageContext(pageId, viewportProfile, editableData, { pageIdentityOverride });
+  const interventionSpec = resolveInterventionRequest(pageId, editableData, {
+    viewportProfile,
+    interventionLayer,
+    patchDepth,
+    targetScope,
+    targetComponents,
+    targetGroupId,
+    targetGroupLabel,
+  });
   const normalizedDesignChangeLevel = normalizeDesignChangeLevel(
     designChangeLevel || approvedPlan?.designChangeLevel,
-    "medium"
+    deriveDesignChangeLevelFromPatchDepth(interventionSpec.patchDepth, "medium")
   );
   return {
     pageContext,
@@ -7759,16 +14956,32 @@ function buildBuilderInputPayload({
       viewportProfile,
       pageIdentityOverride,
       designChangeLevel: normalizedDesignChangeLevel,
-      targetScope,
-      targetComponents,
+      interventionLayer: interventionSpec.interventionLayer,
+      patchDepth: interventionSpec.patchDepth,
+      targetScope: interventionSpec.targetScope,
+      targetComponents: interventionSpec.targetComponents,
+      targetGroupId: interventionSpec.targetGroupId,
+      targetGroupLabel: interventionSpec.targetGroupLabel,
+      builderMode,
+      builderProvider,
+      builderVersion,
+      rendererSurface,
     }),
     generationOptions: {
       intensity: String(intensity || "balanced").trim() || "balanced",
       createNewVersion: true,
       versionLabelHint: String(versionLabelHint || "").trim(),
+      builderVersion: String(builderVersion || "v2").trim() || "v2",
+      builderMode: String(builderMode || "standard").trim() || "standard",
+      builderProvider: String(builderProvider || "openrouter").trim() || "openrouter",
+      rendererSurface: String(rendererSurface || "custom").trim() || "custom",
       designChangeLevel: normalizedDesignChangeLevel,
-      targetScope: String(targetScope || "page").trim() || "page",
-      targetComponents: safeArray(targetComponents || [], 50),
+      interventionLayer: interventionSpec.interventionLayer,
+      patchDepth: interventionSpec.patchDepth,
+      targetScope: interventionSpec.targetScope,
+      targetComponents: interventionSpec.targetComponents,
+      targetGroupId: interventionSpec.targetGroupId,
+      targetGroupLabel: interventionSpec.targetGroupLabel,
     },
   };
 }
@@ -7787,32 +15000,66 @@ async function buildPlannerInputPayload({
   toneAndMood,
   referenceUrls,
   designChangeLevel,
+  interventionLayer,
+  patchDepth,
   targetScope,
   targetComponents,
+  targetGroupId,
+  targetGroupLabel,
+  scopePreset,
+  builderProvider,
+  forceDemoPlanner = false,
 }) {
   const pageContext = buildPlannerPageContext(pageId, viewportProfile, editableData, { pageIdentityOverride });
-  const normalizedTargetScope = String(targetScope || "page").trim() || "page";
-  const normalizedDesignChangeLevel = normalizeDesignChangeLevel(designChangeLevel, "medium");
-  const normalizedTargetComponents = safeArray(targetComponents || [], 50)
-    .map((item) => String(item || "").trim())
-    .filter(Boolean);
+  const interventionSpec = resolveInterventionRequest(pageId, editableData, {
+    viewportProfile,
+    interventionLayer,
+    patchDepth,
+    targetScope,
+    targetComponents,
+    targetGroupId,
+    targetGroupLabel,
+  });
+  const normalizedTargetScope = interventionSpec.targetScope;
+  const normalizedPatchDepth = interventionSpec.patchDepth;
+  const normalizedDesignChangeLevel = normalizeDesignChangeLevel(
+    designChangeLevel,
+    deriveDesignChangeLevelFromPatchDepth(normalizedPatchDepth, "medium")
+  );
+  const normalizedTargetComponents = interventionSpec.targetComponents;
   const pageSummary = buildPlannerPageSummary(pageId, editableData, {
     viewportProfile,
+    interventionLayer: interventionSpec.interventionLayer,
+    patchDepth: normalizedPatchDepth,
     targetScope: normalizedTargetScope,
     targetComponents: normalizedTargetComponents,
+    targetGroupId: interventionSpec.targetGroupId,
+    targetGroupLabel: interventionSpec.targetGroupLabel,
   });
-  const designReferenceLibrary = buildDesignReferenceLibraryContext(pageId, {
-    pageGroup: pageContext.pageGroup,
-    viewportProfile,
-    pageIdentity: pageContext.pageIdentity,
-    limit: 8,
-  });
-  const referenceAnalyses = await analyzeReferenceUrls(referenceUrls, {
-    pageId,
-    pageGroup: pageContext.pageGroup,
-    viewportProfile,
-    editableSlots: pageSummary.editableSlots,
-  });
+  const designReferenceLibrary = forceDemoPlanner
+    ? {
+        pageType: String(pageContext.pageGroup || "").trim(),
+        viewportProfile,
+        entries: [],
+        referenceAnchors: [],
+      }
+    : buildDesignReferenceLibraryContext(pageId, {
+        pageGroup: pageContext.pageGroup,
+        viewportProfile,
+        pageIdentity: pageContext.pageIdentity,
+        interventionLayer: interventionSpec.interventionLayer,
+        targetComponents: normalizedTargetComponents,
+        targetGroupId: interventionSpec.targetGroupId,
+        limit: normalizedTargetScope === "components" ? 4 : 8,
+      });
+  const referenceAnalyses = forceDemoPlanner
+    ? []
+    : await analyzeReferenceUrls(referenceUrls, {
+        pageId,
+        pageGroup: pageContext.pageGroup,
+        viewportProfile,
+        editableSlots: pageSummary.editableSlots,
+      });
   const guardrailBundle = buildGuardrailBundle({
     pageId,
     pageGroup: pageContext.pageGroup,
@@ -7831,16 +15078,172 @@ async function buildPlannerInputPayload({
       toneAndMood: String(toneAndMood || "").trim(),
       referenceUrls: safeArray(referenceUrls || [], 5),
       designChangeLevel: normalizedDesignChangeLevel,
+      interventionLayer: interventionSpec.interventionLayer,
+      patchDepth: normalizedPatchDepth,
+      builderProvider: String(builderProvider || "openrouter").trim() || "openrouter",
       targetScope: normalizedTargetScope,
       targetComponents: normalizedTargetComponents,
+      targetGroupId: interventionSpec.targetGroupId,
+      targetGroupLabel: interventionSpec.targetGroupLabel,
+      scopePreset: String(scopePreset || "").trim(),
     },
     pageSummary,
     referenceSummary: {
       analyses: referenceAnalyses,
       mergedSlotMatches: mergeReferenceSlotMatches(referenceAnalyses),
       designReferenceLibrary,
+      assetPipelineStarter: buildAssetPipelineStarterContext(pageId),
+      styleRuntimeTokenPresets: buildStyleRuntimeTokenPresetContext(),
+      componentRebuildSchemaCatalog: buildComponentRebuildSchemaContext(pageId, {
+        viewportProfile,
+        targetComponentIds: normalizedTargetComponents,
+      }),
     },
     guardrailBundle,
+  };
+}
+
+function buildFastPlannerInputPayload({
+  user,
+  pageId,
+  page,
+  viewportProfile,
+  pageIdentityOverride,
+  mode,
+  requestText,
+  keyMessage,
+  preferredDirection,
+  avoidDirection,
+  toneAndMood,
+  referenceUrls,
+  designChangeLevel,
+  interventionLayer,
+  patchDepth,
+  targetScope,
+  targetComponents,
+  targetGroupId,
+  targetGroupLabel,
+  scopePreset,
+  builderProvider,
+}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile = String(viewportProfile || "pc").trim() || "pc";
+  const normalizedTargetComponents = safeArray(targetComponents || [], 50)
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+  const normalizedInterventionLayer = normalizeInterventionLayer(interventionLayer, "page");
+  const normalizedPatchDepth = normalizePatchDepth(
+    patchDepth,
+    normalizeDesignChangeLevel(designChangeLevel, "medium") === "high" ? "strong" : "medium"
+  );
+  const normalizedTargetScope =
+    normalizedInterventionLayer === "page"
+      ? "page"
+      : normalizedTargetComponents.length
+        ? "components"
+        : String(targetScope || "components").trim() || "components";
+  const mergedPageIdentity = mergePageIdentityBrief(
+    buildPageIdentityBrief(normalizedPageId, {
+      pageTitle: page?.title || normalizedPageId,
+      pageGroup: String(page?.pageGroup || "").trim() || "other",
+    }),
+    pageIdentityOverride || {}
+  );
+  const pageContext = {
+    workspacePageId: normalizedPageId,
+    runtimePageId: normalizedPageId,
+    pageLabel: page?.title || normalizedPageId,
+    pageGroup: String(page?.pageGroup || "").trim() || "other",
+    viewportProfile: normalizedViewportProfile,
+    viewportLabel: normalizedViewportProfile === "mo" ? "mobile" : normalizedViewportProfile === "ta" ? "tablet" : "desktop",
+    pageIdentity: mergedPageIdentity,
+  };
+  const inferredEditableSlots = normalizedTargetComponents
+    .map((item) => inferSlotIdFromComponentId(item) || String(item || "").trim())
+    .filter(Boolean);
+  const fallbackEditableSlotsByPage = {
+    home: ["hero", "quickmenu", "md-choice", "timedeal", "best-ranking", "subscription"],
+    "homestyle-home": ["hero", "quickMenu", "labelBanner", "brandStory"],
+    "care-solutions": ["hero", "tabs", "ranking", "benefit", "careBanner"],
+  };
+  const editableSlots = inferredEditableSlots.length
+    ? inferredEditableSlots
+    : safeArray(fallbackEditableSlotsByPage[String(pageId || "").trim()] || [], 8);
+  return {
+    mode: String(mode || "direct").trim() || "direct",
+    pageContext,
+    workspaceContext: {
+      currentWorkingVersionId: null,
+      currentViewVersionId: null,
+      recentVersionCount: 0,
+    },
+    userInput: {
+      requestText: String(requestText || "").trim(),
+      keyMessage: String(keyMessage || "").trim(),
+      preferredDirection: String(preferredDirection || "").trim(),
+      avoidDirection: String(avoidDirection || "").trim(),
+      toneAndMood: String(toneAndMood || "").trim(),
+      referenceUrls: safeArray(referenceUrls || [], 5),
+      designChangeLevel: normalizeDesignChangeLevel(
+        designChangeLevel,
+        deriveDesignChangeLevelFromPatchDepth(normalizedPatchDepth, "medium")
+      ),
+      interventionLayer: normalizedInterventionLayer,
+      patchDepth: normalizedPatchDepth,
+      builderProvider: String(builderProvider || "openrouter").trim() || "openrouter",
+      targetScope: normalizedTargetScope,
+      targetComponents: normalizedTargetComponents,
+      targetGroupId: String(targetGroupId || "").trim(),
+      targetGroupLabel: String(targetGroupLabel || "").trim(),
+      scopePreset: String(scopePreset || "").trim(),
+    },
+    pageSummary: {
+      editableSlots,
+      existingComponents: editableSlots.map((slotId) => `${String(pageId || "").trim()}.${slotId}`),
+      currentPatchSummary: [],
+      targeting: {
+        scope: normalizedTargetScope,
+        componentIds: normalizedTargetComponents,
+        interventionLayer: normalizedInterventionLayer,
+        patchDepth: normalizedPatchDepth,
+        targetGroupId: String(targetGroupId || "").trim(),
+        targetGroupLabel: String(targetGroupLabel || "").trim(),
+      },
+      groupPresets: [],
+      capabilityProfile: {
+        directPreview: false,
+        directCompositionPreview: false,
+        executionMode: normalizedInterventionLayer === "page" ? "page-composition-plan" : "component-rebuild-plan",
+        missingCapabilities: ["validation-fast-path"],
+      },
+      assetPipelineStarter: buildAssetPipelineStarterContext(pageId),
+      styleRuntimeTokenPresets: buildStyleRuntimeTokenPresetContext(),
+      componentRebuildSchemaCatalog: buildComponentRebuildSchemaContext(pageId, {
+        viewportProfile,
+        targetComponentIds: normalizedTargetComponents,
+      }),
+    },
+    referenceSummary: {
+      analyses: [],
+      mergedSlotMatches: [],
+      designReferenceLibrary: {
+        pageType: String(pageContext.pageGroup || "").trim(),
+        viewportProfile: String(viewportProfile || "pc").trim() || "pc",
+        entries: [],
+        referenceAnchors: [],
+      },
+      assetPipelineStarter: buildAssetPipelineStarterContext(pageId),
+      styleRuntimeTokenPresets: buildStyleRuntimeTokenPresetContext(),
+      componentRebuildSchemaCatalog: buildComponentRebuildSchemaContext(pageId, {
+        viewportProfile,
+        targetComponentIds: normalizedTargetComponents,
+      }),
+    },
+    guardrailBundle: {
+      rules: ["사실 기반 가격/스펙/상품 정보는 임의 변경 금지"],
+      priorities: [],
+      cautions: [],
+    },
   };
 }
 
@@ -8444,6 +15847,3512 @@ function renderCurrentLiveHomeProductSection(
     activeSourceId,
     componentPatch
   );
+}
+
+function findDraftComponentCompositionEntry(draftBuild = null, componentId = "", slotId = "") {
+  const report = draftBuild?.report && typeof draftBuild.report === "object" ? draftBuild.report : {};
+  const entries = Array.isArray(report.componentComposition) ? report.componentComposition : [];
+  const normalizedComponentId = String(componentId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  if (!normalizedComponentId && !normalizedSlotId) return null;
+  return (
+    entries.find((item) => {
+      const itemComponentId = String(item?.componentId || "").trim();
+      const itemSlotId = String(item?.slotId || "").trim();
+      if (normalizedComponentId && itemComponentId === normalizedComponentId) return true;
+      if (normalizedSlotId && itemSlotId === normalizedSlotId) return true;
+      return false;
+    }) || null
+  );
+}
+
+function resolveHomeCompositionTheme(assetPlan = {}) {
+  const iconSetIds = Array.isArray(assetPlan?.iconSetIds) ? assetPlan.iconSetIds.map((item) => String(item || "").trim()) : [];
+  const badgePresetIds = Array.isArray(assetPlan?.badgePresetIds) ? assetPlan.badgePresetIds.map((item) => String(item || "").trim()) : [];
+  const visualSetIds = Array.isArray(assetPlan?.visualSetIds) ? assetPlan.visualSetIds.map((item) => String(item || "").trim()) : [];
+  const thumbnailPresetIds = Array.isArray(assetPlan?.thumbnailPresetIds)
+    ? assetPlan.thumbnailPresetIds.map((item) => String(item || "").trim())
+    : [];
+  const hasAlias = (values = [], patterns = []) =>
+    values.some((value) => patterns.some((pattern) => pattern.test(String(value || "").trim())));
+  return {
+    classes: [
+      hasAlias(visualSetIds, [/editorial/i, /story/i]) ? "is-editorial" : "",
+      hasAlias(visualSetIds, [/premium/i, /stage/i, /contrast/i]) ? "is-premium-stage" : "",
+      hasAlias(visualSetIds, [/cinematic/i, /heroic/i]) ? "is-cinematic" : "",
+      hasAlias(visualSetIds, [/story/i, /editorial/i, /portrait/i]) ? "is-story-editorial" : "",
+      hasAlias(iconSetIds, [/line/i, /outline/i]) ? "is-line-icon" : "",
+      hasAlias(iconSetIds, [/solid/i, /filled/i, /glyph/i]) ? "is-solid-icon" : "",
+      hasAlias(iconSetIds, [/commerce/i, /feature/i, /outline/i]) ? "is-commerce-outline" : "",
+      hasAlias(badgePresetIds, [/soft/i, /pill/i]) ? "is-soft-pill" : "",
+      hasAlias(badgePresetIds, [/premium/i, /contrast/i, /chip/i]) ? "is-premium-chip" : "",
+      hasAlias(badgePresetIds, [/editorial/i, /kicker/i]) ? "is-editorial-kicker" : "",
+      hasAlias(thumbnailPresetIds, [/clean/i]) ? "is-clean-thumb" : "",
+      hasAlias(thumbnailPresetIds, [/ranking/i, /poster/i]) ? "is-ranking-poster" : "",
+      hasAlias(thumbnailPresetIds, [/story/i, /portrait/i]) ? "is-story-portrait" : "",
+    ]
+      .filter(Boolean)
+      .join(" "),
+  };
+}
+
+function resolveHeroTemplateVariant(templateId = "") {
+  const normalized = String(templateId || "").trim().toLowerCase();
+  if (!normalized) return "carousel";
+  const exactMap = new Map([
+    ["hero-carousel-composition-v1", "carousel"],
+    ["hero-editorial-v1", "editorial"],
+    ["hero-premium-stage-v1", "premium-stage"],
+    ["hero-centered-v1", "centered"],
+    ["hero-stacked-v1", "stacked"],
+  ]);
+  if (exactMap.has(normalized)) return exactMap.get(normalized);
+  if (/centered|spotlight|statement|minimal|mono-hero/.test(normalized)) return "centered";
+  if (/stacked|layered|vertical|campaign|poster/.test(normalized)) return "stacked";
+  if (/copy-left|visual-right|editorial|story|magazine|wise|brand-story/.test(normalized)) return "editorial";
+  if (/premium|stage|contrast|cinematic|ferrari|bold/.test(normalized)) return "premium-stage";
+  if (/carousel|slider/.test(normalized)) return "carousel";
+  return "carousel";
+}
+
+function resolveQuickmenuTemplateVariant(templateId = "") {
+  const normalized = String(templateId || "").trim().toLowerCase();
+  if (!normalized) return "grid";
+  const exactMap = new Map([
+    ["icon-link-grid-composition-v1", "grid"],
+    ["quickmenu-panel-v1", "panel"],
+    ["quickmenu-editorial-strip-v1", "editorial-strip"],
+  ]);
+  if (exactMap.has(normalized)) return exactMap.get(normalized);
+  if (/editorial-strip|curation|editorial|story|magazine/.test(normalized)) return "editorial-strip";
+  if (/panel|spotlight|lead-card|feature-grid/.test(normalized)) return "panel";
+  if (/grid|icon-link/.test(normalized)) return "grid";
+  return "grid";
+}
+
+function inferSlotIdFromComponentId(componentId = "") {
+  const normalized = String(componentId || "").trim();
+  if (!normalized) return "";
+  const segments = normalized.split(".");
+  return segments.length > 1 ? String(segments[segments.length - 1] || "").trim() : "";
+}
+
+function toStringArray(values = []) {
+  if (!Array.isArray(values)) return [];
+  return values
+    .map((item) => String(item || "").trim())
+    .filter(Boolean);
+}
+
+const RUNTIME_ALLOWED_PRIMITIVE_TYPES = new Set([
+  "SplitHero",
+  "CenteredHero",
+  "StackedHero",
+  "QuickmenuGrid",
+  "QuickmenuPanel",
+  "QuickmenuEditorialStrip",
+  "RankingList",
+  "CommerceGrid",
+  "PromoBanner",
+  "EditorialStoryGrid",
+  "BenefitHub",
+  "TopCompositionShell",
+  "PageCompositionShell",
+  "Eyebrow",
+  "Title",
+  "Body",
+  "CTACluster",
+  "Media",
+  "CardRail",
+  "Card",
+]);
+
+function normalizeRuntimePrimitiveValue(value) {
+  if (typeof value === "string") return String(value).trim();
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "boolean") return value;
+  return null;
+}
+
+function normalizeRuntimePrimitiveProps(value = {}) {
+  const source = value && typeof value === "object" ? value : {};
+  return Object.fromEntries(
+    Object.entries(source)
+      .map(([key, entryValue]) => {
+        if (Array.isArray(entryValue)) {
+          const values = entryValue.map((item) => normalizeRuntimePrimitiveValue(item)).filter((item) => item !== null && item !== "");
+          return values.length ? [String(key || "").trim(), values] : null;
+        }
+        const normalized = normalizeRuntimePrimitiveValue(entryValue);
+        return normalized !== null && normalized !== "" ? [String(key || "").trim(), normalized] : null;
+      })
+      .filter(Boolean)
+  );
+}
+
+function normalizeRuntimePrimitiveNode(node = {}, depth = 0) {
+  if (depth > 6 || !node || typeof node !== "object") return null;
+  const rawType = String(node.type || node.primitiveId || "").trim();
+  const rawVariant = String(node.variant || "").trim();
+  let type = rawType;
+  let variant = rawVariant;
+  if (rawType === "hero") {
+    if (rawVariant === "editorial-split") {
+      type = "SplitHero";
+      variant = "editorial";
+    } else if (rawVariant === "premium-center") {
+      type = "CenteredHero";
+      variant = "premium-center";
+    } else {
+      type = "SplitHero";
+      variant = rawVariant || "carousel";
+    }
+  } else if (rawType === "quickmenu") {
+    type = "QuickmenuGrid";
+    variant = rawVariant === "editorial-strip" ? "editorial-strip" : (rawVariant || "grid");
+  } else if (rawType === "summary") {
+    type = "StackedHero";
+    variant = rawVariant || "summary-compact";
+  } else if (rawType === "sticky") {
+    type = "QuickmenuPanel";
+    variant = rawVariant || "buybox-focused";
+  }
+  if (!type || !RUNTIME_ALLOWED_PRIMITIVE_TYPES.has(type)) return null;
+  const props = normalizeRuntimePrimitiveProps(node.props || {});
+  const children = safeObjectArray(node.children, 12)
+    .map((child) => normalizeRuntimePrimitiveNode(child, depth + 1))
+    .filter(Boolean);
+  return {
+    type,
+    variant,
+    props,
+    children,
+  };
+}
+
+function normalizeRuntimePrimitiveTree(value = null) {
+  const normalized = normalizeRuntimePrimitiveNode(value, 0);
+  return normalized || null;
+}
+
+function normalizeRuntimeComponentCompositionEntry(item, pageId = "", index = 0) {
+  const source = item && typeof item === "object" ? item : {};
+  const slotId = String(source.slotId || inferSlotIdFromComponentId(source.componentId) || "").trim();
+  const componentId = String(source.componentId || (pageId && slotId ? `${pageId}.${slotId}` : "")).trim();
+  const familyId = String(source.familyId || "").trim();
+  const templateId = String(source.templateId || "").trim();
+  const rendererSurface = normalizeRendererSurfaceRuntime(source.rendererSurface || "", "");
+  const label = String(source.label || slotId || componentId || `composition-${index + 1}`).trim();
+  const summary = String(source.summary || source.description || "").trim();
+  const layoutStrategy = String(source.layoutStrategy || source.layout || "").trim();
+  const scope = String(source.scope || "component").trim() || "component";
+  const preservedElements = toStringArray(source.preservedElements || source.keep);
+  const changedElements = toStringArray(source.changedElements || source.change);
+  const assetPlan = {
+    iconSetIds: toStringArray(source?.assetPlan?.iconSetIds),
+    badgePresetIds: toStringArray(source?.assetPlan?.badgePresetIds),
+    visualSetIds: toStringArray(source?.assetPlan?.visualSetIds),
+    thumbnailPresetIds: toStringArray(source?.assetPlan?.thumbnailPresetIds),
+  };
+  const styleContractSource = source?.styleContract && typeof source.styleContract === "object" ? source.styleContract : {};
+  const styleContract = {
+    surfaceTone: String(styleContractSource?.surfaceTone || "").trim(),
+    density: String(styleContractSource?.density || "").trim(),
+    hierarchyEmphasis: String(styleContractSource?.hierarchyEmphasis || "").trim(),
+    interactionTone: String(styleContractSource?.interactionTone || "").trim(),
+    tokenHints: styleContractSource?.tokenHints && typeof styleContractSource.tokenHints === "object" ? styleContractSource.tokenHints : {},
+  };
+  if (!slotId && !componentId && !summary && !layoutStrategy && !familyId) return null;
+  return {
+    slotId,
+    componentId,
+    familyId,
+    templateId,
+    rendererSurface,
+    label,
+    scope,
+    summary,
+    layoutStrategy,
+    preservedElements,
+    changedElements,
+    styleContract,
+    assetPlan,
+    primitiveTree: normalizeRuntimePrimitiveTree(source?.primitiveTree || source?.primitive || null),
+  };
+}
+
+function normalizeRuntimeComponentCompositionList(value, pageId = "") {
+  return (Array.isArray(value) ? value : [])
+    .map((item, index) => normalizeRuntimeComponentCompositionEntry(item, pageId, index))
+    .filter(Boolean);
+}
+
+function readDraftCanonicalCloneRenderModel(draftBuild = null) {
+  const snapshot = draftBuild?.snapshotData && typeof draftBuild.snapshotData === "object" ? draftBuild.snapshotData : {};
+  const direct = snapshot.cloneRenderModel && typeof snapshot.cloneRenderModel === "object" ? snapshot.cloneRenderModel : null;
+  if (direct && Array.isArray(direct.sections)) return direct;
+  const cloneRequest = snapshot.cloneRequest && typeof snapshot.cloneRequest === "object" ? snapshot.cloneRequest : null;
+  if (cloneRequest && Array.isArray(cloneRequest.sections)) return cloneRequest;
+  return null;
+}
+
+function mapCanonicalSectionToRuntimeComposition(section = {}, cloneRenderModel = {}, index = 0) {
+  const source = section && typeof section === "object" ? section : {};
+  const pageId = String(cloneRenderModel?.pageId || "").trim();
+  const slotId = String(source.slotId || inferSlotIdFromComponentId(source.componentId) || "").trim();
+  const componentId = String(source.componentId || (pageId && slotId ? `${pageId}.${slotId}` : "")).trim();
+  if (!slotId && !componentId) return null;
+  const layout = source.layout && typeof source.layout === "object" ? source.layout : {};
+  const tone = source.tone && typeof source.tone === "object" ? source.tone : {};
+  const typography = source.typography && typeof source.typography === "object" ? source.typography : {};
+  const assets = source.assets && typeof source.assets === "object" ? source.assets : {};
+  const content = source.content && typeof source.content === "object" ? source.content : {};
+  const constraints = source.constraints && typeof source.constraints === "object" ? source.constraints : {};
+  const renderIntent = cloneRenderModel?.renderIntent && typeof cloneRenderModel.renderIntent === "object" ? cloneRenderModel.renderIntent : {};
+  return normalizeRuntimeComponentCompositionEntry({
+    slotId,
+    componentId,
+    familyId: String(source.familyId || "").trim(),
+    templateId: String(source.templateId || "").trim(),
+    rendererSurface: String(source.rendererSurface || cloneRenderModel?.rendererSurface || "").trim(),
+    label: String(content?.primaryMessage || content?.objective || slotId || `section-${index + 1}`).trim(),
+    summary: String(content?.supportMessage || content?.objective || "").trim(),
+    layoutStrategy: String(layout?.layoutMode || renderIntent?.layoutDirection || "").trim(),
+    keep: [
+      ...toStringArray(content?.keep),
+      ...toStringArray(constraints?.preserve),
+    ],
+    change: toStringArray(content?.change),
+    styleContract: {
+      surfaceTone: String(tone?.surfaceTone || "").trim(),
+      density: String(layout?.density || "").trim(),
+      hierarchyEmphasis: String(layout?.layoutMode || "").trim(),
+      interactionTone: String(tone?.emphasisTone || "").trim(),
+      tokenHints: {
+        headlinePreset: String(typography?.headlinePreset || "").trim(),
+        bodyPreset: String(typography?.bodyPreset || "").trim(),
+        eyebrowPreset: String(typography?.eyebrowPreset || "").trim(),
+        ctaPreset: String(typography?.ctaPreset || "").trim(),
+        alignment: String(layout?.alignment || "").trim(),
+        rhythm: String(layout?.rhythm || "").trim(),
+        contrastMode: String(tone?.contrastMode || "").trim(),
+        accentTone: String(tone?.accentTone || "").trim(),
+        visualRole: String(assets?.visualRole || "").trim(),
+      },
+    },
+    assetPlan: assets?.assetPlan && typeof assets.assetPlan === "object" ? assets.assetPlan : {},
+    primitiveTree: source.primitiveTree,
+  }, pageId, index);
+}
+
+function buildCanonicalDraftComponentComposition(draftBuild = null, pageId = "") {
+  const cloneRenderModel = readDraftCanonicalCloneRenderModel(draftBuild);
+  const normalizedPageId = String(pageId || cloneRenderModel?.pageId || draftBuild?.pageId || "").trim();
+  if (!cloneRenderModel || !normalizedPageId) return [];
+  return (Array.isArray(cloneRenderModel.sections) ? cloneRenderModel.sections : [])
+    .map((section, index) => mapCanonicalSectionToRuntimeComposition(section, {
+      ...cloneRenderModel,
+      pageId: normalizedPageId,
+    }, index))
+    .filter(Boolean);
+}
+
+function findComponentRebuildFamilyAssignment(componentId = "") {
+  const normalizedComponentId = String(componentId || "").trim();
+  if (!normalizedComponentId) return null;
+  const catalog = readComponentRebuildSchemaCatalog();
+  const families = Array.isArray(catalog?.families) ? catalog.families : [];
+  const familyMap = new Map(families.map((item) => [String(item?.id || "").trim(), item]).filter(([id]) => id));
+  const assignment = (Array.isArray(catalog?.assignments) ? catalog.assignments : []).find(
+    (item) => String(item?.componentId || "").trim() === normalizedComponentId
+  );
+  if (!assignment) return null;
+  const familyId = String(assignment.familyId || "").trim();
+  return {
+    familyId,
+    family: familyMap.get(familyId) || null,
+  };
+}
+
+function buildFallbackAssetPlanForPage(pageId = "") {
+  const pageDefaults = buildAssetPipelineStarterContext(pageId)?.pageDefaults || {};
+  return {
+    iconSetIds: Array.isArray(pageDefaults.iconSetIds) ? pageDefaults.iconSetIds : [],
+    badgePresetIds: Array.isArray(pageDefaults.badgePresetIds) ? pageDefaults.badgePresetIds : [],
+    visualSetIds: Array.isArray(pageDefaults.visualSetIds) ? pageDefaults.visualSetIds : [],
+    thumbnailPresetIds: Array.isArray(pageDefaults.thumbnailPresetIds) ? pageDefaults.thumbnailPresetIds : [],
+  };
+}
+
+function pickResolvedStarterAssetUrl(items = [], index = 0) {
+  const pool = Array.isArray(items) ? items.filter((item) => String(item?.assetUrl || "").trim()) : [];
+  if (!pool.length) return "";
+  const normalizedIndex = Number.isFinite(index) ? Math.max(0, Math.floor(index)) : 0;
+  return String(pool[Math.min(normalizedIndex, pool.length - 1)]?.assetUrl || "").trim();
+}
+
+function readRuntimePrimitiveRoot(composition = {}) {
+  const root = composition?.primitiveTree && typeof composition.primitiveTree === "object" ? composition.primitiveTree : null;
+  return {
+    root,
+    type: String(root?.type || "").trim(),
+    variant: String(root?.variant || "").trim(),
+    props: root?.props && typeof root.props === "object" ? root.props : {},
+  };
+}
+
+function resolveHeroPrimitiveVariant(composition = {}) {
+  const primitive = readRuntimePrimitiveRoot(composition);
+  if (!primitive.type) return "";
+  if (primitive.type === "CenteredHero") return "centered";
+  if (primitive.type === "StackedHero") return "stacked";
+  if (primitive.type === "SplitHero") {
+    const normalizedVariant = String(primitive.variant || "").trim().toLowerCase();
+    if (normalizedVariant === "editorial") return "editorial";
+    if (normalizedVariant === "premium-stage") return "premium-stage";
+    if (normalizedVariant === "carousel") return "carousel";
+    const tone = String(primitive.props?.tone || "").trim().toLowerCase();
+    if (/premium|contrast|cinematic/.test(tone)) return "premium-stage";
+    if (/editorial|story/.test(tone)) return "editorial";
+    return "carousel";
+  }
+  return "";
+}
+
+function resolveQuickmenuPrimitiveVariant(composition = {}) {
+  const primitive = readRuntimePrimitiveRoot(composition);
+  if (!primitive.type) return "";
+  if (primitive.type === "QuickmenuPanel") return "panel";
+  if (primitive.type === "QuickmenuEditorialStrip") return "editorial-strip";
+  if (primitive.type === "QuickmenuGrid") return "grid";
+  return "";
+}
+
+function resolveRankingPrimitiveVariant(composition = {}) {
+  const primitive = readRuntimePrimitiveRoot(composition);
+  if (!primitive.type) return "";
+  if (primitive.type === "RankingList") {
+    const variant = String(primitive.variant || "").trim().toLowerCase();
+    if (variant === "poster") return "poster";
+    return "compact";
+  }
+  return "";
+}
+
+function resolveCommercePrimitiveVariant(composition = {}) {
+  const primitive = readRuntimePrimitiveRoot(composition);
+  if (!primitive.type) return "";
+  if (primitive.type === "EditorialStoryGrid") {
+    return String(primitive.variant || "").trim().toLowerCase() === "portrait" ? "story-portrait" : "story-editorial";
+  }
+  if (primitive.type === "BenefitHub") {
+    return String(primitive.variant || "").trim().toLowerCase() === "service" ? "benefit-service" : "benefit-hub";
+  }
+  if (primitive.type === "CommerceGrid") {
+    return String(primitive.variant || "").trim().toLowerCase() === "featured" ? "featured" : "grid";
+  }
+  return "";
+}
+
+function resolveBannerPrimitiveVariant(composition = {}) {
+  const primitive = readRuntimePrimitiveRoot(composition);
+  if (!primitive.type) return "";
+  if (primitive.type === "PromoBanner") {
+    return String(primitive.variant || "").trim().toLowerCase() === "cinematic" ? "cinematic" : "clean";
+  }
+  return "";
+}
+
+function buildRuntimePrimitiveClassNames(composition = {}) {
+  const primitive = readRuntimePrimitiveRoot(composition);
+  const typeClass = primitive.type
+    ? `is-primitive-${String(primitive.type).replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}`
+    : "";
+  const variantClass = primitive.variant
+    ? `is-primitive-variant-${String(primitive.variant).replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}`
+    : "";
+  return [typeClass, variantClass].filter(Boolean).join(" ");
+}
+
+function resolveStarterGeometrySpec(starter = {}, componentId = "", slotId = "") {
+  const geometrySpecs = starter?.geometrySpecs && typeof starter.geometrySpecs === "object"
+    ? starter.geometrySpecs
+    : {};
+  const normalizedComponentId = String(componentId || "").trim();
+  const normalizedSlotId = String(slotId || inferSlotIdFromComponentId(componentId) || "").trim();
+  return (
+    (normalizedComponentId && geometrySpecs[normalizedComponentId]) ||
+    (normalizedSlotId && geometrySpecs[normalizedSlotId]) ||
+    null
+  );
+}
+
+function normalizeGeneratedRuntimeAsset(item = {}) {
+  const source = item && typeof item === "object" ? item : {};
+  const width = Number.parseInt(source.width, 10);
+  const height = Number.parseInt(source.height, 10);
+  return {
+    id: String(source.id || "").trim(),
+    label: String(source.label || "").trim(),
+    assetUrl: String(source.assetUrl || "").trim(),
+    kind: String(source.kind || "visual").trim() || "visual",
+    role: String(source.role || "").trim(),
+    source: String(source.source || "generated").trim() || "generated",
+    model: String(source.model || "").trim(),
+    prompt: String(source.prompt || "").trim(),
+    format: String(source.format || "").trim(),
+    width: Number.isFinite(width) ? width : null,
+    height: Number.isFinite(height) ? height : null,
+    aspectRatio: String(source.aspectRatio || "").trim(),
+    slotId: String(source.slotId || "").trim(),
+    componentId: String(source.componentId || "").trim(),
+    tags: toStringArray(source.tags),
+  };
+}
+
+const OPENROUTER_ALLOWED_IMAGE_ASPECT_RATIOS = [
+  "1:1",
+  "1:4",
+  "1:8",
+  "2:3",
+  "3:2",
+  "3:4",
+  "4:1",
+  "4:3",
+  "4:5",
+  "5:4",
+  "8:1",
+  "9:16",
+  "16:9",
+  "21:9",
+];
+
+function parseGenerationAspectRatioValue(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return null;
+  if (/^\d+(\.\d+)?$/.test(raw)) {
+    const parsed = Number.parseFloat(raw);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  }
+  const parts = raw.split(":").map((item) => Number.parseFloat(item));
+  if (parts.length !== 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1]) || parts[1] === 0) return null;
+  return parts[0] / parts[1];
+}
+
+function normalizeGenerationAspectRatio(value, fallback = "16:9") {
+  const preferredRatio = parseGenerationAspectRatioValue(value);
+  if (!preferredRatio) return fallback;
+  let best = fallback;
+  let bestDrift = Number.POSITIVE_INFINITY;
+  OPENROUTER_ALLOWED_IMAGE_ASPECT_RATIOS.forEach((candidate) => {
+    const candidateRatio = parseGenerationAspectRatioValue(candidate);
+    if (!candidateRatio) return;
+    const drift = Math.abs(candidateRatio - preferredRatio);
+    if (drift < bestDrift) {
+      best = candidate;
+      bestDrift = drift;
+    }
+  });
+  return best;
+}
+
+function resolveGenerationAspectRatio(geometrySpec = null, slotId = "") {
+  const preferred = String(geometrySpec?.preferredAspectRatio || "").trim();
+  if (preferred) return normalizeGenerationAspectRatio(preferred, "16:9");
+  const normalizedSlotId = String(slotId || "").trim();
+  if (normalizedSlotId === "hero") return "16:9";
+  if (["summary-banner-2", "marketing-area", "brand-showroom", "bestshop-guide", "missed-benefits"].includes(normalizedSlotId)) return "4:1";
+  return "16:9";
+}
+
+function resolveGenerationImageSize(slotId = "", patchDepth = "") {
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedDepth = String(patchDepth || "").trim();
+  if (normalizedSlotId === "hero") return normalizedDepth === "full" ? "4K" : "2K";
+  if (["summary-banner-2", "marketing-area", "brand-showroom", "bestshop-guide", "missed-benefits"].includes(normalizedSlotId)) {
+    return normalizedDepth === "full" ? "2K" : "1K";
+  }
+  return "1K";
+}
+
+function normalizeRendererSurfaceRuntime(value = "", fallback = "custom") {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "tailwind" || normalized === "tw") return "tailwind";
+  if (normalized === "custom" || normalized === "scoped-css" || normalized === "v2-custom") return "custom";
+  return fallback;
+}
+
+function buildGenerationReferencesForTarget(builderInput = {}, target = {}) {
+  const referenceVisualAssets = Array.isArray(builderInput?.systemContext?.designReferenceLibrary?.referenceVisualAssets)
+    ? builderInput.systemContext.designReferenceLibrary.referenceVisualAssets
+    : [];
+  const wholePageContextAssets = Array.isArray(builderInput?.systemContext?.designReferenceLibrary?.wholePageContextAssets)
+    ? builderInput.systemContext.designReferenceLibrary.wholePageContextAssets
+    : [];
+  const componentId = String(target?.componentId || "").trim();
+  const slotId = String(target?.slotId || "").trim();
+  const matchingReference = referenceVisualAssets.filter((item) => {
+    const targets = Array.isArray(item?.targetComponents) ? item.targetComponents.map((value) => String(value || "").trim()) : [];
+    return targets.includes(componentId) || targets.includes(slotId);
+  });
+  return [
+    ...safeArray(wholePageContextAssets, 3),
+    ...safeArray(matchingReference, 2),
+    ...safeArray(referenceVisualAssets, 1),
+  ]
+    .map((item) => ({
+      id: String(item?.id || "").trim(),
+      label: String(item?.label || item?.id || "").trim(),
+      imageDataUrl: String(item?.imageDataUrl || "").trim(),
+    }))
+    .filter((item) => item.imageDataUrl);
+}
+
+function buildGeneratedVisualPrompt(builderInput = {}, target = {}) {
+  const pageLabel = String(builderInput?.pageContext?.pageLabel || builderInput?.pageContext?.workspacePageId || "page").trim();
+  const pageIdentity = String(builderInput?.approvedPlan?.pageIdentity?.summary || builderInput?.approvedPlan?.pageIdentity?.pagePurpose || "").trim();
+  const summary = String(target?.summary || "").trim();
+  const layoutStrategy = String(target?.layoutStrategy || "").trim();
+  const changedElements = toStringArray(target?.changedElements);
+  const preservedElements = toStringArray(target?.preservedElements);
+  const designDirection = toStringArray(builderInput?.approvedPlan?.designDirection).slice(0, 4);
+  const avoidDirection = toStringArray(builderInput?.approvedPlan?.guardrails).slice(0, 6);
+  const slotId = String(target?.slotId || "").trim();
+  return [
+    `Create a polished web-design quality visual asset for the ${slotId} area of the ${pageLabel} page.`,
+    pageIdentity ? `Page identity: ${pageIdentity}` : "",
+    summary ? `Target summary: ${summary}` : "",
+    layoutStrategy ? `Layout strategy: ${layoutStrategy}` : "",
+    changedElements.length ? `Emphasize: ${changedElements.join(", ")}` : "",
+    preservedElements.length ? `Preserve: ${preservedElements.join(", ")}` : "",
+    designDirection.length ? `Design direction: ${designDirection.join(" | ")}` : "",
+    avoidDirection.length ? `Avoid: ${avoidDirection.join(" | ")}` : "",
+    slotId === "hero"
+      ? "Deliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness."
+      : "Deliver a clean, campaign-grade banner visual that feels on-brand, legible, and compositionally strong for a web layout.",
+    "No text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+  ].filter(Boolean).join("\n");
+}
+
+async function saveGeneratedAssetDataUrl({ pageId = "", slotId = "", dataUrl = "", model = "", prompt = "", kind = "visual" } = {}) {
+  const match = String(dataUrl || "").match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+  if (!match) throw new Error("generated image is not a base64 data url");
+  const mime = String(match[1] || "").trim().toLowerCase();
+  const base64 = String(match[2] || "").trim();
+  const ext =
+    mime === "image/png" ? "png" :
+    mime === "image/jpeg" ? "jpg" :
+    mime === "image/webp" ? "webp" :
+    mime === "image/gif" ? "gif" :
+    "png";
+  const buffer = Buffer.from(base64, "base64");
+  const metadata = await sharp(buffer).metadata().catch(() => ({}));
+  const id = `generated-${String(pageId || "page").trim() || "page"}-${String(slotId || "slot").trim() || "slot"}-${crypto.randomUUID().slice(0, 8)}`;
+  const fileName = `${id}.${ext}`;
+  const filePath = path.join(ASSET_DIR, fileName);
+  fs.writeFileSync(filePath, buffer);
+  const width = Number.isFinite(metadata?.width) ? metadata.width : null;
+  const height = Number.isFinite(metadata?.height) ? metadata.height : null;
+  return {
+    id,
+    label: `${slotId || "visual"} generated asset`,
+    assetUrl: `/assets/${fileName}`,
+    kind,
+    role: kind,
+    source: "generated",
+    model: String(model || "").trim(),
+    prompt: String(prompt || "").trim(),
+    format: ext,
+    width,
+    height,
+    aspectRatio: width && height ? `${width}:${height}` : "",
+    slotId: String(slotId || "").trim(),
+    componentId: pageId && slotId ? `${pageId}.${slotId}` : "",
+    tags: ["generated", kind, slotId].filter(Boolean),
+  };
+}
+
+function readGeneratedAssetCache() {
+  try {
+    const stat = fs.statSync(GENERATED_ASSET_CACHE_PATH);
+    const signature = `${Number(stat.mtimeMs || 0)}:${Number(stat.size || 0)}`;
+    if (GENERATED_ASSET_CACHE_STATE.payload && GENERATED_ASSET_CACHE_STATE.signature === signature) {
+      return GENERATED_ASSET_CACHE_STATE.payload;
+    }
+    const parsed = JSON.parse(fs.readFileSync(GENERATED_ASSET_CACHE_PATH, "utf8"));
+    const payload = parsed && typeof parsed === "object" ? parsed : { entries: {} };
+    GENERATED_ASSET_CACHE_STATE.signature = signature;
+    GENERATED_ASSET_CACHE_STATE.payload = payload;
+    return payload;
+  } catch {
+    GENERATED_ASSET_CACHE_STATE.signature = "";
+    GENERATED_ASSET_CACHE_STATE.payload = { entries: {} };
+    return GENERATED_ASSET_CACHE_STATE.payload;
+  }
+}
+
+function writeGeneratedAssetCache(cache = { entries: {} }) {
+  fs.mkdirSync(path.dirname(GENERATED_ASSET_CACHE_PATH), { recursive: true });
+  const payload = {
+    updatedAt: new Date().toISOString(),
+    entries: cache?.entries && typeof cache.entries === "object" ? cache.entries : {},
+  };
+  const tmpPath = `${GENERATED_ASSET_CACHE_PATH}.${process.pid}.${Date.now()}.tmp`;
+  fs.writeFileSync(tmpPath, `${JSON.stringify(payload, null, 2)}\n`);
+  fs.renameSync(tmpPath, GENERATED_ASSET_CACHE_PATH);
+  const stat = fs.statSync(GENERATED_ASSET_CACHE_PATH);
+  GENERATED_ASSET_CACHE_STATE.signature = `${Number(stat.mtimeMs || 0)}:${Number(stat.size || 0)}`;
+  GENERATED_ASSET_CACHE_STATE.payload = payload;
+}
+
+function buildGeneratedAssetCacheKey({ pageId = "", slotId = "", model = "", prompt = "", references = [], aspectRatio = "", imageSize = "" } = {}) {
+  const payload = JSON.stringify({
+    pageId: String(pageId || "").trim(),
+    slotId: String(slotId || "").trim(),
+    model: String(model || "").trim(),
+    prompt: String(prompt || "").trim(),
+    references: safeObjectArray(references, 6).map((item) => ({
+      id: String(item?.id || "").trim(),
+      label: String(item?.label || "").trim(),
+      imageDataUrl: String(item?.imageDataUrl || "").trim().slice(0, 128),
+    })),
+    aspectRatio: String(aspectRatio || "").trim(),
+    imageSize: String(imageSize || "").trim(),
+  });
+  return crypto.createHash("sha1").update(payload).digest("hex");
+}
+
+function readCachedGeneratedAsset(cacheKey = "") {
+  const normalizedKey = String(cacheKey || "").trim();
+  if (!normalizedKey) return null;
+  const cache = readGeneratedAssetCache();
+  const entry = cache?.entries?.[normalizedKey];
+  if (!entry || typeof entry !== "object") return null;
+  const asset = normalizeGeneratedRuntimeAsset(entry.asset || entry);
+  const assetUrl = String(asset.assetUrl || "").trim();
+  if (!assetUrl) return null;
+  const filePath = path.join(ASSET_DIR, path.basename(assetUrl));
+  if (!fs.existsSync(filePath)) return null;
+  return asset;
+}
+
+function writeCachedGeneratedAsset(cacheKey = "", asset = null) {
+  const normalizedKey = String(cacheKey || "").trim();
+  const normalizedAsset = normalizeGeneratedRuntimeAsset(asset || {});
+  if (!normalizedKey || !normalizedAsset.assetUrl) return;
+  const cache = readGeneratedAssetCache();
+  cache.entries = cache?.entries && typeof cache.entries === "object" ? cache.entries : {};
+  cache.entries[normalizedKey] = {
+    savedAt: new Date().toISOString(),
+    asset: normalizedAsset,
+  };
+  writeGeneratedAssetCache(cache);
+}
+
+function mergeRuntimeCompositionAssetPlan(pageId = "", composition = {}) {
+  const starter = buildAssetPipelineStarterContext(pageId) || {};
+  const lookup = buildAssetPipelineStarterLookup(starter);
+  const pageDefaults = starter.pageDefaults || {};
+  const familyDefaults =
+    starter.familyDefaults && typeof starter.familyDefaults === "object"
+      ? starter.familyDefaults[String(composition?.familyId || "").trim()] || {}
+      : {};
+  const componentDefaults =
+    starter.componentDefaults && typeof starter.componentDefaults === "object"
+      ? starter.componentDefaults[String(composition?.componentId || "").trim()] || {}
+      : {};
+  const compositionPlan = composition?.assetPlan && typeof composition.assetPlan === "object" ? composition.assetPlan : {};
+  const generatedAssets = safeObjectArray(compositionPlan.generatedAssets, 12)
+    .map((item) => normalizeGeneratedRuntimeAsset(item))
+    .filter((item) => item.assetUrl);
+  const iconSetIds = Array.from(new Set([
+    ...toStringArray(pageDefaults.iconSetIds),
+    ...toStringArray(familyDefaults.iconSetIds),
+    ...toStringArray(componentDefaults.iconSetIds),
+    ...toStringArray(compositionPlan.iconSetIds),
+  ]));
+  const badgePresetIds = Array.from(new Set([
+    ...toStringArray(pageDefaults.badgePresetIds),
+    ...toStringArray(familyDefaults.badgePresetIds),
+    ...toStringArray(componentDefaults.badgePresetIds),
+    ...toStringArray(compositionPlan.badgePresetIds),
+  ]));
+  const visualSetIds = Array.from(new Set([
+    ...toStringArray(pageDefaults.visualSetIds),
+    ...toStringArray(familyDefaults.visualSetIds),
+    ...toStringArray(componentDefaults.visualSetIds),
+    ...toStringArray(compositionPlan.visualSetIds),
+  ]));
+  const thumbnailPresetIds = Array.from(new Set([
+    ...toStringArray(pageDefaults.thumbnailPresetIds),
+    ...toStringArray(familyDefaults.thumbnailPresetIds),
+    ...toStringArray(componentDefaults.thumbnailPresetIds),
+    ...toStringArray(compositionPlan.thumbnailPresetIds),
+  ]));
+  const resolvePresetAssets = (items = [], ids = []) =>
+    toStringArray(ids)
+      .map((id) => (Array.isArray(items) ? items : []).find((item) => String(item?.id || "").trim() === id))
+      .filter(Boolean);
+  return {
+    iconSetIds,
+    badgePresetIds,
+    visualSetIds,
+    thumbnailPresetIds,
+    generatedAssets,
+    geometrySpec: resolveStarterGeometrySpec(starter, composition?.componentId, composition?.slotId),
+    resolvedAssets: {
+      iconSets: resolvePresetAssets(lookup.iconSets, iconSetIds),
+      badgePresets: resolvePresetAssets(lookup.badgePresets, badgePresetIds),
+      visualSets: resolvePresetAssets(lookup.visualSets, visualSetIds),
+      thumbnailPresets: resolvePresetAssets(lookup.thumbnailPresets, thumbnailPresetIds),
+      generatedAssets,
+      icons: resolvePresetAssets(lookup.iconSets, iconSetIds).flatMap((item) => safeArray(item?.assets, 12)),
+      badges: resolvePresetAssets(lookup.badgePresets, badgePresetIds).flatMap((item) => safeArray(item?.assets, 12)),
+      visuals: [
+        ...generatedAssets.filter((item) => String(item.kind || "").trim() === "visual"),
+        ...resolvePresetAssets(lookup.visualSets, visualSetIds).flatMap((item) => safeArray(item?.assets, 12)),
+      ],
+      thumbnails: [
+        ...generatedAssets.filter((item) => String(item.kind || "").trim() === "thumbnail"),
+        ...resolvePresetAssets(lookup.thumbnailPresets, thumbnailPresetIds).flatMap((item) => safeArray(item?.assets, 12)),
+      ],
+    },
+  };
+}
+
+function buildFallbackDraftComponentComposition(draftBuild = null, pageId = "") {
+  const normalizedPageId = String(pageId || draftBuild?.pageId || "").trim();
+  if (!draftBuild || !normalizedPageId) return [];
+  const report = draftBuild?.report && typeof draftBuild.report === "object" ? draftBuild.report : {};
+  const summarySignals = [
+    String(draftBuild?.summary || "").trim(),
+    ...toStringArray(report.compositionPlan),
+    ...toStringArray(report.whatChanged),
+  ]
+    .filter(Boolean)
+    .join(" ");
+  if (!/전면\s*개편|전면\s*재구성|재구성|새 시안/i.test(summarySignals)) return [];
+  const changedComponentIds = Array.from(
+    new Set([
+      ...toStringArray(draftBuild?.snapshotData?.changedComponentIds),
+      ...((Array.isArray(draftBuild?.operations) ? draftBuild.operations : []).map((item) => {
+        const slotId = String(item?.slotId || "").trim();
+        return slotId && normalizedPageId ? `${normalizedPageId}.${slotId}` : "";
+      })),
+    ].filter(Boolean))
+  );
+  const assetPlan = buildFallbackAssetPlanForPage(normalizedPageId);
+  return changedComponentIds
+    .map((componentId, index) => {
+      const assignment = findComponentRebuildFamilyAssignment(componentId);
+      if (!assignment?.familyId) return null;
+      const slotId = inferSlotIdFromComponentId(componentId);
+      const family = assignment.family || {};
+      const relatedFinding =
+        toStringArray(report.whatChanged).find((line) => line.includes(slotId) || line.includes(componentId)) ||
+        String(draftBuild?.summary || "").trim();
+      return {
+        slotId,
+        componentId,
+        familyId: assignment.familyId,
+        label: `${slotId || `component-${index + 1}`} 전면개편안`,
+        scope: "component",
+        summary: relatedFinding || `${slotId} 영역을 전면개편 시안 기준으로 재구성합니다.`,
+        layoutStrategy: String(family.useWhen || "").trim() || `${slotId} 영역의 레이아웃 위계와 시각 흐름을 재정렬합니다.`,
+        preservedElements: ["페이지 정체성", "핵심 사실 정보"],
+        changedElements: ["카피 위계", "레이아웃 리듬", "강조 요소 밀도"],
+        assetPlan,
+      };
+    })
+    .filter(Boolean);
+}
+
+function deriveChangedComponentIdsForVersionSave(draftBuild = null, payloadSnapshotData = null, pageId = "") {
+  const normalizedPageId = String(pageId || draftBuild?.pageId || "").trim();
+  const snapshot = payloadSnapshotData && typeof payloadSnapshotData === "object" ? payloadSnapshotData : {};
+  const report = draftBuild?.report && typeof draftBuild.report === "object" ? draftBuild.report : {};
+  const authoredPackage =
+    snapshot?.authoredSectionHtmlPackage && typeof snapshot.authoredSectionHtmlPackage === "object"
+      ? snapshot.authoredSectionHtmlPackage
+      : draftBuild?.snapshotData?.authoredSectionHtmlPackage && typeof draftBuild.snapshotData.authoredSectionHtmlPackage === "object"
+        ? draftBuild.snapshotData.authoredSectionHtmlPackage
+        : null;
+  return Array.from(
+    new Set([
+      ...toStringArray(snapshot?.changedComponentIds),
+      ...toStringArray(draftBuild?.snapshotData?.changedComponentIds),
+      ...safeObjectArray(draftBuild?.operations, 100)
+        .map((item) => String(item?.componentId || "").trim() || (
+          normalizedPageId && String(item?.slotId || "").trim()
+            ? `${normalizedPageId}.${String(item.slotId || "").trim()}`
+            : ""
+        ))
+        .filter(Boolean),
+      ...safeObjectArray(report?.componentComposition, 100)
+        .map((item) => String(item?.componentId || "").trim() || (
+          normalizedPageId && String(item?.slotId || "").trim()
+            ? `${normalizedPageId}.${String(item.slotId || "").trim()}`
+            : ""
+        ))
+        .filter(Boolean),
+      ...safeObjectArray(report?.authoredSections, 100)
+        .map((item) => String(item?.componentId || "").trim() || (
+          normalizedPageId && String(item?.slotId || "").trim()
+            ? `${normalizedPageId}.${String(item.slotId || "").trim()}`
+            : ""
+        ))
+        .filter(Boolean),
+      ...safeObjectArray(authoredPackage?.sections, 100)
+        .map((item) => String(item?.componentId || "").trim() || (
+          normalizedPageId && String(item?.slotId || "").trim()
+            ? `${normalizedPageId}.${String(item.slotId || "").trim()}`
+            : ""
+        ))
+        .filter(Boolean),
+    ].filter(Boolean))
+  );
+}
+
+function listEffectiveDraftComponentComposition(draftBuild = null, pageId = "") {
+  const report = draftBuild?.report && typeof draftBuild.report === "object" ? draftBuild.report : {};
+  const builderVersion = String(draftBuild?.builderVersion || "").trim();
+  const draftSource = String(draftBuild?.snapshotData?.source || "").trim();
+  const explicit = normalizeRuntimeComponentCompositionList(report.componentComposition, String(pageId || draftBuild?.pageId || "").trim());
+  const canonical = buildCanonicalDraftComponentComposition(draftBuild, pageId);
+  if (
+    canonical.length &&
+    (builderVersion === "design-pipeline-local" || draftSource === "design-pipeline-local-build-draft")
+  ) {
+    return canonical;
+  }
+  if (explicit.length) return explicit;
+  if (canonical.length) return canonical;
+  return buildFallbackDraftComponentComposition(draftBuild, pageId);
+}
+
+function findEffectiveDraftComponentCompositionEntry(draftBuild = null, componentId = "", slotId = "") {
+  const normalizedComponentId = String(componentId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  return (
+    listEffectiveDraftComponentComposition(draftBuild, componentId.split(".")[0] || draftBuild?.pageId || "")
+      .find((item) => {
+        const itemComponentId = String(item?.componentId || "").trim();
+        const itemSlotId = String(item?.slotId || "").trim();
+        if (normalizedComponentId && itemComponentId === normalizedComponentId) return true;
+        if (normalizedSlotId && itemSlotId === normalizedSlotId) return true;
+        return false;
+      }) || null
+  );
+}
+
+function findEffectiveDraftComponentPatch(draftBuild = null, componentId = "", slotId = "") {
+  const normalizedComponentId = String(componentId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  const operations = Array.isArray(draftBuild?.operations) ? draftBuild.operations : [];
+  for (let index = operations.length - 1; index >= 0; index -= 1) {
+    const operation = operations[index];
+    const operationComponentId = String(operation?.componentId || "").trim();
+    const operationSlotId = String(operation?.slotId || "").trim();
+    const patch = operation?.patch && typeof operation.patch === "object" ? operation.patch : null;
+    if (!patch) continue;
+    if (normalizedComponentId && operationComponentId === normalizedComponentId) {
+      return JSON.parse(JSON.stringify(patch));
+    }
+    if (normalizedSlotId && operationSlotId === normalizedSlotId) {
+      return JSON.parse(JSON.stringify(patch));
+    }
+  }
+  const composition = findEffectiveDraftComponentCompositionEntry(draftBuild, componentId, slotId);
+  const primitive = composition?.primitiveTree && typeof composition.primitiveTree === "object"
+    ? composition.primitiveTree
+    : null;
+  const primitiveProps = primitive?.props && typeof primitive.props === "object" ? primitive.props : null;
+  if (primitiveProps) {
+    const cloned = JSON.parse(JSON.stringify(primitiveProps));
+    delete cloned.familyId;
+    delete cloned.templateId;
+    return cloned;
+  }
+  return {};
+}
+
+function buildHomeCompositionSectionAttrs(slotId = "", activeSourceId = "", familyId = "", extraClasses = "") {
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedSourceId = String(activeSourceId || "").trim() || "composition-renderer";
+  const resolution = resolveComponentSourceResolution("home", normalizedSlotId, normalizedSourceId);
+  const componentId = normalizedSlotId ? `home.${normalizedSlotId}` : "home";
+  const className = ["codex-home-composition", extraClasses].filter(Boolean).join(" ").trim();
+  const attrs = [
+    `data-codex-slot="${escapeHtml(normalizedSlotId)}"`,
+    `data-codex-source="${escapeHtml(normalizedSourceId)}"`,
+    `data-codex-component-id="${escapeHtml(componentId)}"`,
+    `data-codex-active-source-id="${escapeHtml(normalizedSourceId)}"`,
+    familyId ? `data-codex-composition-family="${escapeHtml(familyId)}"` : "",
+    resolution.sourceResolution ? `data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}"` : "",
+    resolution.resolvedRenderSourceId ? `data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId)}"` : "",
+    resolution.renderMode ? `data-codex-render-mode="${escapeHtml(resolution.renderMode)}"` : "",
+    className ? `class="${escapeHtml(className)}"` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return attrs;
+}
+
+function buildGenericCompositionSectionAttrs(pageId = "", slotId = "", activeSourceId = "", familyId = "", extraClasses = "") {
+  const normalizedPageId = String(pageId || "").trim() || "page";
+  const normalizedSlotId = String(slotId || "").trim();
+  const normalizedSourceId = String(activeSourceId || "").trim() || "composition-renderer";
+  const resolution = resolveComponentSourceResolution(normalizedPageId, normalizedSlotId, normalizedSourceId);
+  const componentId = normalizedSlotId ? `${normalizedPageId}.${normalizedSlotId}` : normalizedPageId;
+  const className = ["codex-home-composition", extraClasses].filter(Boolean).join(" ").trim();
+  const attrs = [
+    `data-codex-slot="${escapeHtml(normalizedSlotId)}"`,
+    `data-codex-source="${escapeHtml(normalizedSourceId)}"`,
+    `data-codex-component-id="${escapeHtml(componentId)}"`,
+    `data-codex-active-source-id="${escapeHtml(normalizedSourceId)}"`,
+    familyId ? `data-codex-composition-family="${escapeHtml(familyId)}"` : "",
+    resolution.sourceResolution ? `data-codex-source-resolution="${escapeHtml(resolution.sourceResolution)}"` : "",
+    resolution.resolvedRenderSourceId ? `data-codex-resolved-render-source-id="${escapeHtml(resolution.resolvedRenderSourceId)}"` : "",
+    resolution.renderMode ? `data-codex-render-mode="${escapeHtml(resolution.renderMode)}"` : "",
+    className ? `class="${escapeHtml(className)}"` : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  return attrs;
+}
+
+function buildHomeCompositionSelfContainedStyleTag() {
+  return `<style data-codex-composition-style="home">${buildHomeHeroRuntimeCss()}</style>`;
+}
+
+function normalizeRuntimeSlotGroup(slotId = "") {
+  const normalized = String(slotId || "").trim();
+  if (normalized === "hero") return "hero";
+  if (normalized === "quickmenu" || normalized === "quickMenu" || normalized === "tabs") return "quickmenu";
+  if (normalized === "best-ranking" || normalized === "ranking") return "ranking";
+  if ([
+    "md-choice",
+    "timedeal",
+    "subscription",
+    "space-renewal",
+    "latest-product-news",
+    "smart-life",
+    "benefit",
+    "review",
+    "brandStory",
+  ].includes(normalized)) return "commerce";
+  if ([
+    "summary-banner-2",
+    "missed-benefits",
+    "marketing-area",
+    "brand-showroom",
+    "lg-best-care",
+    "bestshop-guide",
+    "careBanner",
+    "labelBanner",
+  ].includes(normalized)) return "banner";
+  return "generic";
+}
+
+function resolveStyleRuntimeTokenPreset(slotId = "", composition = {}) {
+  const payload = readStyleRuntimeTokenPresets();
+  const presets = safeArray(payload?.presets, 40).filter((item) => item && typeof item === "object");
+  const primitive = readRuntimePrimitiveRoot(composition);
+  const primitiveType = String(primitive?.type || "").trim();
+  const primitiveVariant = String(primitive?.variant || "").trim();
+  const componentId = String(composition?.componentId || "").trim();
+  const pageId = componentId.includes(".") ? String(componentId.split(".")[0] || "").trim() : "";
+  const styleContractSource = composition?.styleContract && typeof composition.styleContract === "object" ? composition.styleContract : {};
+  const slotGroup = normalizeRuntimeSlotGroup(slotId);
+  const surfaceTone = String(styleContractSource?.surfaceTone || primitive?.props?.tone || "").trim();
+  const density = String(styleContractSource?.density || primitive?.props?.density || "").trim();
+  const hierarchyEmphasis = String(styleContractSource?.hierarchyEmphasis || primitive?.props?.emphasis || "").trim();
+  const tokenHints = styleContractSource?.tokenHints && typeof styleContractSource.tokenHints === "object" ? styleContractSource.tokenHints : {};
+  const explicitPresetId = String(tokenHints?.presetId || "").trim();
+  if (explicitPresetId) {
+    const explicit = presets.find((item) => String(item?.id || "").trim() === explicitPresetId);
+    if (explicit) return explicit;
+  }
+  const candidates = presets.filter((item) => String(item?.slotGroup || "").trim() === slotGroup);
+  const scorePreset = (item = {}) => {
+    let score = 0;
+    if (String(item?.surfaceTone || "").trim() && String(item.surfaceTone).trim() === surfaceTone) score += 3;
+    if (String(item?.density || "").trim() && String(item.density).trim() === density) score += 2;
+    if (String(item?.hierarchyEmphasis || "").trim() && String(item.hierarchyEmphasis).trim() === hierarchyEmphasis) score += 3;
+    if (pageId === "care-solutions") {
+      if (slotGroup === "hero" && String(item?.id || "").includes("service-trust")) score += 6;
+      if (slotGroup === "quickmenu" && String(item?.id || "").includes("service-tabs")) score += 6;
+      if (slotGroup === "banner" && String(item?.id || "").includes("service-ribbon")) score += 5;
+    }
+    if (pageId === "homestyle-home") {
+      if (slotGroup === "commerce" && String(item?.id || "").includes("brand-story")) score += 6;
+      if (slotGroup === "banner" && String(item?.id || "").includes("cinematic")) score += 3;
+      if (slotGroup === "quickmenu" && String(item?.id || "").includes("editorial")) score += 4;
+    }
+    if (slotGroup === "hero") {
+      if (primitiveType === "PremiumHero" && String(item?.id || "").includes("premium")) score += 4;
+      if (primitiveType === "CenteredHero" && String(item?.id || "").includes("centered")) score += 4;
+      if (primitiveType === "StackedHero" && String(item?.id || "").includes("stacked")) score += 4;
+      if (primitiveVariant === "editorial" && String(item?.id || "").includes("editorial")) score += 4;
+    }
+    if (slotGroup === "quickmenu") {
+      if (primitiveType === "QuickmenuPanel" && String(item?.id || "").includes("solid")) score += 3;
+      if (primitiveType === "QuickmenuEditorialStrip" && String(item?.id || "").includes("editorial")) score += 4;
+    }
+    if (slotGroup === "ranking" && primitiveVariant === "poster" && String(item?.id || "").includes("poster")) score += 4;
+    if (slotGroup === "banner" && primitiveVariant === "cinematic" && String(item?.id || "").includes("cinematic")) score += 4;
+    return score;
+  };
+  return candidates
+    .map((item) => ({ item, score: scorePreset(item) }))
+    .sort((left, right) => right.score - left.score)[0]?.item || null;
+}
+
+function buildCompositionRuntimeStyleText(composition = {}, slotId = "") {
+  const styleContractSource = composition?.styleContract && typeof composition.styleContract === "object" ? composition.styleContract : {};
+  const primitive = readRuntimePrimitiveRoot(composition);
+  const primitiveProps = primitive.props && typeof primitive.props === "object" ? primitive.props : {};
+  const preset = resolveStyleRuntimeTokenPreset(slotId, composition);
+  const presetTokenHints = preset?.tokenHints && typeof preset.tokenHints === "object" ? preset.tokenHints : {};
+  const contract = {
+    surfaceTone: String(styleContractSource?.surfaceTone || primitiveProps?.tone || preset?.surfaceTone || "").trim(),
+    density: String(styleContractSource?.density || primitiveProps?.density || preset?.density || "").trim(),
+    hierarchyEmphasis: String(styleContractSource?.hierarchyEmphasis || primitiveProps?.emphasis || preset?.hierarchyEmphasis || "").trim(),
+    interactionTone: String(styleContractSource?.interactionTone || primitiveProps?.interactionTone || "").trim(),
+    tokenHints: {
+      ...presetTokenHints,
+      ...(styleContractSource?.tokenHints && typeof styleContractSource.tokenHints === "object" ? styleContractSource.tokenHints : {}),
+    },
+  };
+  const tokenHints = contract?.tokenHints && typeof contract.tokenHints === "object" ? contract.tokenHints : {};
+  const vars = [];
+  const setVar = (name, value, formatter = (item) => item) => {
+    const raw = String(value ?? "").trim();
+    if (!raw) return;
+    vars.push(`${name}:${formatter(raw)}`);
+  };
+  const formatMaybePx = (value) => (/^\d+(\.\d+)?$/.test(String(value || "").trim()) ? `${String(value).trim()}px` : String(value).trim());
+  setVar("--codex-surface-tone", contract.surfaceTone);
+  setVar("--codex-density", contract.density);
+  setVar("--codex-hierarchy-emphasis", contract.hierarchyEmphasis);
+  setVar("--codex-interaction-tone", contract.interactionTone);
+  setVar("--codex-title-size", tokenHints.titleSize, formatMaybePx);
+  setVar("--codex-description-size", tokenHints.descriptionSize, formatMaybePx);
+  setVar("--codex-title-line-height", tokenHints.titleLineHeight);
+  setVar("--codex-description-line-height", tokenHints.descriptionLineHeight);
+  setVar("--codex-title-letter-spacing", tokenHints.titleLetterSpacing);
+  setVar("--codex-description-letter-spacing", tokenHints.descriptionLetterSpacing);
+  setVar("--codex-title-font-family", tokenHints.titleFontFamily);
+  setVar("--codex-description-font-family", tokenHints.descriptionFontFamily);
+  setVar("--codex-card-radius", tokenHints.cardRadius, formatMaybePx);
+  setVar("--codex-icon-scale", tokenHints.iconScale);
+  setVar("--codex-emphasis-mode", tokenHints.emphasisMode);
+  if (String(slotId || "").trim() === "hero") {
+    if (primitive.type === "CenteredHero" || primitive.variant === "centered") {
+      vars.push("--codex-hero-copy-align:center");
+      vars.push("--codex-hero-copy-max:980px");
+      vars.push("--codex-hero-stage-gap:22px");
+    }
+    if (primitive.type === "StackedHero" || primitive.variant === "stacked") {
+      vars.push("--codex-hero-stage-gap:18px");
+      vars.push("--codex-hero-visual-min-height:540px");
+    }
+    if (contract.hierarchyEmphasis === "headline-centered-spotlight") {
+      vars.push("--codex-hero-copy-align:center");
+      vars.push("--codex-hero-copy-max:920px");
+    }
+    if (contract.hierarchyEmphasis === "headline-dominant-stage") {
+      vars.push("--codex-hero-title-max:64ch");
+      vars.push("--codex-hero-visual-min-height:620px");
+    }
+    if (contract.density === "low") {
+      vars.push("--codex-hero-stage-gap:34px");
+    } else if (contract.density === "medium") {
+      vars.push("--codex-hero-stage-gap:26px");
+    }
+  }
+  if (String(slotId || "").trim() === "quickmenu") {
+    if (primitive.type === "QuickmenuEditorialStrip" || primitive.variant === "editorial-strip") {
+      vars.push("--codex-quickmenu-gap:16px");
+      vars.push("--codex-quickmenu-hover-lift:translateY(-3px)");
+    }
+    if (primitive.type === "QuickmenuPanel" || primitive.variant === "panel") {
+      vars.push("--codex-quickmenu-gap:12px");
+      vars.push("--codex-card-radius:30px");
+    }
+    if (contract.density === "low") vars.push("--codex-quickmenu-gap:14px");
+    if (contract.density === "medium") vars.push("--codex-quickmenu-gap:10px");
+    if (contract.interactionTone === "hover-emphasis") vars.push("--codex-quickmenu-hover-lift:translateY(-4px)");
+    if (contract.surfaceTone === "service-tabs") {
+      vars.push("--codex-quickmenu-gap:12px");
+      vars.push("--codex-card-radius:24px");
+    }
+  }
+  if (["best-ranking", "ranking"].includes(String(slotId || "").trim())) {
+    if (primitive.type === "RankingList" && primitive.variant === "poster") {
+      vars.push("--codex-card-radius:18px");
+      vars.push("--codex-ranking-gap:16px");
+    }
+  }
+  if ([
+    "md-choice",
+    "timedeal",
+    "subscription",
+    "space-renewal",
+    "latest-product-news",
+    "brand-showroom",
+    "marketing-area",
+    "smart-life",
+    "missed-benefits",
+    "lg-best-care",
+    "bestshop-guide",
+    "benefit",
+  ].includes(String(slotId || "").trim())) {
+    if (primitive.type === "CommerceGrid" && primitive.variant === "featured") {
+      vars.push("--codex-commerce-gap:20px");
+      vars.push("--codex-card-radius:28px");
+    }
+    if (primitive.type === "EditorialStoryGrid" && primitive.variant === "portrait") {
+      vars.push("--codex-card-radius:20px");
+      vars.push("--codex-commerce-gap:18px");
+    }
+    if (primitive.type === "BenefitHub") {
+      vars.push("--codex-commerce-gap:16px");
+      vars.push("--codex-card-radius:22px");
+    }
+  }
+  if (["summary-banner-2", "careBanner", "labelBanner"].includes(String(slotId || "").trim())) {
+    if (primitive.type === "PromoBanner" && primitive.variant === "clean") {
+      vars.push("--codex-banner-surface:#f8fafc");
+      vars.push("--codex-banner-copy-color:#111827");
+      vars.push("--codex-banner-body-color:#475569");
+    }
+    if (contract.surfaceTone === "service-ribbon") {
+      vars.push("--codex-banner-surface:#eef4ff");
+      vars.push("--codex-banner-copy-color:#0f172a");
+      vars.push("--codex-banner-body-color:#334155");
+    }
+  }
+  return vars.join(";");
+}
+
+function readDraftHigherLayerCompositionState(draftBuild = null) {
+  const snapshot = draftBuild?.snapshotData && typeof draftBuild.snapshotData === "object" ? draftBuild.snapshotData : {};
+  const report = draftBuild?.report && typeof draftBuild.report === "object" ? draftBuild.report : {};
+  const cloneRenderModel = readDraftCanonicalCloneRenderModel(draftBuild);
+  const renderIntent = cloneRenderModel?.renderIntent && typeof cloneRenderModel.renderIntent === "object" ? cloneRenderModel.renderIntent : {};
+  const targetGroup = cloneRenderModel?.targetGroup && typeof cloneRenderModel.targetGroup === "object" ? cloneRenderModel.targetGroup : {};
+  const targetBoundary = targetGroup?.boundary && typeof targetGroup.boundary === "object" ? targetGroup.boundary : {};
+  const pageId = String(snapshot.workspacePageId || snapshot.pageId || "").trim();
+  const executionMode = String(snapshot.executionMode || renderIntent.compositionMode || "").trim();
+  const targetGroupId = String(snapshot.targetGroupId || targetGroup.groupId || "").trim();
+  const patchDepth = String(snapshot.patchDepth || "").trim();
+  const compositionPlan = toStringArray(report.compositionPlan);
+  const isPageComposition =
+    executionMode === "page-composition-plan" ||
+    executionMode === "page-recompose" ||
+    (/page/i.test(executionMode) && ["strong", "full"].includes(patchDepth)) ||
+    compositionPlan.some((line) => /페이지 전면|page shell|full-page|전면 재구성/i.test(String(line || "")));
+  const isTopGroupComposition =
+    targetGroupId === "top" ||
+    targetGroupId === "top-stage" ||
+    (String(targetBoundary.mode || "").trim() === "replace-inside-group" &&
+      String(targetBoundary.entrySlotId || "").trim() === "hero" &&
+      String(targetBoundary.exitSlotId || "").trim() === "quickmenu") ||
+    executionMode === "section-composition-plan" ||
+    executionMode === "target-group-recompose" ||
+    compositionPlan.some((line) => /상단 진입부|hero-led|top cluster|quickmenu/i.test(String(line || "")));
+  const selectedRecipes = Array.isArray(report?.selectedRecipes) ? report.selectedRecipes : [];
+  const selectedClusterRecipeId = String(
+    selectedRecipes.find((item) => String(item?.scope || "").trim() === "cluster")?.recipeId || ""
+  ).trim();
+  const topShellVariant =
+    selectedClusterRecipeId === "top-stage-vertical-stack-v1"
+      ? "hero-led-stack-top"
+      : resolvePrimitiveShellVariant(pageId, "top", targetGroupId);
+  return {
+    pageId,
+    executionMode,
+    targetGroupId,
+    patchDepth,
+    isPageComposition,
+    isTopGroupComposition,
+    pageShellVariant: resolvePrimitiveShellVariant(pageId, "page", targetGroupId),
+    topShellVariant,
+  };
+}
+
+function shouldUsePureTopStageReplacementMode(draftBuild = null) {
+  const snapshot = draftBuild?.snapshotData && typeof draftBuild.snapshotData === "object" ? draftBuild.snapshotData : {};
+  const normalizedPageId = String(draftBuild?.pageId || snapshot.workspacePageId || snapshot.pageId || "").trim().toLowerCase();
+  const normalizedBuilderVersion = String(
+    draftBuild?.builderVersion ||
+    snapshot.builderVersion ||
+    ""
+  ).trim().toLowerCase();
+  const normalizedBuilderProvider = String(snapshot.builderProvider || "").trim().toLowerCase();
+  const normalizedRendererSurface = normalizeRendererSurfaceRuntime(
+    draftBuild?.rendererSurface ||
+    snapshot.rendererSurface ||
+    "custom",
+    "custom"
+  );
+  const normalizedTargetGroupId = String(snapshot.targetGroupId || "").trim().toLowerCase();
+  const normalizedSource = String(snapshot.source || "").trim().toLowerCase();
+  return (
+    normalizedPageId === "home" &&
+    (normalizedBuilderVersion === "v2" || normalizedBuilderVersion === "design-pipeline-local" || normalizedSource === "design-pipeline-local-build-draft") &&
+    normalizedBuilderProvider === "local" &&
+    normalizedRendererSurface === "tailwind" &&
+    (normalizedTargetGroupId === "top" || normalizedTargetGroupId === "top-stage")
+  );
+}
+
+function shouldUsePureServiceLikeReplacementMode(draftBuild = null) {
+  const snapshot = draftBuild?.snapshotData && typeof draftBuild.snapshotData === "object" ? draftBuild.snapshotData : {};
+  const normalizedPageId = String(draftBuild?.pageId || snapshot.workspacePageId || snapshot.pageId || "").trim().toLowerCase();
+  const normalizedBuilderVersion = String(
+    draftBuild?.builderVersion ||
+    snapshot.builderVersion ||
+    ""
+  ).trim().toLowerCase();
+  const normalizedBuilderProvider = String(snapshot.builderProvider || "").trim().toLowerCase();
+  const normalizedRendererSurface = normalizeRendererSurfaceRuntime(
+    draftBuild?.rendererSurface ||
+    snapshot.rendererSurface ||
+    "custom",
+    "custom"
+  );
+  const normalizedSource = String(snapshot.source || "").trim().toLowerCase();
+  return (
+    isServiceLikePageId(normalizedPageId) &&
+    (normalizedBuilderVersion === "v2" || normalizedBuilderVersion === "design-pipeline-local" || normalizedSource === "design-pipeline-local-build-draft") &&
+    normalizedBuilderProvider === "local" &&
+    normalizedRendererSurface === "tailwind"
+  );
+}
+
+function injectClassIntoBodyHtml(html = "", classes = []) {
+  const normalized = Array.from(new Set((Array.isArray(classes) ? classes : []).map((item) => String(item || "").trim()).filter(Boolean)));
+  if (!normalized.length) return html;
+  return String(html || "").replace(/<body([^>]*)>/i, (match, attrs) => {
+    const attrText = String(attrs || "");
+    const classMatch = attrText.match(/\bclass="([^"]*)"/i);
+    if (classMatch) {
+      const existing = classMatch[1].split(/\s+/).map((item) => item.trim()).filter(Boolean);
+      const merged = Array.from(new Set([...existing, ...normalized])).join(" ");
+      return `<body${attrText.replace(/\bclass="([^"]*)"/i, `class="${merged}"`)}>`;
+    }
+    return `<body${attrText} class="${normalized.join(" ")}">`;
+  });
+}
+
+function dedupeHomeV2PrimitiveStyleTags(html = "") {
+  let seen = false;
+  return String(html || "").replace(/<style data-codex-v2-home-primitive>[\s\S]*?<\/style>/g, (match) => {
+    if (seen) return "";
+    seen = true;
+    return match;
+  });
+}
+
+function buildHomeHigherLayerCompositionStyleTag(state = {}) {
+  const classes = [];
+  if (state?.isPageComposition) classes.push("codex-home-page-composition-v1");
+  if (state?.isTopGroupComposition) classes.push("codex-home-top-composition-v1");
+  if (!classes.length) return "";
+  return `
+    <style data-codex-home-higher-layer="true">
+      body.codex-home-page-composition-v1 {
+        background:
+          radial-gradient(circle at 14% 10%, rgba(255,255,255,0.96), transparent 24%),
+          linear-gradient(180deg, #f4efe8 0%, #f8f5f1 18%, #fff 38%, #f7fafc 100%);
+      }
+      body.codex-home-page-composition-v1 [data-codex-slot="hero"],
+      body.codex-home-top-composition-v1 [data-codex-slot="hero"] {
+        position: relative;
+        z-index: 2;
+      }
+      body.codex-home-page-composition-v1 [data-codex-slot="quickmenu"],
+      body.codex-home-top-composition-v1 [data-codex-slot="quickmenu"] {
+        position: relative;
+        z-index: 3;
+        margin-top: -24px;
+      }
+      body.codex-home-top-composition-v1 .codex-home-higher-shell--top.is-shell-hero-led-stack-top [data-codex-slot="quickmenu"] {
+        margin-top: -10px;
+      }
+      body.codex-home-page-composition-v1 [data-codex-slot="promotion"],
+      body.codex-home-top-composition-v1 [data-area="메인 상단 배너 영역"] {
+        position: relative;
+        z-index: 1;
+        margin-top: 14px;
+      }
+      body.codex-home-page-composition-v1 [data-codex-slot="hero"],
+      body.codex-home-page-composition-v1 [data-codex-slot="quickmenu"],
+      body.codex-home-page-composition-v1 [data-area="메인 상단 배너 영역"],
+      body.codex-home-top-composition-v1 [data-codex-slot="hero"],
+      body.codex-home-top-composition-v1 [data-codex-slot="quickmenu"],
+      body.codex-home-top-composition-v1 [data-area="메인 상단 배너 영역"] {
+        border-radius: 32px;
+        overflow: clip;
+        box-shadow: 0 20px 48px rgba(15,23,42,0.08);
+      }
+      body.codex-home-page-composition-v1 [data-codex-slot="md-choice"],
+      body.codex-home-page-composition-v1 [data-codex-slot="timedeal"],
+      body.codex-home-page-composition-v1 [data-codex-slot="best-ranking"] {
+        margin-top: 18px;
+      }
+      .codex-home-higher-shell {
+        width: min(1360px, calc(100% - 48px));
+        margin: 24px auto 0;
+        display: grid;
+        gap: 24px;
+      }
+      .codex-home-higher-shell--top {
+        align-items: start;
+      }
+      .codex-home-higher-shell--page {
+        padding-bottom: 12px;
+      }
+      .codex-home-higher-shell__top-stage {
+        display: grid;
+        grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.82fr);
+        gap: 24px;
+        align-items: stretch;
+      }
+      .codex-home-higher-shell--top.is-shell-hero-led-stack-top .codex-home-higher-shell__top-stage {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .codex-home-higher-shell--top.is-shell-hero-led-stack-top .codex-home-higher-shell__top-stack {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .codex-home-higher-shell--top.is-shell-split-top .codex-home-higher-shell__top-stage {
+        grid-template-columns: minmax(0, 1fr) minmax(360px, 0.92fr);
+      }
+      .codex-home-higher-shell--top.is-shell-immersive-top .codex-home-higher-shell__top-stage {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+      .codex-home-higher-shell--top.is-shell-immersive-top .codex-home-higher-shell__top-side {
+        grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+        grid-template-rows: none;
+        align-items: start;
+      }
+      .codex-home-higher-shell--page.is-shell-editorial-band-page .codex-home-higher-shell__page-band {
+        grid-template-columns: minmax(0, 0.98fr) minmax(360px, 0.92fr);
+        gap: 28px;
+      }
+      .codex-home-higher-shell--page.is-shell-editorial-band-page .codex-home-higher-shell__page-lower {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .codex-home-higher-shell--page.is-shell-showcase-page .codex-home-higher-shell__page-band {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      .codex-home-higher-shell--page.is-shell-showcase-page .codex-home-higher-shell__page-rail {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .codex-home-higher-shell--page.is-shell-showcase-page .codex-home-higher-shell__page-lower {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      .codex-home-higher-shell__top-main,
+      .codex-home-higher-shell__top-side,
+      .codex-home-higher-shell__page-main,
+      .codex-home-higher-shell__page-rail,
+      .codex-home-higher-shell__page-lower {
+        display: grid;
+        gap: 20px;
+        align-content: start;
+      }
+      .codex-home-higher-shell__top-side {
+        grid-template-rows: auto auto;
+      }
+      .codex-home-higher-shell__top-stack {
+        display: grid;
+        gap: 18px;
+        align-content: start;
+      }
+      .codex-home-higher-shell--top.is-shell-immersive-top .codex-home-higher-shell__top-side,
+      .codex-home-higher-shell--page.is-shell-showcase-page .codex-home-higher-shell__page-rail {
+        display: grid;
+        gap: 20px;
+      }
+      .codex-home-higher-shell__page-band {
+        display: grid;
+        grid-template-columns: minmax(0, 1.16fr) minmax(320px, 0.84fr);
+        gap: 22px;
+        align-items: start;
+      }
+      .codex-home-higher-shell__page-lower {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .codex-home-higher-shell__top-stage > *,
+      .codex-home-higher-shell__page-main > *,
+      .codex-home-higher-shell__page-rail > *,
+      .codex-home-higher-shell__page-lower > * {
+        margin: 0 !important;
+      }
+      body.codex-home-page-composition-v1 .codex-home-higher-shell [data-codex-slot="hero"],
+      body.codex-home-top-composition-v1 .codex-home-higher-shell [data-codex-slot="hero"] {
+        min-height: 100%;
+      }
+      @media (max-width: 900px) {
+        body.codex-home-page-composition-v1 [data-codex-slot="quickmenu"],
+        body.codex-home-top-composition-v1 [data-codex-slot="quickmenu"] {
+          margin-top: -12px;
+        }
+        .codex-home-higher-shell {
+          width: min(100%, calc(100% - 24px));
+          gap: 18px;
+        }
+        .codex-home-higher-shell__top-stage,
+        .codex-home-higher-shell__page-band,
+        .codex-home-higher-shell__page-lower {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  `;
+}
+
+function readServiceLikeHigherLayerCompositionState(draftBuild = null) {
+  const snapshot = draftBuild?.snapshotData && typeof draftBuild.snapshotData === "object" ? draftBuild.snapshotData : {};
+  const report = draftBuild?.report && typeof draftBuild.report === "object" ? draftBuild.report : {};
+  const pageId = String(snapshot.workspacePageId || snapshot.pageId || "").trim();
+  const executionMode = String(snapshot.executionMode || "").trim();
+  const patchDepth = String(snapshot.patchDepth || "").trim();
+  const compositionPlan = toStringArray(report.compositionPlan);
+  const isPageComposition =
+    executionMode === "page-composition-plan" ||
+    compositionPlan.some((line) => /페이지 전면|full-page|전면 재구성|page shell/i.test(String(line || ""))) ||
+    (String(snapshot.interventionLayer || "").trim() === "page" && ["strong", "full"].includes(patchDepth));
+  return {
+    pageId,
+    executionMode,
+    patchDepth,
+    isPageComposition,
+    pageShellVariant: resolvePrimitiveShellVariant(pageId, "page"),
+  };
+}
+
+function buildServiceLikeHigherLayerStyleTag(pageId = "", state = {}) {
+  if (!state?.isPageComposition) return "";
+  const pageClass = `codex-service-page-composition--${String(pageId || "").trim().replace(/[^a-z0-9_-]+/gi, "-")}`;
+  const pageShellVariant = String(state?.pageShellVariant || "").trim();
+  return `
+    <style data-codex-service-higher-layer="true">
+      body.${pageClass} {
+        background:
+          radial-gradient(circle at 12% 10%, rgba(255,255,255,0.96), transparent 24%),
+          linear-gradient(180deg, #f6f1ea 0%, #f8fafc 42%, #eef4ff 100%);
+      }
+      body.${pageClass}.is-shell-editorial-band-page {
+        background:
+          radial-gradient(circle at 18% 8%, rgba(255,255,255,0.92), transparent 22%),
+          linear-gradient(180deg, #f6efe8 0%, #f8f7f2 28%, #f1f5fb 100%);
+      }
+      body.${pageClass} [data-codex-component-id^="${escapeHtml(String(pageId || "").trim())}."] {
+        margin-top: 18px;
+      }
+      body.${pageClass} [data-codex-component-id^="${escapeHtml(String(pageId || "").trim())}."] .codex-home-composition-shell--narrow,
+      body.${pageClass} [data-codex-component-id^="${escapeHtml(String(pageId || "").trim())}."] .codex-home-composition-shell {
+        width: min(1360px, calc(100vw - 48px));
+      }
+      body.${pageClass} [data-codex-component-id^="${escapeHtml(String(pageId || "").trim())}."] {
+        border-radius: 30px;
+        overflow: clip;
+        box-shadow: 0 20px 48px rgba(15, 23, 42, 0.08);
+      }
+      body.${pageClass} [data-codex-slot="hero"] {
+        margin-top: 28px;
+      }
+      body.${pageClass} [data-codex-slot="tabs"],
+      body.${pageClass} [data-codex-slot="quickMenu"] {
+        margin-top: -18px;
+        position: relative;
+        z-index: 2;
+      }
+      body.${pageClass}.is-shell-editorial-band-page [data-codex-slot="hero"] {
+        margin-top: 36px;
+      }
+      body.${pageClass}.is-shell-editorial-band-page [data-codex-slot="tabs"],
+      body.${pageClass}.is-shell-editorial-band-page [data-codex-slot="quickMenu"] {
+        margin-top: -24px;
+      }
+      body.${pageClass}.is-shell-showcase-page {
+        background:
+          radial-gradient(circle at 16% 8%, rgba(255,255,255,0.9), transparent 22%),
+          linear-gradient(180deg, #f3eee6 0%, #f6f8fb 34%, #eef4ff 100%);
+      }
+      body.${pageClass}.is-shell-showcase-page [data-codex-slot="hero"] {
+        margin-top: 32px;
+      }
+      body.${pageClass}.is-shell-showcase-page [data-codex-slot="tabs"],
+      body.${pageClass}.is-shell-showcase-page [data-codex-slot="quickMenu"] {
+        margin-top: -22px;
+      }
+      body.${pageClass}.is-shell-showcase-page [data-codex-slot="ranking"],
+      body.${pageClass}.is-shell-showcase-page [data-codex-slot="benefit"],
+      body.${pageClass}.is-shell-showcase-page [data-codex-slot="brandStory"],
+      body.${pageClass}.is-shell-showcase-page [data-codex-slot="labelBanner"],
+      body.${pageClass}.is-shell-showcase-page [data-codex-slot="careBanner"] {
+        margin-top: 24px;
+      }
+      @media (max-width: 900px) {
+        body.${pageClass} [data-codex-slot="tabs"],
+        body.${pageClass} [data-codex-slot="quickMenu"] {
+          margin-top: -10px;
+        }
+        body.${pageClass} [data-codex-component-id^="${escapeHtml(String(pageId || "").trim())}."] .codex-home-composition-shell--narrow,
+        body.${pageClass} [data-codex-component-id^="${escapeHtml(String(pageId || "").trim())}."] .codex-home-composition-shell {
+          width: min(100%, calc(100vw - 24px));
+        }
+      }
+    </style>
+  `;
+}
+
+function extractSectionImageSources(block = "", limit = 6) {
+  return Array.from(String(block || "").matchAll(/<img\b[^>]*src="([^"]+)"/gi))
+    .map((match) => String(match?.[1] || "").trim())
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+function extractSectionHrefSources(block = "", limit = 8) {
+  return Array.from(String(block || "").matchAll(/<a\b[^>]*href="([^"]+)"/gi))
+    .map((match) => String(match?.[1] || "").trim())
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+function extractSectionTextFragments(block = "", limit = 8) {
+  const text = stripHtml(String(block || ""))
+    .split(/\n+/)
+    .map((item) => String(item || "").replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .filter((item) => item.length >= 2);
+  return Array.from(new Set(text)).slice(0, limit);
+}
+
+function resolveGenericCompositionTitle(pageId = "", slotId = "", patch = {}, composition = {}) {
+  const defaults = {
+    "care-solutions.hero": "구독 서비스 제안",
+    "care-solutions.ranking": "인기 구독 제품",
+    "care-solutions.benefit": "왜 케어솔루션인가",
+    "care-solutions.tabs": "카테고리 탐색",
+    "care-solutions.careBanner": "지금 확인해야 할 혜택",
+    "homestyle-home.quickMenu": "빠른 탐색",
+    "homestyle-home.labelBanner": "큐레이션 배너",
+    "homestyle-home.brandStory": "브랜드 스토리",
+  };
+  const key = `${String(pageId || "").trim()}.${String(slotId || "").trim()}`;
+  return (
+    String(patch?.title || "").trim() ||
+    String(composition?.label || "").trim() ||
+    String(defaults[key] || "").trim() ||
+    String(slotId || "section").trim()
+  );
+}
+
+function resolveGenericCompositionSubtitle(rawBlock = "", patch = {}, composition = {}) {
+  const extracted = extractSectionTextFragments(rawBlock, 6);
+  return (
+    String(patch?.subtitle || "").trim() ||
+    extracted.find((item) => item.length >= 24) ||
+    String(composition?.summary || "").trim() ||
+    ""
+  );
+}
+
+function buildGenericCompositionItems(rawBlock = "", fallbackLabel = "콘텐츠", limit = 4) {
+  const texts = extractSectionTextFragments(rawBlock, limit * 3);
+  const images = extractSectionImageSources(rawBlock, limit);
+  const hrefs = extractSectionHrefSources(rawBlock, limit);
+  const items = [];
+  for (let index = 0; index < limit; index += 1) {
+    const title = texts[index * 2] || texts[index] || `${fallbackLabel} ${index + 1}`;
+    const description = texts[index * 2 + 1] || "";
+    items.push({
+      title,
+      description,
+      image: images[index] || "",
+      href: hrefs[index] || "#",
+      badge: index === 0 ? "추천" : "",
+    });
+  }
+  return items;
+}
+
+function renderServiceHeroCompositionSection(pageId = "", slotId = "", activeSourceId = "", componentPatch = {}, composition = {}, rawBlock = "") {
+  const patch = sanitizeGovernedComponentPatch(pageId, slotId, componentPatch).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan(pageId, composition);
+  const visuals = Array.isArray(mergedAssetPlan?.resolvedAssets?.visuals) ? mergedAssetPlan.resolvedAssets.visuals : [];
+  const generatedVisual = pickResolvedStarterAssetUrl(visuals, 0);
+  const supportVisuals = extractSectionImageSources(rawBlock, 4);
+  const fallbackVisual = supportVisuals[0] || generatedVisual;
+  const templateId = String(composition?.templateId || "").trim();
+  const heroVariant = resolveHeroPrimitiveVariant(composition) || resolveHeroTemplateVariant(templateId);
+  const primitiveClasses = buildRuntimePrimitiveClassNames(composition);
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  const title = resolveGenericCompositionTitle(pageId, slotId, patch, composition);
+  const subtitle = resolveGenericCompositionSubtitle(rawBlock, patch, composition);
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, slotId),
+    buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+  ].filter(Boolean).join(";");
+  const attrs = buildGenericCompositionSectionAttrs(
+    pageId,
+    slotId,
+    activeSourceId || "composition-renderer",
+    String(composition?.familyId || "hero-carousel-composition").trim(),
+    `codex-home-composition--hero ${primitiveClasses} ${heroVariant === "editorial" ? "is-template-editorial-v1" : ""} ${heroVariant === "premium-stage" ? "is-template-premium-v1" : ""} ${heroVariant === "centered" ? "is-template-centered-v1" : ""} ${heroVariant === "stacked" ? "is-template-stacked-v1" : ""}`.trim()
+  );
+  const supportCards = supportVisuals.slice(1, 4);
+  if (rendererSurface === "tailwind") {
+    return renderServiceTailwindHeroSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      badge: String(composition?.summary || patch?.badge || "service redesign").trim(),
+      ctaLabel: String(patch?.ctaLabel || "자세히 보기").trim() || "자세히 보기",
+      ctaHref: String(patch?.ctaHref || "#").trim() || "#",
+      visualSrc: fallbackVisual,
+      visualAlt: title,
+      supportCards: supportCards.map((imageSrc, index) => ({
+        href: "#",
+        title: extractSectionTextFragments(rawBlock, 10)[index] || `${title} ${index + 2}`,
+        description: index === 0 ? "추천 흐름" : "연결 콘텐츠",
+        image: imageSrc,
+      })),
+      escapeHtml,
+    });
+  }
+  return `
+    <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+      ${buildHomeCompositionSelfContainedStyleTag()}
+      <div class="codex-home-composition-shell codex-home-composition-shell--narrow">
+        <div class="codex-home-composition-hero-stage codex-home-composition-hero-stage--centered">
+          <div class="codex-home-composition-hero-copy codex-home-composition-hero-copy--centered">
+            <span class="codex-home-composition-support">${escapeHtml(String(composition?.summary || patch?.badge || "premium service redesign").trim())}</span>
+            <h2 class="codex-home-composition-title"${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
+            ${subtitle ? `<p class="codex-home-composition-description"${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</p>` : ""}
+            <div class="codex-home-composition-hero-actions">
+              <a class="codex-home-composition-pill" href="#">자세히 보기</a>
+              <a class="codex-home-composition-pill codex-home-composition-pill--ghost" href="#">혜택 확인</a>
+            </div>
+          </div>
+          ${heroVariant === "stacked" ? `
+            <div class="codex-home-composition-hero-stacked-stage">
+              <div class="codex-home-composition-hero-visual codex-home-composition-hero-visual--premium">
+                ${fallbackVisual ? `<img src="${escapeHtml(fallbackVisual)}" alt="${escapeHtml(title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+              </div>
+              <div class="codex-home-composition-hero-stacked-rail">
+                ${supportCards.map((imageSrc, index) => `
+                  <a class="codex-home-composition-hero-stacked-card" href="#">
+                    <span class="codex-home-composition-hero-stacked-card-copy">
+                      <em>${escapeHtml(index === 0 ? "추천" : "가이드")}</em>
+                      <strong>${escapeHtml(extractSectionTextFragments(rawBlock, 10)[index] || `${title} ${index + 2}`)}</strong>
+                    </span>
+                    <span class="codex-home-composition-hero-stacked-card-visual">
+                      ${imageSrc ? `<img src="${escapeHtml(imageSrc)}" alt="" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                    </span>
+                  </a>
+                `).join("")}
+              </div>
+            </div>
+          ` : heroVariant === "editorial" ? `
+            <div class="codex-home-composition-hero-editorial-stage">
+              <article class="codex-home-composition-hero-editorial-lead">
+                <div class="codex-home-composition-hero-visual codex-home-composition-hero-visual--lead">
+                  ${fallbackVisual ? `<img src="${escapeHtml(fallbackVisual)}" alt="${escapeHtml(title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                </div>
+                <div class="codex-home-composition-hero-caption codex-home-composition-hero-caption--lead">
+                  <span class="codex-home-composition-hero-mini-badge">${escapeHtml(String(composition?.summary || "Editorial entry").trim())}</span>
+                  <strong>${escapeHtml(title)}</strong>
+                  ${subtitle ? `<p>${escapeHtml(subtitle)}</p>` : ""}
+                </div>
+              </article>
+              <div class="codex-home-composition-hero-editorial-rail">
+                ${supportCards.map((imageSrc, index) => `
+                  <a class="codex-home-composition-hero-editorial-support" href="#">
+                    <span class="codex-home-composition-hero-editorial-support-visual">
+                      ${imageSrc ? `<img src="${escapeHtml(imageSrc)}" alt="" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                    </span>
+                    <span class="codex-home-composition-hero-editorial-support-copy">
+                      <em>${escapeHtml(index === 0 ? "Curated" : "Story")}</em>
+                      <strong>${escapeHtml(extractSectionTextFragments(rawBlock, 10)[index] || `${title} ${index + 2}`)}</strong>
+                    </span>
+                  </a>
+                `).join("")}
+              </div>
+            </div>
+          ` : `
+            <div class="codex-home-composition-hero-visual codex-home-composition-hero-visual--premium">
+              ${fallbackVisual ? `<img src="${escapeHtml(fallbackVisual)}" alt="${escapeHtml(title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+            </div>
+          `}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderServiceGridCompositionSection(pageId = "", slotId = "", activeSourceId = "", componentPatch = {}, composition = {}, rawBlock = "", options = {}) {
+  const patch = sanitizeGovernedComponentPatch(pageId, slotId, componentPatch).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan(pageId, composition);
+  const icons = Array.isArray(mergedAssetPlan?.resolvedAssets?.icons) ? mergedAssetPlan.resolvedAssets.icons : [];
+  const items = buildGenericCompositionItems(rawBlock, String(options.fallbackLabel || "메뉴"), Number(options.limit || 6));
+  const templateId = String(composition?.templateId || "").trim();
+  const quickmenuVariant = resolveQuickmenuPrimitiveVariant(composition) || resolveQuickmenuTemplateVariant(templateId);
+  const commerceVariant = resolveCommercePrimitiveVariant(composition);
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  const usePanelVariant = quickmenuVariant === "panel";
+  const useEditorialStripVariant = quickmenuVariant === "editorial-strip";
+  const primitiveClasses = buildRuntimePrimitiveClassNames(composition);
+  const title = resolveGenericCompositionTitle(pageId, slotId, patch, composition);
+  const subtitle = resolveGenericCompositionSubtitle(rawBlock, patch, composition);
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, slotId),
+    buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+  ].filter(Boolean).join(";");
+  const attrs = buildGenericCompositionSectionAttrs(
+    pageId,
+    slotId,
+    activeSourceId || "composition-renderer",
+    String(composition?.familyId || "icon-link-grid-composition").trim(),
+    `${commerceVariant ? "codex-home-composition--commerce" : "codex-home-composition--quickmenu"} ${primitiveClasses} ${usePanelVariant ? "is-template-panel-v1" : ""} ${useEditorialStripVariant ? "is-template-editorial-strip-v1" : ""} ${commerceVariant === "featured" ? "is-commerce-featured" : ""} ${commerceVariant === "story-editorial" ? "is-story-editorial" : ""} ${commerceVariant === "story-portrait" ? "is-story-portrait" : ""} ${commerceVariant === "benefit-service" ? "is-benefit-service" : ""} ${commerceVariant === "benefit-hub" ? "is-benefit-hub" : ""}`.trim()
+  );
+  const leadItem = items[0] || null;
+  const secondaryItems = leadItem ? items.slice(1, 8) : items;
+  if (rendererSurface === "tailwind") {
+    if (commerceVariant) {
+      return renderServiceTailwindCommerceSection({
+        attrs,
+        sectionStyle,
+        titleStyle,
+        subtitleStyle,
+        title,
+        subtitle,
+        items: items.map((item, index) => ({
+          ...item,
+          image: String(item.image || "").trim() || pickResolvedStarterAssetUrl(icons, index),
+        })),
+        escapeHtml,
+      });
+    }
+    return renderServiceTailwindGridSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      lead: usePanelVariant && leadItem ? {
+        ...leadItem,
+        icon: pickResolvedStarterAssetUrl(icons, 0),
+      } : null,
+      items: (usePanelVariant ? secondaryItems : useEditorialStripVariant ? items.slice(1, 5) : items).map((item, index) => ({
+        ...item,
+        icon: pickResolvedStarterAssetUrl(icons, usePanelVariant ? index + 1 : index),
+      })),
+      ctaLabel: patch.moreLabel || patch.ctaLabel || "",
+      ctaHref: patch.ctaHref || "#",
+      escapeHtml,
+    });
+  }
+  if (commerceVariant) {
+    const commercePatch = {
+      ...(componentPatch && typeof componentPatch === "object" ? componentPatch : {}),
+      title,
+      subtitle,
+    };
+    return renderHomeCommerceCompositionSection(
+      slotId,
+      {
+        compositionItems: items,
+        mdChoiceProducts: [],
+        timedealProducts: [],
+        subscriptionProducts: [],
+        lowerPromotionProducts: [],
+        latestProductNewsProducts: [],
+        smartLifeProducts: items,
+        missedBenefitsProducts: items,
+        lgBestCareProducts: items,
+        brandShowroomProducts: items,
+        spaceRenewalData: null,
+      },
+      activeSourceId,
+      commercePatch,
+      composition
+    );
+  }
+  return `
+    <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+      ${buildHomeCompositionSelfContainedStyleTag()}
+      <div class="codex-home-composition-shell codex-home-composition-shell--narrow">
+        <div class="codex-home-composition-commerce-head">
+          <h2 class="codex-home-composition-title codex-home-composition-title--compact"${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
+          ${subtitle ? `<p class="codex-home-composition-description codex-home-composition-description--compact"${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</p>` : ""}
+        </div>
+        <div class="codex-home-composition-quickmenu-grid">
+          ${useEditorialStripVariant && leadItem ? `
+            <a class="codex-home-composition-quickmenu-card codex-home-composition-quickmenu-card--editorial" href="${escapeHtml(leadItem.href)}">
+              <span class="codex-home-composition-quickmenu-lead-copy">
+                <em>Curated Entry</em>
+                <strong>${escapeHtml(leadItem.title)}</strong>
+                <span>${escapeHtml(leadItem.description || subtitle || "대표 진입과 보조 탐색을 한 흐름으로 재구성했습니다.")}</span>
+              </span>
+              <span class="codex-home-composition-quickmenu-editorial-rail">
+                ${secondaryItems.slice(0, 3).map((item, index) => {
+                  const icon = pickResolvedStarterAssetUrl(icons, index + 1);
+                  return `
+                    <span class="codex-home-composition-quickmenu-editorial-chip">
+                      ${icon ? `<img src="${escapeHtml(icon)}" alt="" />` : `<span class="codex-home-composition-quickmenu-glyph">${String(index + 2).padStart(2, "0")}</span>`}
+                      <strong>${escapeHtml(item.title)}</strong>
+                    </span>
+                  `;
+                }).join("")}
+              </span>
+            </a>
+          ` : usePanelVariant && leadItem ? `
+            <a class="codex-home-composition-quickmenu-card codex-home-composition-quickmenu-card--lead" href="${escapeHtml(leadItem.href)}">
+              <span class="codex-home-composition-quickmenu-lead-copy">
+                <em>Primary Entry</em>
+                <strong>${escapeHtml(leadItem.title)}</strong>
+                <span>${escapeHtml(leadItem.description || subtitle || "대표 카테고리를 크게 강조한 panel 구성입니다.")}</span>
+              </span>
+              <span class="codex-home-composition-quickmenu-icon codex-home-composition-quickmenu-icon--lead">
+                ${pickResolvedStarterAssetUrl(icons, 0) ? `<img src="${escapeHtml(pickResolvedStarterAssetUrl(icons, 0))}" alt="" />` : `<span class="codex-home-composition-quickmenu-glyph">01</span>`}
+              </span>
+            </a>
+          ` : ""}
+          ${(useEditorialStripVariant ? secondaryItems.slice(3, 8) : (usePanelVariant ? secondaryItems : items)).map((item, index) => {
+            const iconIndex = usePanelVariant ? index + 1 : useEditorialStripVariant ? index + 4 : index;
+            const icon = pickResolvedStarterAssetUrl(icons, iconIndex);
+            return `
+              <a class="codex-home-composition-quickmenu-card" href="${escapeHtml(item.href)}">
+                <span class="codex-home-composition-quickmenu-icon">
+                  ${icon ? `<img src="${escapeHtml(icon)}" alt="" />` : `<span class="codex-home-composition-quickmenu-glyph">${String(index + 1).padStart(2, "0")}</span>`}
+                </span>
+                <span class="codex-home-composition-quickmenu-title">${escapeHtml(item.title)}</span>
+                ${item.description ? `<span class="codex-home-composition-quickmenu-meta">${escapeHtml(item.description)}</span>` : ""}
+              </a>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderServiceRankingCompositionSection(pageId = "", slotId = "", activeSourceId = "", componentPatch = {}, composition = {}, rawBlock = "") {
+  const patch = sanitizeGovernedComponentPatch(pageId, slotId, componentPatch).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan(pageId, composition);
+  const thumbs = Array.isArray(mergedAssetPlan?.resolvedAssets?.thumbnails) ? mergedAssetPlan.resolvedAssets.thumbnails : [];
+  const items = buildGenericCompositionItems(rawBlock, "제품", 5);
+  const primitiveClasses = buildRuntimePrimitiveClassNames(composition);
+  const rankingVariant = resolveRankingPrimitiveVariant(composition) || "compact";
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  const title = resolveGenericCompositionTitle(pageId, slotId, patch, composition);
+  const subtitle = resolveGenericCompositionSubtitle(rawBlock, patch, composition);
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, slotId),
+    buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+  ].filter(Boolean).join(";");
+  const attrs = buildGenericCompositionSectionAttrs(
+    pageId,
+    slotId,
+    activeSourceId || "composition-renderer",
+    String(composition?.familyId || "ranking-list-composition").trim(),
+    `codex-home-composition--ranking ${primitiveClasses} ${rankingVariant === "poster" ? "is-ranking-poster" : ""}`.trim()
+  );
+  if (rendererSurface === "tailwind") {
+    return renderServiceTailwindRankingSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      items: items.map((item, index) => ({
+        ...item,
+        image: String(item.image || "").trim() || pickResolvedStarterAssetUrl(thumbs, index),
+      })),
+      escapeHtml,
+    });
+  }
+  return `
+    <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+      ${buildHomeCompositionSelfContainedStyleTag()}
+      <div class="codex-home-composition-shell codex-home-composition-shell--narrow">
+        <div class="codex-home-composition-ranking-head">
+          <h2 class="codex-home-composition-title codex-home-composition-title--compact"${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
+          ${subtitle ? `<p class="codex-home-composition-description codex-home-composition-description--compact"${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</p>` : ""}
+        </div>
+        <div class="codex-home-composition-ranking-list">
+          ${items.map((item, index) => `
+            <a class="codex-home-composition-ranking-card" href="${escapeHtml(item.href)}">
+              <span class="codex-home-composition-ranking-rank">${String(index + 1).padStart(2, "0")}</span>
+              <span class="codex-home-composition-ranking-thumb">
+                ${(item.image || pickResolvedStarterAssetUrl(thumbs, index)) ? `<img src="${escapeHtml(item.image || pickResolvedStarterAssetUrl(thumbs, index))}" alt="${escapeHtml(item.title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+              </span>
+              <span class="codex-home-composition-ranking-body">
+                <strong>${escapeHtml(item.title)}</strong>
+                ${item.description ? `<span>${escapeHtml(item.description)}</span>` : ""}
+              </span>
+            </a>
+          `).join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderServiceBannerCompositionSection(pageId = "", slotId = "", activeSourceId = "", componentPatch = {}, composition = {}, rawBlock = "") {
+  const patch = sanitizeGovernedComponentPatch(pageId, slotId, componentPatch).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan(pageId, composition);
+  const visuals = Array.isArray(mergedAssetPlan?.resolvedAssets?.visuals) ? mergedAssetPlan.resolvedAssets.visuals : [];
+  const title = resolveGenericCompositionTitle(pageId, slotId, patch, composition);
+  const subtitle = resolveGenericCompositionSubtitle(rawBlock, patch, composition);
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const visual = extractSectionImageSources(rawBlock, 1)[0] || pickResolvedStarterAssetUrl(visuals, 0);
+  const primitiveClasses = buildRuntimePrimitiveClassNames(composition);
+  const bannerVariant = resolveBannerPrimitiveVariant(composition) || "cinematic";
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, slotId),
+    buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+  ].filter(Boolean).join(";");
+  const attrs = buildGenericCompositionSectionAttrs(
+    pageId,
+    slotId,
+    activeSourceId || "composition-renderer",
+    String(composition?.familyId || "image-banner-strip-composition").trim(),
+    `codex-home-composition--banner ${primitiveClasses} ${bannerVariant === "cinematic" ? "is-cinematic" : "is-banner-clean"}`.trim()
+  );
+  if (rendererSurface === "tailwind") {
+    return renderServiceTailwindBannerSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      ctaLabel: "자세히 보기",
+      href: "#",
+      imageSrc: visual,
+      imageAlt: title,
+      escapeHtml,
+    });
+  }
+  return `
+    <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+      ${buildHomeCompositionSelfContainedStyleTag()}
+      <div class="codex-home-composition-shell codex-home-composition-shell--narrow">
+        <a class="codex-home-composition-banner-card" href="#">
+          <span class="codex-home-composition-banner-copy">
+            <strong${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</strong>
+            ${subtitle ? `<span${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</span>` : ""}
+            <em>자세히 보기</em>
+          </span>
+          <span class="codex-home-composition-banner-visual">
+            ${visual ? `<img src="${escapeHtml(visual)}" alt="${escapeHtml(title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+          </span>
+        </a>
+      </div>
+    </section>
+  `;
+}
+
+function renderServiceBenefitHubCompositionSection(pageId = "", slotId = "", activeSourceId = "", componentPatch = {}, composition = {}, rawBlock = "") {
+  return renderServiceGridCompositionSection(pageId, slotId, activeSourceId, componentPatch, composition, rawBlock, {
+    fallbackLabel: "혜택",
+    limit: 4,
+  });
+}
+
+function renderServiceEditorialStoryCompositionSection(pageId = "", slotId = "", activeSourceId = "", componentPatch = {}, composition = {}, rawBlock = "") {
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  if (rendererSurface === "tailwind") {
+    const patch = sanitizeGovernedComponentPatch(pageId, slotId, componentPatch).patch || {};
+    const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+    const mergedAssetPlan = mergeRuntimeCompositionAssetPlan(pageId, composition);
+    const visuals = Array.isArray(mergedAssetPlan?.resolvedAssets?.visuals) ? mergedAssetPlan.resolvedAssets.visuals : [];
+    const items = buildGenericCompositionItems(rawBlock, "스토리", 3).map((item, index) => ({
+      ...item,
+      image: String(item.image || "").trim() || pickResolvedStarterAssetUrl(visuals, index),
+    }));
+    const title = resolveGenericCompositionTitle(pageId, slotId, patch, composition);
+    const subtitle = resolveGenericCompositionSubtitle(rawBlock, patch, composition);
+    const titleStyle = buildTextPatchStyleText(styles, "title");
+    const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+    const sectionStyle = [
+      buildCompositionRuntimeStyleText(composition, slotId),
+      buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+    ].filter(Boolean).join(";");
+    const attrs = buildGenericCompositionSectionAttrs(
+      pageId,
+      slotId,
+      activeSourceId || "composition-renderer",
+      String(composition?.familyId || "editorial-visual-story-composition").trim(),
+      `codex-home-composition--commerce ${buildRuntimePrimitiveClassNames(composition)}`.trim()
+    );
+    return renderServiceTailwindStorySection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      items,
+      escapeHtml,
+    });
+  }
+  return renderServiceGridCompositionSection(pageId, slotId, activeSourceId, componentPatch, composition, rawBlock, {
+    fallbackLabel: "스토리",
+    limit: 3,
+  });
+}
+
+function renderServiceLikeCompositionSection(pageId = "", slotId = "", activeSourceId = "", componentPatch = {}, composition = {}, rawBlock = "") {
+  const familyId = String(composition?.familyId || "").trim();
+  if (familyId === "hero-carousel-composition") {
+    return renderServiceHeroCompositionSection(pageId, slotId, activeSourceId, componentPatch, composition, rawBlock);
+  }
+  if (familyId === "ranking-list-composition") {
+    return renderServiceRankingCompositionSection(pageId, slotId, activeSourceId, componentPatch, composition, rawBlock);
+  }
+  if (familyId === "service-benefit-hub-composition") {
+    return renderServiceBenefitHubCompositionSection(pageId, slotId, activeSourceId, componentPatch, composition, rawBlock);
+  }
+  if (familyId === "icon-link-grid-composition") {
+    return renderServiceGridCompositionSection(pageId, slotId, activeSourceId, componentPatch, composition, rawBlock, {
+      fallbackLabel: slotId === "quickMenu" ? "메뉴" : "탭",
+      limit: slotId === "tabs" ? 5 : 6,
+    });
+  }
+  if (familyId === "commerce-card-grid-composition") {
+    return renderServiceGridCompositionSection(pageId, slotId, activeSourceId, componentPatch, composition, rawBlock, {
+      fallbackLabel: slotId === "bestProduct" ? "상품" : "콘텐츠",
+      limit: slotId === "bestProduct" ? 4 : 6,
+    });
+  }
+  if (familyId === "image-banner-strip-composition") {
+    return renderServiceBannerCompositionSection(pageId, slotId, activeSourceId, componentPatch, composition, rawBlock);
+  }
+  if (familyId === "editorial-visual-story-composition") {
+    return renderServiceEditorialStoryCompositionSection(pageId, slotId, activeSourceId, componentPatch, composition, rawBlock);
+  }
+  return "";
+}
+
+function renderCategoryPdpTailwindCompositionSection(pageId = "", slotId = "", activeSourceId = "", componentPatch = {}, composition = {}, rawBlock = "", href = "") {
+  const patch = sanitizeGovernedComponentPatch(pageId, slotId, componentPatch).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const familyId = String(composition?.familyId || "").trim();
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan(pageId, composition);
+  const starterVisuals = Array.isArray(mergedAssetPlan?.resolvedAssets?.visuals) ? mergedAssetPlan.resolvedAssets.visuals : [];
+  const starterThumbnails = Array.isArray(mergedAssetPlan?.resolvedAssets?.thumbnails) ? mergedAssetPlan.resolvedAssets.thumbnails : [];
+  const title = resolveGenericCompositionTitle(pageId, slotId, patch, composition);
+  const subtitle = resolveGenericCompositionSubtitle(rawBlock, patch, composition);
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, slotId),
+    buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+  ].filter(Boolean).join(";");
+  const attrs = buildGenericCompositionSectionAttrs(
+    pageId,
+    slotId,
+    activeSourceId || "composition-renderer",
+    familyId || "tailwind-replacement-composition",
+    "codex-home-composition--commerce"
+  );
+  if (familyId === "image-banner-strip-composition") {
+    const visuals = extractSectionImageSources(rawBlock, 1);
+    const links = extractSectionHrefSources(rawBlock, 1);
+    const imageSrc = visuals[0] || pickResolvedStarterAssetUrl(starterVisuals, 0) || pickResolvedStarterAssetUrl(starterThumbnails, 0);
+    return renderCategoryTailwindBannerSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      ctaLabel: String(patch.ctaLabel || patch.moreLabel || "자세히 보기").trim(),
+      href: String(links[0] || href || "#").trim() || "#",
+      imageSrc,
+      imageAlt: title,
+      escapeHtml,
+    });
+  }
+  if (familyId === "pdp-summary-stack-composition") {
+    const texts = extractSectionTextFragments(rawBlock, 10);
+    const visuals = extractSectionImageSources(rawBlock, 1);
+    const imageSrc = visuals[0] || pickResolvedStarterAssetUrl(starterVisuals, 0) || pickResolvedStarterAssetUrl(starterThumbnails, 0);
+    return renderPdpTailwindSummarySection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      imageSrc,
+      imageAlt: title,
+      highlights: [
+        { label: "핵심 포인트", value: texts[1] || "대표 기능 요약" },
+        { label: "추천 이유", value: texts[2] || "상단 정보 구조 재정리" },
+      ],
+      primaryCta: { label: String(patch.ctaLabel || "구매하기").trim() || "구매하기", href: String(patch.ctaHref || href || "#").trim() || "#" },
+      secondaryCta: { label: "혜택 확인", href: "#" },
+      escapeHtml,
+    });
+  }
+  if (familyId === "pdp-sticky-buybox-composition") {
+    const texts = extractSectionTextFragments(rawBlock, 8);
+    const priceLike = texts.find((item) => /원|,/.test(String(item || ""))) || "가격 확인";
+    return renderPdpTailwindStickySection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      priceText: priceLike,
+      primaryCta: { label: String(patch.ctaLabel || "구매하기").trim() || "구매하기", href: String(patch.ctaHref || href || "#").trim() || "#" },
+      secondaryCta: { label: "혜택", href: "#" },
+      escapeHtml,
+    });
+  }
+  return "";
+}
+
+function injectCategoryPdpReplacements(html = "", rawHtml = "", options = {}) {
+  const pageId = String(options?.pageId || "").trim();
+  const viewportProfile = String(options?.viewportProfile || "pc").trim() || "pc";
+  const editableData = options?.editableData || {};
+  const draftBuild = options?.draftBuild || null;
+  const href = String(options?.href || "").trim();
+  const allowDraftComposition = String(options?.snapshotState || "").trim().toLowerCase() !== "before";
+  if (!pageId || (!pageId.startsWith("category-") && !isPdpCasePageId(pageId))) return String(html || "");
+  let groups = {};
+  if (pageId.startsWith("category-")) {
+    const entry = findPlpGroupEntry(pageId, viewportProfile, "working");
+    groups = normalizeGroupMap(entry?.groups);
+  } else {
+    const pdpContext = resolvePdpRuntimeContext(pageId, href);
+    const runtimePageId = pdpContext?.runtimePageId || pageId;
+    const effectiveHref = pdpContext?.href || href;
+    const entry =
+      findPdpGroupEntry(runtimePageId, viewportProfile, effectiveHref, "reference") ||
+      findPdpGroupEntry(runtimePageId, viewportProfile === "pc" ? "mo" : "pc", effectiveHref, "reference");
+    groups = normalizeGroupMap(entry?.groups);
+  }
+  if (!Object.keys(groups || {}).length) return String(html || "");
+  let next = String(html || "");
+  const pendingSlots = [];
+  const renderedSlotIds = new Set();
+  for (const [slotId, group] of Object.entries(groups || {})) {
+    const composition = allowDraftComposition
+      ? findEffectiveDraftComponentCompositionEntry(draftBuild, `${pageId}.${slotId}`, slotId)
+      : null;
+    if (!composition) continue;
+    const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+    if (rendererSurface !== "tailwind") continue;
+    const sourceMeta = getWorkspaceSlotSourceMeta(editableData || {}, pageId, slotId);
+    const componentId = `${pageId}.${slotId}`;
+    const componentPatch = findComponentPatch(editableData || {}, pageId, componentId, sourceMeta.sourceId, viewportProfile)?.patch || {};
+    const selectors = buildReplacementSelectorCandidates(pageId, slotId, group?.selector, viewportProfile);
+    pendingSlots.push({ slotId, composition, sourceMeta, componentPatch, selectors });
+    const result = replaceFirstAvailableSelectorBlock(next, selectors, (block) => {
+      const rendered = renderCategoryPdpTailwindCompositionSection(pageId, slotId, sourceMeta.sourceId, componentPatch, composition, block, href);
+      return rendered || block;
+    });
+    next = result.html;
+    if (result.replaced && hasCodexSlotMarker(next, slotId)) renderedSlotIds.add(slotId);
+  }
+  for (const item of pendingSlots) {
+    if (renderedSlotIds.has(item.slotId) || hasCodexSlotMarker(next, item.slotId)) continue;
+    const rawBlock =
+      extractFirstAvailableSelectorBlock(rawHtml, item.selectors) ||
+      extractFirstAvailableSelectorBlock(html, item.selectors);
+    const rendered = renderCategoryPdpTailwindCompositionSection(
+      pageId,
+      item.slotId,
+      item.sourceMeta.sourceId,
+      item.componentPatch,
+      item.composition,
+      rawBlock,
+      href
+    );
+    if (!rendered) continue;
+    next = appendMarkupBeforeMainClose(next, rendered);
+    renderedSlotIds.add(item.slotId);
+  }
+  return next;
+}
+
+function injectServiceLikeReplacements(html = "", rawHtml = "", options = {}) {
+  const pageId = String(options?.pageId || "").trim();
+  const viewportProfile = String(options?.viewportProfile || "pc").trim() || "pc";
+  const editableData = options?.editableData || {};
+  const draftBuild = options?.draftBuild || null;
+  const allowDraftComposition = String(options?.snapshotState || "").trim().toLowerCase() !== "before";
+  if (!pageId || !isServiceLikePageId(pageId)) return String(html || "");
+  const entry = resolveServiceGroupEntry(pageId, viewportProfile, "working");
+  const groups = normalizeGroupMap(entry?.groups);
+  if (!Object.keys(groups || {}).length) return String(html || "");
+  let next = String(html || "");
+  const pendingSlots = [];
+  const renderedSlotIds = new Set();
+  for (const [slotId, group] of Object.entries(groups || {})) {
+    const composition = allowDraftComposition
+      ? findEffectiveDraftComponentCompositionEntry(draftBuild, `${pageId}.${slotId}`, slotId)
+      : null;
+    if (!composition) continue;
+    const sourceMeta = getWorkspaceSlotSourceMeta(editableData || {}, pageId, slotId);
+    const componentId = `${pageId}.${slotId}`;
+    const componentPatch = findComponentPatch(editableData || {}, pageId, componentId, sourceMeta.sourceId, viewportProfile)?.patch || {};
+    const selectors = group?.found && group?.selector
+      ? [String(group.selector || "").trim()].filter(Boolean)
+      : [];
+    pendingSlots.push({ slotId, composition, sourceMeta, componentPatch, selectors });
+    const result = replaceFirstAvailableSelectorBlock(next, selectors, (block) => {
+      const rendered = renderServiceLikeCompositionSection(pageId, slotId, sourceMeta.sourceId, componentPatch, composition, block);
+      return rendered || block;
+    });
+    next = result.html;
+    if (result.replaced && hasCodexSlotMarker(next, slotId)) renderedSlotIds.add(slotId);
+  }
+  for (const item of pendingSlots) {
+    if (renderedSlotIds.has(item.slotId) || hasCodexSlotMarker(next, item.slotId)) continue;
+    const rawSelectors = buildReplacementSelectorCandidates(pageId, item.slotId, item.selectors[0] || "", viewportProfile);
+    const rawBlock =
+      extractFirstAvailableSelectorBlock(rawHtml, rawSelectors) ||
+      extractFirstAvailableSelectorBlock(html, rawSelectors);
+    const rendered = renderServiceLikeCompositionSection(
+      pageId,
+      item.slotId,
+      item.sourceMeta.sourceId,
+      item.componentPatch,
+      item.composition,
+      rawBlock
+    );
+    if (!rendered) continue;
+    next = appendMarkupBeforeMainClose(next, rendered);
+    renderedSlotIds.add(item.slotId);
+  }
+  return next;
+}
+
+function extractFirstSectionByNeedles(html, needles = []) {
+  const source = String(html || "");
+  const normalizedNeedles = (Array.isArray(needles) ? needles : []).map((item) => String(item || "").trim()).filter(Boolean);
+  if (!source || !normalizedNeedles.length) return { html: source, block: "" };
+  for (const needle of normalizedNeedles) {
+    const anchorIndex = source.indexOf(needle);
+    if (anchorIndex === -1) continue;
+    const sectionStart = source.lastIndexOf("<section", anchorIndex);
+    if (sectionStart === -1) continue;
+    const tagPattern = /<\/?section\b[^>]*>/gi;
+    tagPattern.lastIndex = sectionStart;
+    let depth = 0;
+    let match;
+    while ((match = tagPattern.exec(source))) {
+      if (/^<section\b/i.test(match[0])) {
+        depth += 1;
+      } else {
+        depth -= 1;
+        if (depth === 0) {
+          const sectionEnd = match.index + match[0].length;
+          return {
+            html: `${source.slice(0, sectionStart)}${source.slice(sectionEnd)}`,
+            block: source.slice(sectionStart, sectionEnd),
+          };
+        }
+      }
+    }
+  }
+  return { html: source, block: "" };
+}
+
+function buildHomeTopCompositionMarkup(parts = {}, options = {}) {
+  const hero = String(parts.hero || "").trim();
+  const quickmenu = String(parts.quickmenu || "").trim();
+  const promotion = String(parts.promotion || "").trim();
+  if (!hero && !quickmenu && !promotion) return "";
+  const shellVariant = String(options.shellVariant || "").trim();
+  if (shellVariant === "immersive-top") {
+    return `
+      <section data-codex-slot="home-top-composition-shell" data-codex-component-id="home.top-composition-shell" class="codex-home-higher-shell codex-home-higher-shell--top is-shell-immersive-top">
+        <div class="codex-home-higher-shell__top-stage">
+          <div class="codex-home-higher-shell__top-main">
+            ${hero}
+          </div>
+          <div class="codex-home-higher-shell__top-side">
+            ${quickmenu}
+            ${promotion}
+          </div>
+        </div>
+      </section>
+    `;
+  }
+  return `
+    <section data-codex-slot="home-top-composition-shell" data-codex-component-id="home.top-composition-shell" class="codex-home-higher-shell codex-home-higher-shell--top ${shellVariant ? `is-shell-${escapeHtml(shellVariant)}` : ""}">
+      <div class="codex-home-higher-shell__top-stage">
+        ${hero ? `
+          <div class="codex-home-higher-shell__top-main">
+            ${hero}
+          </div>
+        ` : ""}
+        ${(quickmenu || promotion) ? `
+          <div class="codex-home-higher-shell__top-stack">
+            ${quickmenu}
+            ${promotion}
+          </div>
+        ` : ""}
+      </div>
+    </section>
+  `;
+}
+
+function hasCodexSectionMarkup(html = "", slotId = "") {
+  const normalizedSlotId = String(slotId || "").trim();
+  if (!normalizedSlotId) return false;
+  return new RegExp(`<section[^>]*data-codex-slot="${escapeRegExp(normalizedSlotId)}"`, "i").test(String(html || ""));
+}
+
+function buildHomePageCompositionMarkup(parts = {}, options = {}) {
+  const shellVariant = String(options.shellVariant || "").trim();
+  const topShellVariant = String(options.topShellVariant || "").trim();
+  const topMarkup = buildHomeTopCompositionMarkup({
+    hero: parts.hero,
+    quickmenu: parts.quickmenu,
+    promotion: parts.promotion,
+  }, {
+    shellVariant: topShellVariant,
+  });
+  const mainItems = [
+    parts.mdChoice,
+    parts.timedeal,
+    parts.subscription,
+    parts.spaceRenewal,
+  ].map((item) => String(item || "").trim()).filter(Boolean);
+  const railItems = [
+    parts.bestRanking,
+    parts.marketingArea,
+    parts.lowerPromotion,
+  ].map((item) => String(item || "").trim()).filter(Boolean);
+  const lowerItems = [
+    parts.brandShowroom,
+    parts.latestProductNews,
+    parts.smartLife,
+    parts.missedBenefits,
+    parts.lgBestCare,
+    parts.bestshopGuide,
+  ].map((item) => String(item || "").trim()).filter(Boolean);
+  if (!topMarkup && !mainItems.length && !railItems.length && !lowerItems.length) return "";
+  if (shellVariant === "showcase-page") {
+    return `
+      <section data-codex-slot="home-page-composition-shell" data-codex-component-id="home.page-composition-shell" class="codex-home-higher-shell codex-home-higher-shell--page is-shell-showcase-page">
+        ${topMarkup}
+        ${mainItems.length ? `
+          <div class="codex-home-higher-shell__page-band">
+            <div class="codex-home-higher-shell__page-main">
+              ${mainItems.join("\n")}
+            </div>
+          </div>
+        ` : ""}
+        ${railItems.length ? `
+          <aside class="codex-home-higher-shell__page-rail">
+            ${railItems.join("\n")}
+          </aside>
+        ` : ""}
+        ${lowerItems.length ? `
+          <div class="codex-home-higher-shell__page-lower">
+            ${lowerItems.join("\n")}
+          </div>
+        ` : ""}
+      </section>
+    `;
+  }
+  return `
+    <section data-codex-slot="home-page-composition-shell" data-codex-component-id="home.page-composition-shell" class="codex-home-higher-shell codex-home-higher-shell--page ${shellVariant ? `is-shell-${escapeHtml(shellVariant)}` : ""}">
+      ${topMarkup}
+      ${mainItems.length || railItems.length ? `
+        <div class="codex-home-higher-shell__page-band">
+          <div class="codex-home-higher-shell__page-main">
+            ${mainItems.join("\n")}
+          </div>
+          <aside class="codex-home-higher-shell__page-rail">
+            ${railItems.join("\n")}
+          </aside>
+        </div>
+      ` : ""}
+      ${lowerItems.length ? `
+        <div class="codex-home-higher-shell__page-lower">
+          ${lowerItems.join("\n")}
+        </div>
+      ` : ""}
+    </section>
+  `;
+}
+
+function applyHomeHigherLayerCompositionLayout(html, state = {}) {
+  let working = String(html || "");
+  if (!working || (!state?.isPageComposition && !state?.isTopGroupComposition)) return working;
+  const extracted = {};
+  const extractInto = (key, needles) => {
+    const result = extractFirstSectionByNeedles(working, needles);
+    working = result.html;
+    extracted[key] = result.block;
+  };
+  extractInto("hero", [
+    'data-codex-slot="hero"',
+    'class="codex-home-composition codex-home-composition--hero',
+    'HomePcBannerHero_banner_hero__',
+    'HomeTaBannerHero_banner_hero__',
+    'HomeMoBannerHero_banner_hero__',
+  ]);
+  extractInto("quickmenu", [
+    'data-codex-slot="quickmenu"',
+    'class="codex-home-composition codex-home-composition--quickmenu',
+    'HomePcQuickmenu_quickmenu__',
+    'HomeTaQuickmenu_quickmenu__',
+    'HomeMoQuickmenu_quickmenu__',
+  ]);
+  extractInto("promotion", [
+    'data-codex-slot="promotion"',
+    'data-area="메인 상단 배너 영역"',
+    'HomePcBannerPromotion_banner_promotion__',
+    'HomeMoBannerPromotion_banner_promotion__',
+  ]);
+  if (state.isPageComposition) {
+    extractInto("mdChoice", ['data-codex-slot="md-choice"']);
+    extractInto("timedeal", ['data-codex-slot="timedeal"']);
+    extractInto("subscription", ['data-codex-slot="subscription"']);
+    extractInto("spaceRenewal", ['data-codex-slot="space-renewal"']);
+    extractInto("bestRanking", ['data-codex-slot="best-ranking"']);
+    extractInto("marketingArea", ['data-codex-slot="marketing-area"']);
+    extractInto("lowerPromotion", ['data-codex-slot="summary-banner-2"', 'data-area="메인 하단 배너 영역"']);
+    extractInto("brandShowroom", ['data-codex-slot="brand-showroom"']);
+    extractInto("latestProductNews", ['data-codex-slot="latest-product-news"']);
+    extractInto("smartLife", ['data-codex-slot="smart-life"']);
+    extractInto("missedBenefits", ['data-codex-slot="missed-benefits"']);
+    extractInto("lgBestCare", ['data-codex-slot="lg-best-care"']);
+    extractInto("bestshopGuide", ['data-codex-slot="bestshop-guide"']);
+  }
+  const wrapper = state.isPageComposition
+    ? buildHomePageCompositionMarkup(extracted, {
+        shellVariant: state.pageShellVariant,
+        topShellVariant: state.topShellVariant,
+      })
+    : buildHomeTopCompositionMarkup(extracted, {
+        shellVariant: state.topShellVariant,
+      });
+  if (!wrapper) return html;
+  return injectMarkupAfterSlot(working, "header-bottom", wrapper);
+}
+
+function renderHomeHeroCompositionSection(rawHtml, mobileHtml = "", activeSourceId = "", componentPatch = {}, composition = {}, viewportProfile = "pc") {
+  const normalizedViewport = normalizeHomeViewportProfile(viewportProfile || "pc", "pc");
+  const primitive = readRuntimePrimitiveRoot(composition);
+  const primitivePatch =
+    primitive?.props && typeof primitive.props === "object"
+      ? { ...primitive.props }
+      : {};
+  delete primitivePatch.familyId;
+  delete primitivePatch.templateId;
+  const patch = sanitizeGovernedComponentPatch("home", "hero", {
+    ...primitivePatch,
+    ...(componentPatch && typeof componentPatch === "object" ? componentPatch : {}),
+  }).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const slides = normalizedViewport === "mo" ? extractHomeHeroSlides(mobileHtml || rawHtml) : extractHomeHeroSlides(rawHtml);
+  const visibleSlides = slides.length ? slides.slice(0, 4) : [{
+    href: "/clone/home",
+    badge: patch.badge || "Design Proposal",
+    headline: patch.headline || patch.title || "홈 첫 인상을 전면 재구성한 히어로 제안",
+    description: patch.description || String(composition?.summary || "").trim() || "기획서 기준 메시지 위계와 행동 유도를 다시 정렬한 전면개편안입니다.",
+    imageSrc: "",
+  }];
+  const firstSlide = visibleSlides[0] || {};
+  const supportSlides = visibleSlides.slice(1, 4);
+  const templateId = String(composition?.templateId || "").trim();
+  const heroVariant = resolveHeroPrimitiveVariant(composition) || resolveHeroTemplateVariant(templateId);
+  const useEditorialVariant = heroVariant === "editorial";
+  const usePremiumStageVariant = heroVariant === "premium-stage";
+  const useCenteredVariant = heroVariant === "centered";
+  const useStackedVariant = heroVariant === "stacked";
+  const primitiveClasses = buildRuntimePrimitiveClassNames(composition);
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan("home", composition);
+  const starterVisuals = Array.isArray(mergedAssetPlan?.resolvedAssets?.visuals) ? mergedAssetPlan.resolvedAssets.visuals : [];
+  const theme = resolveHomeCompositionTheme(mergedAssetPlan);
+  const badge = String(patch.badge || firstSlide.badge || "").trim();
+  const headline = String(patch.headline || patch.title || firstSlide.headline || "").trim();
+  const description = String(patch.description || patch.subtitle || patch.support || firstSlide.description || "").trim();
+  const ctaLabel = String(patch.ctaLabel || patch.primaryCtaLabel || "자세히 보기").trim();
+  const ctaHref = String(patch.ctaHref || firstSlide.href || "/clone/home").trim() || "/clone/home";
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, "hero"),
+    buildSectionPatchStyleText(styles, { includeHeight: true, hidden: patch.visibility === false }),
+  ].filter(Boolean).join(";");
+  const attrs = buildHomeCompositionSectionAttrs(
+    "hero",
+    activeSourceId || "composition-renderer",
+    String(composition?.familyId || "hero-carousel-composition").trim(),
+    `codex-home-composition--hero ${theme.classes} ${primitiveClasses} ${useEditorialVariant ? "is-template-editorial-v1" : ""} ${usePremiumStageVariant ? "is-template-premium-v1" : ""} ${useCenteredVariant ? "is-template-centered-v1" : ""} ${useStackedVariant ? "is-template-stacked-v1" : ""}`.trim()
+  );
+  const resolveHeroImageSrc = (slide, index = 0) => {
+    const explicitSrc = String(slide?.imageSrc || "").trim();
+    const starterSrc = pickResolvedStarterAssetUrl(starterVisuals, index);
+    if (usePremiumStageVariant || useEditorialVariant || useCenteredVariant || useStackedVariant) return starterSrc || explicitSrc;
+    return explicitSrc || starterSrc;
+  };
+  if (rendererSurface === "tailwind") {
+    return renderHomeTailwindHeroSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      badge,
+      headline,
+      description,
+      ctaLabel,
+      ctaHref,
+      firstSlide,
+      supportSlides,
+      visibleSlides,
+      heroVariant,
+      escapeHtml,
+      resolveHeroImageSrc,
+      primitiveId: primitive?.type || "",
+      recipeId: composition?.recipeId || primitive?.props?.recipeId || "",
+      primitiveTone: primitive?.props?.tone || composition?.styleContract?.surfaceTone || "",
+      primitiveProps: primitive?.props || {},
+      styleContract: composition?.styleContract || {},
+    });
+  }
+  if (resolveHeroPrimitiveVariant(composition)) {
+    return renderHomePrimitiveHeroSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      badge,
+      headline,
+      description,
+      ctaLabel,
+      ctaHref,
+      firstSlide,
+      supportSlides,
+      visibleSlides,
+      heroVariant,
+      escapeHtml,
+      resolveHeroImageSrc,
+      primitiveId: primitive?.type || "",
+      recipeId: composition?.recipeId || primitive?.props?.recipeId || "",
+      primitiveTone: primitive?.props?.tone || composition?.styleContract?.surfaceTone || "",
+    });
+  }
+  const renderHeroCard = (slide, index, mode = "support") => {
+    const slideHeadline = String(slide?.headline || headline || `슬라이드 ${index + 1}`).trim();
+    const slideDescription = String(slide?.description || description || "").trim();
+    const slideBadge = String(slide?.badge || badge || "").trim();
+    const slideHref = String(slide?.href || ctaHref).trim() || ctaHref;
+    const imageSrc = resolveHeroImageSrc(slide, index);
+    if (mode === "lead") {
+      return `
+        <article class="codex-home-composition-hero-editorial-lead">
+          <a class="codex-home-composition-hero-visual codex-home-composition-hero-visual--lead" href="${escapeHtml(slideHref)}">
+            ${imageSrc ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(slideHeadline)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+          </a>
+          <div class="codex-home-composition-hero-caption codex-home-composition-hero-caption--lead">
+            ${slideBadge ? `<span class="codex-home-composition-hero-mini-badge">${escapeHtml(slideBadge)}</span>` : ""}
+            <strong>${escapeHtml(slideHeadline)}</strong>
+            ${slideDescription ? `<p>${escapeHtml(slideDescription)}</p>` : ""}
+          </div>
+        </article>
+      `;
+    }
+    return `
+      <a class="codex-home-composition-hero-editorial-support" href="${escapeHtml(slideHref)}">
+        <span class="codex-home-composition-hero-editorial-support-visual">
+          ${imageSrc ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(slideHeadline)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+        </span>
+        <span class="codex-home-composition-hero-editorial-support-copy">
+          ${slideBadge ? `<em>${escapeHtml(slideBadge)}</em>` : ""}
+          <strong>${escapeHtml(slideHeadline)}</strong>
+        </span>
+      </a>
+    `;
+  };
+  return `
+    <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+      ${buildHomeCompositionSelfContainedStyleTag()}
+      <div class="codex-home-composition-shell">
+        <div class="codex-home-composition-hero-stage">
+          <div class="codex-home-composition-copy">
+            ${badge ? `<span class="codex-home-composition-badge">${escapeHtml(badge)}</span>` : ""}
+            ${headline ? `<h2 class="codex-home-composition-title"${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(headline)}</h2>` : ""}
+            ${description ? `<p class="codex-home-composition-description"${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(description)}</p>` : ""}
+            <div class="codex-home-composition-actions">
+              <a class="codex-home-composition-primary" href="${escapeHtml(ctaHref)}">${escapeHtml(ctaLabel)}</a>
+            </div>
+          </div>
+          <div class="codex-home-composition-visual-stack">
+            ${usePremiumStageVariant ? `
+              <div class="codex-home-composition-hero-premium-stage">
+                <article class="codex-home-composition-hero-premium-main">
+                  <a class="codex-home-composition-hero-visual codex-home-composition-hero-visual--lead" href="${escapeHtml(String(firstSlide?.href || ctaHref).trim() || ctaHref)}">
+                    ${resolveHeroImageSrc(firstSlide, 0) ? `<img src="${escapeHtml(resolveHeroImageSrc(firstSlide, 0))}" alt="${escapeHtml(String(firstSlide?.headline || headline).trim())}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                  </a>
+                  <div class="codex-home-composition-hero-premium-main-copy">
+                    ${firstSlide?.badge ? `<span class="codex-home-composition-hero-mini-badge">${escapeHtml(String(firstSlide.badge).trim())}</span>` : ""}
+                    <strong>${escapeHtml(String(firstSlide?.headline || headline).trim())}</strong>
+                    ${firstSlide?.description ? `<p>${escapeHtml(String(firstSlide.description).trim())}</p>` : ""}
+                  </div>
+                </article>
+                <div class="codex-home-composition-hero-premium-stack">
+                  ${supportSlides.map((slide, index) => `
+                    <a class="codex-home-composition-hero-premium-support" href="${escapeHtml(String(slide?.href || ctaHref).trim() || ctaHref)}">
+                      <span class="codex-home-composition-hero-premium-support-copy">
+                        ${slide?.badge ? `<em>${escapeHtml(String(slide.badge).trim())}</em>` : ""}
+                        <strong>${escapeHtml(String(slide?.headline || `슬라이드 ${index + 2}`).trim())}</strong>
+                      </span>
+                      <span class="codex-home-composition-hero-premium-support-visual">
+                        ${resolveHeroImageSrc(slide, index + 1) ? `<img src="${escapeHtml(resolveHeroImageSrc(slide, index + 1))}" alt="${escapeHtml(String(slide?.headline || `슬라이드 ${index + 2}`).trim())}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                      </span>
+                    </a>
+                  `).join("")}
+                </div>
+              </div>
+            ` : useCenteredVariant ? `
+              <div class="codex-home-composition-hero-centered-stage">
+                <a class="codex-home-composition-hero-visual codex-home-composition-hero-visual--lead" href="${escapeHtml(String(firstSlide?.href || ctaHref).trim() || ctaHref)}">
+                  ${resolveHeroImageSrc(firstSlide, 0) ? `<img src="${escapeHtml(resolveHeroImageSrc(firstSlide, 0))}" alt="${escapeHtml(String(firstSlide?.headline || headline).trim())}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                </a>
+                <div class="codex-home-composition-hero-centered-summary">
+                  ${firstSlide?.badge ? `<span class="codex-home-composition-hero-mini-badge">${escapeHtml(String(firstSlide.badge).trim())}</span>` : ""}
+                  <strong>${escapeHtml(String(firstSlide?.headline || headline).trim())}</strong>
+                  ${firstSlide?.description ? `<p>${escapeHtml(String(firstSlide.description).trim())}</p>` : ""}
+                </div>
+              </div>
+            ` : useStackedVariant ? `
+              <div class="codex-home-composition-hero-stacked-stage">
+                <a class="codex-home-composition-hero-visual codex-home-composition-hero-visual--lead" href="${escapeHtml(String(firstSlide?.href || ctaHref).trim() || ctaHref)}">
+                  ${resolveHeroImageSrc(firstSlide, 0) ? `<img src="${escapeHtml(resolveHeroImageSrc(firstSlide, 0))}" alt="${escapeHtml(String(firstSlide?.headline || headline).trim())}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                </a>
+                <div class="codex-home-composition-hero-stacked-rail">
+                  ${supportSlides.map((slide, index) => `
+                    <a class="codex-home-composition-hero-stacked-card" href="${escapeHtml(String(slide?.href || ctaHref).trim() || ctaHref)}">
+                      <span class="codex-home-composition-hero-stacked-card-copy">
+                        ${slide?.badge ? `<em>${escapeHtml(String(slide.badge).trim())}</em>` : ""}
+                        <strong>${escapeHtml(String(slide?.headline || `슬라이드 ${index + 2}`).trim())}</strong>
+                      </span>
+                      <span class="codex-home-composition-hero-stacked-card-visual">
+                        ${resolveHeroImageSrc(slide, index + 1) ? `<img src="${escapeHtml(resolveHeroImageSrc(slide, index + 1))}" alt="${escapeHtml(String(slide?.headline || `슬라이드 ${index + 2}`).trim())}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                      </span>
+                    </a>
+                  `).join("")}
+                </div>
+              </div>
+            ` : useEditorialVariant ? `
+              <div class="codex-home-composition-hero-editorial-stage">
+                ${renderHeroCard(firstSlide, 0, "lead")}
+                <div class="codex-home-composition-hero-editorial-rail">
+                  ${supportSlides.map((slide, index) => renderHeroCard(slide, index + 1, "support")).join("")}
+                </div>
+              </div>
+            ` : `
+              ${visibleSlides
+                .map((slide, index) => {
+                  const slideHeadline = String(slide?.headline || headline || `슬라이드 ${index + 1}`).trim();
+                  const slideDescription = String(slide?.description || description || "").trim();
+                  const slideBadge = String(slide?.badge || badge || "").trim();
+                  const slideHref = String(slide?.href || ctaHref).trim() || ctaHref;
+                  const imageSrc = resolveHeroImageSrc(slide, index);
+                  return `
+                    <article class="codex-home-composition-hero-slide${index === 0 ? " is-active" : ""}" data-codex-hero-composition-slide="${index}">
+                      <a class="codex-home-composition-hero-visual" href="${escapeHtml(slideHref)}">
+                        ${imageSrc ? `<img src="${escapeHtml(imageSrc)}" alt="${escapeHtml(slideHeadline)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                      </a>
+                      <div class="codex-home-composition-hero-caption">
+                        ${slideBadge ? `<span class="codex-home-composition-hero-mini-badge">${escapeHtml(slideBadge)}</span>` : ""}
+                        <strong>${escapeHtml(slideHeadline)}</strong>
+                        ${slideDescription ? `<p>${escapeHtml(slideDescription)}</p>` : ""}
+                      </div>
+                    </article>
+                  `;
+                })
+                .join("")}
+            `}
+          </div>
+        </div>
+        ${visibleSlides.length > 1 ? `
+          <div class="codex-home-composition-hero-nav" role="tablist" aria-label="히어로 전면개편 슬라이드 선택">
+            ${visibleSlides
+              .map((slide, index) => `
+                <button type="button" class="codex-home-composition-hero-tab${index === 0 ? " is-active" : ""}" data-codex-hero-composition-tab="${index}" role="tab" aria-selected="${index === 0 ? "true" : "false"}">
+                  <span class="codex-home-composition-hero-tab-index">${String(index + 1).padStart(2, "0")}</span>
+                  <span class="codex-home-composition-hero-tab-copy">
+                    <strong>${escapeHtml(String(slide?.headline || `슬라이드 ${index + 1}`).trim())}</strong>
+                    ${slide?.badge ? `<span>${escapeHtml(String(slide.badge || "").trim())}</span>` : ""}
+                  </span>
+                </button>
+              `)
+              .join("")}
+          </div>
+        ` : ""}
+      </div>
+    </section>
+  `;
+}
+
+function findCanonicalCloneSectionBySlot(draftBuild = null, slotId = "") {
+  const cloneRenderModel = readDraftCanonicalCloneRenderModel(draftBuild);
+  const normalizedSlotId = String(slotId || "").trim();
+  if (!cloneRenderModel || !normalizedSlotId) return null;
+  const sections = Array.isArray(cloneRenderModel.sections) ? cloneRenderModel.sections : [];
+  const index = sections.findIndex((section) => String(section?.slotId || "").trim() === normalizedSlotId);
+  if (index < 0) return null;
+  const rawSection = sections[index] && typeof sections[index] === "object" ? sections[index] : null;
+  if (!rawSection) return null;
+  return {
+    cloneRenderModel,
+    index,
+    rawSection,
+    composition: mapCanonicalSectionToRuntimeComposition(rawSection, cloneRenderModel, index),
+  };
+}
+
+function resolveCanonicalHeroVariant(composition = {}, rawSection = {}) {
+  const fromPrimitive = resolveHeroPrimitiveVariant(composition);
+  if (fromPrimitive) return fromPrimitive;
+  const layoutMode = String(rawSection?.layout?.layoutMode || "").trim().toLowerCase();
+  if (layoutMode.includes("editorial")) return "editorial";
+  if (layoutMode.includes("center")) return "centered";
+  if (layoutMode.includes("stack")) return "stacked";
+  return "premium-stage";
+}
+
+function resolveCanonicalQuickmenuVariant(composition = {}, rawSection = {}) {
+  const fromPrimitive = resolveQuickmenuPrimitiveVariant(composition);
+  if (fromPrimitive) return fromPrimitive;
+  const layoutMode = String(rawSection?.layout?.layoutMode || "").trim().toLowerCase();
+  if (layoutMode.includes("panel")) return "panel";
+  if (layoutMode.includes("editorial")) return "editorial-strip";
+  return "grid";
+}
+
+function renderCanonicalHomeHeroSection(rawHtml, mobileHtml = "", draftBuild = null, viewportProfile = "pc", activeSourceId = "canonical-home-hero") {
+  const canonical = findCanonicalCloneSectionBySlot(draftBuild, "hero");
+  if (!canonical?.rawSection || !canonical?.composition) return "";
+  const normalizedViewport = normalizeHomeViewportProfile(viewportProfile || "pc", "pc");
+  const patch = canonical.rawSection.patch && typeof canonical.rawSection.patch === "object"
+    ? canonical.rawSection.patch
+    : {};
+  const composition = canonical.composition;
+  const primitive = readRuntimePrimitiveRoot(composition);
+  const extractedSlides = normalizedViewport === "mo"
+    ? extractHomeHeroSlides(mobileHtml || rawHtml)
+    : extractHomeHeroSlides(rawHtml);
+  const fallbackLeadHref = String(extractedSlides[0]?.href || "/clone/home").trim() || "/clone/home";
+  const badge = String(
+    patch.badge ||
+    canonical.rawSection.content?.primaryMessage ||
+    "Brand Focus"
+  ).trim();
+  const headline = String(
+    patch.headline ||
+    patch.title ||
+    canonical.rawSection.content?.primaryMessage ||
+    "브랜드 첫 인상을 재정의한 히어로 제안"
+  ).trim();
+  const description = String(
+    patch.description ||
+    patch.subtitle ||
+    patch.support ||
+    canonical.rawSection.content?.supportMessage ||
+    canonical.rawSection.content?.objective ||
+    ""
+  ).trim();
+  const ctaLabel = String(patch.primaryCtaLabel || patch.ctaLabel || "자세히 보기").trim();
+  const ctaHref = String(patch.ctaHref || fallbackLeadHref).trim() || fallbackLeadHref;
+  const firstSlide = {
+    ...(extractedSlides[0] || {}),
+    badge,
+    headline,
+    description,
+    href: ctaHref,
+  };
+  const supportFallbackLines = [
+    ...toStringArray(canonical.rawSection.content?.keep),
+    ...toStringArray(canonical.rawSection.content?.change),
+    ...toStringArray(canonical.cloneRenderModel?.renderIntent?.northStar),
+  ].filter(Boolean);
+  const supportSlides = (extractedSlides.slice(1, 4).length ? extractedSlides.slice(1, 4) : supportFallbackLines.slice(0, 3).map((line, index) => ({
+    headline: line,
+    badge: index === 0 ? "Keep" : "Change",
+    href: ctaHref,
+  })))
+    .map((item, index) => ({
+      ...item,
+      href: String(item?.href || ctaHref).trim() || ctaHref,
+      headline: String(item?.headline || supportFallbackLines[index] || `지원 카드 ${index + 1}`).trim(),
+      badge: String(item?.badge || (index === 0 ? "Keep" : "Guide")).trim(),
+    }));
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan("home", composition);
+  const starterVisuals = Array.isArray(mergedAssetPlan?.resolvedAssets?.visuals) ? mergedAssetPlan.resolvedAssets.visuals : [];
+  const attrs = buildHomeCompositionSectionAttrs(
+    "hero",
+    activeSourceId,
+    String(composition?.familyId || canonical.rawSection.familyId || "hero-carousel-composition").trim(),
+    "codex-home-composition--hero is-canonical-top-stage"
+  );
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, "hero"),
+    buildHomeSectionContractStyle("hero", normalizedViewport),
+  ].filter(Boolean).join(";");
+  return renderHomeTailwindHeroSection({
+    attrs,
+    sectionStyle,
+    titleStyle: "",
+    subtitleStyle: "",
+    badge,
+    headline,
+    description,
+    ctaLabel,
+    ctaHref,
+    firstSlide,
+    supportSlides,
+    heroVariant: resolveCanonicalHeroVariant(composition, canonical.rawSection),
+    escapeHtml,
+    resolveHeroImageSrc: (slide, index = 0) => String(slide?.imageSrc || "").trim() || pickResolvedStarterAssetUrl(starterVisuals, index),
+    primitiveId: primitive?.type || "",
+    recipeId: composition?.recipeId || primitive?.props?.recipeId || "",
+    primitiveTone: primitive?.props?.tone || composition?.styleContract?.surfaceTone || canonical.rawSection.tone?.surfaceTone || "",
+    primitiveProps: primitive?.props || {},
+    styleContract: composition?.styleContract || {},
+  });
+}
+
+function renderCanonicalHomeQuickmenuSection(rawHtml, mobileHtml = "", draftBuild = null, viewportProfile = "pc", activeSourceId = "canonical-home-quickmenu") {
+  const canonical = findCanonicalCloneSectionBySlot(draftBuild, "quickmenu");
+  if (!canonical?.rawSection || !canonical?.composition) return "";
+  const normalizedViewport = normalizeHomeViewportProfile(viewportProfile || "pc", "pc");
+  const patch = canonical.rawSection.patch && typeof canonical.rawSection.patch === "object"
+    ? canonical.rawSection.patch
+    : {};
+  const composition = canonical.composition;
+  const primitive = readRuntimePrimitiveRoot(composition);
+  const baseItems = normalizedViewport === "mo"
+    ? extractMobileQuickMenuItems(mobileHtml || "")
+    : extractQuickMenuSlides(rawHtml);
+  const items = ((Array.isArray(patch.items) && patch.items.length) ? patch.items : baseItems)
+    .slice(0, 8)
+    .map((item, index) => ({
+      title: String(item?.title || `바로가기 ${index + 1}`).trim(),
+      href: String(item?.href || "/clone/home").trim() || "/clone/home",
+      image: String(item?.image || item?.imageSrc || "").trim(),
+      alt: String(item?.alt || item?.title || "").trim(),
+      description: String(item?.description || "").trim(),
+    }));
+  const title = String(
+    patch.title ||
+    canonical.rawSection.content?.primaryMessage ||
+    "퀵메뉴 재정렬"
+  ).trim();
+  const subtitle = String(
+    patch.subtitle ||
+    patch.support ||
+    canonical.rawSection.content?.supportMessage ||
+    ""
+  ).trim();
+  const ctaLabel = String(patch.ctaLabel || patch.moreLabel || "전체 바로가기 보기").trim();
+  const ctaHref = String(patch.ctaHref || items[0]?.href || "/clone/home").trim() || "/clone/home";
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan("home", composition);
+  const starterIcons = Array.isArray(mergedAssetPlan?.resolvedAssets?.icons) ? mergedAssetPlan.resolvedAssets.icons : [];
+  const attrs = buildHomeCompositionSectionAttrs(
+    "quickmenu",
+    activeSourceId,
+    String(composition?.familyId || canonical.rawSection.familyId || "icon-link-grid-composition").trim(),
+    "codex-home-composition--quickmenu is-canonical-top-stage"
+  );
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, "quickmenu"),
+    buildHomeSectionContractStyle("quickmenu", normalizedViewport),
+  ].filter(Boolean).join(";");
+  return renderHomeTailwindQuickmenuSection({
+    attrs,
+    sectionStyle,
+    titleStyle: "",
+    subtitleStyle: "",
+    title,
+    subtitle,
+    ctaLabel,
+    ctaHref,
+    items,
+    quickmenuVariant: resolveCanonicalQuickmenuVariant(composition, canonical.rawSection),
+    escapeHtml,
+    resolveQuickmenuIconSrc: (item, index = 0) => String(item?.image || item?.imageSrc || "").trim() || pickResolvedStarterAssetUrl(starterIcons, index),
+    primitiveId: primitive?.type || "",
+    recipeId: composition?.recipeId || primitive?.props?.recipeId || "",
+    primitiveTone: primitive?.props?.tone || composition?.styleContract?.surfaceTone || canonical.rawSection.tone?.surfaceTone || "",
+    primitiveProps: primitive?.props || {},
+    styleContract: composition?.styleContract || {},
+  });
+}
+
+function renderHomeQuickmenuCompositionSection(rawHtml, mobileHtml = "", activeSourceId = "", componentPatch = {}, composition = {}, viewportProfile = "pc") {
+  const normalizedViewport = normalizeHomeViewportProfile(viewportProfile || "pc", "pc");
+  const primitive = readRuntimePrimitiveRoot(composition);
+  const primitivePatch =
+    primitive?.props && typeof primitive.props === "object"
+      ? { ...primitive.props }
+      : {};
+  delete primitivePatch.familyId;
+  delete primitivePatch.templateId;
+  const patch = sanitizeGovernedComponentPatch("home", "quickmenu", {
+    ...primitivePatch,
+    ...(componentPatch && typeof componentPatch === "object" ? componentPatch : {}),
+  }, { sectionType: "icon-grid" }).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const baseItems =
+    normalizedViewport === "mo"
+      ? extractMobileQuickMenuItems(mobileHtml || "")
+      : extractQuickMenuSlides(rawHtml);
+  const fallbackItems = Array.isArray(baseItems) && baseItems.length ? baseItems : [];
+  const patchItems = Array.isArray(patch.items) ? patch.items : [];
+  const items = (patchItems.length ? patchItems : fallbackItems)
+    .slice(0, 8)
+    .map((item, index) => ({
+      title: String(item?.title || `바로가기 ${index + 1}`).trim(),
+      href: String(item?.href || "/clone/home").trim() || "/clone/home",
+      image: String(item?.image || item?.imageSrc || "").trim(),
+      alt: String(item?.alt || item?.title || "").trim(),
+    }));
+  const templateId = String(composition?.templateId || "").trim();
+  const quickmenuVariant = resolveQuickmenuPrimitiveVariant(composition) || resolveQuickmenuTemplateVariant(templateId);
+  const usePanelVariant = quickmenuVariant === "panel";
+  const useEditorialStripVariant = quickmenuVariant === "editorial-strip";
+  const primitiveClasses = buildRuntimePrimitiveClassNames(composition);
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan("home", composition);
+  const starterIcons = Array.isArray(mergedAssetPlan?.resolvedAssets?.icons) ? mergedAssetPlan.resolvedAssets.icons : [];
+  const theme = resolveHomeCompositionTheme(mergedAssetPlan);
+  const title = String(patch.title || "빠른 메뉴").trim();
+  const subtitle = String(patch.subtitle || "").trim();
+  const ctaLabel = String(patch.ctaLabel || patch.moreLabel || "전체 바로가기 보기").trim();
+  const ctaHref = String(patch.ctaHref || "/clone/home").trim() || "/clone/home";
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, "quickmenu"),
+    buildHomeSectionContractStyle("quickmenu", viewportProfile),
+    buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+  ]
+    .filter(Boolean)
+    .join(";");
+  const attrs = buildHomeCompositionSectionAttrs(
+    "quickmenu",
+    activeSourceId || "composition-renderer",
+    String(composition?.familyId || "icon-link-grid-composition").trim(),
+    `codex-home-composition--quickmenu ${theme.classes} ${primitiveClasses} ${usePanelVariant ? "is-template-panel-v1" : ""} ${useEditorialStripVariant ? "is-template-editorial-strip-v1" : ""}`.trim()
+  );
+  const resolveQuickmenuIconSrc = (item, index = 0) => {
+    const explicitSrc = String(item?.image || item?.imageSrc || "").trim();
+    const starterSrc = pickResolvedStarterAssetUrl(starterIcons, index);
+    if (usePanelVariant || useEditorialStripVariant) return starterSrc || explicitSrc;
+    return explicitSrc || starterSrc;
+  };
+  const leadItem = items[0] || null;
+  const secondaryItems = leadItem ? items.slice(1, 8) : items;
+  if (rendererSurface === "tailwind") {
+    return renderHomeTailwindQuickmenuSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      ctaLabel,
+      ctaHref,
+      items,
+      quickmenuVariant,
+      escapeHtml,
+      resolveQuickmenuIconSrc,
+      primitiveId: primitive?.type || "",
+      recipeId: composition?.recipeId || primitive?.props?.recipeId || "",
+      primitiveTone: primitive?.props?.tone || composition?.styleContract?.surfaceTone || "",
+      primitiveProps: primitive?.props || {},
+      styleContract: composition?.styleContract || {},
+    });
+  }
+  if (resolveQuickmenuPrimitiveVariant(composition)) {
+    return renderHomePrimitiveQuickmenuSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      ctaLabel,
+      ctaHref,
+      items,
+      quickmenuVariant,
+      escapeHtml,
+      resolveQuickmenuIconSrc,
+      primitiveId: primitive?.type || "",
+      recipeId: composition?.recipeId || primitive?.props?.recipeId || "",
+      primitiveTone: primitive?.props?.tone || composition?.styleContract?.surfaceTone || "",
+    });
+  }
+  return `
+    <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+      ${buildHomeCompositionSelfContainedStyleTag()}
+      <div class="codex-home-composition-shell codex-home-composition-shell--narrow">
+        <div class="codex-home-composition-quickmenu-head">
+          <div class="codex-home-composition-quickmenu-copy">
+            ${title ? `<h2 class="codex-home-composition-title codex-home-composition-title--compact"${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>` : ""}
+            ${subtitle ? `<p class="codex-home-composition-description codex-home-composition-description--compact"${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</p>` : ""}
+          </div>
+          <a class="codex-home-composition-secondary" href="${escapeHtml(ctaHref)}">${escapeHtml(ctaLabel)}</a>
+        </div>
+        <div class="codex-home-composition-quickmenu-grid">
+          ${useEditorialStripVariant ? `
+            <a class="codex-home-composition-quickmenu-card codex-home-composition-quickmenu-card--editorial" href="${escapeHtml(String(leadItem?.href || ctaHref).trim() || ctaHref)}">
+              <span class="codex-home-composition-quickmenu-lead-copy">
+                <em>Curated Entry</em>
+                <strong>${escapeHtml(String(leadItem?.title || "대표 메뉴").trim())}</strong>
+                <span>${escapeHtml(subtitle || "핵심 탐색 진입과 보조 카테고리를 에디토리얼 리듬으로 재정렬했습니다.")}</span>
+              </span>
+              <span class="codex-home-composition-quickmenu-editorial-rail">
+                ${items.slice(1, 4).map((item) => `
+                  <span class="codex-home-composition-quickmenu-editorial-chip">
+                    ${resolveQuickmenuIconSrc(item, items.indexOf(item)) ? `<img src="${escapeHtml(resolveQuickmenuIconSrc(item, items.indexOf(item)))}" alt="${escapeHtml(item.alt || item.title)}" />` : `<span class="codex-home-composition-quickmenu-fallback">${escapeHtml(String(item.title || "").slice(0, 1) || "•")}</span>`}
+                    <strong>${escapeHtml(item.title)}</strong>
+                  </span>
+                `).join("")}
+              </span>
+            </a>
+          ` : usePanelVariant && leadItem ? `
+            <a class="codex-home-composition-quickmenu-card codex-home-composition-quickmenu-card--lead" href="${escapeHtml(leadItem.href)}">
+              <span class="codex-home-composition-quickmenu-lead-copy">
+                <em>Primary Entry</em>
+                <strong>${escapeHtml(leadItem.title)}</strong>
+                <span>핵심 진입을 크게 강조한 전면개편 메뉴 카드입니다.</span>
+              </span>
+              <span class="codex-home-composition-quickmenu-icon codex-home-composition-quickmenu-icon--lead">
+                ${resolveQuickmenuIconSrc(leadItem, 0) ? `<img src="${escapeHtml(resolveQuickmenuIconSrc(leadItem, 0))}" alt="${escapeHtml(leadItem.alt || leadItem.title)}" />` : `<span class="codex-home-composition-quickmenu-fallback">01</span>`}
+              </span>
+            </a>
+          ` : ""}
+          ${(useEditorialStripVariant ? items.slice(3, 8) : (usePanelVariant ? secondaryItems : items))
+            .map((item, index) => `
+              <a class="codex-home-composition-quickmenu-card" href="${escapeHtml(item.href)}">
+                <span class="codex-home-composition-quickmenu-icon">
+                  ${resolveQuickmenuIconSrc(item, usePanelVariant ? index + 1 : useEditorialStripVariant ? index + 3 : index) ? `<img src="${escapeHtml(resolveQuickmenuIconSrc(item, usePanelVariant ? index + 1 : useEditorialStripVariant ? index + 3 : index))}" alt="${escapeHtml(item.alt || item.title)}" />` : `<span class="codex-home-composition-quickmenu-fallback">${String((usePanelVariant ? index + 2 : useEditorialStripVariant ? index + 4 : index + 1)).padStart(2, "0")}</span>`}
+                </span>
+                <strong>${escapeHtml(item.title)}</strong>
+              </a>
+            `)
+            .join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function normalizeHomeCommerceCompositionItems(slotId = "", data = {}) {
+  const normalizedSlotId = String(slotId || "").trim();
+  const buildImageItems = (items = [], fallbackTitle = "카드") =>
+    (Array.isArray(items) ? items : []).slice(0, 6).map((item, index) => ({
+      title: String(item?.title || item?.name || `${fallbackTitle} ${index + 1}`).trim(),
+      description: String(item?.description || item?.subtitle || item?.category || item?.sku || "").trim(),
+      href: String(item?.href || item?.url || "/clone/home").trim() || "/clone/home",
+      image: String(item?.image || item?.imageSrc || "").trim(),
+      badge: Array.isArray(item?.badges) ? String(item.badges[0] || "").trim() : String(item?.badge || "").trim(),
+      price: item?.price ? formatPrice(item.price) : "",
+    }));
+  if (Array.isArray(data?.compositionItems) && data.compositionItems.length) {
+    return buildImageItems(data.compositionItems, "카드");
+  }
+  if (normalizedSlotId === "best-ranking") {
+    return buildImageItems(HOME_BEST_RANKING_SAMPLE_ITEMS, "랭킹 카드");
+  }
+  if (normalizedSlotId === "marketing-area") {
+    return buildImageItems(HOME_MARKETING_AREA_ITEMS, "마케팅 카드");
+  }
+  if (normalizedSlotId === "brand-showroom") {
+    return buildImageItems(data.brandShowroomProducts, "브랜드 쇼룸");
+  }
+  if (normalizedSlotId === "latest-product-news") {
+    return buildImageItems(data.latestProductNewsProducts, "최신 제품");
+  }
+  if (normalizedSlotId === "smart-life") {
+    return buildImageItems(data.smartLifeProducts, "스토리");
+  }
+  if (normalizedSlotId === "missed-benefits") {
+    return buildImageItems(data.missedBenefitsProducts, "혜택");
+  }
+  if (normalizedSlotId === "lg-best-care") {
+    return buildImageItems(data.lgBestCareProducts, "베스트 케어");
+  }
+  if (normalizedSlotId === "bestshop-guide") {
+    return buildImageItems(HOME_BESTSHOP_GUIDE_ITEMS, "베스트샵 가이드");
+  }
+  if (normalizedSlotId === "space-renewal") {
+    return buildImageItems(buildSpaceRenewalProducts(data.spaceRenewalData), "공간 리뉴얼");
+  }
+  if (normalizedSlotId === "summary-banner-2") {
+    return buildImageItems(data.lowerPromotionProducts, "배너");
+  }
+  if (normalizedSlotId === "md-choice") {
+    return buildImageItems(data.mdChoiceProducts, "추천 상품");
+  }
+  if (normalizedSlotId === "timedeal") {
+    return buildImageItems(data.timedealProducts, "타임딜");
+  }
+  if (normalizedSlotId === "subscription") {
+    return buildImageItems(data.subscriptionProducts, "구독");
+  }
+  return [];
+}
+
+function renderHomeRankingCompositionSection(activeSourceId = "", componentPatch = {}, composition = {}) {
+  const patch = sanitizeGovernedComponentPatch("home", "best-ranking", componentPatch).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const items = normalizeHomeCommerceCompositionItems("best-ranking").slice(0, 5);
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan("home", composition);
+  const starterThumbnails = Array.isArray(mergedAssetPlan?.resolvedAssets?.thumbnails) ? mergedAssetPlan.resolvedAssets.thumbnails : [];
+  const theme = resolveHomeCompositionTheme(mergedAssetPlan);
+  const primitiveClasses = buildRuntimePrimitiveClassNames(composition);
+  const rankingVariant = resolveRankingPrimitiveVariant(composition) || "compact";
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  const title = String(patch.title || "베스트 랭킹").trim();
+  const subtitle = String(patch.subtitle || "").trim();
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, "best-ranking"),
+    buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+  ].filter(Boolean).join(";");
+  const attrs = buildHomeCompositionSectionAttrs(
+    "best-ranking",
+    activeSourceId || "composition-renderer",
+    String(composition?.familyId || "ranking-list-composition").trim(),
+    `codex-home-composition--ranking ${theme.classes} ${primitiveClasses} ${rankingVariant === "poster" ? "is-ranking-poster" : ""}`.trim()
+  );
+  if (rendererSurface === "tailwind") {
+    return renderServiceTailwindRankingSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      items: items.map((item, index) => ({
+        ...item,
+        image: String(item.image || "").trim() || pickResolvedStarterAssetUrl(starterThumbnails, index),
+      })),
+      escapeHtml,
+    });
+  }
+  if (resolveRankingPrimitiveVariant(composition)) {
+    return renderHomePrimitiveRankingSection({
+      attrs,
+      sectionStyle,
+      selfContainedStyleTag: buildHomeCompositionSelfContainedStyleTag(),
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      tabs: HOME_BEST_RANKING_TABS.slice(0, 5),
+      items,
+      rankingVariant,
+      escapeHtml,
+      resolveThumbSrc: (item, index = 0) => String(item.image || "").trim() || pickResolvedStarterAssetUrl(starterThumbnails, index),
+    });
+  }
+  return `
+    <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+      ${buildHomeCompositionSelfContainedStyleTag()}
+      <div class="codex-home-composition-shell codex-home-composition-shell--narrow">
+        <div class="codex-home-composition-ranking-head">
+          <h2 class="codex-home-composition-title codex-home-composition-title--compact"${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
+          ${subtitle ? `<p class="codex-home-composition-description codex-home-composition-description--compact"${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</p>` : ""}
+        </div>
+        <div class="codex-home-composition-ranking-tabs">
+          ${HOME_BEST_RANKING_TABS.slice(0, 5).map((item, index) => `<span class="codex-home-composition-ranking-tab${index === 0 ? " is-active" : ""}">${escapeHtml(String(item.label || "").trim())}</span>`).join("")}
+        </div>
+        <div class="codex-home-composition-ranking-list">
+          ${items
+            .map((item, index) => `
+              <a class="codex-home-composition-ranking-card" href="${escapeHtml(item.href)}">
+                <span class="codex-home-composition-ranking-rank">${String(index + 1).padStart(2, "0")}</span>
+                <span class="codex-home-composition-ranking-thumb">
+                  ${(String(item.image || "").trim() || pickResolvedStarterAssetUrl(starterThumbnails, index)) ? `<img src="${escapeHtml(String(item.image || "").trim() || pickResolvedStarterAssetUrl(starterThumbnails, index))}" alt="${escapeHtml(item.title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                </span>
+                <span class="codex-home-composition-ranking-body">
+                  ${item.badge ? `<span class="codex-home-composition-badge codex-home-composition-badge--inline">${escapeHtml(item.badge)}</span>` : ""}
+                  <strong>${escapeHtml(item.title)}</strong>
+                  ${item.description ? `<span>${escapeHtml(item.description)}</span>` : ""}
+                  ${item.price ? `<em>${escapeHtml(item.price)}원</em>` : ""}
+                </span>
+              </a>
+            `)
+            .join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderHomeCommerceCompositionSection(slotId = "", data = {}, activeSourceId = "", componentPatch = {}, composition = {}) {
+  const normalizedSlotId = String(slotId || "").trim();
+  const patch = sanitizeGovernedComponentPatch("home", normalizedSlotId, componentPatch).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const items = normalizeHomeCommerceCompositionItems(normalizedSlotId, data);
+  if (!items.length) return "";
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan("home", composition);
+  const starterThumbnails = Array.isArray(mergedAssetPlan?.resolvedAssets?.thumbnails) ? mergedAssetPlan.resolvedAssets.thumbnails : [];
+  const theme = resolveHomeCompositionTheme(mergedAssetPlan);
+  const primitiveClasses = buildRuntimePrimitiveClassNames(composition);
+  const commerceVariant = resolveCommercePrimitiveVariant(composition) || "grid";
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  const titleBySlot = {
+    "md-choice": "MD 추천",
+    "timedeal": "타임딜",
+    "subscription": "가전 구독",
+    "space-renewal": "공간별 가전 제안",
+    "latest-product-news": "최신 제품 소식",
+    "smart-life": "스마트한 생활",
+  };
+  const title = String(patch.title || titleBySlot[normalizedSlotId] || "추천 콘텐츠").trim();
+  const subtitle = String(patch.subtitle || "").trim();
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, normalizedSlotId),
+    buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+  ].filter(Boolean).join(";");
+  const attrs = buildHomeCompositionSectionAttrs(
+    normalizedSlotId,
+    activeSourceId || "composition-renderer",
+    String(composition?.familyId || "commerce-card-grid-composition").trim(),
+    `codex-home-composition--commerce ${theme.classes} ${primitiveClasses} ${commerceVariant === "featured" ? "is-commerce-featured" : ""} ${commerceVariant === "story-editorial" ? "is-story-editorial" : ""} ${commerceVariant === "story-portrait" ? "is-story-portrait" : ""} ${commerceVariant === "benefit-service" ? "is-benefit-service" : ""} ${commerceVariant === "benefit-hub" ? "is-benefit-hub" : ""}`.trim()
+  );
+  const leadItem = items[0] || null;
+  const trailingItems = leadItem ? items.slice(1) : items;
+  const resolveCommerceThumb = (item, index = 0) => String(item.image || "").trim() || pickResolvedStarterAssetUrl(starterThumbnails, index);
+  if (rendererSurface === "tailwind") {
+    const tailwindItems = items.map((item, index) => ({
+      ...item,
+      image: resolveCommerceThumb(item, index),
+    }));
+    if (commerceVariant === "story-editorial" || commerceVariant === "story-portrait") {
+      return renderServiceTailwindStorySection({
+        attrs,
+        sectionStyle,
+        titleStyle,
+        subtitleStyle,
+        title,
+        subtitle,
+        items: tailwindItems.slice(0, 3),
+        escapeHtml,
+      });
+    }
+    return renderServiceTailwindCommerceSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      items: tailwindItems.slice(0, commerceVariant === "featured" ? 4 : 6),
+      escapeHtml,
+    });
+  }
+  if (commerceVariant === "benefit-service" || commerceVariant === "benefit-hub") {
+    return `
+      <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+        ${buildHomeCompositionSelfContainedStyleTag()}
+        <div class="codex-home-composition-shell codex-home-composition-shell--narrow">
+          <div class="codex-home-composition-commerce-head">
+            <h2 class="codex-home-composition-title codex-home-composition-title--compact"${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
+            ${subtitle ? `<p class="codex-home-composition-description codex-home-composition-description--compact"${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</p>` : ""}
+          </div>
+          <div class="codex-home-composition-commerce-grid">
+            ${items
+              .map((item, index) => `
+                <a class="codex-home-composition-commerce-card codex-home-composition-commerce-card--service" href="${escapeHtml(item.href)}">
+                  <span class="codex-home-composition-commerce-thumb codex-home-composition-commerce-thumb--service">
+                    ${resolveCommerceThumb(item, index) ? `<img src="${escapeHtml(resolveCommerceThumb(item, index))}" alt="${escapeHtml(item.title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                  </span>
+                  <span class="codex-home-composition-commerce-body">
+                    ${item.badge ? `<span class="codex-home-composition-badge codex-home-composition-badge--inline">${escapeHtml(item.badge)}</span>` : ""}
+                    <strong>${escapeHtml(item.title)}</strong>
+                    ${item.description ? `<span>${escapeHtml(item.description)}</span>` : ""}
+                  </span>
+                </a>
+              `)
+              .join("")}
+          </div>
+        </div>
+      </section>
+    `;
+  }
+  return `
+    <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+      ${buildHomeCompositionSelfContainedStyleTag()}
+      <div class="codex-home-composition-shell codex-home-composition-shell--narrow">
+        <div class="codex-home-composition-commerce-head">
+          <h2 class="codex-home-composition-title codex-home-composition-title--compact"${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</h2>
+          ${subtitle ? `<p class="codex-home-composition-description codex-home-composition-description--compact"${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</p>` : ""}
+        </div>
+        <div class="codex-home-composition-commerce-grid">
+          ${commerceVariant === "featured" && leadItem ? `
+            <a class="codex-home-composition-commerce-card codex-home-composition-commerce-card--lead" href="${escapeHtml(leadItem.href)}">
+              <span class="codex-home-composition-commerce-thumb codex-home-composition-commerce-thumb--lead">
+                ${resolveCommerceThumb(leadItem, 0) ? `<img src="${escapeHtml(resolveCommerceThumb(leadItem, 0))}" alt="${escapeHtml(leadItem.title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+              </span>
+              <span class="codex-home-composition-commerce-body">
+                ${leadItem.badge ? `<span class="codex-home-composition-badge codex-home-composition-badge--inline">${escapeHtml(leadItem.badge)}</span>` : ""}
+                <strong>${escapeHtml(leadItem.title)}</strong>
+                ${leadItem.description ? `<span>${escapeHtml(leadItem.description)}</span>` : ""}
+                ${leadItem.price ? `<em>${escapeHtml(leadItem.price)}원</em>` : ""}
+              </span>
+            </a>
+          ` : ""}
+          ${(commerceVariant === "featured" ? trailingItems : items)
+            .map((item, index) => `
+              <a class="codex-home-composition-commerce-card${commerceVariant === "story-editorial" ? " codex-home-composition-commerce-card--editorial" : ""}" href="${escapeHtml(item.href)}">
+                <span class="codex-home-composition-commerce-thumb">
+                  ${resolveCommerceThumb(item, commerceVariant === "featured" ? index + 1 : index) ? `<img src="${escapeHtml(resolveCommerceThumb(item, commerceVariant === "featured" ? index + 1 : index))}" alt="${escapeHtml(item.title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+                </span>
+                <span class="codex-home-composition-commerce-body">
+                  ${item.badge ? `<span class="codex-home-composition-badge codex-home-composition-badge--inline">${escapeHtml(item.badge)}</span>` : ""}
+                  <strong>${escapeHtml(item.title)}</strong>
+                  ${item.description ? `<span>${escapeHtml(item.description)}</span>` : ""}
+                  ${item.price ? `<em>${escapeHtml(item.price)}원</em>` : ""}
+                </span>
+              </a>
+            `)
+            .join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderHomeImageBannerCompositionSection(slotId = "", data = {}, activeSourceId = "", componentPatch = {}, composition = {}) {
+  const normalizedSlotId = String(slotId || "").trim();
+  const patch = sanitizeGovernedComponentPatch("home", normalizedSlotId, componentPatch).patch || {};
+  const styles = patch.styles && typeof patch.styles === "object" ? patch.styles : {};
+  const item = normalizeHomeCommerceCompositionItems(normalizedSlotId, data)[0] || null;
+  if (!item) return "";
+  const mergedAssetPlan = mergeRuntimeCompositionAssetPlan("home", composition);
+  const starterVisuals = Array.isArray(mergedAssetPlan?.resolvedAssets?.visuals) ? mergedAssetPlan.resolvedAssets.visuals : [];
+  const theme = resolveHomeCompositionTheme(mergedAssetPlan);
+  const primitiveClasses = buildRuntimePrimitiveClassNames(composition);
+  const bannerVariant = resolveBannerPrimitiveVariant(composition) || "cinematic";
+  const rendererSurface = normalizeRendererSurfaceRuntime(composition?.rendererSurface || "", "custom");
+  const titleBySlot = {
+    "summary-banner-2": "혜택 배너",
+    "missed-benefits": "놓치면 아쉬운 혜택",
+    "marketing-area": "기획전 배너",
+    "brand-showroom": "브랜드 쇼룸",
+    "lg-best-care": "LG 베스트 케어",
+    "bestshop-guide": "베스트샵 가이드",
+  };
+  const title = String(patch.title || item.title || titleBySlot[normalizedSlotId] || "프로모션").trim();
+  const subtitle = String(patch.subtitle || item.description || "").trim();
+  const ctaLabel = String(patch.ctaLabel || patch.moreLabel || "자세히 보기").trim();
+  const eyebrow = String(patch.badge || item.badge || "").trim();
+  const titleStyle = buildTextPatchStyleText(styles, "title");
+  const subtitleStyle = buildTextPatchStyleText(styles, "subtitle");
+  const sectionStyle = [
+    buildCompositionRuntimeStyleText(composition, normalizedSlotId),
+    buildSectionPatchStyleText(styles, { hidden: patch.visibility === false }),
+  ].filter(Boolean).join(";");
+  const attrs = buildHomeCompositionSectionAttrs(
+    normalizedSlotId,
+    activeSourceId || "composition-renderer",
+    String(composition?.familyId || "image-banner-strip-composition").trim(),
+    `codex-home-composition--banner ${theme.classes} ${primitiveClasses} ${bannerVariant === "cinematic" ? "is-cinematic" : "is-banner-clean"}`.trim()
+  );
+  if (rendererSurface === "tailwind") {
+    return renderServiceTailwindBannerSection({
+      attrs,
+      sectionStyle,
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      ctaLabel,
+      href: item.href,
+      imageSrc: String(item.image || "").trim() || pickResolvedStarterAssetUrl(starterVisuals, 0),
+      imageAlt: item.title || title,
+      escapeHtml,
+    });
+  }
+  if (resolveBannerPrimitiveVariant(composition)) {
+    return renderHomePrimitiveBannerSection({
+      attrs,
+      sectionStyle,
+      selfContainedStyleTag: buildHomeCompositionSelfContainedStyleTag(),
+      titleStyle,
+      subtitleStyle,
+      title,
+      subtitle,
+      ctaLabel,
+      eyebrow,
+      href: item.href,
+      imageSrc: String(item.image || "").trim() || pickResolvedStarterAssetUrl(starterVisuals, 0),
+      imageAlt: item.title || title,
+      escapeHtml,
+    });
+  }
+  return `
+    <section ${attrs}${sectionStyle ? ` style="${escapeHtml(sectionStyle)}"` : ""}>
+      ${buildHomeCompositionSelfContainedStyleTag()}
+      <div class="codex-home-composition-shell codex-home-composition-shell--narrow">
+        <a class="codex-home-composition-banner-card" href="${escapeHtml(item.href)}">
+          <span class="codex-home-composition-banner-copy">
+            ${eyebrow ? `<span class="codex-home-composition-eyebrow">${escapeHtml(eyebrow)}</span>` : ""}
+            <strong${titleStyle ? ` style="${escapeHtml(titleStyle)}"` : ""}>${escapeHtml(title)}</strong>
+            ${subtitle ? `<span${subtitleStyle ? ` style="${escapeHtml(subtitleStyle)}"` : ""}>${escapeHtml(subtitle)}</span>` : ""}
+            <em>${escapeHtml(ctaLabel)}</em>
+          </span>
+          <span class="codex-home-composition-banner-visual">
+            ${(String(item.image || "").trim() || pickResolvedStarterAssetUrl(starterVisuals, 0)) ? `<img src="${escapeHtml(String(item.image || "").trim() || pickResolvedStarterAssetUrl(starterVisuals, 0))}" alt="${escapeHtml(item.title || title)}" />` : `<span class="codex-home-composition-hero-fallback"></span>`}
+          </span>
+        </a>
+      </div>
+    </section>
+  `;
 }
 
 function extractMobilePromotionSection(rawHtml) {
@@ -9446,24 +20355,77 @@ function escapeRegExp(value) {
 function parseSelectorMatcher(selector) {
   const normalized = String(selector || "").trim();
   if (!normalized) return null;
-  if (normalized.startsWith(".")) {
-    const classNames = normalized
-      .split(".")
-      .map((item) => item.trim())
-      .filter(Boolean);
-    if (!classNames.length) return null;
-    return (attrs) => {
-      const classMatch = String(attrs || "").match(/\bclass="([^"]*)"/i);
-      const classes = new Set(String(classMatch?.[1] || "").split(/\s+/).filter(Boolean));
-      return classNames.every((className) => classes.has(className));
+  let tagName = "";
+  let remainder = normalized;
+  const tagMatch = remainder.match(/^[a-zA-Z][\w:-]*/);
+  if (tagMatch && ![".", "#", "["].includes(remainder.charAt(0))) {
+    tagName = String(tagMatch[0] || "").toLowerCase();
+    remainder = remainder.slice(tagMatch[0].length);
+  }
+  const classNames = [];
+  let idName = "";
+  const attributeChecks = [];
+  while (remainder.startsWith(".")) {
+    const classMatch = remainder.match(/^\.([a-zA-Z0-9_-]+)/);
+    if (!classMatch) break;
+    classNames.push(classMatch[1]);
+    remainder = remainder.slice(classMatch[0].length);
+  }
+  if (remainder.startsWith("#")) {
+    const idMatch = remainder.match(/^#([a-zA-Z0-9_-]+)/);
+    if (idMatch) {
+      idName = idMatch[1];
+      remainder = remainder.slice(idMatch[0].length);
+    }
+  }
+  const attrPattern = /^\[([a-zA-Z_:][-a-zA-Z0-9_:.]*)([*^$]?=)"([^"]*)"\]/;
+  while (remainder.startsWith("[")) {
+    const attrMatch = remainder.match(attrPattern);
+    if (!attrMatch) return null;
+    attributeChecks.push({
+      name: attrMatch[1],
+      operator: attrMatch[2] || "",
+      value: attrMatch[3] || "",
+    });
+    remainder = remainder.slice(attrMatch[0].length);
+  }
+  if (remainder) return null;
+  if (!tagName && !classNames.length && !idName && !attributeChecks.length) {
+    if (/^[a-zA-Z0-9_-]+$/.test(normalized)) {
+      const needle = normalized;
+      return (attrs) => String(attrs || "").includes(needle);
+    }
+    return null;
+  }
+  return (attrs, nodeTagName = "") => {
+    const safeAttrs = String(attrs || "");
+    const readAttr = (name) => {
+      const match = safeAttrs.match(new RegExp(`\\b${escapeRegExp(name)}="([^"]*)"`, "i"));
+      return String(match?.[1] || "");
     };
-  }
-  const dataAreaContains = normalized.match(/^\[data-area\*="([^"]+)"\]$/);
-  if (dataAreaContains) {
-    const needle = dataAreaContains[1];
-    return (attrs) => String(attrs || "").includes(`data-area="`) && String(attrs || "").includes(needle);
-  }
-  return null;
+    if (tagName && String(nodeTagName || "").toLowerCase() !== tagName) return false;
+    if (classNames.length) {
+      const classes = new Set(readAttr("class").split(/\s+/).filter(Boolean));
+      if (!classNames.every((className) => classes.has(className))) return false;
+    }
+    if (idName && readAttr("id") !== idName) return false;
+    for (const check of attributeChecks) {
+      const actual = readAttr(check.name);
+      if (!actual) return false;
+      if (!check.operator || check.operator === "=") {
+        if (actual !== check.value) return false;
+      } else if (check.operator === "*=") {
+        if (!actual.includes(check.value)) return false;
+      } else if (check.operator === "^=") {
+        if (!actual.startsWith(check.value)) return false;
+      } else if (check.operator === "$=") {
+        if (!actual.endsWith(check.value)) return false;
+      } else {
+        return false;
+      }
+    }
+    return true;
+  };
 }
 
 function findFirstSelectorNodeRange(html, selector) {
@@ -9475,7 +20437,7 @@ function findFirstSelectorNodeRange(html, selector) {
   while ((match = pattern.exec(source))) {
     const [openingTag, tagName, attrs] = match;
     if (openingTag.startsWith("</") || openingTag.startsWith("<!") || openingTag.startsWith("<?")) continue;
-    if (!matcher(attrs)) continue;
+    if (!matcher(attrs, tagName)) continue;
     return {
       start: match.index,
       end: pattern.lastIndex,
@@ -9517,6 +20479,12 @@ function normalizeCssSizeValue(value) {
   return raw;
 }
 
+function normalizeCssInlineValue(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  return raw.replace(/[;\n\r{}]/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function buildSectionPatchStyleText(styles = {}, options = {}) {
   const nextStyles = styles && typeof styles === "object" ? styles : {};
   const styleParts = [];
@@ -9552,11 +20520,26 @@ function buildTextPatchStyleText(styles = {}, kind = "title") {
   const colorKey = kind === "subtitle" ? "subtitleColor" : "titleColor";
   const weightKey = kind === "subtitle" ? "subtitleWeight" : "titleWeight";
   const sizeKey = kind === "subtitle" ? "subtitleSize" : "titleSize";
+  const lineHeightKey = kind === "subtitle" ? "subtitleLineHeight" : "titleLineHeight";
+  const letterSpacingKey = kind === "subtitle" ? "subtitleLetterSpacing" : "titleLetterSpacing";
+  const familyKey = kind === "subtitle" ? "subtitleFontFamily" : "titleFontFamily";
+  const transformKey = kind === "subtitle" ? "subtitleTextTransform" : "titleTextTransform";
+  const styleKey = kind === "subtitle" ? "subtitleFontStyle" : "titleFontStyle";
   const styleParts = [];
   if (nextStyles[colorKey]) styleParts.push(`color:${nextStyles[colorKey]}`);
   if (nextStyles[weightKey]) styleParts.push(`font-weight:${nextStyles[weightKey]}`);
   const size = normalizeCssSizeValue(nextStyles[sizeKey]);
   if (size) styleParts.push(`font-size:${size}`);
+  const lineHeight = normalizeCssSizeValue(nextStyles[lineHeightKey]);
+  if (lineHeight) styleParts.push(`line-height:${lineHeight}`);
+  const letterSpacing = normalizeCssSizeValue(nextStyles[letterSpacingKey]);
+  if (letterSpacing) styleParts.push(`letter-spacing:${letterSpacing}`);
+  const fontFamily = normalizeCssInlineValue(nextStyles[familyKey]);
+  if (fontFamily) styleParts.push(`font-family:${fontFamily}`);
+  const textTransform = normalizeCssInlineValue(nextStyles[transformKey]);
+  if (textTransform) styleParts.push(`text-transform:${textTransform}`);
+  const fontStyle = normalizeCssInlineValue(nextStyles[styleKey]);
+  if (fontStyle) styleParts.push(`font-style:${fontStyle}`);
   if (nextStyles.textAlign) styleParts.push(`text-align:${nextStyles.textAlign}`);
   return styleParts.filter(Boolean).join(";");
 }
@@ -9896,6 +20879,33 @@ function transformFirstSelectorBlock(html, selector, transform) {
   return `${source.slice(0, opening.start)}${nextBlock}${source.slice(closing.end)}`;
 }
 
+function replaceFirstAvailableSelectorBlock(html, selectors = [], transform) {
+  const source = String(html || "");
+  const candidates = Array.isArray(selectors)
+    ? selectors.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  for (const selector of candidates) {
+    const opening = findFirstSelectorNodeRange(source, selector);
+    if (!opening) continue;
+    const closing = findMatchingClosingTagRange(source, opening.end, opening.tagName);
+    if (!closing) continue;
+    const block = source.slice(opening.start, closing.end);
+    const nextBlock = typeof transform === "function" ? transform(block, opening, selector) : block;
+    return {
+      html: `${source.slice(0, opening.start)}${nextBlock}${source.slice(closing.end)}`,
+      replaced: String(nextBlock || "") !== block,
+      selector,
+      block,
+    };
+  }
+  return {
+    html: source,
+    replaced: false,
+    selector: "",
+    block: "",
+  };
+}
+
 function extractFirstSelectorBlock(html, selector) {
   let extracted = "";
   transformFirstSelectorBlock(String(html || ""), selector, (block) => {
@@ -9903,6 +20913,42 @@ function extractFirstSelectorBlock(html, selector) {
     return block;
   });
   return extracted;
+}
+
+function buildReplacementSelectorCandidates(pageId = "", slotId = "", selector = "", viewportProfile = "pc") {
+  const candidates = [];
+  const primarySelector = String(selector || "").trim();
+  if (primarySelector) candidates.push(primarySelector);
+  for (const fallbackSelector of getArtifactFallbackSelectors(pageId, slotId, viewportProfile)) {
+    const normalized = String(fallbackSelector || "").trim();
+    if (normalized) candidates.push(normalized);
+  }
+  return Array.from(new Set(candidates));
+}
+
+function hasCodexSlotMarker(html = "", slotId = "") {
+  const normalizedSlotId = String(slotId || "").trim();
+  if (!normalizedSlotId) return false;
+  return new RegExp(`\\bdata-codex-slot="${escapeRegExp(normalizedSlotId)}"`, "i").test(String(html || ""));
+}
+
+function extractFirstAvailableSelectorBlock(html = "", selectors = []) {
+  for (const selector of Array.isArray(selectors) ? selectors : []) {
+    const normalized = String(selector || "").trim();
+    if (!normalized) continue;
+    const block = extractFirstSelectorBlock(html, normalized);
+    if (String(block || "").trim()) return block;
+  }
+  return "";
+}
+
+function appendMarkupBeforeMainClose(html = "", markup = "") {
+  const source = String(html || "");
+  const addition = String(markup || "").trim();
+  if (!addition) return source;
+  const closePattern = /<\/main>/i;
+  if (!closePattern.test(source)) return `${source}${addition}`;
+  return source.replace(closePattern, `${addition}\n</main>`);
 }
 
 function applyWorkspacePageVariants(html, pageId, viewportProfile, editableData) {
@@ -10191,6 +21237,1013 @@ function buildHomeHeroRuntimeCss() {
         line-height: 1;
         opacity: 0.82;
       }
+      .codex-home-composition {
+        box-sizing: border-box;
+      }
+      .codex-home-composition *,
+      .codex-home-composition *::before,
+      .codex-home-composition *::after {
+        box-sizing: border-box;
+      }
+      .codex-home-composition-shell {
+        width: min(1440px, calc(100vw - 48px));
+        margin: 0 auto;
+      }
+      .codex-home-composition-shell--narrow {
+        width: min(var(--codex-content-width, 1460px), calc(100vw - 48px));
+      }
+      .codex-home-composition--hero {
+        --codex-title-size: 46px;
+        --codex-description-size: 17px;
+        --codex-title-line-height: 1.08;
+        --codex-description-line-height: 1.65;
+        --codex-title-letter-spacing: -0.04em;
+        --codex-description-letter-spacing: -0.02em;
+        --codex-title-font-family: Arial, sans-serif;
+        --codex-description-font-family: Arial, sans-serif;
+        --codex-card-radius: 24px;
+        --codex-hero-stage-gap: 28px;
+        --codex-hero-copy-align: left;
+        --codex-hero-copy-max: none;
+        --codex-hero-visual-min-height: 540px;
+        padding: 28px 0 14px;
+        background:
+          radial-gradient(circle at 18% 16%, rgba(255,255,255,0.92), transparent 34%),
+          linear-gradient(135deg, #f7efe7 0%, #f3f0ff 46%, #edf4ff 100%);
+      }
+      .codex-home-composition--hero.is-editorial {
+        background:
+          radial-gradient(circle at 20% 14%, rgba(255,255,255,0.98), transparent 34%),
+          linear-gradient(135deg, #f7e8dd 0%, #f5f1eb 42%, #eef5ff 100%);
+      }
+      .codex-home-composition--hero.is-premium-stage {
+        background:
+          radial-gradient(circle at 78% 20%, rgba(255,255,255,0.18), transparent 28%),
+          linear-gradient(135deg, #0f172a 0%, #1e293b 52%, #334155 100%);
+      }
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-title,
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-description,
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-support,
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-hero-caption strong,
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-hero-caption p,
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-hero-tab-copy strong,
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-hero-tab-copy span {
+        color: #f8fafc;
+      }
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-badge,
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-hero-mini-badge,
+      .codex-home-composition--hero.is-premium-stage .codex-home-composition-hero-tab {
+        background: rgba(255,255,255,0.1);
+        color: #f8fafc;
+        border-color: rgba(255,255,255,0.14);
+      }
+      .codex-home-composition-hero-stage {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+        gap: var(--codex-hero-stage-gap);
+        align-items: stretch;
+      }
+      .codex-home-composition--hero.is-template-centered-v1 .codex-home-composition-hero-stage,
+      .codex-home-composition--hero.is-template-stacked-v1 .codex-home-composition-hero-stage {
+        grid-template-columns: 1fr;
+        gap: 22px;
+      }
+      .codex-home-composition--hero.is-template-editorial-v1 .codex-home-composition-hero-stage {
+        grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
+        gap: 34px;
+      }
+      .codex-home-composition--hero.is-template-premium-v1 .codex-home-composition-hero-stage {
+        grid-template-columns: minmax(0, 0.82fr) minmax(460px, 1.18fr);
+        gap: 36px;
+      }
+      .codex-home-composition-copy,
+      .codex-home-composition-visual-stack {
+        min-width: 0;
+      }
+      .codex-home-composition-copy {
+        display: grid;
+        align-content: center;
+        gap: 14px;
+        padding: 34px 6px 34px 0;
+        text-align: var(--codex-hero-copy-align);
+        max-width: var(--codex-hero-copy-max);
+      }
+      .codex-home-composition--hero.is-template-centered-v1 .codex-home-composition-copy {
+        justify-items: center;
+        text-align: center;
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 20px 0 0;
+      }
+      .codex-home-composition--hero.is-template-stacked-v1 .codex-home-composition-copy {
+        max-width: 860px;
+        padding: 12px 0 0;
+      }
+      .codex-home-composition-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 0 10px;
+        min-height: 28px;
+        border-radius: 999px;
+        background: rgba(17, 24, 39, 0.08);
+        color: #111827;
+        font: 700 12px/1 Arial, sans-serif;
+        letter-spacing: -0.01em;
+      }
+      .codex-home-composition-badge {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        min-height: 32px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.84);
+        border: 1px solid rgba(17,24,39,0.08);
+        color: #7c2d12;
+        font: 700 13px/1 Arial, sans-serif;
+        letter-spacing: -0.01em;
+      }
+      .codex-home-composition-badge--inline {
+        min-height: 24px;
+        padding: 0 10px;
+        font-size: 11px;
+      }
+      .codex-home-composition--hero.is-soft-pill .codex-home-composition-badge {
+        background: rgba(255,255,255,0.92);
+        color: #9a3412;
+      }
+      .codex-home-composition-title {
+        margin: 0;
+        color: #111827;
+        font-size: var(--codex-title-size);
+        line-height: var(--codex-title-line-height);
+        font-family: var(--codex-title-font-family);
+        font-weight: 700;
+        letter-spacing: var(--codex-title-letter-spacing);
+      }
+      .codex-home-composition-title--compact {
+        font-size: 32px;
+        line-height: 1.16;
+      }
+      .codex-home-composition-description {
+        margin: 0;
+        max-width: 620px;
+        color: #334155;
+        font-size: var(--codex-description-size);
+        line-height: var(--codex-description-line-height);
+        font-family: var(--codex-description-font-family);
+        font-weight: 500;
+        letter-spacing: var(--codex-description-letter-spacing);
+      }
+      .codex-home-composition--hero.is-template-centered-v1 .codex-home-composition-description {
+        max-width: 760px;
+      }
+      .codex-home-composition-description--compact {
+        font-size: 15px;
+        line-height: 1.55;
+      }
+      .codex-home-composition-chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .codex-home-composition-chip {
+        display: inline-flex;
+        align-items: center;
+        min-height: 30px;
+        padding: 0 12px;
+        border-radius: 999px;
+        background: rgba(17, 24, 39, 0.06);
+        color: #334155;
+        font: 600 12px/1 Arial, sans-serif;
+      }
+      .codex-home-composition-actions {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 12px;
+        margin-top: 4px;
+      }
+      .codex-home-composition-primary,
+      .codex-home-composition-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 999px;
+        text-decoration: none;
+        font: 700 14px/1 Arial, sans-serif;
+        letter-spacing: -0.01em;
+      }
+      .codex-home-composition-primary {
+        background: #111827;
+        color: #fff;
+      }
+      .codex-home-composition-secondary {
+        border: 1px solid rgba(17,24,39,0.12);
+        color: #111827;
+        background: #fff;
+      }
+      .codex-home-composition-support {
+        color: #475569;
+        font: 500 13px/1.45 Arial, sans-serif;
+      }
+      .codex-home-composition-visual-stack {
+        position: relative;
+        min-height: var(--codex-hero-visual-min-height);
+      }
+      .codex-home-composition-hero-editorial-stage {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(220px, 0.72fr);
+        gap: 16px;
+        min-height: 540px;
+      }
+      .codex-home-composition-hero-editorial-lead,
+      .codex-home-composition-hero-editorial-support {
+        text-decoration: none;
+        color: inherit;
+      }
+      .codex-home-composition-hero-visual--lead {
+        min-height: 540px;
+      }
+      .codex-home-composition--hero.is-template-centered-v1 .codex-home-composition-hero-visual--lead,
+      .codex-home-composition--hero.is-template-stacked-v1 .codex-home-composition-hero-visual--lead {
+        min-height: 620px;
+      }
+      .codex-home-composition-hero-caption--lead {
+        padding-top: 16px;
+      }
+      .codex-home-composition-hero-editorial-rail {
+        display: grid;
+        gap: 12px;
+      }
+      .codex-home-composition-hero-premium-stage {
+        display: grid;
+        grid-template-columns: minmax(0, 1.18fr) minmax(220px, 0.72fr);
+        gap: 14px;
+        min-height: 540px;
+      }
+      .codex-home-composition-hero-centered-stage {
+        display: grid;
+        gap: 18px;
+        min-height: 620px;
+      }
+      .codex-home-composition-hero-centered-summary {
+        display: grid;
+        justify-items: center;
+        gap: 8px;
+        max-width: 760px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .codex-home-composition-hero-centered-summary strong {
+        color: #111827;
+        font: 700 22px/1.2 Arial, sans-serif;
+        letter-spacing: -0.03em;
+      }
+      .codex-home-composition-hero-centered-summary p {
+        margin: 0;
+        color: #475569;
+        font: 500 15px/1.6 Arial, sans-serif;
+      }
+      .codex-home-composition-hero-stacked-stage {
+        display: grid;
+        gap: 16px;
+        min-height: 620px;
+      }
+      .codex-home-composition-hero-stacked-rail {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .codex-home-composition-hero-stacked-card {
+        display: grid;
+        gap: 10px;
+        min-width: 0;
+        padding: 14px;
+        border-radius: calc(var(--codex-card-radius) - 2px);
+        background: rgba(255,255,255,0.88);
+        border: 1px solid rgba(17,24,39,0.06);
+        box-shadow: 0 12px 24px rgba(17,24,39,0.06);
+        text-decoration: none;
+        color: inherit;
+      }
+      .codex-home-composition-hero-stacked-card-copy {
+        display: grid;
+        gap: 6px;
+      }
+      .codex-home-composition-hero-stacked-card-copy em {
+        color: #7c2d12;
+        font: 700 11px/1 Arial, sans-serif;
+        font-style: normal;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .codex-home-composition-hero-stacked-card-copy strong {
+        color: #111827;
+        font: 700 15px/1.35 Arial, sans-serif;
+        letter-spacing: -0.02em;
+      }
+      .codex-home-composition-hero-stacked-card-visual {
+        display: block;
+        overflow: hidden;
+        min-height: 132px;
+        border-radius: calc(var(--codex-card-radius) - 6px);
+        background: #fff;
+      }
+      .codex-home-composition-hero-stacked-card-visual img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .codex-home-composition-hero-premium-main,
+      .codex-home-composition-hero-premium-support {
+        text-decoration: none;
+        color: inherit;
+      }
+      .codex-home-composition-hero-premium-main-copy {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .codex-home-composition-hero-premium-main-copy strong {
+        color: #f8fafc;
+        font: 700 20px/1.24 Arial, sans-serif;
+        letter-spacing: -0.03em;
+      }
+      .codex-home-composition-hero-premium-main-copy p {
+        margin: 0;
+        color: rgba(248,250,252,0.82);
+        font: 500 14px/1.55 Arial, sans-serif;
+      }
+      .codex-home-composition-hero-premium-stack {
+        display: grid;
+        gap: 12px;
+      }
+      .codex-home-composition-hero-premium-support {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 96px;
+        gap: 10px;
+        align-items: stretch;
+        padding: 14px;
+        border-radius: calc(var(--codex-card-radius) - 4px);
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+      }
+      .codex-home-composition-hero-premium-support-copy {
+        display: grid;
+        gap: 6px;
+        align-content: center;
+      }
+      .codex-home-composition-hero-premium-support-copy em {
+        color: rgba(255,255,255,0.64);
+        font: 700 11px/1 Arial, sans-serif;
+        font-style: normal;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .codex-home-composition-hero-premium-support-copy strong {
+        color: #f8fafc;
+        font: 700 14px/1.36 Arial, sans-serif;
+      }
+      .codex-home-composition-hero-premium-support-visual {
+        overflow: hidden;
+        border-radius: 16px;
+        min-height: 96px;
+        background: rgba(255,255,255,0.08);
+      }
+      .codex-home-composition-hero-premium-support-visual img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .codex-home-composition-hero-editorial-support {
+        display: grid;
+        grid-template-columns: 108px minmax(0, 1fr);
+        gap: 12px;
+        align-items: center;
+        padding: 12px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.82);
+        border: 1px solid rgba(17,24,39,0.08);
+        box-shadow: 0 10px 24px rgba(17,24,39,0.06);
+      }
+      .codex-home-composition-hero-editorial-support-visual {
+        display: block;
+        overflow: hidden;
+        height: 108px;
+        border-radius: 16px;
+        background: #fff;
+      }
+      .codex-home-composition-hero-editorial-support-visual img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .codex-home-composition-hero-editorial-support-copy {
+        display: grid;
+        gap: 6px;
+      }
+      .codex-home-composition-hero-editorial-support-copy em {
+        color: #7c2d12;
+        font: 700 11px/1 Arial, sans-serif;
+        font-style: normal;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .codex-home-composition-hero-editorial-support-copy strong {
+        color: #111827;
+        font: 700 15px/1.35 Arial, sans-serif;
+        letter-spacing: -0.02em;
+      }
+      .codex-home-composition-hero-slide {
+        display: none;
+        grid-template-rows: minmax(380px, 1fr) auto;
+        gap: 14px;
+        height: 100%;
+      }
+      .codex-home-composition-hero-slide.is-active {
+        display: grid;
+      }
+      .codex-home-composition-hero-visual {
+        display: block;
+        position: relative;
+        overflow: hidden;
+        border-radius: 34px;
+        background: rgba(255,255,255,0.82);
+        border: 1px solid rgba(17,24,39,0.08);
+        min-height: 380px;
+        box-shadow: 0 24px 56px rgba(17,24,39,0.12);
+      }
+      .codex-home-composition-hero-visual img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .codex-home-composition-hero-fallback {
+        display: block;
+        width: 100%;
+        height: 100%;
+        min-height: 380px;
+        background: linear-gradient(135deg, rgba(17,24,39,0.1), rgba(15,23,42,0.02));
+      }
+      .codex-home-composition-hero-caption {
+        display: grid;
+        gap: 6px;
+        padding: 0 8px 0 2px;
+      }
+      .codex-home-composition-hero-caption strong {
+        color: #111827;
+        font: 700 18px/1.35 Arial, sans-serif;
+        letter-spacing: -0.02em;
+      }
+      .codex-home-composition-hero-caption p {
+        margin: 0;
+        color: #475569;
+        font: 500 14px/1.55 Arial, sans-serif;
+      }
+      .codex-home-composition-hero-mini-badge {
+        display: inline-flex;
+        width: fit-content;
+        padding: 0 10px;
+        min-height: 26px;
+        border-radius: 999px;
+        background: rgba(17,24,39,0.07);
+        color: #334155;
+        font: 700 12px/1 Arial, sans-serif;
+      }
+      .codex-home-composition-hero-nav {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 10px;
+        margin-top: 18px;
+      }
+      .codex-home-composition--hero.is-template-centered-v1 .codex-home-composition-hero-nav {
+        max-width: 1080px;
+        margin: 18px auto 0;
+      }
+      .codex-home-composition-hero-tab {
+        display: grid;
+        grid-template-columns: 38px minmax(0, 1fr);
+        gap: 10px;
+        align-items: start;
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid rgba(17,24,39,0.08);
+        border-radius: 18px;
+        background: rgba(255,255,255,0.7);
+        cursor: pointer;
+      }
+      .codex-home-composition-hero-tab.is-active {
+        border-color: rgba(17,24,39,0.18);
+        background: #fff;
+        box-shadow: 0 10px 28px rgba(17,24,39,0.08);
+      }
+      .codex-home-composition-hero-tab-index {
+        color: #64748b;
+        font: 700 12px/1 Arial, sans-serif;
+      }
+      .codex-home-composition-hero-tab-copy {
+        display: grid;
+        gap: 4px;
+        text-align: left;
+      }
+      .codex-home-composition-hero-tab-copy strong {
+        color: #111827;
+        font: 700 13px/1.35 Arial, sans-serif;
+      }
+      .codex-home-composition-hero-tab-copy span {
+        color: #64748b;
+        font: 500 12px/1.35 Arial, sans-serif;
+      }
+      .codex-home-composition--quickmenu {
+        --codex-quickmenu-gap: 16px;
+        --codex-quickmenu-hover-lift: translateY(-2px);
+        --codex-card-radius: 24px;
+        padding: 20px 0 8px;
+        background: #fff;
+      }
+      .codex-home-composition--quickmenu.is-solid-icon .codex-home-composition-quickmenu-card {
+        background: linear-gradient(180deg, #fff 0%, #f6f8fb 100%);
+      }
+      .codex-home-composition--quickmenu.is-premium-chip .codex-home-composition-secondary {
+        background: #111827;
+        color: #fff;
+        border-color: transparent;
+      }
+      .codex-home-composition--ranking,
+      .codex-home-composition--commerce,
+      .codex-home-composition--banner {
+        padding: 18px 0 10px;
+        background: #fff;
+      }
+      .codex-home-composition--banner.is-banner-clean .codex-home-composition-banner-card {
+        background: linear-gradient(180deg, var(--codex-banner-surface, #f8fafc) 0%, #ffffff 100%);
+        color: var(--codex-banner-copy-color, #111827);
+        border: 1px solid rgba(17,24,39,0.08);
+        box-shadow: 0 20px 40px rgba(15,23,42,0.06);
+      }
+      .codex-home-composition--banner.is-banner-clean .codex-home-composition-banner-copy span,
+      .codex-home-composition--banner.is-banner-clean .codex-home-composition-banner-copy em {
+        color: var(--codex-banner-body-color, #475569);
+      }
+      .codex-home-composition--commerce.is-story-editorial .codex-home-composition-commerce-card,
+      .codex-home-composition--banner.is-cinematic .codex-home-composition-banner-card {
+        background: linear-gradient(180deg, #ffffff 0%, #f7f8fb 100%);
+      }
+      .codex-home-composition--commerce.is-commerce-featured .codex-home-composition-commerce-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+      .codex-home-composition--commerce.is-commerce-featured .codex-home-composition-commerce-card--lead {
+        grid-column: span 3;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+        align-items: stretch;
+        gap: 18px;
+        padding: 22px;
+      }
+      .codex-home-composition--commerce.is-commerce-featured .codex-home-composition-commerce-card--lead .codex-home-composition-commerce-thumb--lead {
+        aspect-ratio: 4 / 5;
+      }
+      .codex-home-composition--commerce.is-commerce-featured .codex-home-composition-commerce-grid > .codex-home-composition-commerce-card:not(.codex-home-composition-commerce-card--lead) {
+        grid-column: span 1;
+      }
+      .codex-home-composition--commerce.is-benefit-service .codex-home-composition-commerce-grid,
+      .codex-home-composition--commerce.is-benefit-hub .codex-home-composition-commerce-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--codex-commerce-gap, 16px);
+      }
+      .codex-home-composition-commerce-card--service {
+        grid-template-columns: 132px minmax(0, 1fr);
+        align-items: center;
+      }
+      .codex-home-composition-commerce-thumb--service {
+        aspect-ratio: 1 / 1;
+      }
+      .codex-home-composition-commerce-card--editorial .codex-home-composition-commerce-body {
+        gap: 8px;
+      }
+      .codex-home-composition-quickmenu-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 18px;
+      }
+      .codex-home-composition-quickmenu-copy {
+        display: grid;
+        gap: 10px;
+      }
+      .codex-home-composition-quickmenu-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: var(--codex-quickmenu-gap);
+      }
+      .codex-home-composition--quickmenu.is-template-panel-v1 .codex-home-composition-quickmenu-grid {
+        grid-auto-rows: minmax(168px, auto);
+      }
+      .codex-home-composition--quickmenu.is-template-editorial-strip-v1 .codex-home-composition-quickmenu-grid {
+        grid-template-columns: minmax(0, 1.45fr) repeat(3, minmax(0, 1fr));
+        align-items: stretch;
+      }
+      .codex-home-composition-quickmenu-card {
+        display: grid;
+        gap: 12px;
+        align-content: start;
+        min-height: 188px;
+        padding: 20px 18px;
+        border-radius: var(--codex-card-radius);
+        background: #f8fafc;
+        border: 1px solid rgba(17,24,39,0.06);
+        text-decoration: none;
+        color: #111827;
+        transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+      }
+      .codex-home-composition-quickmenu-card:hover {
+        transform: var(--codex-quickmenu-hover-lift);
+        border-color: rgba(17,24,39,0.12);
+        box-shadow: 0 14px 32px rgba(17,24,39,0.08);
+      }
+      .codex-home-composition-quickmenu-card strong {
+        font: 700 16px/1.4 Arial, sans-serif;
+        letter-spacing: -0.02em;
+      }
+      .codex-home-composition-quickmenu-card--lead {
+        grid-column: span 2;
+        grid-row: span 2;
+        grid-template-columns: minmax(0, 1fr) 118px;
+        align-items: end;
+        gap: 18px;
+        background: linear-gradient(135deg, #111827 0%, #1f2937 55%, #334155 100%);
+        color: #fff;
+        padding: 24px;
+        box-shadow: 0 22px 40px rgba(15,23,42,0.18);
+      }
+      .codex-home-composition-quickmenu-lead-copy {
+        display: grid;
+        align-content: end;
+        gap: 10px;
+      }
+      .codex-home-composition-quickmenu-lead-copy em {
+        color: rgba(255,255,255,0.72);
+        font: 700 11px/1 Arial, sans-serif;
+        font-style: normal;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .codex-home-composition-quickmenu-lead-copy strong {
+        font-size: 28px;
+        line-height: 1.08;
+        letter-spacing: -0.04em;
+      }
+      .codex-home-composition-quickmenu-lead-copy span {
+        color: rgba(255,255,255,0.8);
+        font: 500 14px/1.5 Arial, sans-serif;
+      }
+      .codex-home-composition-quickmenu-card--editorial {
+        grid-column: span 2;
+        grid-row: span 2;
+        align-content: stretch;
+        background: linear-gradient(135deg, #fffdf8 0%, #f7f3ea 44%, #eef4fb 100%);
+      }
+      .codex-home-composition-quickmenu-editorial-rail {
+        display: grid;
+        gap: 10px;
+        margin-top: auto;
+      }
+      .codex-home-composition-quickmenu-editorial-chip {
+        display: grid;
+        grid-template-columns: 52px minmax(0, 1fr);
+        gap: 10px;
+        align-items: center;
+        min-height: 64px;
+        padding: 10px 12px;
+        border-radius: calc(var(--codex-card-radius) - 6px);
+        background: rgba(255,255,255,0.82);
+        border: 1px solid rgba(17,24,39,0.06);
+      }
+      .codex-home-composition-quickmenu-editorial-chip img {
+        display: block;
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
+      }
+      .codex-home-composition-quickmenu-editorial-chip strong {
+        font: 700 14px/1.35 Arial, sans-serif;
+        letter-spacing: -0.02em;
+      }
+      .codex-home-composition-quickmenu-icon {
+        display: grid;
+        place-items: center;
+        width: 64px;
+        height: 64px;
+        border-radius: calc(var(--codex-card-radius) - 4px);
+        background: #fff;
+        box-shadow: inset 0 0 0 1px rgba(17,24,39,0.08);
+      }
+      .codex-home-composition--quickmenu.is-line-icon .codex-home-composition-quickmenu-icon {
+        background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+      }
+      .codex-home-composition-quickmenu-icon--lead {
+        width: 118px;
+        height: 118px;
+        border-radius: 28px;
+        background: rgba(255,255,255,0.12);
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,0.16);
+      }
+      .codex-home-composition-quickmenu-icon--lead img {
+        width: 62px;
+        height: 62px;
+      }
+      .codex-home-composition-quickmenu-icon img {
+        display: block;
+        width: 34px;
+        height: 34px;
+        object-fit: contain;
+      }
+      .codex-home-composition-quickmenu-fallback {
+        color: #475569;
+        font: 700 13px/1 Arial, sans-serif;
+      }
+      .codex-home-composition-ranking-head,
+      .codex-home-composition-commerce-head {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .codex-home-composition-ranking-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+      .codex-home-composition-ranking-tab {
+        display: inline-flex;
+        align-items: center;
+        min-height: 34px;
+        padding: 0 14px;
+        border-radius: 999px;
+        background: #f1f5f9;
+        color: #334155;
+        font: 700 12px/1 Arial, sans-serif;
+      }
+      .codex-home-composition-ranking-tab.is-active {
+        background: #111827;
+        color: #fff;
+      }
+      .codex-home-composition-ranking-list {
+        display: grid;
+        gap: var(--codex-ranking-gap, 12px);
+      }
+      .codex-home-composition-ranking-card {
+        display: grid;
+        grid-template-columns: 56px 128px minmax(0, 1fr);
+        gap: 14px;
+        align-items: center;
+        padding: 16px 18px;
+        border-radius: 22px;
+        background: #f8fafc;
+        text-decoration: none;
+        color: #111827;
+        border: 1px solid rgba(17,24,39,0.06);
+      }
+      .codex-home-composition--ranking.is-ranking-poster .codex-home-composition-ranking-card {
+        grid-template-columns: 56px 104px minmax(0, 1fr);
+      }
+      .codex-home-composition-ranking-rank {
+        color: #111827;
+        font: 700 24px/1 Arial, sans-serif;
+        letter-spacing: -0.04em;
+        text-align: center;
+      }
+      .codex-home-composition-ranking-thumb,
+      .codex-home-composition-commerce-thumb {
+        display: block;
+        overflow: hidden;
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: inset 0 0 0 1px rgba(17,24,39,0.08);
+      }
+      .codex-home-composition-ranking-thumb {
+        width: 128px;
+        height: 128px;
+      }
+      .codex-home-composition--ranking.is-ranking-poster .codex-home-composition-ranking-thumb {
+        width: 104px;
+        height: 132px;
+        border-radius: 14px;
+      }
+      .codex-home-composition-ranking-thumb img,
+      .codex-home-composition-commerce-thumb img,
+      .codex-home-composition-banner-visual img {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .codex-home-composition-ranking-thumb img,
+      .codex-home-composition-commerce-thumb img {
+        object-fit: contain;
+      }
+      .codex-home-composition-ranking-body,
+      .codex-home-composition-commerce-body {
+        display: grid;
+        gap: 6px;
+        min-width: 0;
+      }
+      .codex-home-composition-ranking-body strong,
+      .codex-home-composition-commerce-body strong {
+        color: #111827;
+        font: 700 16px/1.4 Arial, sans-serif;
+        letter-spacing: -0.02em;
+      }
+      .codex-home-composition-ranking-body span,
+      .codex-home-composition-commerce-body span {
+        color: #475569;
+        font: 500 13px/1.5 Arial, sans-serif;
+      }
+      .codex-home-composition-ranking-body em,
+      .codex-home-composition-commerce-body em {
+        color: #b91c1c;
+        font: 700 14px/1.4 Arial, sans-serif;
+        font-style: normal;
+      }
+      .codex-home-composition-commerce-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: var(--codex-commerce-gap, 18px);
+      }
+      .codex-home-composition-commerce-card {
+        display: grid;
+        gap: 14px;
+        align-content: start;
+        padding: 18px;
+        border-radius: 24px;
+        background: #f8fafc;
+        text-decoration: none;
+        color: #111827;
+        border: 1px solid rgba(17,24,39,0.06);
+      }
+      .codex-home-composition-commerce-thumb {
+        aspect-ratio: 1 / 1;
+      }
+      .codex-home-composition--commerce.is-story-portrait .codex-home-composition-commerce-thumb {
+        aspect-ratio: 3 / 4;
+        border-radius: 20px;
+      }
+      .codex-home-composition-banner-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+        gap: 24px;
+        align-items: stretch;
+        padding: 24px;
+        border-radius: 28px;
+        background: linear-gradient(135deg, #111827 0%, #1f2937 54%, #334155 100%);
+        text-decoration: none;
+        color: #fff;
+        overflow: hidden;
+      }
+      .codex-home-composition--banner.is-cinematic .codex-home-composition-banner-card {
+        background:
+          radial-gradient(circle at 82% 18%, rgba(255,255,255,0.18), transparent 28%),
+          linear-gradient(135deg, #111827 0%, #1f2937 46%, #475569 100%);
+      }
+      .codex-home-composition--banner.is-editorial-kicker .codex-home-composition-banner-copy em,
+      .codex-home-composition--commerce.is-editorial-kicker .codex-home-composition-badge--inline {
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .codex-home-composition-banner-copy {
+        display: grid;
+        align-content: center;
+        gap: 12px;
+      }
+      .codex-home-composition-banner-copy .codex-home-composition-eyebrow {
+        background: rgba(255,255,255,0.12);
+        color: #fff;
+      }
+      .codex-home-composition-banner-copy strong {
+        font: 700 30px/1.14 Arial, sans-serif;
+        letter-spacing: -0.04em;
+      }
+      .codex-home-composition-banner-copy span {
+        font: 500 15px/1.6 Arial, sans-serif;
+        color: rgba(255,255,255,0.82);
+      }
+      .codex-home-composition-banner-copy em {
+        font: 700 14px/1 Arial, sans-serif;
+        color: #fff;
+        font-style: normal;
+      }
+      .codex-home-composition-banner-visual {
+        display: block;
+        min-height: 220px;
+        border-radius: 24px;
+        overflow: hidden;
+        background: rgba(255,255,255,0.1);
+      }
+      .codex-home-composition-banner-visual img {
+        object-fit: cover;
+      }
+      @media (max-width: 1180px) {
+        .codex-home-composition-title {
+          font-size: 38px;
+        }
+        .codex-home-composition-hero-stage {
+          grid-template-columns: 1fr;
+        }
+        .codex-home-composition-visual-stack {
+          min-height: 0;
+        }
+        .codex-home-composition-commerce-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .codex-home-composition--commerce.is-commerce-featured .codex-home-composition-commerce-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .codex-home-composition--commerce.is-commerce-featured .codex-home-composition-commerce-card--lead {
+          grid-column: span 2;
+        }
+        .codex-home-composition-banner-card {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 900px) {
+        .codex-home-composition-shell,
+        .codex-home-composition-shell--narrow {
+          width: calc(100vw - 32px);
+        }
+        .codex-home-composition--hero.is-template-centered-v1 .codex-home-composition-copy,
+        .codex-home-composition--hero.is-template-stacked-v1 .codex-home-composition-copy {
+          text-align: left;
+          justify-items: start;
+        }
+        .codex-home-composition-hero-stacked-rail {
+          grid-template-columns: 1fr;
+        }
+        .codex-home-composition-quickmenu-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .codex-home-composition-quickmenu-head {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .codex-home-composition-ranking-card {
+          grid-template-columns: 44px 96px minmax(0, 1fr);
+        }
+        .codex-home-composition-ranking-thumb {
+          width: 96px;
+          height: 96px;
+        }
+      }
+      @media (max-width: 640px) {
+        .codex-home-composition--hero {
+          padding-top: 18px;
+        }
+        .codex-home-composition-title {
+          font-size: 30px;
+        }
+        .codex-home-composition-description {
+          font-size: 15px;
+        }
+        .codex-home-composition-hero-nav {
+          grid-template-columns: 1fr;
+        }
+        .codex-home-composition-quickmenu-grid {
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+        .codex-home-composition-quickmenu-card {
+          min-height: 156px;
+          padding: 16px 14px;
+        }
+        .codex-home-composition-commerce-grid {
+          grid-template-columns: 1fr;
+        }
+        .codex-home-composition--commerce.is-commerce-featured .codex-home-composition-commerce-card--lead,
+        .codex-home-composition-commerce-card--service {
+          grid-template-columns: 1fr;
+        }
+        .codex-home-composition--commerce.is-benefit-service .codex-home-composition-commerce-grid,
+        .codex-home-composition--commerce.is-benefit-hub .codex-home-composition-commerce-grid {
+          grid-template-columns: 1fr;
+        }
+        .codex-home-composition-ranking-card {
+          grid-template-columns: 36px 72px minmax(0, 1fr);
+          padding: 14px;
+        }
+        .codex-home-composition-ranking-thumb {
+          width: 72px;
+          height: 72px;
+        }
+        .codex-home-composition-banner-copy strong {
+          font-size: 24px;
+        }
+      }
   `;
 }
 
@@ -10313,6 +22366,34 @@ function buildHomeHeroRuntimeScript() {
           });
 
           activate(tabs.find((tab) => tab.classList.contains('is-active')) || tabs[0]);
+        }
+
+        function initCodexHomeCompositionRuntime(root = document) {
+          root.querySelectorAll('.codex-home-composition--hero[data-codex-composition-family="hero-carousel-composition"]').forEach((section) => {
+            if (!section || section.dataset.codexCompositionInit === 'true') return;
+            const slides = Array.from(section.querySelectorAll('[data-codex-hero-composition-slide]'));
+            const tabs = Array.from(section.querySelectorAll('[data-codex-hero-composition-tab]'));
+            if (!slides.length || !tabs.length) return;
+            section.dataset.codexCompositionInit = 'true';
+
+            function activate(index) {
+              const normalizedIndex = Math.max(0, Math.min(slides.length - 1, index));
+              slides.forEach((slide, slideIndex) => {
+                slide.classList.toggle('is-active', slideIndex === normalizedIndex);
+              });
+              tabs.forEach((tab, tabIndex) => {
+                const isActive = tabIndex === normalizedIndex;
+                tab.classList.toggle('is-active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+              });
+            }
+
+            tabs.forEach((tab, index) => {
+              tab.addEventListener('click', () => activate(index));
+            });
+
+            activate(0);
+          });
         }
   `;
 }
@@ -12192,10 +24273,19 @@ function renderHomeEnhancements(rawHtml, mobileHtml = "", options = {}) {
 }
 
 function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
+  const perfTimer = options?.perfTimer || null;
+  perfTimer?.mark("injectHomeReplacements:start");
   const data = parseHomeEnhancements(rawHtml, mobileHtml, options);
+  perfTimer?.mark("injectHomeReplacements:parsed");
   const rebuilt = renderHomeEnhancements(rawHtml, mobileHtml, options);
+  perfTimer?.mark("injectHomeReplacements:rebuilt");
   if (!rebuilt) return html;
   const viewportProfile = normalizeHomeViewportProfile(options.viewportProfile || "ta", "ta");
+  const draftBuild = options.draftBuild || null;
+  const draftBuildId = String(draftBuild?.id || "").trim();
+  const higherLayerComposition = readDraftHigherLayerCompositionState(draftBuild);
+  const pureTopStageReplacementMode = shouldUsePureTopStageReplacementMode(draftBuild);
+  const allowDraftComposition = String(options.snapshotState || "").trim().toLowerCase() !== "before";
   const artifactRegistry = buildArtifactSectionRegistry("home", {
     editableData: options.editableData || null,
     viewportProfile,
@@ -12230,22 +24320,35 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
     options.viewportProfile || ""
   )?.patch || {};
   const heroSourceId = getActiveSourceId(options.editableData || {}, "home", "hero", "captured-home-hero");
-  const heroPatch = findComponentPatch(
+  const heroLivePatch = findComponentPatch(
     options.editableData || {},
     "home",
     "home.hero",
     heroSourceId,
     options.viewportProfile || ""
   )?.patch || {};
+  const heroComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.hero", "hero") : null;
+  const heroDraftPatch = allowDraftComposition ? findEffectiveDraftComponentPatch(draftBuild, "home.hero", "hero") : {};
+  const heroPatch = {
+    ...(heroLivePatch && typeof heroLivePatch === "object" ? heroLivePatch : {}),
+    ...(heroDraftPatch && typeof heroDraftPatch === "object" ? heroDraftPatch : {}),
+  };
   const quickmenuSourceId = getActiveSourceId(options.editableData || {}, "home", "quickmenu", "captured-home-quickmenu");
-  const quickmenuPatch = findComponentPatch(
+  const quickmenuLivePatch = findComponentPatch(
     options.editableData || {},
     "home",
     "home.quickmenu",
     quickmenuSourceId,
     options.viewportProfile || ""
   )?.patch || {};
+  const quickmenuComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.quickmenu", "quickmenu") : null;
+  const quickmenuDraftPatch = allowDraftComposition ? findEffectiveDraftComponentPatch(draftBuild, "home.quickmenu", "quickmenu") : {};
+  const quickmenuPatch = {
+    ...(quickmenuLivePatch && typeof quickmenuLivePatch === "object" ? quickmenuLivePatch : {}),
+    ...(quickmenuDraftPatch && typeof quickmenuDraftPatch === "object" ? quickmenuDraftPatch : {}),
+  };
   const mdChoiceSourceId = getActiveSourceId(options.editableData || {}, "home", "md-choice", "captured-home-md-choice");
+  const mdChoiceComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.md-choice", "md-choice") : null;
   const mdChoicePatch = findComponentPatch(
     options.editableData || {},
     "home",
@@ -12254,6 +24357,7 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
     options.viewportProfile || ""
   )?.patch || {};
   const timedealSourceId = getActiveSourceId(options.editableData || {}, "home", "timedeal", "captured-home-timedeal");
+  const timedealComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.timedeal", "timedeal") : null;
   const timedealPatch = findComponentPatch(
     options.editableData || {},
     "home",
@@ -12262,16 +24366,27 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
     options.viewportProfile || ""
   )?.patch || {};
   const bestRankingSourceId = getActiveSourceId(options.editableData || {}, "home", "best-ranking", "custom-live-current");
+  const bestRankingComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.best-ranking", "best-ranking") : null;
   const subscriptionSourceId = getActiveSourceId(options.editableData || {}, "home", "subscription", "custom-live-current");
+  const subscriptionComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.subscription", "subscription") : null;
   const spaceRenewalSourceId = getActiveSourceId(options.editableData || {}, "home", "space-renewal", "custom-live-current");
+  const spaceRenewalComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.space-renewal", "space-renewal") : null;
   const brandShowroomSourceId = getActiveSourceId(options.editableData || {}, "home", "brand-showroom", "custom-live-current");
+  const brandShowroomComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.brand-showroom", "brand-showroom") : null;
   const latestProductNewsSourceId = getActiveSourceId(options.editableData || {}, "home", "latest-product-news", "custom-live-current");
+  const latestProductNewsComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.latest-product-news", "latest-product-news") : null;
   const smartLifeSourceId = getActiveSourceId(options.editableData || {}, "home", "smart-life", "custom-live-current");
+  const smartLifeComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.smart-life", "smart-life") : null;
   const lowerPromotionSourceId = getActiveSourceId(options.editableData || {}, "home", "summary-banner-2", "custom-live-current");
+  const lowerPromotionComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.summary-banner-2", "summary-banner-2") : null;
   const missedBenefitsSourceId = getActiveSourceId(options.editableData || {}, "home", "missed-benefits", "custom-live-current");
+  const missedBenefitsComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.missed-benefits", "missed-benefits") : null;
   const marketingAreaSourceId = getActiveSourceId(options.editableData || {}, "home", "marketing-area", "custom-live-current");
+  const marketingAreaComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.marketing-area", "marketing-area") : null;
   const lgBestCareSourceId = getActiveSourceId(options.editableData || {}, "home", "lg-best-care", "custom-live-current");
+  const lgBestCareComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.lg-best-care", "lg-best-care") : null;
   const bestshopGuideSourceId = getActiveSourceId(options.editableData || {}, "home", "bestshop-guide", "custom-live-current");
+  const bestshopGuideComposition = allowDraftComposition ? findEffectiveDraftComponentCompositionEntry(draftBuild, "home.bestshop-guide", "bestshop-guide") : null;
   const bestRankingRenderSourceId = preferExactReferenceSource("best-ranking", bestRankingSourceId);
   const subscriptionRenderSourceId = preferExactReferenceSource("subscription", subscriptionSourceId);
   const spaceRenewalRenderSourceId = preferExactReferenceSource("space-renewal", spaceRenewalSourceId);
@@ -12368,36 +24483,102 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
     "mobile-derived",
     "custom-live-current"
   );
+  const draftBuilderVersion = String(
+    draftBuild?.builderVersion ||
+    draftBuild?.snapshotData?.builderVersion ||
+    ""
+  ).trim().toLowerCase();
+  const draftRendererSurface = normalizeRendererSurfaceRuntime(
+    draftBuild?.rendererSurface ||
+    draftBuild?.snapshotData?.rendererSurface ||
+    "custom",
+    "custom"
+  );
+  const hasRenderablePrimitiveTree = (composition = null) =>
+    Boolean(normalizeRuntimePrimitiveTree(composition?.primitiveTree || composition?.primitive || null));
+  const hasV2DraftComposition = (composition = null) =>
+    Boolean(
+      composition &&
+      (
+        hasRenderablePrimitiveTree(composition) ||
+        draftBuilderVersion === "v2"
+      )
+    );
+  const shouldRenderHeroComposition = Boolean(
+    heroComposition &&
+    (
+      hasV2DraftComposition(heroComposition) ||
+      String(heroComposition.familyId || "").trim() === "hero-carousel-composition"
+    )
+  );
+  const quickmenuFamilyId = String(quickmenuComposition?.familyId || "").trim();
+  const shouldRenderQuickmenuComposition = Boolean(
+    quickmenuComposition &&
+    (
+      hasV2DraftComposition(quickmenuComposition) ||
+      [
+        "icon-link-grid-composition",
+        "quickmenu-panel",
+        "quickmenu-editorial-strip",
+      ].includes(quickmenuFamilyId)
+    )
+  );
+  const hasCanonicalTopStage =
+    Boolean(findCanonicalCloneSectionBySlot(draftBuild, "hero") || findCanonicalCloneSectionBySlot(draftBuild, "quickmenu"));
+  const useCanonicalDedicatedTopStage =
+    allowDraftComposition &&
+    draftRendererSurface === "tailwind" &&
+    hasCanonicalTopStage &&
+    (draftBuilderVersion === "design-pipeline-local" || String(draftBuild?.snapshotData?.source || "").trim() === "design-pipeline-local-build-draft");
   const hero =
-    viewportProfile === "mo"
-      ? (() => {
-          const heroBaseSection = mobileHtml ? extractMobileHeroSection(mobileHtml) : "";
-          return heroBaseSection ? applyHomeHeroPatch(heroBaseSection, heroSourceId, heroPatch) : "";
-        })()
-      : renderCurrentLiveHomeHeroSection(heroSourceId, heroPatch, viewportProfile) ||
-        (() => {
-          const heroBaseSection = extractHomeHeroSection(rawHtml);
-          return heroBaseSection ? applyHomeHeroPatch(heroBaseSection, heroSourceId, heroPatch) : "";
-        })();
+    useCanonicalDedicatedTopStage
+      ? renderCanonicalHomeHeroSection(rawHtml, mobileHtml, draftBuild, viewportProfile, heroSourceId)
+      : shouldRenderHeroComposition
+      ? renderHomeHeroCompositionSection(rawHtml, mobileHtml, heroSourceId, heroPatch, {
+          ...(heroComposition || {}),
+          rendererSurface: draftRendererSurface,
+        }, viewportProfile)
+      : viewportProfile === "mo"
+        ? (() => {
+            const heroBaseSection = mobileHtml ? extractMobileHeroSection(mobileHtml) : "";
+            return heroBaseSection ? applyHomeHeroPatch(heroBaseSection, heroSourceId, heroPatch) : "";
+          })()
+        : renderCurrentLiveHomeHeroSection(heroSourceId, heroPatch, viewportProfile) ||
+          (() => {
+            const heroBaseSection = extractHomeHeroSection(rawHtml);
+            return heroBaseSection ? applyHomeHeroPatch(heroBaseSection, heroSourceId, heroPatch) : "";
+          })();
   const liveQuickMenuSection =
     viewportProfile === "mo"
       ? ""
       : extractCurrentLiveHomeSectionByProfile("quickmenu") ||
         extractCurrentLiveHomeSectionByClass("HomePcQuickmenu_quickmenu__");
   const quickMenu =
-    applyHomeQuickmenuPatch(
-      (liveQuickMenuSection
-        ? markHomeLiveCustomSection(liveQuickMenuSection, "quickmenu", quickmenuSourceId)
-        : "") ||
-      (viewportProfile === "mo" ? (mobileHtml ? extractMobileQuickMenuSection(mobileHtml) : "") : extractHomeQuickMenuSection(rawHtml)) ||
-      rebuilt.match(/<section class="HomeMoQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
-      rebuilt.match(/<section class="codex-home-section codex-home-quickmenu">[\s\S]*?<\/section>/)?.[0] ||
-      "",
-      quickmenuSourceId,
-      quickmenuPatch,
-      viewportProfile
-    ) ||
-    "";
+    useCanonicalDedicatedTopStage
+      ? renderCanonicalHomeQuickmenuSection(rawHtml, mobileHtml, draftBuild, viewportProfile, quickmenuSourceId)
+      : shouldRenderQuickmenuComposition
+      ? renderHomeQuickmenuCompositionSection(rawHtml, mobileHtml, quickmenuSourceId, quickmenuPatch, {
+          ...(quickmenuComposition || {}),
+          rendererSurface: draftRendererSurface,
+        }, viewportProfile)
+      : applyHomeQuickmenuPatch(
+          (liveQuickMenuSection
+            ? markHomeLiveCustomSection(liveQuickMenuSection, "quickmenu", quickmenuSourceId)
+            : "") ||
+          (viewportProfile === "mo" ? (mobileHtml ? extractMobileQuickMenuSection(mobileHtml) : "") : extractHomeQuickMenuSection(rawHtml)) ||
+          rebuilt.match(/<section class="HomeMoQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
+          rebuilt.match(/<section class="codex-home-section codex-home-quickmenu">[\s\S]*?<\/section>/)?.[0] ||
+          "",
+          quickmenuSourceId,
+          quickmenuPatch,
+          viewportProfile
+        ) ||
+        "";
+  if (draftBuildId) {
+    console.log(
+      `[home-composition] build=${draftBuildId} surface=${draftRendererSurface} hero=${shouldRenderHeroComposition ? "composition" : "live"} heroFamily=${String(heroComposition?.familyId || "").trim() || "none"} heroPrimitive=${hasRenderablePrimitiveTree(heroComposition) ? "yes" : "no"} quickmenu=${shouldRenderQuickmenuComposition ? "composition" : "live"} quickmenuFamily=${quickmenuFamilyId || "none"} quickmenuPrimitive=${hasRenderablePrimitiveTree(quickmenuComposition) ? "yes" : "no"}`
+    );
+  }
   const promotion =
     viewportProfile === "mo"
       ? (() => {
@@ -12414,7 +24595,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
         rebuilt.match(/<section class="HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
         "";
   const lowerPromotion =
-    viewportProfile === "mo"
+    lowerPromotionComposition && String(lowerPromotionComposition.familyId || "").trim() === "image-banner-strip-composition"
+      ? renderHomeImageBannerCompositionSection("summary-banner-2", data, lowerPromotionRenderSourceId, lowerPromotionPatch, lowerPromotionComposition)
+      : viewportProfile === "mo"
       ? (() => {
           const section = mobileHtml ? extractMobileLowerPromotionSection(mobileHtml) : "";
           return section
@@ -12450,7 +24633,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
             : "";
         })();
   const mdChoice =
-    viewportProfile === "mo"
+    mdChoiceComposition && String(mdChoiceComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("md-choice", data, mdChoiceSourceId, mdChoicePatch, mdChoiceComposition)
+      : viewportProfile === "mo"
       ? (() => {
           const section = mobileHtml ? extractMobileMdChoiceSection(mobileHtml) : "";
           if (!section) return "";
@@ -12473,7 +24658,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
         rebuilt.match(/<section class="HomePcListHorizontype[^"]*"[\s\S]*?<\/section>/)?.[0] ||
         "";
   const timedeal =
-    viewportProfile === "mo"
+    timedealComposition && String(timedealComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("timedeal", data, timedealSourceId, timedealPatch, timedealComposition)
+      : viewportProfile === "mo"
       ? (() => {
           const section = mobileHtml ? extractMobileTimedealSection(mobileHtml) : "";
           if (!section) return "";
@@ -12496,7 +24683,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
         rebuilt.match(/<section class="HomePcTimedeal_timedeal__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
         "";
   const subscription =
-    viewportProfile === "mo"
+    subscriptionComposition && String(subscriptionComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("subscription", data, subscriptionRenderSourceId, subscriptionPatch, subscriptionComposition)
+      : viewportProfile === "mo"
       ? (() => {
           const section = mobileHtml ? extractMobileSubscriptionSection(mobileHtml) : "";
           return section
@@ -12535,7 +24724,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
             : "";
         })();
   const spaceRenewal =
-    viewportProfile === "mo"
+    spaceRenewalComposition && String(spaceRenewalComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("space-renewal", data, spaceRenewalRenderSourceId, spaceRenewalPatch, spaceRenewalComposition)
+      : viewportProfile === "mo"
       ? (() => {
           const section = mobileHtml ? extractMobileSpaceRenewalSection(mobileHtml) : "";
           return section
@@ -12576,7 +24767,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
             : "";
         })();
   const bestRanking =
-    viewportProfile === "mo"
+    bestRankingComposition && String(bestRankingComposition.familyId || "").trim() === "ranking-list-composition"
+      ? renderHomeRankingCompositionSection(bestRankingRenderSourceId, bestRankingPatch, bestRankingComposition)
+      : viewportProfile === "mo"
       ? rebuilt.match(/<section[^>]+data-codex-slot="best-ranking"[^>]*[\s\S]*?<\/section>/)?.[0] ||
         rebuilt.match(/<section class="codex-home-best-ranking"[\s\S]*?<\/section>/)?.[0] ||
         rebuilt.match(/<section class="HomeMoListTabstypeBestranking_list_tab_bestranking__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
@@ -12593,7 +24786,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
         rebuilt.match(/<section class="HomeMoListTabstypeBestranking_list_tab_bestranking__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
         "";
   const marketingArea =
-    viewportProfile === "mo"
+    marketingAreaComposition && String(marketingAreaComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("marketing-area", data, marketingAreaRenderSourceId, marketingAreaPatch, marketingAreaComposition)
+      : viewportProfile === "mo"
       ? ""
       : renderCurrentLiveHomeSection(
           "marketing-area",
@@ -12606,7 +24801,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
         rebuilt.match(/<section class="HomeMoListMarketingArea_list_marketing_area__[^"]*"[\s\S]*?<\/section>/)?.[0] ||
         "";
   const brandShowroom =
-    viewportProfile !== "mo" && hasExactReferenceSection("brand-showroom")
+    brandShowroomComposition && String(brandShowroomComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("brand-showroom", data, brandShowroomRenderSourceId, brandShowroomPatch, brandShowroomComposition)
+      : viewportProfile !== "mo" && hasExactReferenceSection("brand-showroom")
       ? renderCurrentLiveHomeSection(
           "brand-showroom",
           brandShowroomRenderSourceId,
@@ -12643,7 +24840,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
             : "";
         })();
   const latestProductNews =
-    viewportProfile !== "mo" && hasExactReferenceSection("latest-product-news")
+    latestProductNewsComposition && String(latestProductNewsComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("latest-product-news", data, latestProductNewsRenderSourceId, latestProductNewsPatch, latestProductNewsComposition)
+      : viewportProfile !== "mo" && hasExactReferenceSection("latest-product-news")
       ? renderCurrentLiveHomeSection(
           "latest-product-news",
           latestProductNewsRenderSourceId,
@@ -12680,7 +24879,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
             : "";
         })();
   const smartLife =
-    viewportProfile !== "mo" && hasExactReferenceSection("smart-life")
+    smartLifeComposition && String(smartLifeComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("smart-life", data, smartLifeRenderSourceId, smartLifePatch, smartLifeComposition)
+      : viewportProfile !== "mo" && hasExactReferenceSection("smart-life")
       ? renderCurrentLiveHomeSection(
           "smart-life",
           smartLifeRenderSourceId,
@@ -12716,7 +24917,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
             : "";
         })();
   const missedBenefits =
-    viewportProfile === "mo"
+    missedBenefitsComposition && String(missedBenefitsComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("missed-benefits", data, missedBenefitsRenderSourceId, missedBenefitsPatch, missedBenefitsComposition)
+      : viewportProfile === "mo"
       ? (() => {
           const section = mobileHtml ? extractMobileMissedBenefitsSection(mobileHtml) : "";
           return section
@@ -12754,7 +24957,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
             : "";
         })();
   const lgBestCare =
-    viewportProfile === "mo"
+    lgBestCareComposition && String(lgBestCareComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("lg-best-care", data, lgBestCareRenderSourceId, lgBestCarePatch, lgBestCareComposition)
+      : viewportProfile === "mo"
       ? (() => {
           const section = mobileHtml ? extractMobileLgBestCareSection(mobileHtml) : "";
           return section
@@ -12782,7 +24987,9 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
           lgBestCarePatch
         ) || "";
   const bestshopGuide =
-    viewportProfile === "mo"
+    bestshopGuideComposition && String(bestshopGuideComposition.familyId || "").trim() === "commerce-card-grid-composition"
+      ? renderHomeCommerceCompositionSection("bestshop-guide", data, bestshopGuideRenderSourceId, bestshopGuidePatch, bestshopGuideComposition)
+      : viewportProfile === "mo"
       ? (() => {
           const section = mobileHtml ? extractMobileBestshopGuideSection(mobileHtml) : "";
           return section ? markHomeLowerReplay(section, "bestshop-guide", "mobile-derived", viewportProfile) : "";
@@ -12802,21 +25009,46 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
           bestshopGuideRenderSourceId,
           bestshopGuidePatch
         ) || "";
+  const debugHomeReplacement = Boolean(draftBuildId);
+  const replaceHomeSectionBySelectors = (sourceHtml, selectors, nextMarkup) => {
+    const normalizedMarkup = String(nextMarkup || "").trim();
+    if (!normalizedMarkup) return String(sourceHtml || "");
+    const selectorList = Array.isArray(selectors) ? selectors : [selectors];
+    let nextHtml = String(sourceHtml || "");
+    let replaced = false;
+    for (const selector of selectorList.map((item) => String(item || "").trim()).filter(Boolean)) {
+      const candidate = transformFirstSelectorBlock(nextHtml, selector, () => {
+        replaced = true;
+        return normalizedMarkup;
+      });
+      if (candidate !== nextHtml) {
+        nextHtml = candidate;
+        break;
+      }
+    }
+    return { html: nextHtml, replaced };
+  };
   if (hero) {
     if (viewportProfile === "mo") {
-      html = html.replace(
-        /<section class="HomeMoBannerHero_banner_hero__[^"]*"[\s\S]*?<\/section>/,
-        () => hero
+      const heroReplacement = replaceHomeSectionBySelectors(
+        html,
+        ['[class*="HomeMoBannerHero_banner_hero__"]'],
+        hero
       );
+      html = heroReplacement.html;
+      if (debugHomeReplacement) {
+        console.log(`[home-replace] build=${draftBuildId} slot=hero viewport=${viewportProfile} variant=mo replaced=${heroReplacement.replaced ? "yes" : "no"} length=${hero.length}`);
+      }
     } else {
-      html = html.replace(
-        /<section class="HomePcBannerHero_banner_hero__[^"]*"[\s\S]*?(?=<section class="HomePcQuickmenu_quickmenu__)/,
-        () => hero
+      const heroReplacement = replaceHomeSectionBySelectors(
+        html,
+        ['[class*="HomePcBannerHero_banner_hero__"]', '[class*="HomeTaBannerHero_banner_hero__"]'],
+        hero
       );
-      html = html.replace(
-        /<section class="HomeTaBannerHero_banner_hero__[^"]*"[\s\S]*?(?=<section class="HomePcQuickmenu_quickmenu__|<section class="HomeTaQuickmenu_quickmenu__)/,
-        () => hero
-      );
+      html = heroReplacement.html;
+      if (debugHomeReplacement) {
+        console.log(`[home-replace] build=${draftBuildId} slot=hero viewport=${viewportProfile} variant=pc-ta replaced=${heroReplacement.replaced ? "yes" : "no"} length=${hero.length}`);
+      }
     }
   }
 
@@ -12831,45 +25063,53 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
 
   if (quickMenu) {
     if (viewportProfile === "mo") {
-      html = html.replace(
-        /<section class="HomeMoQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
+      const quickmenuReplacement = replaceHomeSectionBySelectors(
+        html,
+        [
+          '[class*="HomeMoQuickmenu_quickmenu__"]',
+          '[class*="HomePcQuickmenu_quickmenu__"]',
+          '[class*="HomeTaQuickmenu_quickmenu__"]',
+        ],
         quickMenu
       );
-      html = html.replace(
-        /<section class="HomePcQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
-        quickMenu
-      );
-      html = html.replace(
-        /<section class="HomeTaQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
-        quickMenu
-      );
+      html = quickmenuReplacement.html;
+      if (debugHomeReplacement) {
+        console.log(`[home-replace] build=${draftBuildId} slot=quickmenu viewport=${viewportProfile} variant=mo replaced=${quickmenuReplacement.replaced ? "yes" : "no"} length=${quickMenu.length}`);
+      }
     } else {
-      html = html.replace(
-        /<section class="HomePcQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
+      const quickmenuReplacement = replaceHomeSectionBySelectors(
+        html,
+        ['[class*="HomePcQuickmenu_quickmenu__"]', '[class*="HomeTaQuickmenu_quickmenu__"]'],
         quickMenu
       );
-      html = html.replace(
-        /<section class="HomeTaQuickmenu_quickmenu__[^"]*"[\s\S]*?<\/section>/,
-        quickMenu
-      );
+      html = quickmenuReplacement.html;
+      if (debugHomeReplacement) {
+        console.log(`[home-replace] build=${draftBuildId} slot=quickmenu viewport=${viewportProfile} variant=pc-ta replaced=${quickmenuReplacement.replaced ? "yes" : "no"} length=${quickMenu.length}`);
+      }
     }
   }
 
   if (promotion) {
     if (viewportProfile === "mo") {
-      html = html.replace(
-        /<section class="HomeMoBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/,
+      const promotionReplacement = replaceHomeSectionBySelectors(
+        html,
+        ['[class*="HomeMoBannerPromotion_banner_promotion__"]', '[class*="HomePcBannerPromotion_banner_promotion__"]'],
         promotion
       );
-      html = html.replace(
-        /<section class="HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/,
-        promotion
-      );
+      html = promotionReplacement.html;
+      if (debugHomeReplacement) {
+        console.log(`[home-replace] build=${draftBuildId} slot=promotion viewport=${viewportProfile} variant=mo replaced=${promotionReplacement.replaced ? "yes" : "no"} length=${promotion.length}`);
+      }
     } else {
-      html = html.replace(
-        /<section class="HomePcBannerPromotion_banner_promotion__[^"]*"[\s\S]*?<\/section>/,
+      const promotionReplacement = replaceHomeSectionBySelectors(
+        html,
+        ['[class*="HomePcBannerPromotion_banner_promotion__"]'],
         promotion
       );
+      html = promotionReplacement.html;
+      if (debugHomeReplacement) {
+        console.log(`[home-replace] build=${draftBuildId} slot=promotion viewport=${viewportProfile} variant=pc replaced=${promotionReplacement.replaced ? "yes" : "no"} length=${promotion.length}`);
+      }
     }
   }
 
@@ -13124,6 +25364,73 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
       }
     }
   }
+  if (pureTopStageReplacementMode && debugHomeReplacement) {
+    console.log(
+      `[home-replace] build=${draftBuildId} pure-top-stage-replacement=yes provider=local surface=tailwind targetGroup=top higher-layer=skipped`
+    );
+  }
+  if (!pureTopStageReplacementMode && (higherLayerComposition.isPageComposition || higherLayerComposition.isTopGroupComposition)) {
+      if (debugHomeReplacement) {
+        console.log(
+          `[home-replace] build=${draftBuildId} higher-layer before hero=${hasCodexSectionMarkup(html, "hero") ? "yes" : "no"} quickmenu=${hasCodexSectionMarkup(html, "quickmenu") ? "yes" : "no"} promotion=${hasCodexSectionMarkup(html, "promotion") || html.includes('data-area=\"메인 상단 배너 영역\"') ? "yes" : "no"} page=${higherLayerComposition.isPageComposition ? "yes" : "no"} top=${higherLayerComposition.isTopGroupComposition ? "yes" : "no"}`
+        );
+      }
+    html = applyHomeHigherLayerCompositionLayout(html, higherLayerComposition);
+    const hasTopShellAfterLayout =
+      hasCodexSectionMarkup(html, "home-top-composition-shell") ||
+      hasCodexSectionMarkup(html, "home-page-composition-shell");
+    if (!hasTopShellAfterLayout) {
+      const directHigherLayerWrapper = higherLayerComposition.isPageComposition
+        ? buildHomePageCompositionMarkup({
+            hero,
+            quickmenu: quickMenu,
+            promotion,
+            mdChoice,
+            timedeal,
+            subscription,
+            spaceRenewal,
+            bestRanking,
+            marketingArea,
+            lowerPromotion,
+            brandShowroom,
+            latestProductNews,
+            smartLife,
+            missedBenefits,
+            lgBestCare,
+            bestshopGuide,
+          }, {
+            shellVariant: higherLayerComposition.pageShellVariant,
+            topShellVariant: higherLayerComposition.topShellVariant,
+          })
+        : buildHomeTopCompositionMarkup({
+            hero,
+            quickmenu: quickMenu,
+            promotion,
+          }, {
+            shellVariant: higherLayerComposition.topShellVariant,
+          });
+      if (directHigherLayerWrapper) {
+        const injectedAfterHeader = injectMarkupAfterSlot(html, "header-bottom", directHigherLayerWrapper);
+        html = injectedAfterHeader !== html
+          ? injectedAfterHeader
+          : html.replace(/(<main\b[^>]*>)/i, `$1${directHigherLayerWrapper}`);
+      }
+    }
+    if (debugHomeReplacement) {
+      console.log(
+        `[home-replace] build=${draftBuildId} higher-layer after top-shell=${hasCodexSectionMarkup(html, "home-top-composition-shell") ? "yes" : "no"} hero=${hasCodexSectionMarkup(html, "hero") ? "yes" : "no"} quickmenu=${hasCodexSectionMarkup(html, "quickmenu") ? "yes" : "no"}`
+      );
+    }
+    const shellClasses = [
+      higherLayerComposition.isPageComposition ? "codex-home-page-composition-v1" : "",
+      higherLayerComposition.isTopGroupComposition ? "codex-home-top-composition-v1" : "",
+    ].filter(Boolean);
+    html = injectClassIntoBodyHtml(html, shellClasses);
+    const styleTag = buildHomeHigherLayerCompositionStyleTag(higherLayerComposition);
+    if (styleTag && !html.includes('data-codex-home-higher-layer="true"')) {
+      html = html.replace(/<\/head>/i, `${styleTag}\n</head>`);
+    }
+  }
 
   html = html.replace(
     /(?:<div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div>\s*){2,}(?=(?:<!--\$\?--><template id="B:[^"]+"><\/template>\s*<div aria-hidden="true" class="gap_gap__[^"]+ gap_gap80__[^"]+"><\/div>\s*<!--\/\$-->\s*)?<section[^>]+data-codex-slot="(?:space-renewal|subscription|brand-showroom|latest-product-news|smart-life|summary-banner-2|missed-benefits|lg-best-care|bestshop-guide)")/g,
@@ -13211,10 +25518,13 @@ function injectHomeReplacements(html, rawHtml, mobileHtml = "", options = {}) {
   html = html.replace(/<template id="B:1"><\/template>/g, "");
   html = html.replace(/<div hidden id="S:\d+">[\s\S]*?<\/div>/g, "");
   html = html.replace(/<\/footer>[\s\S]*?(?=<\/body>)/i, "</footer>");
+  perfTimer?.mark("injectHomeReplacements:end");
   return html;
 }
 
 function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {}) {
+  const perfTimer = options?.perfTimer || null;
+  perfTimer?.mark("rewriteCloneHtml:start");
   const editableData = options.editableData || readEditableData();
   const showEditorChrome = options.editorEnabled === true;
   const archiveMap = buildArchivePageMap();
@@ -13236,6 +25546,12 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
   const headerBottomSourceId = isHome ? getActiveSourceId(editableData, "home", "header-bottom", "captured-home-header-bottom") : "pc-like";
   const heroSourceId = isHome ? getActiveSourceId(editableData, "home", "hero", "captured-home-hero") : "pc-like";
   const quickmenuSourceId = isHome ? getActiveSourceId(editableData, "home", "quickmenu", "captured-home-quickmenu") : "mobile-derived";
+  const draftBuildId = String(options?.draftBuild?.id || "").trim();
+  const debugHomeRewrite = isHome && Boolean(draftBuildId);
+  const pureTopStageReplacementMode = isHome ? shouldUsePureTopStageReplacementMode(options?.draftBuild || null) : false;
+  const pureServiceLikeReplacementMode = !isHome && isServiceLikePageId(pageId)
+    ? shouldUsePureServiceLikeReplacementMode(options?.draftBuild || null)
+    : false;
 
   let html = materializeStreamedMainContent(rawHtml);
   html = html.replace(/<script\b[\s\S]*?<\/script>/gi, "");
@@ -13243,8 +25559,20 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
   html = html.replace(/<base[^>]+href=("|')[^"']+\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+as=("|')font\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+rel=("|')manifest\1[^>]*>/gi, "");
+  if (isHome && viewportProfile === "mo") {
+    html = html.replace(/\sdata-scroll-locked=(["'])1\1/gi, "");
+    html = html.replace(/<body([^>]*)style=(["'])([^"']*)\2([^>]*)>/i, (_match, before, quote, styleText, after) => {
+      const normalizedStyle = String(styleText || "")
+        .replace(/pointer-events\s*:\s*none;?/gi, "")
+        .replace(/overflow\s*:\s*hidden;?/gi, "")
+        .trim();
+      const nextStyle = [normalizedStyle, "pointer-events: auto", "overflow-y: auto", "overflow-x: hidden"].filter(Boolean).join("; ");
+      return `<body${before}style=${quote}${nextStyle}${quote}${after}>`;
+    });
+  }
   html = forceCloneEagerImages(html, pageId, viewportProfile);
   html = rewriteHtmlAssetUrls(html, pageId);
+  perfTimer?.mark("rewriteCloneHtml:sanitized");
   if (isHomestylePage) {
     html = html.replace(/<body([^>]*)style=(["'])[^"']*\bposition:\s*fixed;?\s*top:\s*0px;?\s*width:\s*100%;?[^"']*\2([^>]*)>/i, '<body$1$3>');
   }
@@ -13256,15 +25584,58 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
   }
   if (isHome) {
     html = injectHomeReplacements(html, rawHtml, homeMobileHtml, { ...options, editableData, viewportProfile });
-    if (viewportProfile === "pc") {
+    perfTimer?.mark("rewriteCloneHtml:home-replacements");
+    if (debugHomeRewrite) {
+      console.log(
+        `[home-rewrite] build=${draftBuildId} stage=after-inject hero=${hasCodexSectionMarkup(html, "hero") ? "yes" : "no"} quickmenu=${hasCodexSectionMarkup(html, "quickmenu") ? "yes" : "no"} top=${hasCodexSectionMarkup(html, "home-top-composition-shell") ? "yes" : "no"}`
+      );
+    }
+    if (viewportProfile === "pc" && !options?.draftBuild) {
       const desktopFooter = extractFooterSection(readHomeDesktopHtml());
       if (desktopFooter) {
         html = html.replace(/<footer\b[\s\S]*?<\/footer>/i, desktopFooter);
       }
     }
   }
-  html = applyWorkspacePageVariants(html, pageId, viewportProfile, editableData);
+  if (!isHome) {
+    html = applyWorkspacePageVariants(html, pageId, viewportProfile, editableData);
+    if (isServiceLikePageId(pageId)) {
+      html = injectServiceLikeReplacements(html, rawHtml, {
+        ...options,
+        pageId,
+        viewportProfile,
+        editableData,
+      });
+      const serviceCompositionState = readServiceLikeHigherLayerCompositionState(options?.draftBuild || null);
+      if (serviceCompositionState.isPageComposition && !pureServiceLikeReplacementMode) {
+        const pageClass = `codex-service-page-composition--${String(pageId || "").trim().replace(/[^a-z0-9_-]+/gi, "-")}`;
+        const shellVariantClass = serviceCompositionState.pageShellVariant
+          ? `is-shell-${String(serviceCompositionState.pageShellVariant).trim().replace(/[^a-z0-9_-]+/gi, "-").toLowerCase()}`
+          : "";
+        html = injectClassIntoBodyHtml(html, [pageClass, shellVariantClass].filter(Boolean));
+        html = html.replace(/<\/head>/i, `${buildServiceLikeHigherLayerStyleTag(pageId, serviceCompositionState)}</head>`);
+      }
+    }
+    if (pageId.startsWith("category-") || isPdpCasePageId(pageId)) {
+      html = injectCategoryPdpReplacements(html, rawHtml, {
+        ...options,
+        pageId,
+        viewportProfile,
+        editableData,
+      });
+    }
+  }
+  if (debugHomeRewrite) {
+    console.log(
+      `[home-rewrite] build=${draftBuildId} stage=after-workspace hero=${hasCodexSectionMarkup(html, "hero") ? "yes" : "no"} quickmenu=${hasCodexSectionMarkup(html, "quickmenu") ? "yes" : "no"} top=${hasCodexSectionMarkup(html, "home-top-composition-shell") ? "yes" : "no"}`
+    );
+  }
   html = rewriteHtmlAssetUrls(html, pageId);
+  if (debugHomeRewrite) {
+    console.log(
+      `[home-rewrite] build=${draftBuildId} stage=after-asset-rewrite hero=${hasCodexSectionMarkup(html, "hero") ? "yes" : "no"} quickmenu=${hasCodexSectionMarkup(html, "quickmenu") ? "yes" : "no"} top=${hasCodexSectionMarkup(html, "home-top-composition-shell") ? "yes" : "no"}`
+    );
+  }
   if (isHome && viewportProfile === "mo" && homeMobileHtml && !html.includes('data-codex-slot="md-choice"')) {
     const mobileMdChoiceSection = extractMobileMdChoiceSection(homeMobileHtml);
     if (mobileMdChoiceSection) {
@@ -13311,6 +25682,11 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
     html = html.replace(/<section class="HomeMoBannerHero_banner_hero__([^"]*)"/, `<section data-codex-slot="hero" data-codex-component-id="home.hero" data-codex-active-source-id="${escapeHtml(heroSourceId)}" class="HomeMoBannerHero_banner_hero__$1"`);
     html = html.replace(/<section class="HomeMoQuickmenu_quickmenu__([^"]*)"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="HomeMoQuickmenu_quickmenu__$1"`);
     html = html.replace(/<section class="codex-home-section codex-home-quickmenu"/, `<section data-codex-slot="quickmenu" data-codex-component-id="home.quickmenu" data-codex-active-source-id="${escapeHtml(quickmenuSourceId)}" class="codex-home-section codex-home-quickmenu"`);
+    if (debugHomeRewrite) {
+      console.log(
+        `[home-rewrite] build=${draftBuildId} stage=after-home-annotate hero=${hasCodexSectionMarkup(html, "hero") ? "yes" : "no"} quickmenu=${hasCodexSectionMarkup(html, "quickmenu") ? "yes" : "no"} top=${hasCodexSectionMarkup(html, "home-top-composition-shell") ? "yes" : "no"}`
+      );
+    }
   }
   const injectedHead = `
     <style>
@@ -13338,10 +25714,33 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
         display: none !important;
       }`
         : ""}
+      ${isHome && viewportProfile === "mo"
+        ? `
+      html,
+      body {
+        height: auto !important;
+        min-height: 100% !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        touch-action: auto !important;
+      }
+      body[data-scroll-locked="1"] {
+        pointer-events: auto !important;
+        overflow: auto !important;
+      }
+      .popup_popup_wrap__JofyJ,
+      .popup_popup_dim__oupc0 {
+        display: none !important;
+      }`
+        : ""}
       [hidden][data-codex-force-visible] { display: initial !important; }
       .skip_nav,
       .skip-nav {
         display: none !important;
+      }
+      /* LG captured shells use the contents class as a wrapper; prevent Tailwind utility collision. */
+      .contents {
+        display: block !important;
       }
       ${!isHome ? `
       .CommonPcGnb_nav_inner__I7DAQ > ul > li > div,
@@ -15343,7 +27742,7 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
         if (quickmenuSlot) quickmenuSlot.setAttribute('data-codex-interaction-id', 'home.quickmenu.nav');
         const timedealSlot = document.querySelector('[data-codex-slot="timedeal"]');
         if (timedealSlot) timedealSlot.setAttribute('data-codex-interaction-id', 'home.timedeal.cards');
-        ${isHome ? "initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document);" : ""}
+        ${isHome ? "initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document); initCodexHomeCompositionRuntime(document);" : ""}
 
         const overlay = document.querySelector('.codex-gnb-overlay');
         let overlayCloseTimer = null;
@@ -15854,6 +28253,27 @@ function rewriteCloneHtml(rawHtml, pageId, viewportProfile = "pc", options = {})
       })();
     </script></body>`
   );
+  if (isHome && options?.draftBuild && !pureTopStageReplacementMode) {
+    html = injectHomeReplacements(html, rawHtml, homeMobileHtml, { ...options, editableData, viewportProfile });
+    perfTimer?.mark("rewriteCloneHtml:home-replacements-final");
+    if (debugHomeRewrite) {
+      console.log(
+        `[home-rewrite] build=${draftBuildId} stage=final-reinject hero=${hasCodexSectionMarkup(html, "hero") ? "yes" : "no"} quickmenu=${hasCodexSectionMarkup(html, "quickmenu") ? "yes" : "no"} top=${hasCodexSectionMarkup(html, "home-top-composition-shell") ? "yes" : "no"}`
+      );
+    }
+  } else if (debugHomeRewrite && pureTopStageReplacementMode) {
+    console.log(
+      `[home-rewrite] build=${draftBuildId} stage=final-reinject-skipped pure-top-stage-replacement=yes`
+    );
+  }
+  if (debugHomeRewrite) {
+    console.log(
+      `[home-rewrite] build=${draftBuildId} stage=final hero=${hasCodexSectionMarkup(html, "hero") ? "yes" : "no"} quickmenu=${hasCodexSectionMarkup(html, "quickmenu") ? "yes" : "no"} top=${hasCodexSectionMarkup(html, "home-top-composition-shell") ? "yes" : "no"}`
+    );
+  }
+
+  html = dedupeHomeV2PrimitiveStyleTags(html);
+  perfTimer?.mark("rewriteCloneHtml:end");
 
   return html;
 }
@@ -15869,6 +28289,17 @@ function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
   html = html.replace(/<base[^>]+href=("|')[^"']+\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+as=("|')font\1[^>]*>/gi, "");
   html = html.replace(/<link[^>]+rel=("|')manifest\1[^>]*>/gi, "");
+  if (isHome && viewportProfile === "mo") {
+    html = html.replace(/\sdata-scroll-locked=(["'])1\1/gi, "");
+    html = html.replace(/<body([^>]*)style=(["'])([^"']*)\2([^>]*)>/i, (_match, before, quote, styleText, after) => {
+      const normalizedStyle = String(styleText || "")
+        .replace(/pointer-events\s*:\s*none;?/gi, "")
+        .replace(/overflow\s*:\s*hidden;?/gi, "")
+        .trim();
+      const nextStyle = [normalizedStyle, "pointer-events: auto", "overflow-y: auto", "overflow-x: hidden"].filter(Boolean).join("; ");
+      return `<body${before}style=${quote}${nextStyle}${quote}${after}>`;
+    });
+  }
   html = rewriteHtmlAssetUrls(html, pageId);
   if (isHomestylePage) {
     html = html.replace(/<body([^>]*)style=(["'])[^"']*\bposition:\s*fixed;?\s*top:\s*0px;?\s*width:\s*100%;?[^"']*\2([^>]*)>/i, '<body$1$3>');
@@ -15917,6 +28348,25 @@ function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
       .ins-preview-wrapper-82 {
         display: none !important;
       }` : ""}
+      ${isHome && viewportProfile === "mo"
+        ? `
+      html,
+      body {
+        height: auto !important;
+        min-height: 100% !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        touch-action: auto !important;
+      }
+      body[data-scroll-locked="1"] {
+        pointer-events: auto !important;
+        overflow: auto !important;
+      }
+      .popup_popup_wrap__JofyJ,
+      .popup_popup_dim__oupc0 {
+        display: none !important;
+      }`
+        : ""}
       ${!isHome ? `
       .CommonPcGnb_nav_inner__I7DAQ > ul > li > div,
       .CommonPcGnb_nav_inner__I7DAQ > ul > li.codex-active-li > div,
@@ -16102,17 +28552,17 @@ function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
         window.addEventListener('load', stitchDetachedStreamContent);
         document.addEventListener('DOMContentLoaded', startMeasurementBurst);
         document.addEventListener('DOMContentLoaded', () => {
-        ${isHome ? "initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document);" : ""}
+        ${isHome ? "initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document); initCodexHomeCompositionRuntime(document);" : ""}
         });
         window.addEventListener('load', startMeasurementBurst);
         window.addEventListener('load', () => {
-          ${isHome ? "initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document);" : ""}
+          ${isHome ? "initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document); initCodexHomeCompositionRuntime(document);" : ""}
         });
         window.addEventListener('resize', startMeasurementBurst);
         window.addEventListener('resize', () => {
-          ${isHome ? "initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document);" : ""}
+          ${isHome ? "initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document); initCodexHomeCompositionRuntime(document);" : ""}
         });
-        ${isHome ? "setTimeout(() => { initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document); }, 40);" : ""}
+        ${isHome ? "setTimeout(() => { initCodexHomeHeroRuntime(document); initCodexBestRankingRuntime(document); initCodexHomeCompositionRuntime(document); }, 40);" : ""}
         setTimeout(startMeasurementBurst, 40);
       })();
     </script></body>`
@@ -16121,7 +28571,7 @@ function rewriteReferenceHtml(rawHtml, pageId, viewportProfile = "pc") {
   return html;
 }
 
-function rewriteProductCapturedHtml(rawHtml, pageId = "", viewportProfile = "pc", href = "", editableData = null) {
+function rewriteProductCapturedHtml(rawHtml, pageId = "", viewportProfile = "pc", href = "", editableData = null, options = {}) {
   const assetOrigin = resolveAssetOriginForPage(pageId, href);
   let html = materializeStreamedMainContent(rawHtml);
   const isHomestylePage = String(pageId || "").startsWith("homestyle-");
@@ -16135,6 +28585,14 @@ function rewriteProductCapturedHtml(rawHtml, pageId = "", viewportProfile = "pc"
     html = html.replace(/<body([^>]*)style=(["'])[^"']*\bposition:\s*fixed;?\s*top:\s*0px;?\s*width:\s*100%;?[^"']*\2([^>]*)>/i, '<body$1$3>');
   }
   html = applyWorkspaceProductVariants(html, pageId, viewportProfile, href, editableData || {});
+  html = injectCategoryPdpReplacements(html, rawHtml, {
+    pageId,
+    viewportProfile,
+    editableData: editableData || {},
+    href,
+    draftBuild: options?.draftBuild || null,
+    snapshotState: options?.snapshotState || "",
+  });
   html = rewriteHtmlAssetUrls(html, pageId, href);
   html = html.replace(
     /<\/head>/i,
@@ -16168,8 +28626,22 @@ function sendCloneContent(req, res, pageId, requestUrl = null) {
     const homeVariant = String(requestUrl?.searchParams?.get("homeVariant") || "").trim();
     const sectionPreviewSlot = String(requestUrl?.searchParams?.get("sectionPreviewSlot") || "").trim();
     const editorEnabled = String(requestUrl?.searchParams?.get("editor") || "").trim() === "1";
-    const { data: editableData } = resolvePinnedDataForPage(req, pageId, viewportProfile);
+    const selectMode = String(requestUrl?.searchParams?.get("selectMode") || "").trim().toLowerCase();
+    const enableComponentSelection = selectMode === "component" || selectMode === "revision" || selectMode === "revise";
+    const criticLightweight = hasInternalVisualCriticAccess(req);
+    const perfTimer = createPerfTimer(
+      `clone-content page=${pageId} viewport=${viewportProfile} draft=${String(requestUrl?.searchParams?.get("draftBuildId") || "").trim() || "none"} snapshot=${String(requestUrl?.searchParams?.get("snapshotState") || "").trim() || "live"} critic=${criticLightweight ? "yes" : "no"} section=${sectionPreviewSlot || "none"}`,
+      criticLightweight
+    );
+    perfTimer.mark("sendCloneContent:start");
+    const pinnedData = resolvePinnedDataForPage(req, pageId, viewportProfile, {
+      fastWorkspaceRead: criticLightweight,
+      perfTimer,
+    });
+    perfTimer.mark("sendCloneContent:pinned");
+    const editableData = pinnedData?.data;
     const rawHtml = readCloneSourceHtmlByPageId(pageId, viewportProfile);
+    perfTimer.mark("sendCloneContent:raw-html");
     if (!rawHtml) {
       return sendRawHtml(
         res,
@@ -16181,8 +28653,16 @@ function sendCloneContent(req, res, pageId, requestUrl = null) {
       homeSandbox,
       homeVariant,
       editableData,
-      editorEnabled,
+      draftBuild: pinnedData?.draftBuild || null,
+      snapshotState: pinnedData?.draftSnapshotState || "",
+      editorEnabled: criticLightweight ? false : editorEnabled,
+      perfTimer,
     });
+    perfTimer.mark("sendCloneContent:rewritten");
+    const lightweightTransformed = criticLightweight
+      ? transformed.replace(/<script\b[\s\S]*?<\/script>/gi, "")
+      : transformed;
+    perfTimer.mark("sendCloneContent:lightweight-strip");
     const imageDiffMeta = sectionPreviewSlot
       ? buildSectionPreviewImageDiffMeta({
           req,
@@ -16190,13 +28670,44 @@ function sendCloneContent(req, res, pageId, requestUrl = null) {
           viewportProfile,
           slotId: sectionPreviewSlot,
           rawHtml,
-          currentHtml: transformed,
+          currentHtml: lightweightTransformed,
           homeSandbox,
           homeVariant,
           editorEnabled,
         })
       : null;
-    return sendRawHtml(res, 200, sectionPreviewSlot ? applySectionPreviewMode(transformed, sectionPreviewSlot, { imageDiff: imageDiffMeta }) : transformed);
+    if (criticLightweight) {
+      const previewHtml = sectionPreviewSlot
+        ? buildLightweightSectionPreviewHtml(lightweightTransformed, sectionPreviewSlot)
+        : lightweightTransformed;
+      perfTimer.mark("sendCloneContent:lightweight-preview");
+      return sendRawHtml(
+        res,
+        200,
+        enableComponentSelection
+          ? injectComponentSelectionRuntime(previewHtml, {
+              pageId,
+              viewportProfile,
+              source: "clone-content",
+              selectMode,
+            })
+          : previewHtml
+      );
+    }
+    perfTimer.mark("sendCloneContent:response");
+    const responseHtml = sectionPreviewSlot ? applySectionPreviewMode(lightweightTransformed, sectionPreviewSlot, { imageDiff: imageDiffMeta }) : lightweightTransformed;
+    return sendRawHtml(
+      res,
+      200,
+      enableComponentSelection
+        ? injectComponentSelectionRuntime(responseHtml, {
+            pageId,
+            viewportProfile,
+            source: "clone-content",
+            selectMode,
+          })
+        : responseHtml
+    );
   } catch (error) {
     return sendRawHtml(
       res,
@@ -16212,7 +28723,10 @@ function sendCloneProductContent(req, res, requestUrl) {
     const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "pc").trim() || "pc";
     const href = String(requestUrl.searchParams.get("href") || "").trim();
     const sectionPreviewSlot = String(requestUrl.searchParams.get("sectionPreviewSlot") || "").trim();
-    const { data: editableData } = resolvePinnedDataForPage(req, pageId, viewportProfile);
+    const selectMode = String(requestUrl.searchParams.get("selectMode") || "").trim().toLowerCase();
+    const enableComponentSelection = selectMode === "component" || selectMode === "revision" || selectMode === "revise";
+    const pinnedData = resolvePinnedDataForPage(req, pageId, viewportProfile);
+    const editableData = pinnedData?.data;
     const pdpContext = resolvePdpRuntimeContext(pageId, href);
     const capturePageId = pdpContext?.runtimePageId || pageId;
     const effectiveHref = pdpContext?.href || href;
@@ -16226,7 +28740,10 @@ function sendCloneProductContent(req, res, requestUrl) {
     const directLiveHtml = isPdpCasePageId(pageId) ? readPageReferenceLiveHtml(pageId, viewportProfile) : null;
     if (directLiveHtml) {
       const rawHtml = directLiveHtml;
-      const transformed = rewriteProductCapturedHtml(rawHtml, pageId, viewportProfile, effectiveHref, editableData);
+      const transformed = rewriteProductCapturedHtml(rawHtml, pageId, viewportProfile, effectiveHref, editableData, {
+        draftBuild: pinnedData?.draftBuild || null,
+        snapshotState: pinnedData?.draftSnapshotState || "",
+      });
       const imageDiffMeta = sectionPreviewSlot
         ? buildSectionPreviewImageDiffMeta({
             req,
@@ -16238,10 +28755,18 @@ function sendCloneProductContent(req, res, requestUrl) {
             href: effectiveHref,
           })
         : null;
+      const responseHtml = sectionPreviewSlot ? applySectionPreviewMode(transformed, sectionPreviewSlot, { imageDiff: imageDiffMeta }) : transformed;
       return sendRawHtml(
         res,
         200,
-        sectionPreviewSlot ? applySectionPreviewMode(transformed, sectionPreviewSlot, { imageDiff: imageDiffMeta }) : transformed
+        enableComponentSelection
+          ? injectComponentSelectionRuntime(responseHtml, {
+              pageId,
+              viewportProfile,
+              source: "clone-product-content",
+              selectMode,
+            })
+          : responseHtml
       );
     }
     const capture =
@@ -16256,7 +28781,10 @@ function sendCloneProductContent(req, res, requestUrl) {
       );
     }
     const rawHtml = fs.readFileSync(htmlPath, "utf-8");
-    const transformed = rewriteProductCapturedHtml(rawHtml, pageId, viewportProfile, effectiveHref, editableData);
+    const transformed = rewriteProductCapturedHtml(rawHtml, pageId, viewportProfile, effectiveHref, editableData, {
+      draftBuild: pinnedData?.draftBuild || null,
+      snapshotState: pinnedData?.draftSnapshotState || "",
+    });
     const imageDiffMeta = sectionPreviewSlot
       ? buildSectionPreviewImageDiffMeta({
           req,
@@ -16268,7 +28796,19 @@ function sendCloneProductContent(req, res, requestUrl) {
           href: effectiveHref,
         })
       : null;
-    return sendRawHtml(res, 200, sectionPreviewSlot ? applySectionPreviewMode(transformed, sectionPreviewSlot, { imageDiff: imageDiffMeta }) : transformed);
+    const responseHtml = sectionPreviewSlot ? applySectionPreviewMode(transformed, sectionPreviewSlot, { imageDiff: imageDiffMeta }) : transformed;
+    return sendRawHtml(
+      res,
+      200,
+      enableComponentSelection
+        ? injectComponentSelectionRuntime(responseHtml, {
+            pageId,
+            viewportProfile,
+            source: "clone-product-content",
+            selectMode,
+          })
+        : responseHtml
+    );
   } catch (error) {
     return sendRawHtml(
       res,
@@ -16360,6 +28900,11 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
   const homeVariantQuery = homeVariant ? `&homeVariant=${encodeURIComponent(homeVariant)}` : "";
   const draftBuildId = String(requestUrl?.searchParams?.get("draftBuildId") || "").trim();
   const snapshotState = String(requestUrl?.searchParams?.get("snapshotState") || "").trim();
+  const baselineMode = String(requestUrl?.searchParams?.get("baseline") || "").trim().toLowerCase();
+  const baselineQuery =
+    baselineMode === "live" || baselineMode === "origin"
+      ? `&baseline=${encodeURIComponent(baselineMode)}`
+      : "";
   const snapshotQuery = draftBuildId
     ? `&draftBuildId=${encodeURIComponent(draftBuildId)}${snapshotState ? `&snapshotState=${encodeURIComponent(snapshotState)}` : ""}`
     : "";
@@ -16383,28 +28928,35 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
   const isMobileShell = shellViewportProfile === "mo";
   const useCapturedShellHeader = true;
   const clonePageLinks = [
-    { label: "홈 - PC", href: "/clone/home?viewportProfile=pc" },
-    { label: "홈 - 테블릿", href: "/clone/home?viewportProfile=ta" },
-    { label: "고객지원", href: "/clone/support" },
-    { label: "베스트샵", href: "/clone/bestshop" },
-    { label: "가전 구독 메인", href: "/clone/care-solutions" },
-    { label: "가전 구독 PDP", href: "/clone/care-solutions-pdp" },
-    { label: "홈스타일 메인", href: "/clone/homestyle-home" },
-    { label: "홈스타일 PDP", href: "/clone/homestyle-pdp" },
-    { label: "TV PLP", href: "/clone/category-tvs" },
-    { label: "냉장고 PLP", href: "/clone/category-refrigerators" },
-    { label: "TV PDP 일반", href: "/clone/pdp-tv-general" },
-    { label: "TV PDP 프리미엄", href: "/clone/pdp-tv-premium" },
-    { label: "냉장고 PDP 일반", href: "/clone/pdp-refrigerator-general" },
-    { label: "냉장고 PDP 노크온", href: "/clone/pdp-refrigerator-knockon" },
-    { label: "냉장고 PDP 글라스", href: "/clone/pdp-refrigerator-glass" },
+    { label: "홈", pageId: "home", href: "/clone/home" },
+    { label: "고객지원", pageId: "support", href: "/clone/support" },
+    { label: "베스트샵", pageId: "bestshop", href: "/clone/bestshop" },
+    { label: "가전 구독 메인", pageId: "care-solutions", href: "/clone/care-solutions" },
+    { label: "가전 구독 PDP", pageId: "care-solutions-pdp", href: "/clone/care-solutions-pdp" },
+    { label: "홈스타일 메인", pageId: "homestyle-home", href: "/clone/homestyle-home" },
+    { label: "홈스타일 PDP", pageId: "homestyle-pdp", href: "/clone/homestyle-pdp" },
+    { label: "TV PLP", pageId: "category-tvs", href: "/clone/category-tvs" },
+    { label: "냉장고 PLP", pageId: "category-refrigerators", href: "/clone/category-refrigerators" },
+    { label: "TV PDP 일반", pageId: "pdp-tv-general", href: "/clone/pdp-tv-general" },
+    { label: "TV PDP 프리미엄", pageId: "pdp-tv-premium", href: "/clone/pdp-tv-premium" },
+    { label: "냉장고 PDP 일반", pageId: "pdp-refrigerator-general", href: "/clone/pdp-refrigerator-general" },
+    { label: "냉장고 PDP 노크온", pageId: "pdp-refrigerator-knockon", href: "/clone/pdp-refrigerator-knockon" },
+    { label: "냉장고 PDP 글라스", pageId: "pdp-refrigerator-glass", href: "/clone/pdp-refrigerator-glass" },
   ];
-  const defaultCloneHref = "/clone/home?viewportProfile=pc";
   const currentReferenceHref = `/reference-content/${encodeURIComponent(safePageId)}?viewportProfile=${encodeURIComponent(shellViewportProfile)}`;
   const clonePageOptionsHtml = clonePageLinks
     .map(
       (item) =>
-        `<option value="${escapeHtml(item.href)}"${item.href === defaultCloneHref ? " selected" : ""}>${escapeHtml(item.label)}</option>`
+        `<option value="${escapeHtml(item.href)}"${item.pageId === safePageId ? " selected" : ""}>${escapeHtml(item.label)}</option>`
+    )
+    .join("");
+  const cloneViewportOptionsHtml = [
+    { label: "PC", value: "pc" },
+    { label: "모바일", value: "mo" },
+  ]
+    .map(
+      (item) =>
+        `<option value="${escapeHtml(item.value)}"${item.value === shellViewportProfile ? " selected" : ""}>${escapeHtml(item.label)}</option>`
     )
     .join("");
   const gnb = isMobileShell ? { topLinks: [], brandTabs: [], utilityLinks: [], dropdownMenus: {} } : buildShellGnbData();
@@ -16535,10 +29087,9 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         color: #cbd5e1;
         white-space: nowrap;
       }
-      .clone-page-jump {
+      .clone-page-jump,
+      .clone-viewport-jump {
         height: 26px;
-        min-width: 220px;
-        max-width: 340px;
         border-radius: 7px;
         border: 1px solid rgba(255,255,255,0.18);
         background: rgba(255,255,255,0.08);
@@ -16546,8 +29097,16 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         font: 600 12px/1 Arial, sans-serif;
         padding: 0 10px;
       }
+      .clone-page-jump {
+        min-width: 220px;
+        max-width: 340px;
+      }
+      .clone-viewport-jump {
+        min-width: 96px;
+      }
       .clone-page-jump option,
-      .clone-page-jump optgroup {
+      .clone-page-jump optgroup,
+      .clone-viewport-jump option {
         color: #111827;
         background: #ffffff;
       }
@@ -16840,6 +29399,9 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
           min-width: 180px;
           max-width: 220px;
         }
+        .clone-viewport-jump {
+          min-width: 86px;
+        }
         .shell-top {
           gap: 10px;
           padding: 0 24px;
@@ -16873,6 +29435,9 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
             <span class="clone-topbar-label">Clone Nav</span>
             <select class="clone-page-jump" id="clone-page-jump" aria-label="클론 페이지 이동">
               ${clonePageOptionsHtml}
+            </select>
+            <select class="clone-viewport-jump" id="clone-viewport-jump" aria-label="클론 화면 분류">
+              ${cloneViewportOptionsHtml}
             </select>
             <button type="button" class="clone-topbar-button" id="clone-page-jump-go">이동</button>
           </div>
@@ -16933,7 +29498,7 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         id="clone-frame"
         class="clone-frame"
         title="Captured clone"
-        src="/clone-content/${encodeURIComponent(safePageId)}?viewportProfile=${encodeURIComponent(shellViewportProfile)}&v=${Date.now()}${homeSandboxQuery}${homeVariantQuery}${snapshotQuery}"
+        src="/clone-content/${encodeURIComponent(safePageId)}?viewportProfile=${encodeURIComponent(shellViewportProfile)}&v=${Date.now()}${homeSandboxQuery}${homeVariantQuery}${baselineQuery}${snapshotQuery}"
       ></iframe>
     </div>
     <script>
@@ -16943,6 +29508,7 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         const loading = document.getElementById('clone-loading');
         const toast = document.getElementById('shell-toast');
         const pageJump = document.getElementById('clone-page-jump');
+        const viewportJump = document.getElementById('clone-viewport-jump');
         const pageJumpGo = document.getElementById('clone-page-jump-go');
         const productPanel = document.getElementById('shell-product-panel');
         const dropdownButtons = Array.from(document.querySelectorAll('[data-shell-dropdown]'));
@@ -16963,7 +29529,7 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
         }
 
         function buildFrameSrc(pageId, viewportProfile) {
-          return '/clone-content/' + encodeURIComponent(pageId) + '?viewportProfile=' + encodeURIComponent(viewportProfile) + '&v=' + cacheBust + '${homeSandboxQuery}${homeVariantQuery}${snapshotQuery}';
+          return '/clone-content/' + encodeURIComponent(pageId) + '?viewportProfile=' + encodeURIComponent(viewportProfile) + '&v=' + cacheBust + '${homeSandboxQuery}${homeVariantQuery}${baselineQuery}${snapshotQuery}';
         }
 
         function syncHomeViewport(forceReload = false) {
@@ -16993,7 +29559,10 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
 
         function navigateClonePage() {
           if (!pageJump || !pageJump.value) return;
-          window.location.href = pageJump.value;
+          const nextViewport = viewportJump && viewportJump.value ? viewportJump.value : '${escapeHtml(shellViewportProfile)}';
+          const nextUrl = new URL(pageJump.value, window.location.origin);
+          nextUrl.searchParams.set('viewportProfile', nextViewport);
+          window.location.href = nextUrl.pathname + nextUrl.search;
         }
 
         if (pageJumpGo) pageJumpGo.addEventListener('click', navigateClonePage);
@@ -17001,6 +29570,9 @@ function sendCloneShell(req, res, pageId, requestUrl = null) {
           pageJump.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') navigateClonePage();
           });
+        }
+        if (viewportJump) {
+          viewportJump.addEventListener('change', navigateClonePage);
         }
 
         function setPage(nextPageId) {
@@ -17378,7 +29950,9 @@ function sendCompareShell(res, pageId, requestUrl = null) {
   const buildCloneUrl = (snapshotState) => {
     const params = new URLSearchParams();
     if (safePageId === "home") params.set("viewportProfile", requestedViewportProfile);
-    if (draftBuildId) {
+    if (snapshotState === "before") {
+      params.set("baseline", "origin");
+    } else if (draftBuildId) {
       params.set("draftBuildId", draftBuildId);
       params.set("snapshotState", snapshotState);
     }
@@ -17943,6 +30517,7 @@ async function sendAssetProxy(res, requestUrl) {
 function route(req, res) {
   const requestUrl = new URL(req.url, `http://${req.headers.host || "localhost"}`);
   const pathname = requestUrl.pathname;
+  traceRouteRequest(req, requestUrl);
 
   if (pathname === "/" || pathname === "/preview") {
     return sendHtml(res, 200, "preview.html");
@@ -17956,6 +30531,12 @@ function route(req, res) {
     );
   }
   if (pathname === "/admin") {
+    if (!getUserFromRequest(req)) {
+      return sendRedirect(res, "/login");
+    }
+    return sendHtml(res, 200, "admin-research.html");
+  }
+  if (pathname === "/admin-legacy") {
     if (!getUserFromRequest(req)) {
       return sendRedirect(res, "/login");
     }
@@ -18007,9 +30588,267 @@ function route(req, res) {
   if (pathname === "/clone-product") {
     return sendCloneProductShell(req, res, requestUrl);
   }
+  if (pathname.startsWith("/share/")) {
+    const sharePath = decodeURIComponent(pathname.slice("/share/".length));
+    const [token, mode] = sharePath.split("/").map((item) => String(item || "").trim()).filter(Boolean);
+    if (mode === "journey") {
+      return sendJourneyShareShell(res, token);
+    }
+    if (mode === "compare") {
+      return sendShareCompareShell(res, token);
+    }
+    const snapshotState = String(requestUrl.searchParams.get("snapshotState") || "after").trim().toLowerCase();
+    const sectionPreviewSlot = String(requestUrl.searchParams.get("sectionPreviewSlot") || "").trim();
+    const rendered = renderSharedVersionHtml(token, { snapshotState, sectionPreviewSlot });
+    return sendRawHtml(res, rendered.status, rendered.html);
+  }
+  if (pathname.startsWith("/runtime-compare/")) {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const draftBuildId = decodeURIComponent(pathname.slice("/runtime-compare/".length));
+    const sectionPreviewSlot = String(requestUrl.searchParams.get("sectionPreviewSlot") || "").trim();
+    const draftBuild = findDraftBuildById(user.userId, draftBuildId);
+    if (!draftBuild) {
+      return sendRawHtml(
+        res,
+        404,
+        `<!doctype html><html><head><meta charset="utf-8"><title>Runtime Compare Not Found</title></head><body><h1>Runtime Compare Not Found</h1><p>${escapeHtml(draftBuildId)}</p></body></html>`
+      );
+    }
+    const storedViewportProfile = String(draftBuild.viewportProfile || draftBuild.snapshotData?.viewportProfile || "").trim();
+    const requestedViewportProfile = String(requestUrl.searchParams.get("viewportProfile") || storedViewportProfile || "pc").trim().toLowerCase();
+    const compareViewportProfile = requestedViewportProfile === "mo" || requestedViewportProfile === "mobile" ? "mo" : "pc";
+    const compareViewportLabel = compareViewportProfile === "mo" ? "Mobile" : "PC";
+    const beforeParams = new URLSearchParams();
+    beforeParams.set("snapshotState", "before");
+    beforeParams.set("viewportProfile", compareViewportProfile);
+    if (sectionPreviewSlot) beforeParams.set("sectionPreviewSlot", sectionPreviewSlot);
+    const afterParams = new URLSearchParams();
+    afterParams.set("snapshotState", "after");
+    afterParams.set("viewportProfile", compareViewportProfile);
+    if (sectionPreviewSlot) afterParams.set("sectionPreviewSlot", sectionPreviewSlot);
+    const beforeSrc = `/runtime-draft/${encodeURIComponent(draftBuildId)}?${beforeParams.toString()}`;
+    const afterSrc = `/runtime-draft/${encodeURIComponent(draftBuildId)}?${afterParams.toString()}`;
+    const pcParams = new URLSearchParams(requestUrl.searchParams);
+    pcParams.set("viewportProfile", "pc");
+    const moParams = new URLSearchParams(requestUrl.searchParams);
+    moParams.set("viewportProfile", "mo");
+    const pcCompareHref = `/runtime-compare/${encodeURIComponent(draftBuildId)}?${pcParams.toString()}`;
+    const moCompareHref = `/runtime-compare/${encodeURIComponent(draftBuildId)}?${moParams.toString()}`;
+    const title = escapeHtml(draftBuild.summary || draftBuild.pageId || "Runtime Draft");
+    return sendRawHtml(
+      res,
+      200,
+      `<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Runtime Compare | ${title}</title>
+    <style>
+      html, body { margin: 0; width: 100%; height: 100%; background: #f5f5f5; font-family: Arial, sans-serif; }
+      .runtime-compare-shell { display: grid; grid-template-rows: 48px 1fr; min-height: 100vh; }
+      .runtime-compare-bar { display:flex; align-items:center; justify-content:space-between; padding:0 14px; border-bottom:1px solid #d9d9d9; background:#111827; color:#fff; font:600 12px/1 Arial,sans-serif; }
+      .runtime-compare-meta { display:flex; align-items:center; gap:10px; min-width:0; }
+      .runtime-compare-title { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:52vw; }
+      .runtime-compare-actions { display:flex; align-items:center; gap:8px; }
+      .runtime-compare-toggle { display:inline-flex; align-items:center; gap:4px; padding:4px; border:1px solid rgba(255,255,255,.24); border-radius:999px; background:rgba(255,255,255,.08); }
+      .runtime-compare-toggle a { color:#fff; text-decoration:none; padding:6px 10px; border-radius:999px; opacity:.72; }
+      .runtime-compare-toggle a.active { background:#fff; color:#111827; opacity:1; }
+      .runtime-share-btn { border:1px solid rgba(255,255,255,.28); border-radius:999px; background:rgba(255,255,255,.1); color:#fff; padding:7px 11px; font:700 12px/1 Arial,sans-serif; cursor:pointer; }
+      .runtime-share-btn:disabled { cursor:wait; opacity:.64; }
+      .runtime-compare-id { opacity:.7; }
+      .runtime-compare-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: calc(100vh - 49px); }
+      .runtime-compare-pane { display:grid; grid-template-rows: 40px 1fr; border-right:1px solid #e5e7eb; background:#fff; }
+      .runtime-compare-pane:last-child { border-right:0; }
+      .runtime-compare-label { display:flex; align-items:center; padding:0 12px; border-bottom:1px solid #e5e7eb; font:600 12px/1 Arial,sans-serif; background:#fafafa; color:#111827; }
+      .runtime-compare-frame-wrap { min-width:0; min-height:0; overflow:auto; background:#eef2f7; }
+      .runtime-compare-frame-shell { width:100%; min-width:0; height:100%; margin:0 auto; background:#fff; box-shadow:none; }
+      .runtime-compare-frame { width:100%; height:100%; border:0; display:block; background:#fff; }
+      .runtime-compare-shell[data-viewport-profile="mo"] .runtime-compare-grid { background:#cbd5e1; gap:1px; }
+      .runtime-compare-shell[data-viewport-profile="mo"] .runtime-compare-frame-wrap { display:flex; justify-content:center; align-items:stretch; padding:18px; }
+      .runtime-compare-shell[data-viewport-profile="mo"] .runtime-compare-frame-shell { width:430px; max-width:100%; min-width:360px; border-radius:20px; overflow:hidden; box-shadow:0 18px 50px rgba(15,23,42,.22); }
+    </style>
+  </head>
+  <body>
+    <div class="runtime-compare-shell" data-viewport-profile="${escapeHtml(compareViewportProfile)}">
+      <div class="runtime-compare-bar">
+        <div class="runtime-compare-meta">
+          <span class="runtime-compare-title">${title}</span>
+          <span>${escapeHtml(compareViewportLabel)}</span>
+        </div>
+        <div class="runtime-compare-actions">
+          <nav class="runtime-compare-toggle" aria-label="Compare viewport">
+            <a class="${compareViewportProfile === "pc" ? "active" : ""}" href="${escapeHtml(pcCompareHref)}">PC</a>
+            <a class="${compareViewportProfile === "mo" ? "active" : ""}" href="${escapeHtml(moCompareHref)}">Mobile</a>
+          </nav>
+          <button class="runtime-share-btn" type="button" data-draft-build-id="${escapeHtml(String(draftBuild.id || "").trim())}" data-page-id="${escapeHtml(String(draftBuild.pageId || "").trim())}" data-viewport-profile="${escapeHtml(compareViewportProfile)}">공유 링크</button>
+          <span class="runtime-compare-id">${escapeHtml(String(draftBuild.id || "").trim())}</span>
+        </div>
+      </div>
+      <div class="runtime-compare-grid">
+        <div class="runtime-compare-pane">
+          <div class="runtime-compare-label">Before · ${escapeHtml(compareViewportLabel)}</div>
+          <div class="runtime-compare-frame-wrap"><div class="runtime-compare-frame-shell"><iframe class="runtime-compare-frame" src="${beforeSrc}" title="Before"></iframe></div></div>
+        </div>
+        <div class="runtime-compare-pane">
+          <div class="runtime-compare-label">After · ${escapeHtml(compareViewportLabel)}</div>
+          <div class="runtime-compare-frame-wrap"><div class="runtime-compare-frame-shell"><iframe class="runtime-compare-frame" src="${afterSrc}" title="After"></iframe></div></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var button = document.querySelector(".runtime-share-btn");
+        if (!button) return;
+        function copyText(value) {
+          var text = String(value || "");
+          if (!text) return Promise.reject(new Error("copy_text_empty"));
+          if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+            return navigator.clipboard.writeText(text);
+          }
+          return new Promise(function (resolve, reject) {
+            var textarea = document.createElement("textarea");
+            textarea.value = text;
+            textarea.setAttribute("readonly", "readonly");
+            textarea.style.position = "fixed";
+            textarea.style.left = "-9999px";
+            textarea.style.top = "0";
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            textarea.setSelectionRange(0, textarea.value.length);
+            try {
+              var copied = document.execCommand("copy");
+              document.body.removeChild(textarea);
+              copied ? resolve() : reject(new Error("exec_copy_failed"));
+            } catch (error) {
+              document.body.removeChild(textarea);
+              reject(error);
+            }
+          });
+        }
+        button.addEventListener("click", function () {
+          var originalText = button.textContent || "공유 링크";
+          button.disabled = true;
+          button.textContent = "링크 생성 중";
+          fetch("/api/workspace/share-draft", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              draftBuildId: button.getAttribute("data-draft-build-id") || "",
+              pageId: button.getAttribute("data-page-id") || "",
+              viewportProfile: button.getAttribute("data-viewport-profile") || "pc"
+            })
+          })
+            .then(function (response) {
+              return response.text().then(function (text) {
+                var payload = {};
+                try { payload = text ? JSON.parse(text) : {}; } catch (error) {}
+                if (!response.ok) throw new Error(payload.error || payload.detail || response.statusText);
+                return payload;
+              });
+            })
+            .then(function (payload) {
+              var shareUrl = payload.compareUrl || payload.shareUrl || "";
+              if (!shareUrl) throw new Error("share_url_missing");
+              return copyText(shareUrl).then(function () {
+                alert("공유 비교 링크를 복사했습니다.\\n" + shareUrl);
+              }).catch(function () {
+                window.prompt("복사가 차단되었습니다. 아래 링크를 복사하세요.", shareUrl);
+              });
+            })
+            .catch(function (error) {
+              alert("공유 링크 생성 실패: " + (error && error.message ? error.message : error));
+            })
+            .finally(function () {
+              button.disabled = false;
+              button.textContent = originalText;
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>`
+    );
+  }
+  if (pathname.startsWith("/runtime-draft/")) {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const draftBuildId = decodeURIComponent(pathname.slice("/runtime-draft/".length));
+    const snapshotState = String(requestUrl.searchParams.get("snapshotState") || "after").trim().toLowerCase();
+    const sectionPreviewSlot = String(requestUrl.searchParams.get("sectionPreviewSlot") || "").trim();
+    const selectMode = String(requestUrl.searchParams.get("selectMode") || "").trim().toLowerCase();
+    const enableComponentSelection = selectMode === "component" || selectMode === "revision" || selectMode === "revise";
+    const draftBuild = findDraftBuildById(user.userId, draftBuildId);
+    if (!draftBuild) {
+      return sendRawHtml(
+        res,
+        404,
+        `<!doctype html><html><head><meta charset="utf-8"><title>Runtime Draft Not Found</title></head><body><h1>Runtime Draft Not Found</h1><p>${escapeHtml(draftBuildId)}</p></body></html>`
+      );
+    }
+    const renderedHtmlReference =
+      draftBuild?.snapshotData?.renderedHtmlReference && typeof draftBuild.snapshotData.renderedHtmlReference === "object"
+        ? draftBuild.snapshotData.renderedHtmlReference
+        : draftBuild?.renderedHtmlReference && typeof draftBuild.renderedHtmlReference === "object"
+          ? draftBuild.renderedHtmlReference
+          : {};
+    const lightweightPreviewHtml =
+      String(draftBuild?.builderVersion || "").trim() === "design-runtime-v1"
+        ? buildLightweightRuntimePreviewHtml(draftBuild, snapshotState, sectionPreviewSlot)
+        : "";
+    if (lightweightPreviewHtml) {
+      const interactiveHtml = snapshotState === "before"
+        ? lightweightPreviewHtml
+        : injectInteractionComponentRuntimeIntoHtml(lightweightPreviewHtml);
+      const nextHtml = enableComponentSelection
+        ? injectComponentSelectionRuntime(interactiveHtml, {
+            pageId: draftBuild.pageId || "",
+            viewportProfile: draftBuild.viewportProfile || "pc",
+            draftBuildId,
+            source: "runtime-draft",
+            selectMode,
+          })
+        : interactiveHtml;
+      return sendRawHtml(res, 200, nextHtml);
+    }
+    const html = snapshotState === "before"
+      ? String(renderedHtmlReference.beforeHtml || "").trim()
+      : String(renderedHtmlReference.afterHtml || "").trim();
+    if (!html) {
+      return sendRawHtml(
+        res,
+        404,
+        `<!doctype html><html><head><meta charset="utf-8"><title>Runtime Draft HTML Missing</title></head><body><h1>Runtime Draft HTML Missing</h1><p>${escapeHtml(draftBuildId)}</p></body></html>`
+      );
+    }
+    const interactiveHtml = snapshotState === "before"
+      ? html
+      : injectInteractionComponentRuntimeIntoHtml(html);
+    const nextHtml = enableComponentSelection
+      ? injectComponentSelectionRuntime(interactiveHtml, {
+          pageId: draftBuild.pageId || "",
+          viewportProfile: draftBuild.viewportProfile || "pc",
+          draftBuildId,
+          source: "runtime-draft",
+          selectMode,
+        })
+      : interactiveHtml;
+    return sendRawHtml(res, 200, nextHtml);
+  }
   if (pathname.startsWith("/clone-content/")) {
     const pageId = decodeURIComponent(pathname.slice("/clone-content/".length));
     return sendCloneContent(req, res, pageId, requestUrl);
+  }
+  if (pathname.startsWith("/interaction-components/")) {
+    return sendStaticWebAsset(res, pathname.slice(1));
+  }
+  if (pathname === "/review-packs" || pathname === "/review-packs/") {
+    return sendReviewPackAsset(res, "");
+  }
+  if (pathname.startsWith("/review-packs/")) {
+    return sendReviewPackAsset(res, decodeURIComponent(pathname.slice("/review-packs/".length)));
   }
   if (pathname === "/api/slot-snapshots") {
     const pageId = requestUrl.searchParams.get("pageId") || "home";
@@ -18192,6 +31031,35 @@ function route(req, res) {
     fs.createReadStream(filePath).pipe(res);
     return;
   }
+  if (pathname.startsWith("/raw-assets/")) {
+    const relativePath = decodeURIComponent(pathname.slice("/raw-assets/".length));
+    const safePath = path.normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, "");
+    const filePath = path.join(ASSET_DIR, safePath);
+    const normalizedRoot = path.resolve(ASSET_DIR);
+    const normalizedPath = path.resolve(filePath);
+    if (!normalizedPath.startsWith(`${normalizedRoot}${path.sep}`) || !fs.existsSync(normalizedPath)) {
+      return sendJson(res, 404, { error: "raw_asset_not_found", file: safePath });
+    }
+    const ext = path.extname(normalizedPath).toLowerCase();
+    const contentType =
+      ext === ".png"
+        ? "image/png"
+        : ext === ".jpg" || ext === ".jpeg"
+          ? "image/jpeg"
+          : ext === ".svg"
+            ? "image/svg+xml"
+            : ext === ".webp"
+              ? "image/webp"
+              : ext === ".gif"
+                ? "image/gif"
+                : "application/octet-stream";
+    res.writeHead(200, {
+      "Content-Type": contentType,
+      "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+    });
+    fs.createReadStream(normalizedPath).pipe(res);
+    return;
+  }
   if (pathname.startsWith("/debug/gnb-state/")) {
     const relativePath = decodeURIComponent(pathname.slice("/debug/gnb-state/".length));
     const safePath = path.normalize(relativePath).replace(/^(\.\.(\/|\\|$))+/, "");
@@ -18235,7 +31103,7 @@ function route(req, res) {
   if (pathname === "/api/auth/session") {
     const user = getUserFromRequest(req);
     if (!user) return sendJson(res, 200, { authenticated: false, user: null });
-    const workspace = getWorkspace(user.userId);
+    const workspace = getWorkspace(user.userId, { normalize: false });
     return sendJson(res, 200, {
       authenticated: true,
       user: sanitizeUser(user),
@@ -18303,8 +31171,11 @@ function route(req, res) {
     const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
     const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "").trim();
     const limit = Math.max(1, Math.min(200, Number(requestUrl.searchParams.get("limit") || 50)));
+    const summaryOnly = String(requestUrl.searchParams.get("summary") || "").trim() === "1";
     return sendJson(res, 200, {
-      items: listRequirementPlans(user.userId, { pageId, viewportProfile, limit }),
+      items: (listRequirementPlans(user.userId, { pageId, viewportProfile, limit, summaryOnly }) || []).map((item) =>
+        summaryOnly ? summarizeRequirementPlanForWorkspaceList(item) : item
+      ),
     });
   }
   if (pathname === "/api/workspace/page-identity") {
@@ -18313,7 +31184,7 @@ function route(req, res) {
     if (req.method === "GET") {
       const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
       if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
-      const editableData = readWorkspaceData(user.userId);
+      const editableData = getWorkspace(user.userId, { normalize: false })?.data || readEditableData();
       const page = findPage(editableData, pageId);
       const pdpContext = resolvePdpRuntimeContext(pageId);
       const defaultIdentity = buildPageIdentityBrief(pageId, {
@@ -18348,10 +31219,538 @@ function route(req, res) {
         const payload = body ? JSON.parse(body) : {};
         const pageId = String(payload.pageId || "").trim();
         if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
-        const saved = saveRequirementPlan(user.userId, payload);
+        const requestedOriginType = String(payload.originType || "").trim();
+        const originType = ["local-provider-saved", "openrouter-provider-saved"].includes(requestedOriginType)
+          ? requestedOriginType
+          : "user-input";
+        const generatedBy =
+          originType === "local-provider-saved"
+            ? "design-pipeline-local"
+            : originType === "openrouter-provider-saved"
+              ? "openrouter-planner"
+              : "admin-ui";
+        const sanitizedPayload = sanitizeInvalidJourneyFlowFromPlanPayload(payload);
+        const saved = saveRequirementPlan(user.userId, {
+          ...sanitizedPayload,
+          originType,
+          approvalState: "user-reviewed",
+          generatedBy,
+        });
+        const journeyFlow =
+          saved?.output?.requirementPlan?.journeyFlow && typeof saved.output.requirementPlan.journeyFlow === "object"
+            ? saved.output.requirementPlan.journeyFlow
+            : buildJourneyFlowFromInput(saved?.input?.userInput || sanitizedPayload?.input?.userInput || sanitizedPayload, {
+                viewportProfile: saved?.viewportProfile || sanitizedPayload.viewportProfile,
+              });
+        const flowValidation = validateJourneyFlowForSource({
+          sourcePageId: saved.pageId,
+          journeyId: saved?.input?.userInput?.journeyId,
+          journeyFlow,
+        });
+        if (isExecutableJourneyFlow(journeyFlow) && flowValidation.ok) {
+          saveJourneyFlow(user.userId, {
+            planId: saved.id,
+            sourcePageId: saved.pageId,
+            viewportProfile: saved.viewportProfile,
+            journeyId: journeyFlow.journeyId,
+            journeyFlow,
+          });
+        }
         return sendJson(res, 200, { ok: true, item: saved });
       })
       .catch((error) => sendJson(res, 500, { error: "workspace_plan_save_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/plan-local-preview" && req.method === "POST") {
+    return readBody(req)
+      .then(async (body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const editableData = readWorkspaceData(user.userId);
+        const page = findPage(editableData, pageId);
+        const pdpContext = resolvePdpRuntimeContext(pageId);
+        const defaultIdentity = buildPageIdentityBrief(pageId, {
+          pageTitle: pdpContext?.title || page?.title || pageId,
+          pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
+        });
+        const override = getPageIdentityOverride(user.userId, pageId);
+        const effectiveIdentity = mergePageIdentityBrief(defaultIdentity, override || {});
+        const planningProvider = normalizeDesignAuthorProvider(payload.builderProvider || payload.plannerProvider || "local");
+        if (planningProvider === "openrouter") {
+          const plannerInput = await buildPlannerInputPayload({
+            user,
+            editableData,
+            pageId,
+            viewportProfile: payload.viewportProfile || "pc",
+            pageIdentityOverride: override || {},
+            mode: payload.mode,
+            requestText: payload.requestText,
+            keyMessage: payload.keyMessage,
+            preferredDirection: payload.preferredDirection,
+            avoidDirection: payload.avoidDirection,
+            toneAndMood: payload.toneAndMood,
+            referenceUrls: payload.referenceUrls,
+            designChangeLevel: payload.designChangeLevel,
+            interventionLayer: payload.interventionLayer,
+            patchDepth: payload.patchDepth,
+            targetScope: payload.targetScope,
+            targetComponents: payload.targetComponents,
+            targetGroupId: payload.targetGroupId,
+            targetGroupLabel: payload.targetGroupLabel,
+            scopePreset: payload.scopePreset,
+            builderProvider: "openrouter",
+          });
+          const plannerResult = await handleLlmPlan(plannerInput);
+          const item = buildOpenRouterPlanningPreviewPlan(plannerResult, {
+            ...payload,
+            builderProvider: "openrouter",
+          });
+          return sendJson(res, 200, { ok: true, item, providerResult: plannerResult });
+        }
+        const planningInput = buildLocalPlanningProviderInput(payload, { effectiveIdentity });
+        const preview = runLocalPlanningProvider(planningInput, {
+          scenarioId: inferLocalPlanningScenarioId(pageId),
+        });
+        const item = buildLocalPlanningPreviewPlan(preview, payload);
+        return sendJson(res, 200, { ok: true, item, providerResult: preview });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_plan_local_preview_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/build-local-preview" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const approvedPlan = payload.approvedPlan && typeof payload.approvedPlan === "object" ? payload.approvedPlan : null;
+        if (!approvedPlan) return sendJson(res, 400, { error: "approved_plan_required" });
+        const editableData = readWorkspaceData(user.userId);
+        const page = findPage(editableData, pageId);
+        const editablePayload = buildLlmEditableList(pageId, {
+          editableData,
+          viewportProfile: payload.viewportProfile || "pc",
+        });
+        const pageEditableComponents = Array.isArray(editablePayload?.components) ? editablePayload.components : [];
+        const pdpContext = resolvePdpRuntimeContext(pageId);
+        const defaultIdentity = buildPageIdentityBrief(pageId, {
+          pageTitle: pdpContext?.title || page?.title || pageId,
+          pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
+        });
+        const override = getPageIdentityOverride(user.userId, pageId);
+        const effectiveIdentity = mergePageIdentityBrief(defaultIdentity, override || {});
+        const buildInput = buildLocalBuildProviderInput(payload, {
+          effectiveIdentity,
+          pageEditableComponents,
+        });
+        const foundation = buildLocalBuildFoundation(buildInput, {
+          selectedConceptId: approvedPlan?.selectedConcept?.conceptId,
+          selectedConceptLabel: approvedPlan?.selectedConcept?.conceptLabel,
+        });
+        const item = buildLocalBuildPreviewItem(foundation, {
+          pageId,
+          viewportProfile: payload.viewportProfile,
+          planId: payload.planId,
+          rendererSurface: payload.rendererSurface,
+          patchDepth: payload.patchDepth,
+          interventionLayer: payload.interventionLayer,
+          targetGroupId: payload.targetGroupId,
+        });
+        return sendJson(res, 200, { ok: true, item, providerResult: foundation });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_build_local_preview_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/build-local-draft" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const approvedPlan = payload.approvedPlan && typeof payload.approvedPlan === "object" ? payload.approvedPlan : null;
+        if (!approvedPlan) return sendJson(res, 400, { error: "approved_plan_required" });
+        const editableData = readWorkspaceData(user.userId);
+        const page = findPage(editableData, pageId);
+        const editablePayload = buildLlmEditableList(pageId, {
+          editableData,
+          viewportProfile: payload.viewportProfile || "pc",
+        });
+        const pageEditableComponents = Array.isArray(editablePayload?.components) ? editablePayload.components : [];
+        const pdpContext = resolvePdpRuntimeContext(pageId);
+        const defaultIdentity = buildPageIdentityBrief(pageId, {
+          pageTitle: pdpContext?.title || page?.title || pageId,
+          pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
+        });
+        const override = getPageIdentityOverride(user.userId, pageId);
+        const effectiveIdentity = mergePageIdentityBrief(defaultIdentity, override || {});
+        const buildInput = buildLocalBuildProviderInput(payload, {
+          effectiveIdentity,
+          pageEditableComponents,
+        });
+        const foundation = buildLocalBuildFoundation(buildInput, {
+          selectedConceptId: approvedPlan?.selectedConcept?.conceptId,
+          selectedConceptLabel: approvedPlan?.selectedConcept?.conceptLabel,
+        });
+        const slotIds = Array.isArray(foundation?.request?.targetGroup?.slotIds)
+          ? foundation.request.targetGroup.slotIds
+          : [];
+        const referenceArtifacts = buildRuntimeReferenceArtifacts(pageId, payload.viewportProfile, slotIds);
+        if (!referenceArtifacts?.rawShellHtml) {
+          return sendJson(res, 404, { error: "reference_page_shell_not_found", pageId, viewportProfile: payload.viewportProfile || "pc" });
+        }
+        const conceptPackage = buildConceptPackageFromRequirementPlan(approvedPlan, {
+          viewportProfile: referenceArtifacts.viewportProfile || payload.viewportProfile,
+          pageIdentity: effectiveIdentity,
+          targetGroupId: payload.targetGroupId,
+          targetGroupLabel: payload.targetGroupLabel,
+          targetScope: payload.targetScope,
+          patchDepth: payload.patchDepth,
+          designChangeLevel: payload.designChangeLevel,
+        });
+        const authorInput = buildDesignAuthorInput({
+          pageId,
+          viewportProfile: referenceArtifacts.viewportProfile,
+          conceptPackage,
+          referenceContext: {
+            rawShellHtml: referenceArtifacts.rawShellHtml,
+            currentPageHtmlExcerpt: referenceArtifacts.rawShellHtml,
+            currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+          },
+          currentSectionContext: {
+            currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+            currentSectionAssetMap:
+              referenceArtifacts.currentSectionAssetMap && typeof referenceArtifacts.currentSectionAssetMap === "object"
+                ? referenceArtifacts.currentSectionAssetMap
+                : Object.fromEntries(
+                    Object.entries(referenceArtifacts.currentSectionHtmlMap || {}).map(([slotId]) => [
+                      slotId,
+                      Object.entries(referenceArtifacts.currentPageAssetMap || {})
+                        .filter(([assetSlotId]) => String(assetSlotId || "").startsWith(`${slotId}-`))
+                        .map(([assetSlotId, sourceUrl]) => ({ assetSlotId, source: sourceUrl })),
+                    ])
+                  ),
+          },
+        });
+        const authorSequencePlan = buildSectionSequencePlan(authorInput);
+        const designAuthorProvider = normalizeDesignAuthorProvider(payload.builderProvider || payload.authorProvider || "local");
+        const designAuthorModel = String(payload.designAuthorModel || payload.authorModel || payload.model || "").trim();
+        const bypassDesignModelProfile =
+          designAuthorProvider === "openrouter" &&
+          designAuthorModel &&
+          (payload.bypassDesignModelProfile === true || String(payload.bypassDesignModelProfile || "").trim() === "1");
+        const authorResult = designAuthorProvider === "openrouter"
+          ? withTemporaryEnv(
+              bypassDesignModelProfile ? { DESIGN_MODEL_PROFILE_BYPASS: "1" } : {},
+              () => buildLlmAuthoredSectionHtmlPackage({
+                pageId,
+                viewportProfile: referenceArtifacts.viewportProfile,
+                authorInput,
+                cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+                referenceContext: {
+                  currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+                  currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+                },
+              }, designAuthorModel ? { model: designAuthorModel } : {})
+            )
+          : Promise.resolve({
+              package: buildLocalAuthoredSectionHtmlPackage({
+                pageId,
+                viewportProfile: referenceArtifacts.viewportProfile,
+                authorInput,
+                cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+                referenceContext: {
+                  currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+                  currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+                },
+              }),
+              providerMeta: {
+                provider: "local",
+                usedDemoFallback: false,
+              },
+            });
+        return Promise.resolve(authorResult).then((resolvedAuthorResult) => {
+        let authoredSectionHtmlPackage =
+          resolvedAuthorResult?.package && typeof resolvedAuthorResult.package === "object"
+              ? enrichAuthoredSectionHtmlPackageWithAuthorInput({
+                  authoredSectionHtmlPackage: resolvedAuthorResult.package,
+                  authorInput,
+                  cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+                })
+              : buildLocalAuthoredSectionHtmlPackage({
+                  pageId,
+                  viewportProfile: referenceArtifacts.viewportProfile,
+                  authorInput,
+                  cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+                  referenceContext: {
+                    currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+                  currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+                },
+              });
+          const authorInputSnapshot = buildDesignAuthorInputSnapshot(authorInput);
+          const normalizedAssetUsage = normalizeAuthoredAssetUsage({
+            authoredSectionHtmlPackage,
+            authorInputSnapshot,
+          });
+          authoredSectionHtmlPackage = normalizedAssetUsage?.package || authoredSectionHtmlPackage;
+          const authoredSectionMarkdownDocument =
+            String(resolvedAuthorResult?.document || "").trim() ||
+            buildLocalAuthoredSectionMarkdownDocument({
+              pageId,
+              viewportProfile: referenceArtifacts.viewportProfile,
+              authorInput,
+              cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+              referenceContext: {
+                currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+                currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+              },
+            });
+          const authorProviderMeta =
+            resolvedAuthorResult?.providerMeta && typeof resolvedAuthorResult.providerMeta === "object"
+              ? resolvedAuthorResult.providerMeta
+              : { provider: designAuthorProvider };
+        const authoringStageTrace = buildAuthoringStageTrace({
+          payload,
+          approvedPlan,
+          pageEditableComponents,
+          buildInput,
+          foundation,
+          referenceArtifacts,
+          conceptPackage,
+          authorInput,
+          sequencePlan: authorSequencePlan,
+          authorProviderMeta,
+        });
+        const designAuthorFailureDebug =
+          authorProviderMeta?.provider === "local-fallback"
+            ? {
+                error: String(authorProviderMeta.error || "").trim(),
+                diagnostics:
+                  authorProviderMeta.diagnostics && typeof authorProviderMeta.diagnostics === "object"
+                    ? authorProviderMeta.diagnostics
+                    : null,
+                rawDocumentPreview: String(authorProviderMeta.rawDocumentPreview || "").trim(),
+                failedDocument: String(authorProviderMeta.failedDocument || "").trim(),
+                failedRawDocument: String(authorProviderMeta.failedRawDocument || "").trim(),
+                authoringStageTrace,
+              }
+            : null;
+        const authorOutputValidation = validateDesignAuthorOutput({
+          authoredSectionMarkdownDocument,
+          authoredSectionHtmlPackage,
+          conceptPackage,
+          authorInputSnapshot,
+          validationContext: {
+            referencePageShell: {
+              pageId,
+              viewportProfile: referenceArtifacts.viewportProfile,
+              rawShellHtml: referenceArtifacts.rawShellHtml,
+              sectionBoundaryMap: referenceArtifacts.sectionBoundaryMap,
+              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+              currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+            },
+            assetResolutionContext: {
+              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+            },
+            sanitizePolicy: {
+              stripScripts: true,
+              stripInlineHandlers: true,
+              stripJavascriptUrls: true,
+            },
+          },
+        });
+        if (!authorOutputValidation?.deliveryReadiness?.readyForRuntime) {
+          return sendJson(res, 422, {
+            error: "design_author_output_not_ready",
+            validation: authorOutputValidation,
+            conceptPackage: sanitizeAuthoringSnapshotForStorage(conceptPackage),
+            authorInput: sanitizeAuthoringSnapshotForStorage(authorInputSnapshot),
+            authorProviderMeta,
+          });
+        }
+        const runtimeResult = renderRuntimeDraft({
+          authoredSectionMarkdownDocument,
+          authoredSectionHtmlPackage,
+          referencePageShell: {
+            pageId,
+            viewportProfile: referenceArtifacts.viewportProfile,
+            rawShellHtml: referenceArtifacts.rawShellHtml,
+            sectionBoundaryMap: referenceArtifacts.sectionBoundaryMap,
+          },
+          runtimeContext: {
+            assetResolutionContext: {
+              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+            },
+          },
+        });
+        const runtimeDraft = runtimeResult?.draftBuild && typeof runtimeResult.draftBuild === "object"
+          ? runtimeResult.draftBuild
+          : {};
+        const storedConceptPackage = sanitizeAuthoringSnapshotForStorage(conceptPackage);
+        const storedAuthorInputSnapshot = sanitizeAuthoringSnapshotForStorage(authorInputSnapshot);
+        const storedAuthoringStageTrace = sanitizeAuthoringSnapshotForStorage(authoringStageTrace);
+        const storedFoundation = sanitizeAuthoringSnapshotForStorage(foundation);
+        const draftItem = sanitizeAuthoringSnapshotForStorage({
+          ...runtimeDraft,
+          id: String(runtimeDraft.id || "").trim() || `runtime-draft-${Date.now()}`,
+          planId: String(payload.planId || "").trim(),
+          summary: foundation?.draft?.summary || runtimeDraft.summary || "runtime authored html draft",
+          builderProvider: designAuthorProvider,
+          builderVersion: "design-runtime-v1",
+          rendererSurface: "tailwind",
+          targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
+          executionStrategy: {
+            builderProvider: designAuthorProvider,
+            rendererSurface: "tailwind",
+            targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
+          },
+          operations: Array.isArray(foundation?.draft?.operations) ? foundation.draft.operations : [],
+          report: {
+            ...(foundation?.draft?.report && typeof foundation.draft.report === "object" ? foundation.draft.report : {}),
+            authoredSections: runtimeDraft?.report?.authoredSections || [],
+            sanitizeRemoved: runtimeDraft?.report?.sanitizeRemoved || [],
+            resolvedAssets: runtimeDraft?.report?.resolvedAssets || [],
+          },
+          snapshotData: {
+            ...(runtimeDraft?.snapshotData && typeof runtimeDraft.snapshotData === "object" ? runtimeDraft.snapshotData : {}),
+            source: "design-runtime-local-build-draft",
+            pageId,
+            workspacePageId: pageId,
+            builderProvider: designAuthorProvider,
+            patchDepth: String(payload.patchDepth || "medium").trim() || "medium",
+            interventionLayer: String(payload.interventionLayer || "section-group").trim() || "section-group",
+            targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
+            executionMode: "authored-section-html",
+            cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+            conceptPackage: storedConceptPackage,
+            designAuthorInput: storedAuthorInputSnapshot,
+            designAuthorOutputValidation: authorOutputValidation,
+            designAuthorProviderMeta: authorProviderMeta,
+            designAuthorFailureDebug,
+            authoredSectionMarkdownDocument,
+            authoredSectionHtmlPackage,
+            authoringStageTrace: storedAuthoringStageTrace,
+            referencePageShell: {
+              pageId,
+              viewportProfile: referenceArtifacts.viewportProfile,
+              rawShellHtml: referenceArtifacts.rawShellHtml,
+              currentPageHtmlExcerpt: referenceArtifacts.rawShellHtml,
+              sectionBoundaryMap: referenceArtifacts.sectionBoundaryMap,
+              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+              currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+            },
+            currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+            currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+            runtimeAdvisory: Array.isArray(runtimeResult?.advisory) ? runtimeResult.advisory : [],
+          },
+        });
+        const saved = saveDraftBuild(user.userId, draftItem);
+        return sendJson(res, 200, {
+          ok: true,
+          item: saved,
+          previewPath: `/runtime-draft/${encodeURIComponent(String(saved?.id || "").trim())}`,
+          comparePath: `/runtime-compare/${encodeURIComponent(String(saved?.id || "").trim())}`,
+          providerResult: {
+            ...storedFoundation,
+            conceptPackage: storedConceptPackage,
+            authorInput: storedAuthorInputSnapshot,
+            authorOutputValidation,
+            authorProviderMeta,
+            designAuthorFailureDebug,
+            authoringStageTrace: storedAuthoringStageTrace,
+            authoredSectionMarkdownDocument,
+            authoredSectionHtmlPackage,
+            referenceArtifacts: {
+              pageId: referenceArtifacts.pageId,
+              viewportProfile: referenceArtifacts.viewportProfile,
+              currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+            },
+            runtimeAdvisory: runtimeResult?.advisory || [],
+          },
+        });
+        });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_build_local_draft_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/runtime-draft" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const authoredSectionMarkdownDocument = String(payload.authoredSectionMarkdownDocument || "").trim();
+        const authoredSectionHtmlPackage =
+          payload.authoredSectionHtmlPackage && typeof payload.authoredSectionHtmlPackage === "object"
+            ? payload.authoredSectionHtmlPackage
+            : null;
+        if (!authoredSectionHtmlPackage && !authoredSectionMarkdownDocument) {
+          return sendJson(res, 400, { error: "authored_section_content_required" });
+        }
+        const pageId = String(authoredSectionHtmlPackage?.pageId || payload.pageId || "").trim();
+        const viewportProfile = String(authoredSectionHtmlPackage?.viewportProfile || payload.viewportProfile || "pc").trim() || "pc";
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const authoredSlotIds = Array.isArray(authoredSectionHtmlPackage?.sections)
+          ? authoredSectionHtmlPackage.sections.map((section) => String(section?.slotId || "").trim()).filter(Boolean)
+          : [];
+        const referenceArtifacts = buildRuntimeReferenceArtifacts(pageId, viewportProfile, authoredSlotIds);
+        const rawShellHtml =
+          String(payload?.referencePageShell?.rawShellHtml || "").trim() ||
+          String(referenceArtifacts?.rawShellHtml || "").trim();
+        if (!rawShellHtml) {
+          return sendJson(res, 404, { error: "reference_page_shell_not_found", pageId, viewportProfile });
+        }
+        const currentSectionHtmlMap =
+          payload?.currentSectionHtmlMap && typeof payload.currentSectionHtmlMap === "object" && !Array.isArray(payload.currentSectionHtmlMap)
+            ? payload.currentSectionHtmlMap
+            : (referenceArtifacts?.currentSectionHtmlMap || {});
+        const sectionBoundaryMap =
+          payload?.referencePageShell?.sectionBoundaryMap && typeof payload.referencePageShell.sectionBoundaryMap === "object" && !Array.isArray(payload.referencePageShell.sectionBoundaryMap)
+            ? payload.referencePageShell.sectionBoundaryMap
+            : (referenceArtifacts?.sectionBoundaryMap || Object.fromEntries(
+                Object.entries(currentSectionHtmlMap).map(([slotId, currentHtml]) => [String(slotId || "").trim(), { currentHtml: String(currentHtml || "").trim() }])
+              ));
+        const currentPageAssetMap =
+          payload?.runtimeContext?.assetResolutionContext?.currentPageAssetMap &&
+          typeof payload.runtimeContext.assetResolutionContext.currentPageAssetMap === "object" &&
+          !Array.isArray(payload.runtimeContext.assetResolutionContext.currentPageAssetMap)
+            ? payload.runtimeContext.assetResolutionContext.currentPageAssetMap
+            : (referenceArtifacts?.currentPageAssetMap || {});
+        const runtimeResult = renderRuntimeDraft({
+          authoredSectionMarkdownDocument,
+          authoredSectionHtmlPackage,
+          referencePageShell: {
+            pageId,
+            viewportProfile,
+            rawShellHtml,
+            sectionBoundaryMap,
+          },
+          runtimeContext: {
+            assetResolutionContext: {
+              currentPageAssetMap,
+            },
+          },
+        });
+        const draftItem = {
+          ...runtimeResult.draftBuild,
+          planId: String(payload.planId || "").trim(),
+        };
+        const saved = saveDraftBuild(user.userId, draftItem);
+        const previewPath = `/runtime-draft/${encodeURIComponent(String(saved?.id || "").trim())}`;
+        return sendJson(res, 200, {
+          ok: true,
+          item: saved,
+          previewPath,
+          beforePath: `${previewPath}?snapshotState=before`,
+          renderResult: {
+            advisory: runtimeResult.advisory,
+          },
+        });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_runtime_draft_failed", detail: String(error) }));
   }
   if (pathname === "/api/workspace/draft-builds") {
     const user = requireAuthenticatedUser(req, res);
@@ -18359,8 +31758,11 @@ function route(req, res) {
     const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
     const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "").trim();
     const limit = Math.max(1, Math.min(200, Number(requestUrl.searchParams.get("limit") || 50)));
+    const summaryOnly = String(requestUrl.searchParams.get("summary") || "").trim() === "1";
     return sendJson(res, 200, {
-      items: listDraftBuilds(user.userId, { pageId, viewportProfile, limit }),
+      items: (listDraftBuilds(user.userId, { pageId, viewportProfile, limit, summaryOnly }) || []).map((item) =>
+        summaryOnly ? summarizeDraftBuildForWorkspaceList(item) : item
+      ),
     });
   }
   if (pathname === "/api/workspace/draft-build" && req.method === "POST") {
@@ -18375,6 +31777,120 @@ function route(req, res) {
         return sendJson(res, 200, { ok: true, item: saved });
       })
       .catch((error) => sendJson(res, 500, { error: "workspace_draft_build_save_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/batched-compose" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const job = startBatchedComposeJob({ user, req, payload });
+        return sendJson(res, 202, { ok: true, item: summarizeBatchedComposeJob(job) });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_batched_compose_start_failed", detail: String(error) }));
+  }
+  if (pathname.startsWith("/api/workspace/batched-compose/")) {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const jobId = decodeURIComponent(pathname.slice("/api/workspace/batched-compose/".length));
+    pruneRuntimeJobs(batchedComposeJobs);
+    const job = batchedComposeJobs.get(jobId);
+    if (!job || String(job.userId || "").trim() !== String(user.userId || "").trim()) {
+      return sendJson(res, 404, { error: "batched_compose_job_not_found" });
+    }
+    return sendJson(res, 200, { ok: true, item: summarizeBatchedComposeJob(job) });
+  }
+  if (pathname === "/api/workspace/journey-build" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const flow = payload?.journeyFlow && typeof payload.journeyFlow === "object" ? payload.journeyFlow : null;
+        if (!flow || !Array.isArray(flow.pages) || !flow.pages.length) {
+          return sendJson(res, 400, { error: "journey_flow_required" });
+        }
+        if (!isExecutableJourneyFlow(flow)) {
+          return sendJson(res, 400, { error: "journey_flow_not_approved" });
+        }
+        const validation = validateJourneyBuildPayload(payload);
+        if (!validation.ok) {
+          return sendJson(res, 400, validation);
+        }
+        const job = startJourneyBuildJob({ user, req, payload });
+        return sendJson(res, 202, { ok: true, item: summarizeJourneyBuildJob(job) });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_journey_build_start_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/journey-builds" && req.method === "GET") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+    const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "").trim();
+    const journeyId = String(requestUrl.searchParams.get("journeyId") || "").trim();
+    const limit = Math.max(1, Math.min(100, Number(requestUrl.searchParams.get("limit") || 20)));
+    return sendJson(res, 200, {
+      items: listJourneyBuildRecords(user.userId, { pageId, viewportProfile, journeyId, limit }).map(summarizeJourneyBuildRecord),
+    });
+  }
+  if (pathname.startsWith("/api/workspace/journey-build/")) {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const jobId = decodeURIComponent(pathname.slice("/api/workspace/journey-build/".length));
+    pruneRuntimeJobs(journeyBuildJobs);
+    const job = journeyBuildJobs.get(jobId) || findJourneyBuildRecord(jobId);
+    if (!job || String(job.userId || "").trim() !== String(user.userId || "").trim()) {
+      return sendJson(res, 404, { error: "journey_build_job_not_found" });
+    }
+    return sendJson(res, 200, { ok: true, item: summarizeJourneyBuildJob(job) });
+  }
+  if (pathname === "/api/workspace/draft-fixture" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        const viewportProfile = String(payload.viewportProfile || "pc").trim() || "pc";
+        const sourceDraftBuildId = String(payload.sourceDraftBuildId || "").trim();
+        const fixtureLabel = String(payload.fixtureLabel || "").trim();
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const draftBuilds = listDraftBuilds(user.userId, { pageId, viewportProfile, limit: 200 });
+        const sourceDraftBuild = sourceDraftBuildId
+          ? draftBuilds.find((item) => String(item?.id || "").trim() === sourceDraftBuildId) || null
+          : draftBuilds[0] || null;
+        if (!sourceDraftBuild) return sendJson(res, 404, { error: "draft_build_not_found" });
+        const fixtureDraft = buildFixtureDraftFromSource(sourceDraftBuild, { fixtureLabel });
+        const saved = saveDraftBuild(user.userId, fixtureDraft);
+        return sendJson(res, 200, { ok: true, item: saved, sourceDraftBuildId: String(sourceDraftBuild.id || "").trim() });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_draft_fixture_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/draft-replay-check" && req.method === "POST") {
+    return readBody(req)
+      .then(async (body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        const viewportProfile = String(payload.viewportProfile || "pc").trim() || "pc";
+        const draftBuildId = String(payload.draftBuildId || "").trim();
+        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
+        const draftBuilds = listDraftBuilds(user.userId, { pageId, viewportProfile, limit: 200 });
+        const draftBuild = draftBuildId
+          ? draftBuilds.find((item) => item.id === draftBuildId) || null
+          : draftBuilds[0] || null;
+        if (!draftBuild) return sendJson(res, 404, { error: "draft_build_not_found" });
+        const replayCheck = await runLocalDraftReplayCheck({
+          userId: user.userId,
+          pageId,
+          viewportProfile,
+          draftBuild,
+        });
+        const saved = attachDraftReplayCheck(user.userId, String(draftBuild?.id || "").trim(), replayCheck);
+        return sendJson(res, 200, { ok: true, item: saved, replayCheck });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_draft_replay_check_failed", detail: String(error) }));
   }
   if (pathname === "/api/workspace/versions") {
     const user = requireAuthenticatedUser(req, res);
@@ -18396,7 +31912,7 @@ function route(req, res) {
         const viewportProfile = String(payload.viewportProfile || "").trim();
         if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
         const currentData = readWorkspaceData(user.userId);
-        const buildId = String(payload.buildId || "").trim();
+        const buildId = String(payload.buildId || payload.draftBuildId || "").trim();
         const draftBuild =
           buildId
             ? listDraftBuilds(user.userId, { pageId, viewportProfile, limit: 200 }).find((item) => item.id === buildId) || null
@@ -18405,16 +31921,18 @@ function route(req, res) {
           (payload.snapshotData && payload.snapshotData.pageSnapshot) ||
           draftBuild?.snapshotData?.pageSnapshot ||
           extractPageScopedSnapshot(currentData, pageId, viewportProfile || draftBuild?.viewportProfile || "");
-        const changedComponentIds = Array.isArray(payload.snapshotData?.changedComponentIds)
-          ? payload.snapshotData.changedComponentIds.filter(Boolean)
-          : Array.isArray(draftBuild?.snapshotData?.changedComponentIds)
-            ? draftBuild.snapshotData.changedComponentIds.filter(Boolean)
-            : [];
+        const changedComponentIds = deriveChangedComponentIdsForVersionSave(
+          draftBuild,
+          payload.snapshotData && typeof payload.snapshotData === "object" ? payload.snapshotData : null,
+          pageId
+        );
         if (!changedComponentIds.length) {
           return sendJson(res, 400, { error: "no_effect_build_cannot_save" });
         }
         const item = saveSavedVersion(user.userId, {
           ...payload,
+          buildId,
+          planId: String(payload.planId || draftBuild?.planId || "").trim(),
           snapshotData: {
             ...(payload.snapshotData && typeof payload.snapshotData === "object" ? payload.snapshotData : {}),
             changedComponentIds,
@@ -18425,6 +31943,202 @@ function route(req, res) {
         return sendJson(res, 200, { ok: true, item });
       })
       .catch((error) => sendJson(res, 500, { error: "workspace_version_save_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/share-version" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const pageId = String(payload.pageId || "").trim();
+        const viewportProfile = String(payload.viewportProfile || "pc").trim() || "pc";
+        const versionId = String(payload.versionId || "").trim();
+        if (!pageId || !versionId) return sendJson(res, 400, { error: "page_id_and_version_id_required" });
+        const version = listSavedVersions(user.userId, { pageId, viewportProfile, limit: 200 })
+          .find((item) => String(item?.id || "").trim() === versionId) || null;
+        if (!version) return sendJson(res, 404, { error: "saved_version_not_found" });
+        const link = createOrReuseShareLink({
+          userId: user.userId,
+          pageId,
+          viewportProfile,
+          versionId,
+          buildId: version.buildId || "",
+        });
+        const origin = `http://${req.headers.host || `127.0.0.1:${PORT}`}`;
+        return sendJson(res, 200, {
+          ok: true,
+          item: link,
+          shareUrl: `${origin}/share/${encodeURIComponent(link.token)}`,
+          compareUrl: `${origin}/share/${encodeURIComponent(link.token)}/compare`,
+        });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_share_version_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/share-draft" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const draftBuildId = String(payload.draftBuildId || payload.buildId || "").trim();
+        const pageId = String(payload.pageId || "").trim();
+        const viewportProfile = String(payload.viewportProfile || "pc").trim() || "pc";
+        if (!draftBuildId || !pageId) return sendJson(res, 400, { error: "draft_build_id_and_page_id_required" });
+        const draftBuild = findDraftBuildById(user.userId, draftBuildId);
+        if (!draftBuild) return sendJson(res, 404, { error: "draft_build_not_found" });
+        const draftPageId = String(draftBuild.pageId || "").trim();
+        const draftViewportProfile = normalizeViewportProfile(draftBuild.viewportProfile || viewportProfile, "pc");
+        if (draftPageId !== pageId || draftViewportProfile !== normalizeViewportProfile(viewportProfile, "pc")) {
+          return sendJson(res, 400, { error: "draft_build_scope_mismatch" });
+        }
+        const link = createOrReuseShareLink({
+          userId: user.userId,
+          pageId,
+          viewportProfile,
+          versionId: "",
+          buildId: draftBuildId,
+        });
+        const origin = `http://${req.headers.host || `127.0.0.1:${PORT}`}`;
+        return sendJson(res, 200, {
+          ok: true,
+          item: link,
+          shareUrl: `${origin}/share/${encodeURIComponent(link.token)}`,
+          compareUrl: `${origin}/share/${encodeURIComponent(link.token)}/compare`,
+        });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_share_draft_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/workspace/share-journey-build" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const journeyBuildId = String(payload.journeyBuildId || payload.id || "").trim();
+        if (!journeyBuildId) return sendJson(res, 400, { error: "journey_build_id_required" });
+        const record = findJourneyBuildRecord(journeyBuildId);
+        if (!record || String(record.userId || "").trim() !== String(user.userId || "").trim()) {
+          return sendJson(res, 404, { error: "journey_build_not_found" });
+        }
+        const link = createOrReuseJourneyShareLink({ userId: user.userId, journeyBuild: record, req });
+        const origin = `http://${req.headers.host || `127.0.0.1:${PORT}`}`;
+        return sendJson(res, 200, {
+          ok: true,
+          item: link,
+          shareUrl: `${origin}/share/${encodeURIComponent(link.token)}/journey`,
+        });
+      })
+      .catch((error) => sendJson(res, 500, { error: "workspace_share_journey_build_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/journeys" && req.method === "GET") {
+    return sendJson(res, 200, readJourneyDefinitions());
+  }
+  if (pathname === "/api/journey-flows" && req.method === "GET") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const planId = String(requestUrl.searchParams.get("planId") || "").trim();
+    const pageId = String(requestUrl.searchParams.get("pageId") || "").trim();
+    const viewportProfile = String(requestUrl.searchParams.get("viewportProfile") || "").trim();
+    const journeyId = String(requestUrl.searchParams.get("journeyId") || "").trim();
+    const payload = readJourneyFlows();
+    const flows = (Array.isArray(payload.flows) ? payload.flows : [])
+      .filter((item) => String(item?.userId || "").trim() === String(user.userId || "").trim())
+      .filter((item) => !planId || String(item?.planId || "").trim() === planId)
+      .filter((item) => !pageId || String(item?.sourcePageId || item?.pageId || "").trim() === pageId)
+      .filter((item) => !viewportProfile || String(item?.viewportProfile || "").trim() === normalizeViewportProfile(viewportProfile, "pc"))
+      .filter((item) => !journeyId || String(item?.journeyId || "").trim() === journeyId);
+    return sendJson(res, 200, { flows });
+  }
+  if (pathname === "/api/journey-flows" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const flow = payload?.journeyFlow && typeof payload.journeyFlow === "object" ? payload.journeyFlow : payload;
+        const validation = validateJourneyFlowForSource({
+          sourcePageId: payload.sourcePageId || payload.pageId,
+          journeyId: payload.journeyId,
+          journeyFlow: flow,
+        });
+        if (!validation.ok) return sendJson(res, 400, validation);
+        const item = saveJourneyFlow(user.userId, payload);
+        if (!item) return sendJson(res, 400, { error: "journey_flow_required" });
+        return sendJson(res, 200, { ok: true, item });
+      })
+      .catch((error) => sendJson(res, 500, { error: "journey_flow_save_failed", detail: String(error) }));
+  }
+  if (pathname.startsWith("/api/journey-flows/") && req.method === "PUT") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const flowId = decodeURIComponent(pathname.slice("/api/journey-flows/".length));
+        const existing = (readJourneyFlows().flows || []).find((item) => String(item?.id || "").trim() === flowId) || null;
+        if (!existing || String(existing.userId || "").trim() !== String(user.userId || "").trim()) {
+          return sendJson(res, 404, { error: "journey_flow_not_found" });
+        }
+        const payload = body ? JSON.parse(body) : {};
+        const flow = payload?.journeyFlow && typeof payload.journeyFlow === "object" ? payload.journeyFlow : { ...(existing.journeyFlow || {}), ...(payload.journeyFlow || {}) };
+        const validation = validateJourneyFlowForSource({
+          sourcePageId: payload.sourcePageId || existing.sourcePageId || payload.pageId || existing.pageId,
+          journeyId: payload.journeyId || existing.journeyId,
+          journeyFlow: flow,
+        });
+        if (!validation.ok) return sendJson(res, 400, validation);
+        const item = saveJourneyFlow(user.userId, { ...existing, ...payload, id: flowId });
+        if (!item) return sendJson(res, 400, { error: "journey_flow_required" });
+        return sendJson(res, 200, { ok: true, item });
+      })
+      .catch((error) => sendJson(res, 500, { error: "journey_flow_update_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/concept-packages" && req.method === "GET") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const journeyId = String(requestUrl.searchParams.get("journeyId") || "").trim();
+    const payload = readConceptPackages();
+    const packages = (Array.isArray(payload.packages) ? payload.packages : [])
+      .filter((item) => String(item?.userId || "").trim() === String(user.userId || "").trim())
+      .filter((item) => !journeyId || String(item?.journeyId || "").trim() === journeyId)
+      .map((item) => ({ ...item, consistency: calculateConceptPackageConsistency(item) }));
+    return sendJson(res, 200, { packages });
+  }
+  if (pathname === "/api/concept-packages" && req.method === "POST") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const payload = body ? JSON.parse(body) : {};
+        const item = saveConceptPackage(user.userId, payload);
+        return sendJson(res, 200, { ok: true, item: { ...item, consistency: calculateConceptPackageConsistency(item) } });
+      })
+      .catch((error) => sendJson(res, 500, { error: "concept_package_save_failed", detail: String(error) }));
+  }
+  if (pathname.startsWith("/api/concept-packages/") && pathname.endsWith("/assign") && req.method === "PUT") {
+    return readBody(req)
+      .then((body) => {
+        const user = requireAuthenticatedUser(req, res);
+        if (!user) return;
+        const packageId = decodeURIComponent(pathname.slice("/api/concept-packages/".length, -"/assign".length));
+        const existing = findConceptPackageById(packageId);
+        if (!existing || String(existing.userId || "").trim() !== String(user.userId || "").trim()) {
+          return sendJson(res, 404, { error: "concept_package_not_found" });
+        }
+        const payload = body ? JSON.parse(body) : {};
+        const item = assignConceptPackage(packageId, payload);
+        return sendJson(res, 200, { ok: true, item: { ...item, consistency: calculateConceptPackageConsistency(item) } });
+      })
+      .catch((error) => sendJson(res, 500, { error: "concept_package_assign_failed", detail: String(error) }));
+  }
+  if (pathname.startsWith("/api/concept-packages/") && pathname.endsWith("/consistency") && req.method === "GET") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const packageId = decodeURIComponent(pathname.slice("/api/concept-packages/".length, -"/consistency".length));
+    const item = findConceptPackageById(packageId);
+    if (!item || String(item.userId || "").trim() !== String(user.userId || "").trim()) {
+      return sendJson(res, 404, { error: "concept_package_not_found" });
+    }
+    return sendJson(res, 200, { ok: true, item: calculateConceptPackageConsistency(item) });
   }
   if (pathname === "/api/workspace/view-pin") {
     const user = requireAuthenticatedUser(req, res);
@@ -18591,6 +32305,53 @@ function route(req, res) {
     const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "";
     const data = readWorkspaceData(user.userId);
     return sendJson(res, 200, buildWorkingEditableComponentCatalog(pageId, { editableData: data, viewportProfile }));
+  }
+  if (pathname === "/api/workspace/asset-registry-cards") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const pageId = requestUrl.searchParams.get("pageId") || "home";
+    const viewportProfile = requestUrl.searchParams.get("viewportProfile") || "pc";
+    const includeEmpty = requestUrl.searchParams.get("includeEmpty") === "1";
+    const data = readWorkspaceData(user.userId);
+    const editablePayload = buildLlmEditableList(pageId, { editableData: data, viewportProfile });
+    return sendJson(res, 200, buildAssetRegistryCatalogForPage({
+      pageId,
+      viewportProfile,
+      components: Array.isArray(editablePayload?.components) ? editablePayload.components : [],
+      includeEmpty,
+    }));
+  }
+  if (pathname === "/api/workspace/asset-registry-status" && req.method === "POST") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    return readBody(req)
+      .then((body) => {
+        const payload = body ? JSON.parse(body) : {};
+        const targetType = String(payload.targetType || "").trim();
+        const status = String(payload.status || "").trim();
+        const reviewedBy = user.loginId || user.userId || "";
+        if (targetType === "image") {
+          const item = updateImageAssetVariantStatus({
+            assetId: payload.assetId,
+            viewportProfile: payload.viewportProfile,
+            status,
+            reviewedBy,
+            reviewNotes: payload.reviewNotes,
+          });
+          return sendJson(res, 200, { ok: true, item });
+        }
+        if (targetType === "interaction") {
+          const item = updateInteractionComponentStatus({
+            interactionId: payload.interactionId,
+            status,
+            reviewedBy,
+            reviewNotes: payload.reviewNotes,
+          });
+          return sendJson(res, 200, { ok: true, item });
+        }
+        return sendJson(res, 400, { error: "unsupported_asset_registry_target_type", targetType });
+      })
+      .catch((error) => sendJson(res, 400, { error: "asset_registry_status_update_failed", detail: String(error?.message || error) }));
   }
   if (pathname === "/api/workspace/component-rollback") {
     const user = requireAuthenticatedUser(req, res);
@@ -18765,7 +32526,11 @@ function route(req, res) {
   if (pathname === "/api/visual-batch-summary") {
     const summary = readVisualBatchSummary();
     if (!summary) {
-      return sendJson(res, 404, { error: "visual_batch_summary_not_found" });
+      return sendJson(res, 200, {
+        generatedAt: null,
+        totalPages: 0,
+        items: [],
+      });
     }
     return sendJson(res, 200, summary);
   }
@@ -18786,24 +32551,40 @@ function route(req, res) {
   if (pathname === "/api/data") {
     try {
       const { user, data, workspace, source } = readDataForRequest(req);
+      const summaryOnly = requestUrl.searchParams.get("summary") === "1";
       const { linkMap, heroMap } = buildPageEnhancementMaps(data);
       const runtimePageSummary = buildRuntimePageSummary(data);
       const pageAdvisories = buildPageOperationalAdvisories();
       const includeCoverage = requestUrl.searchParams.get("includeCoverage") === "1";
+      const includeCompletion = requestUrl.searchParams.get("includeCompletion") === "1";
       const coverageMap = includeCoverage
         ? Object.fromEntries((data.pages || []).map((page) => [page.id, buildCoverageModel(page.id)]))
         : undefined;
+      const basePayload = {
+        pages: summaryOnly
+          ? (data.pages || []).map((page) => {
+              const { sections, ...rest } = page || {};
+              return rest;
+            })
+          : data.pages || [],
+        homePageId: (data.pages || []).find((p) => p.id === "home") ? "home" : (data.pages || [])[0]?.id,
+        workspaceSource: source,
+        currentUser: sanitizeUser(user),
+        workspaceMeta: buildWorkspaceMetaSummary(workspace),
+        pageWorkSummary: buildAdminPageWorkSummaryMap(workspace, data.pages || []),
+        ...(includeCompletion ? { fullCompletionReport: buildFullCompletionReport() } : {}),
+      };
+      if (summaryOnly) {
+        return sendJson(res, 200, basePayload);
+      }
       return sendJson(res, 200, {
         ...data,
+        ...basePayload,
         linkMap,
         heroMap,
         runtimePageSummary,
         pageAdvisories,
         ...(includeCoverage ? { coverageMap } : {}),
-        homePageId: (data.pages || []).find((p) => p.id === "home") ? "home" : (data.pages || [])[0]?.id,
-        workspaceSource: source,
-        currentUser: sanitizeUser(user),
-        workspaceMeta: buildWorkspaceMetaSummary(workspace),
       });
     } catch (error) {
       return sendJson(res, 500, { error: "failed_to_read_data", detail: String(error) });
@@ -18812,329 +32593,30 @@ function route(req, res) {
   if (pathname === "/api/llm/status") {
     return sendJson(res, 200, {
       configured: Boolean(process.env.OPENROUTER_API_KEY),
-      model: process.env.OPENROUTER_MODEL || "openai/gpt-4.1-mini",
-      plannerModel: process.env.PLANNER_MODEL || process.env.OPENROUTER_MODEL || "openai/gpt-4.1-mini",
-      builderModel: process.env.BUILDER_MODEL || process.env.OPENROUTER_MODEL || "openai/gpt-4.1-mini",
+      model: process.env.OPENROUTER_MODEL || DEFAULT_OPENROUTER_TEXT_MODEL,
+      plannerModel: process.env.PLANNER_MODEL || process.env.OPENROUTER_MODEL || DEFAULT_OPENROUTER_TEXT_MODEL,
+      builderModel: process.env.BUILDER_MODEL || process.env.OPENROUTER_MODEL || DEFAULT_OPENROUTER_TEXT_MODEL,
+      imageModel: process.env.OPENROUTER_IMAGE_MODEL || null,
     });
   }
   if (pathname === "/api/llm/plan" && req.method === "POST") {
-    return readBody(req)
-      .then(async (body) => {
-        const user = requireAuthenticatedUser(req, res);
-        if (!user) return;
-        const payload = body ? JSON.parse(body) : {};
-        const pageId = String(payload.pageId || "").trim();
-        const viewportProfile = String(payload.viewportProfile || "pc").trim() || "pc";
-        const mode = String(payload.mode || "direct").trim() || "direct";
-        const requestText = String(payload.requestText || "").trim();
-        const keyMessage = String(payload.keyMessage || "").trim();
-        const preferredDirection = String(payload.preferredDirection || "").trim();
-        const avoidDirection = String(payload.avoidDirection || "").trim();
-        const toneAndMood = String(payload.toneAndMood || "").trim();
-        const referenceUrls = safeArray(payload.referenceUrls || [], 5);
-        const designChangeLevel = normalizeDesignChangeLevel(payload.designChangeLevel, "medium");
-        const targetScope = String(payload.targetScope || "page").trim() || "page";
-        const targetComponents = safeArray(payload.targetComponents || [], 50)
-          .map((item) => String(item || "").trim())
-          .filter(Boolean);
-        console.log(
-          `[planner] request user=${user.userId} page=${pageId || "n/a"} mode=${mode} refs=${referenceUrls.length} requestLength=${requestText.length} scope=${targetScope} components=${targetComponents.length}`
-        );
-        if (!pageId) {
-          return sendJson(res, 400, { error: "page_id_required" });
-        }
-        setLlmProgress(user.userId, pageId, "planner", {
-          status: "running",
-          stage: "validate",
-          message: "기획안 생성 요청을 확인하고 있습니다.",
-          percent: 8,
-        });
-        if (!requestText && referenceUrls.length === 0) {
-          return sendJson(res, 400, { error: "request_text_or_reference_required" });
-        }
-        const data = readWorkspaceData(user.userId);
-        const pageIdentityOverride = getPageIdentityOverride(user.userId, pageId);
-        const page = findPage(data, pageId);
-        if (!page) {
-          return sendJson(res, 404, { error: "page_not_found", pageId });
-        }
-        setLlmProgress(user.userId, pageId, "planner", {
-          status: "running",
-          stage: "prepare_input",
-          message: referenceUrls.length
-            ? "페이지 구조와 레퍼런스 정보를 수집하고 있습니다."
-            : "페이지 구조와 편집 범위를 정리하고 있습니다.",
-          percent: referenceUrls.length ? 20 : 28,
-          detail: { referenceCount: referenceUrls.length },
-        });
-        const plannerInput = await buildPlannerInputPayload({
-          user,
-          editableData: data,
-          pageId,
-          viewportProfile,
-          pageIdentityOverride,
-          mode,
-          requestText,
-          keyMessage,
-          preferredDirection,
-          avoidDirection,
-          toneAndMood,
-          referenceUrls,
-          designChangeLevel,
-          targetScope,
-          targetComponents,
-        });
-        setLlmProgress(user.userId, pageId, "planner", {
-          status: "running",
-          stage: "model_generation",
-          message: "기획 방향과 디자인 방향을 생성하고 있습니다.",
-          percent: 62,
-        });
-        const plannerResult = await handleLlmPlan(plannerInput);
-        setLlmProgress(user.userId, pageId, "planner", {
-          status: "running",
-          stage: "save_result",
-          message: "생성된 기획안을 저장하고 화면에 반영할 준비를 하고 있습니다.",
-          percent: 88,
-        });
-        const savedPlan = saveRequirementPlan(user.userId, {
-          pageId,
-          viewportProfile,
-          mode,
-          status: "draft",
-          title: plannerResult.requirementPlan?.title || "",
-          summary: plannerResult.summary || "",
-          input: plannerInput,
-          output: {
-            requirementPlan: plannerResult.requirementPlan || {},
-            toolContext: {
-              referenceSummary: plannerInput.referenceSummary,
-              guardrailBundle: plannerInput.guardrailBundle,
-            },
-          },
-        });
-        incrementLlmUsage(user.userId, {
-          kind: "planner",
-          pageId,
-          promptLength: requestText.length,
-          referenceCount: referenceUrls.length,
-        });
-        logEvent(user.userId, "llm_plan_created", {
-          pageId,
-          planId: savedPlan?.id || null,
-          referenceCount: referenceUrls.length,
-          viewportProfile,
-        });
-        console.log(
-          `[planner] success user=${user.userId} page=${pageId} planId=${savedPlan?.id || "n/a"} summaryLength=${String(plannerResult.summary || "").length}`
-        );
-        setLlmProgress(user.userId, pageId, "planner", {
-          status: "completed",
-          stage: "completed",
-          message: "기획안 생성이 완료되었습니다.",
-          percent: 100,
-          detail: { planId: savedPlan?.id || null },
-        });
-        clearCompletedLlmProgress(user.userId, pageId, "planner");
-        return sendJson(res, 200, {
-          summary: plannerResult.summary || "요구사항 정리 완료",
-          planId: savedPlan?.id || null,
-          requirementPlan: plannerResult.requirementPlan || {},
-          toolContext: {
-            referenceSummary: plannerInput.referenceSummary,
-            guardrailBundle: plannerInput.guardrailBundle,
-          },
-        });
-      })
-      .catch((error) => {
-        console.error(`[planner] failed ${String(error)}`);
-        try {
-          const user = getUserFromRequest(req);
-          const payload = req.__lastParsedBody ? JSON.parse(req.__lastParsedBody) : {};
-          const pageId = String(payload.pageId || "").trim();
-          if (user && pageId) {
-            setLlmProgress(user.userId, pageId, "planner", {
-              status: "failed",
-              stage: "failed",
-              message: "기획안 생성 중 오류가 발생했습니다.",
-              percent: 100,
-              detail: { error: String(error) },
-            });
-            clearCompletedLlmProgress(user.userId, pageId, "planner");
-          }
-        } catch {}
-        return sendJson(res, 500, {
-          error: "llm_plan_failed",
-          detail: String(error),
-        });
-      });
+    return sendJson(res, 410, {
+      error: "legacy_mainline_retired",
+      detail: "컨셉서 본선은 local planning provider로 전환되었습니다. /api/workspace/plan-local-preview 또는 /api/workspace/plan 경로를 사용하세요.",
+      replacement: {
+        previewPath: "/api/workspace/plan-local-preview",
+        savePath: "/api/workspace/plan",
+      },
+    });
   }
   if (pathname === "/api/llm/build" && req.method === "POST") {
-    return readBody(req)
-      .then(async (body) => {
-        const user = requireAuthenticatedUser(req, res);
-        if (!user) return;
-        const payload = body ? JSON.parse(body) : {};
-        const pageId = String(payload.pageId || "").trim();
-        const viewportProfile = String(payload.viewportProfile || "pc").trim() || "pc";
-        const planId = String(payload.planId || "").trim();
-        const intensity = String(payload.intensity || "balanced").trim() || "balanced";
-        const versionLabelHint = String(payload.versionLabelHint || "").trim();
-        if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
-        setLlmProgress(user.userId, pageId, "builder", {
-          status: "running",
-          stage: "validate",
-          message: "디자인 생성 요청과 승인된 기획안을 확인하고 있습니다.",
-          percent: 10,
-        });
-        const data = readWorkspaceData(user.userId);
-        const pageIdentityOverride = getPageIdentityOverride(user.userId, pageId);
-        const page = findPage(data, pageId);
-        if (!page) return sendJson(res, 404, { error: "page_not_found", pageId });
-        const savedPlans = listRequirementPlans(user.userId, { pageId, limit: 200 });
-        const matchedPlan = planId
-          ? savedPlans.find((item) => item.id === planId) || null
-          : savedPlans[0] || null;
-        const targetScope = String(payload.targetScope || matchedPlan?.input?.userInput?.targetScope || "page").trim() || "page";
-        const designChangeLevel = normalizeDesignChangeLevel(
-          payload.designChangeLevel ||
-            payload.approvedPlan?.designChangeLevel ||
-            matchedPlan?.output?.requirementPlan?.designChangeLevel ||
-            matchedPlan?.input?.userInput?.designChangeLevel,
-          "medium"
-        );
-        const targetComponents = safeArray(payload.targetComponents || matchedPlan?.input?.userInput?.targetComponents || [], 50)
-          .map((item) => String(item || "").trim())
-          .filter(Boolean);
-        const approvedPlan =
-          payload.approvedPlan && typeof payload.approvedPlan === "object"
-            ? payload.approvedPlan
-            : matchedPlan?.output?.requirementPlan || null;
-        if (!approvedPlan) {
-          return sendJson(res, 400, { error: "approved_plan_required" });
-        }
-        console.log(
-          `[builder] request user=${user.userId} page=${pageId} viewport=${viewportProfile} planId=${matchedPlan?.id || planId || ""} intensity=${intensity} scope=${targetScope} targetComponents=${targetComponents.length}`
-        );
-        setLlmProgress(user.userId, pageId, "builder", {
-          status: "running",
-          stage: "prepare_input",
-          message: "실제 반영 가능한 슬롯과 patch 범위를 정리하고 있습니다.",
-          percent: 28,
-        });
-        const beforePageSnapshot = extractPageScopedSnapshot(data, pageId, viewportProfile);
-        const builderInput = buildBuilderInputPayload({
-          editableData: data,
-          pageId,
-          viewportProfile,
-          pageIdentityOverride,
-          approvedPlan,
-          intensity,
-          versionLabelHint,
-          designChangeLevel,
-          targetScope,
-          targetComponents,
-        });
-        setLlmProgress(user.userId, pageId, "builder", {
-          status: "running",
-          stage: "model_generation",
-          message: "실행 가능한 디자인 operation을 생성하고 있습니다.",
-          percent: 64,
-          detail: { editableComponentCount: Array.isArray(builderInput?.systemContext?.editableComponents) ? builderInput.systemContext.editableComponents.length : 0 },
-        });
-        const buildResult = await handleLlmBuildOnData(builderInput, data);
-        setLlmProgress(user.userId, pageId, "builder", {
-          status: "running",
-          stage: "save_result",
-          message: "생성된 draft를 저장하고 미리보기 반영을 준비하고 있습니다.",
-          percent: 90,
-        });
-        const nextData = buildResult.data || data;
-        saveDataForUser(user, nextData, buildResult.summary || `llm_build:${pageId}`);
-        const changedComponentIds = Array.from(
-          new Set(
-            (buildResult.buildResult?.changedTargets || [])
-              .map((item) => String(item.componentId || "").trim())
-              .filter(Boolean)
-          )
-        );
-        const pageSnapshot = extractPageScopedSnapshot(nextData, pageId);
-        const saved = saveDraftBuild(user.userId, {
-          pageId,
-          viewportProfile,
-          planId: matchedPlan?.id || planId || "",
-          status: "draft",
-          summary: buildResult.summary || "",
-          proposedVersionLabel: buildResult.buildResult?.proposedVersionLabel || "",
-          operations: buildResult.buildResult?.operations || [],
-          report: buildResult.buildResult?.report || {},
-          snapshotData: {
-            changedComponentIds,
-            previewUrl: buildPreviewUrlForWorkspacePage(pageId),
-            intensity,
-            designChangeLevel,
-            critic: buildResult.buildResult?.report?.critic || null,
-            beforePageSnapshot,
-            pageSnapshot,
-          },
-        });
-        incrementLlmUsage(user.userId, {
-          kind: "builder",
-          pageId,
-          planId: matchedPlan?.id || planId || null,
-          operationCount: Array.isArray(buildResult.buildResult?.operations) ? buildResult.buildResult.operations.length : 0,
-        });
-        logEvent(user.userId, "llm_build_created", {
-          pageId,
-          draftBuildId: saved?.id || null,
-          planId: matchedPlan?.id || planId || null,
-          intensity,
-        });
-        console.log(
-          `[builder] success user=${user.userId} page=${pageId} viewport=${viewportProfile} draftBuildId=${saved?.id || ""} operations=${Array.isArray(buildResult.buildResult?.operations) ? buildResult.buildResult.operations.length : 0} changed=${changedComponentIds.length}`
-        );
-        setLlmProgress(user.userId, pageId, "builder", {
-          status: "completed",
-          stage: "completed",
-          message: "디자인 생성과 draft 반영이 완료되었습니다.",
-          percent: 100,
-          detail: {
-            draftBuildId: saved?.id || null,
-            operationCount: Array.isArray(buildResult.buildResult?.operations) ? buildResult.buildResult.operations.length : 0,
-          },
-        });
-        clearCompletedLlmProgress(user.userId, pageId, "builder");
-        return sendJson(res, 200, {
-          summary: buildResult.summary || "시안 생성 완료",
-          draftBuildId: saved?.id || null,
-          criticReport: buildResult.buildResult?.report?.critic || null,
-          buildResult: buildResult.buildResult || {},
-        });
-      })
-      .catch((error) => {
-        try {
-          const user = getUserFromRequest(req);
-          const payload = req.__lastParsedBody ? JSON.parse(req.__lastParsedBody) : {};
-          const pageId = String(payload.pageId || "").trim();
-          if (user && pageId) {
-            console.error(`[builder] failed user=${user.userId} page=${pageId}`, error);
-          }
-          if (user && pageId) {
-            setLlmProgress(user.userId, pageId, "builder", {
-              status: "failed",
-              stage: "failed",
-              message: "디자인 생성 중 오류가 발생했습니다.",
-              percent: 100,
-              detail: { error: String(error) },
-            });
-            clearCompletedLlmProgress(user.userId, pageId, "builder");
-          }
-        } catch {}
-        return sendJson(res, 500, {
-          error: "llm_build_failed",
-          detail: String(error),
-        });
-      });
+    return sendJson(res, 410, {
+      error: "legacy_mainline_retired",
+      detail: "빌드 본선은 local canonical draft 경로로 전환되었습니다. /api/workspace/build-local-draft 경로를 사용하세요.",
+      replacement: {
+        buildPath: "/api/workspace/build-local-draft",
+      },
+    });
   }
   if (pathname === "/api/llm/change" && req.method === "POST") {
     return readBody(req)
