@@ -3478,14 +3478,22 @@
 
       function getViewportProfile(page) {
         const explicit = String(page?.viewportProfile || page?.homeViewportProfile || "").trim();
-        if (explicit) return explicit;
+        if (explicit) return normalizeViewportProfile(explicit);
         const id = String(page?.id || "").trim();
         const suffix = id.match(/-(pc|mo|ta)$/i)?.[1];
         return suffix ? suffix.toLowerCase() : "pc";
       }
 
+      function normalizeViewportProfile(viewportProfile = "pc", fallback = "pc") {
+        const normalized = String(viewportProfile || fallback || "pc").trim().toLowerCase();
+        if (normalized === "mobile") return "mo";
+        if (normalized === "desktop") return "pc";
+        if (["pc", "mo", "ta"].includes(normalized)) return normalized;
+        return String(fallback || "pc").trim().toLowerCase() || "pc";
+      }
+
       function buildViewportAuthoringMeta(viewportProfile = "pc") {
-        const normalized = String(viewportProfile || "pc").trim().toLowerCase() || "pc";
+        const normalized = normalizeViewportProfile(viewportProfile || "pc");
         if (normalized === "mo" || normalized === "mobile") {
           return {
             viewportProfile: "mo",
@@ -4727,7 +4735,7 @@
 
       function countRunnableJourneyPages(journeyFlow) {
         return Array.isArray(journeyFlow?.pages)
-          ? journeyFlow.pages.filter((item) => String(item?.sourceType || "live-clone").trim() !== "reference-based").length
+          ? journeyFlow.pages.length
           : 0;
       }
 
@@ -7121,7 +7129,7 @@
         const viewParams = `&viewportProfile=${encodeURIComponent(viewportProfile)}`;
         const [identityPayload, plansPayload, draftsPayload, versionsPayload, pinPayload, assetRegistryPayload, journeyBuildsPayload] = await Promise.all([
           fetchJson(`/api/workspace/page-identity?pageId=${encodeURIComponent(workspacePageId)}`),
-          fetchJson(`/api/workspace/plans?pageId=${encodeURIComponent(workspacePageId)}&limit=3&summary=1${viewParams}`),
+          fetchJson(`/api/workspace/plans?pageId=${encodeURIComponent(workspacePageId)}&limit=10&summary=1${viewParams}`),
           fetchJson(`/api/workspace/draft-builds?pageId=${encodeURIComponent(workspacePageId)}&limit=3&summary=1${viewParams}`),
           fetchJson(`/api/workspace/versions?pageId=${encodeURIComponent(workspacePageId)}&limit=5${viewParams}`),
           fetchJson(`/api/workspace/view-pin?pageId=${encodeURIComponent(workspacePageId)}${viewParams}`),
@@ -7141,8 +7149,20 @@
         const drafts = sortByUpdatedDesc(Array.isArray(draftsPayload?.items) ? draftsPayload.items : []);
         const versions = sortByUpdatedDesc(Array.isArray(versionsPayload?.items) ? versionsPayload.items : []);
         const pinned = pinPayload?.item || null;
-        const latestPlan = plans[0] || null;
         const latestJourneyBuild = Array.isArray(journeyBuildsPayload?.items) ? journeyBuildsPayload.items[0] || null : null;
+        const latestJourneyId = String(latestJourneyBuild?.journeyId || "").trim();
+        const journeyPlan = latestJourneyId
+          ? plans.find((item) => {
+              const userInput = item?.input?.userInput || {};
+              const flow = item?.output?.requirementPlan?.journeyFlow || item?.journeyFlow || {};
+              const flowPages = Array.isArray(flow?.pages) ? flow.pages.map((pageItem) => String(pageItem?.pageId || "").trim()) : [];
+              return (
+                String(userInput?.journeyId || flow?.journeyId || "").trim() === latestJourneyId &&
+                flowPages.includes(workspacePageId)
+              );
+            })
+          : null;
+        const latestPlan = journeyPlan || plans[0] || null;
         if (latestJourneyBuild?.id) {
           journeyBuildResultByPage.set(getPrimaryAdminPageMemoryKey(page), latestJourneyBuild);
         }
@@ -8538,8 +8558,10 @@
       function buildJourneyBuildPayload(page) {
         const requirementDraft = buildRequirementDraftFromInputs();
         const journeyFlow = resolvePageJourneyFlow(page);
+        const latestPlanId = String(page?.latestPlan?.id || page?.planId || "").trim();
         return {
           pageId: getTargetWorkspacePageId(page),
+          planId: latestPlanId,
           viewportProfile: getViewportProfile(page),
           journeyId: journeyFlow?.journeyId || "",
           journeyFlow,
@@ -8612,7 +8634,6 @@
           return;
         }
         const runnablePages = journeyFlow.pages
-          .filter((item) => String(item?.sourceType || "live-clone").trim() !== "reference-based")
           .map((item) => String(item?.pageId || "").trim())
           .filter(Boolean);
         const shouldRun = window.confirm([

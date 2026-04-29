@@ -1185,6 +1185,46 @@ function saveDraftBuild(userId, buildInput = {}) {
   return savedBuild;
 }
 
+function updateDraftBuildById(userId, draftBuildId = "", updater = null) {
+  const normalizedUserId = String(userId || "").trim();
+  const normalizedDraftBuildId = String(draftBuildId || "").trim();
+  if (!normalizedUserId || !normalizedDraftBuildId || typeof updater !== "function") return null;
+  const existing = findDraftBuildById(normalizedUserId, normalizedDraftBuildId);
+  if (!existing) return null;
+  const patch = updater(existing);
+  if (!patch || typeof patch !== "object") return existing;
+  const nextBuild = normalizeDraftBuild({
+    ...existing,
+    ...patch,
+    id: existing.id,
+    createdAt: existing.createdAt || patch.createdAt || nowIso(),
+    updatedAt: nowIso(),
+  });
+  writeWorkspaceCollectionItem(normalizedUserId, "draftBuilds", nextBuild);
+  const indexItems = readWorkspaceCollectionIndex(normalizedUserId, "draftBuilds")
+    .filter((item) => String(item?.id || "").trim() !== normalizedDraftBuildId);
+  const summaryItems = writeWorkspaceCollectionIndex(normalizedUserId, "draftBuilds", [nextBuild, ...indexItems].slice(0, 200));
+  const collectionPath = getWorkspaceCollectionPath(normalizedUserId, "draftBuilds");
+  if (collectionPath) {
+    writeJson(collectionPath, {
+      userId: normalizedUserId,
+      collection: "draftBuilds",
+      updatedAt: nowIso(),
+      storageMode: "item-files",
+      items: summaryItems,
+    });
+  }
+  const shard = readWorkspaceShard(normalizedUserId);
+  if (shard && typeof shard === "object") {
+    shard.draftBuilds = summaryItems;
+    shard.updatedAt = nowIso();
+    writeJson(getWorkspaceShardPath(normalizedUserId), shard);
+    rememberWorkspaceShard(normalizedUserId, getWorkspaceShardPath(normalizedUserId), shard);
+  }
+  logEvent(normalizedUserId, "workspace_draft_build_updated", { buildId: nextBuild.id, pageId: nextBuild.pageId || null });
+  return nextBuild;
+}
+
 function attachDraftReplayCheck(userId, draftBuildId, replayCheck = null) {
   const normalizedDraftBuildId = String(draftBuildId || "").trim();
   if (!normalizedDraftBuildId) return null;
@@ -1462,6 +1502,7 @@ module.exports = {
   listDraftBuilds,
   findDraftBuildById,
   saveDraftBuild,
+  updateDraftBuildById,
   attachDraftReplayCheck,
   listSavedVersions,
   saveSavedVersion,

@@ -106,6 +106,7 @@ const {
   listDraftBuilds,
   findDraftBuildById,
   saveDraftBuild,
+  updateDraftBuildById,
   attachDraftReplayCheck,
   listSavedVersions,
   saveSavedVersion,
@@ -222,6 +223,8 @@ const SERVICE_LIKE_PAGE_IDS = [
   "care-solutions-pdp",
   "homestyle-home",
   "homestyle-pdp",
+  "checkout",
+  "order-complete",
 ];
 const HOME_COMPONENT_SCALE_TOKENS = {
   pc: {
@@ -1419,49 +1422,150 @@ function escapeHtmlAttr(value = "") {
     .replace(/>/g, "&gt;");
 }
 
-function injectJourneyNextLinkIntoHtml(html = "", { ctaLabel = "", targetUrl = "", nextPageId = "" } = {}) {
+function getJourneyPageLabel(pageId = "") {
+  const normalized = String(pageId || "").trim();
+  return ({
+    home: "홈",
+    "care-solutions": "가전 구독",
+    "care-solutions-pdp": "구독 PDP",
+    checkout: "신청/결제",
+    "order-complete": "완료",
+    plp: "PLP",
+    pdp: "PDP",
+    support: "고객지원",
+    bestshop: "베스트샵",
+  })[normalized] || normalized || "페이지";
+}
+
+function stripJourneyNavigationWidgets(html = "") {
+  return String(html || "")
+    .replace(/<section\b[^>]*data-journey-flow-widget=["'][^"']*["'][\s\S]*?<\/section>/gi, "")
+    .replace(/<div\b[^>]*class=["'][^"']*\bjourney-next-link\b[^"']*["'][^>]*>[\s\S]*?<\/div>/gi, "");
+}
+
+function buildJourneyFlowWidgetHtml({
+  currentPageId = "",
+  nextPageId = "",
+  ctaLabel = "",
+  targetUrl = "",
+  flowPages = [],
+  completedByPageId = new Map(),
+} = {}) {
+  const normalizedCurrentPageId = String(currentPageId || "").trim();
+  const normalizedNextPageId = String(nextPageId || "").trim();
+  const label = String(ctaLabel || "다음 단계 보기").trim() || "다음 단계 보기";
+  const steps = (Array.isArray(flowPages) ? flowPages : [])
+    .map((step, index) => {
+      const pageId = String(step?.pageId || "").trim();
+      if (!pageId) return "";
+      const isCurrent = pageId === normalizedCurrentPageId;
+      const result = completedByPageId instanceof Map ? completedByPageId.get(pageId) : null;
+      const href = result?.draftBuildId ? `/runtime-draft/${encodeURIComponent(result.draftBuildId)}` : "";
+      const stateLabel = isCurrent ? "현재" : href ? "보기" : "대기";
+      const bg = isCurrent ? "#111827" : href ? "#ffffff" : "#f3f4f6";
+      const fg = isCurrent ? "#ffffff" : href ? "#111827" : "#9ca3af";
+      const border = isCurrent ? "#111827" : href ? "#d1d5db" : "#e5e7eb";
+      const content = [
+        `<span style="display:flex;align-items:center;gap:7px;white-space:nowrap">`,
+        `<span style="display:inline-flex;width:20px;height:20px;align-items:center;justify-content:center;border-radius:999px;background:${isCurrent ? "rgba(255,255,255,.18)" : "#f3f4f6"};font-size:11px;font-weight:800">${index + 1}</span>`,
+        `<span style="font-size:12px;font-weight:800">${escapeHtmlAttr(getJourneyPageLabel(pageId))}</span>`,
+        `<span style="font-size:10px;font-weight:800;opacity:.72">${escapeHtmlAttr(stateLabel)}</span>`,
+        `</span>`,
+      ].join("");
+      const commonStyle = `display:inline-flex;align-items:center;border:1px solid ${border};background:${bg};color:${fg};border-radius:999px;padding:8px 10px;text-decoration:none;box-shadow:${isCurrent ? "0 8px 20px rgba(17,24,39,.18)" : "none"}`;
+      return href
+        ? `<a href="${escapeHtmlAttr(href)}" data-journey-map-page="${escapeHtmlAttr(pageId)}" style="${commonStyle}">${content}</a>`
+        : `<span data-journey-map-page="${escapeHtmlAttr(pageId)}" style="${commonStyle}">${content}</span>`;
+    })
+    .filter(Boolean)
+    .join(`<span aria-hidden="true" style="color:#c7cdd6;font-weight:900">›</span>`);
+  const nextCta = targetUrl
+    ? `<a href="${escapeHtmlAttr(targetUrl)}" data-journey-next-page="${escapeHtmlAttr(normalizedNextPageId)}" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#a50034;color:#fff;padding:12px 16px;font-size:13px;font-weight:900;text-decoration:none;box-shadow:0 12px 28px rgba(165,0,52,.28)">${escapeHtmlAttr(label)}</a>`
+    : `<span style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#e5e7eb;color:#6b7280;padding:12px 16px;font-size:13px;font-weight:900">다음 단계 준비 중</span>`;
+  return [
+    `<section data-journey-flow-widget="v1" data-journey-current-page="${escapeHtmlAttr(normalizedCurrentPageId)}" style="position:fixed;left:12px;right:12px;bottom:14px;z-index:2147483000;box-sizing:border-box;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">`,
+    `<div style="max-width:760px;margin:0 auto;border:1px solid rgba(17,24,39,.12);background:rgba(255,255,255,.94);backdrop-filter:blur(18px);border-radius:22px;box-shadow:0 18px 50px rgba(15,23,42,.18);padding:12px">`,
+    `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">`,
+    `<div style="min-width:0"><div style="font-size:11px;font-weight:900;letter-spacing:.08em;color:#a50034">CUSTOMER JOURNEY</div><div style="font-size:13px;font-weight:900;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">현재 단계: ${escapeHtmlAttr(getJourneyPageLabel(normalizedCurrentPageId))}</div></div>`,
+    nextCta,
+    `</div>`,
+    `<div style="display:flex;align-items:center;gap:7px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch">${steps}</div>`,
+    `</div>`,
+    `</section>`,
+  ].join("");
+}
+
+function appendJourneyFlowWidget(html = "", widgetHtml = "") {
+  const source = String(html || "");
+  const widget = String(widgetHtml || "");
+  if (!widget) return source;
+  if (/<\/body>/i.test(source)) return source.replace(/<\/body>/i, `${widget}</body>`);
+  return `${source}${widget}`;
+}
+
+function extractJourneyFlowWidgetHtml(html = "") {
+  const source = String(html || "");
+  const match = source.match(/<section\b[^>]*data-journey-flow-widget=["'][^"']*["'][\s\S]*?<\/section>/i);
+  return match ? match[0] : "";
+}
+
+function injectRuntimeCompareJourneyWidget(html = "", draftBuild = null) {
+  const source = String(html || "");
+  if (!source || /data-journey-flow-widget=/i.test(source)) return source;
+  const afterHtml = String(draftBuild?.snapshotData?.renderedHtmlReference?.afterHtml || "").trim();
+  const widgetHtml = extractJourneyFlowWidgetHtml(afterHtml);
+  return widgetHtml ? appendJourneyFlowWidget(stripJourneyNavigationWidgets(source), widgetHtml) : source;
+}
+
+function injectRuntimeGeneratedHighlight(html = "") {
+  const source = String(html || "");
+  if (!source || /data-runtime-generated-highlight=["']v1["']/i.test(source)) return source;
+  const style = [
+    `<style data-runtime-generated-highlight="v1">`,
+    `html::before{content:"생성 결과";position:fixed;top:12px;right:12px;z-index:2147482999;background:#a50034;color:#fff;border-radius:999px;padding:8px 12px;font:900 12px/1 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 10px 24px rgba(165,0,52,.28)}`,
+    `[data-codex-slot],[data-codex-component-id],[data-design-author-source]{outline:2px solid rgba(165,0,52,.78)!important;outline-offset:3px!important;box-shadow:0 0 0 6px rgba(165,0,52,.10)!important;position:relative}`,
+    `[data-codex-slot]::before,[data-codex-component-id]::before{content:"생성 영역";position:absolute;left:10px;top:10px;z-index:20;background:#a50034;color:#fff;border-radius:999px;padding:5px 8px;font:900 10px/1 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:.02em;pointer-events:none;box-shadow:0 8px 18px rgba(165,0,52,.22)}`,
+    `body{padding-bottom:132px!important}`,
+    `</style>`,
+  ].join("");
+  if (/<\/head>/i.test(source)) return source.replace(/<\/head>/i, `${style}</head>`);
+  return `${style}${source}`;
+}
+
+function injectJourneyNextLinkIntoHtml(html = "", { ctaLabel = "", targetUrl = "", nextPageId = "", currentPageId = "", flowPages = [], completedByPageId = new Map() } = {}) {
   const source = String(html || "");
   const href = String(targetUrl || "").trim();
   const label = String(ctaLabel || "다음 단계 보기").trim() || "다음 단계 보기";
-  if (!source || !href) return { html: source, injected: false, strategy: "missing_source_or_target" };
+  if (!source) return { html: source, injected: false, strategy: "missing_source" };
+  const cleanSource = stripJourneyNavigationWidgets(source);
+  const widgetHtml = buildJourneyFlowWidgetHtml({ currentPageId, nextPageId, ctaLabel: label, targetUrl: href, flowPages, completedByPageId });
   const labelPattern = escapeRegExp(label);
   const anchorPattern = new RegExp(`<a\\b([^>]*)>([\\s\\S]*?${labelPattern}[\\s\\S]*?)<\\/a>`, "i");
-  if (anchorPattern.test(source)) {
+  if (href && anchorPattern.test(cleanSource)) {
     return {
-      html: source.replace(anchorPattern, (match, attrs, inner) => {
+      html: appendJourneyFlowWidget(cleanSource.replace(anchorPattern, (match, attrs, inner) => {
         const nextAttrs = /href\s*=/i.test(attrs)
           ? attrs.replace(/href\s*=\s*(['"])[\s\S]*?\1/i, `href="${escapeHtmlAttr(href)}"`)
           : `${attrs} href="${escapeHtmlAttr(href)}"`;
         return `<a${nextAttrs} data-journey-next-page="${escapeHtmlAttr(nextPageId)}">${inner}</a>`;
-      }),
+      }), widgetHtml),
       injected: true,
-      strategy: "rewrite_anchor",
+      strategy: "rewrite_anchor_with_widget",
     };
   }
   const buttonPattern = new RegExp(`<button\\b([^>]*)>([\\s\\S]*?${labelPattern}[\\s\\S]*?)<\\/button>`, "i");
-  if (buttonPattern.test(source)) {
+  if (href && buttonPattern.test(cleanSource)) {
     return {
-      html: source.replace(buttonPattern, (match, attrs, inner) => {
+      html: appendJourneyFlowWidget(cleanSource.replace(buttonPattern, (match, attrs, inner) => {
         const classMatch = String(attrs || "").match(/\bclass\s*=\s*(['"])([\s\S]*?)\1/i);
         const classAttr = classMatch?.[2] ? ` class="${escapeHtmlAttr(classMatch[2])}"` : "";
         return `<a href="${escapeHtmlAttr(href)}"${classAttr} data-journey-next-page="${escapeHtmlAttr(nextPageId)}">${inner}</a>`;
-      }),
+      }), widgetHtml),
       injected: true,
-      strategy: "replace_button",
+      strategy: "replace_button_with_widget",
     };
   }
-  const fallbackLink = [
-    `<div class="journey-next-link" data-journey-next-page="${escapeHtmlAttr(nextPageId)}" style="padding:24px;text-align:center">`,
-    `<a href="${escapeHtmlAttr(href)}" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#111;color:#fff;padding:14px 22px;font-weight:700;text-decoration:none">${escapeHtmlAttr(label)}</a>`,
-    `</div>`,
-  ].join("");
-  if (/<\/main>/i.test(source)) {
-    return { html: source.replace(/<\/main>/i, `${fallbackLink}</main>`), injected: true, strategy: "append_to_main" };
-  }
-  if (/<\/body>/i.test(source)) {
-    return { html: source.replace(/<\/body>/i, `${fallbackLink}</body>`), injected: true, strategy: "append_to_body" };
-  }
-  return { html: `${source}${fallbackLink}`, injected: true, strategy: "append_to_document" };
+  return { html: appendJourneyFlowWidget(cleanSource, widgetHtml), injected: true, strategy: href ? "append_widget_to_body" : "append_widget_without_next_target" };
 }
 
 function rewriteJourneyDraftLinks({ userId = "", results = [], flowPages = [] } = {}) {
@@ -1476,8 +1580,8 @@ function rewriteJourneyDraftLinks({ userId = "", results = [], flowPages = [] } 
     const ctaLabel = String(step?.ctaLabel || "다음 단계 보기").trim() || "다음 단계 보기";
     const currentResult = completedByPageId.get(pageId);
     const nextResult = completedByPageId.get(nextPageId);
-    if (!currentResult?.draftBuildId || !nextResult?.draftBuildId) {
-      return { pageId, nextPageId, status: "skipped", reason: "draft_pair_missing" };
+    if (!currentResult?.draftBuildId) {
+      return { pageId, nextPageId, status: "skipped", reason: "current_draft_missing" };
     }
     const draftBuild = findDraftBuildById(userId, currentResult.draftBuildId);
     const renderedHtmlReference =
@@ -1485,22 +1589,21 @@ function rewriteJourneyDraftLinks({ userId = "", results = [], flowPages = [] } 
         ? draftBuild.snapshotData.renderedHtmlReference
         : {};
     const afterHtml = String(renderedHtmlReference.afterHtml || "").trim();
-    const targetUrl = `/runtime-draft/${encodeURIComponent(nextResult.draftBuildId)}`;
-    const rewrite = injectJourneyNextLinkIntoHtml(afterHtml, { ctaLabel, targetUrl, nextPageId });
+    const targetUrl = nextResult?.draftBuildId ? `/runtime-draft/${encodeURIComponent(nextResult.draftBuildId)}` : "";
+    const rewrite = injectJourneyNextLinkIntoHtml(afterHtml, { ctaLabel, targetUrl, nextPageId, currentPageId: pageId, flowPages, completedByPageId });
     if (!draftBuild || !rewrite.injected) {
       return { pageId, nextPageId, status: "skipped", reason: rewrite.strategy || "rewrite_failed" };
     }
-    saveDraftBuild(userId, {
-      ...draftBuild,
+    updateDraftBuildById(userId, currentResult.draftBuildId, (currentDraftBuild) => ({
       snapshotData: {
-        ...(draftBuild.snapshotData && typeof draftBuild.snapshotData === "object" ? draftBuild.snapshotData : {}),
+        ...(currentDraftBuild.snapshotData && typeof currentDraftBuild.snapshotData === "object" ? currentDraftBuild.snapshotData : {}),
         renderedHtmlReference: {
           ...renderedHtmlReference,
           afterHtml: rewrite.html,
         },
         journeyLinkRewrite: {
           nextPageId,
-          nextDraftBuildId: nextResult.draftBuildId,
+          nextDraftBuildId: nextResult?.draftBuildId || "",
           ctaLabel,
           targetUrl,
           strategy: rewrite.strategy,
@@ -1508,18 +1611,18 @@ function rewriteJourneyDraftLinks({ userId = "", results = [], flowPages = [] } 
         },
       },
       report: {
-        ...(draftBuild.report && typeof draftBuild.report === "object" ? draftBuild.report : {}),
+        ...(currentDraftBuild.report && typeof currentDraftBuild.report === "object" ? currentDraftBuild.report : {}),
         journeyLinks: [
           ...(
-            Array.isArray(draftBuild.report?.journeyLinks)
-              ? draftBuild.report.journeyLinks.filter((item) => String(item?.nextPageId || "").trim() !== nextPageId)
+            Array.isArray(currentDraftBuild.report?.journeyLinks)
+              ? currentDraftBuild.report.journeyLinks.filter((item) => String(item?.nextPageId || "").trim() !== nextPageId)
               : []
           ),
-          { nextPageId, nextDraftBuildId: nextResult.draftBuildId, ctaLabel, targetUrl, strategy: rewrite.strategy },
+          { nextPageId, nextDraftBuildId: nextResult?.draftBuildId || "", ctaLabel, targetUrl, strategy: rewrite.strategy },
         ],
       },
-    });
-    return { pageId, nextPageId, status: "rewritten", targetUrl, strategy: rewrite.strategy };
+    }));
+    return { pageId, nextPageId, status: targetUrl ? "rewritten" : "widget_only", targetUrl, strategy: rewrite.strategy };
   });
 }
 
@@ -1648,9 +1751,54 @@ function startJourneyBuildJob({ user, req, payload = {} } = {}) {
   rememberRuntimeJob(journeyBuildJobs, jobId, job);
   saveJourneyBuildRecord(job);
 
+  const restoreSourceJourneyPlanAsLatest = () => {
+    const sourcePageId = String(job.sourcePageId || "").trim();
+    const sourcePlanId = String(job.planId || "").trim();
+    if (!sourcePageId) return;
+    const candidatePlans = listRequirementPlans(user.userId, {
+      pageId: sourcePageId,
+      viewportProfile,
+      limit: 50,
+      summaryOnly: false,
+    }) || [];
+    const expectedJourneyId = String(job.journeyId || job.journeyFlow?.journeyId || "").trim();
+    const sourcePlan = sourcePlanId
+      ? candidatePlans.find((item) => String(item?.id || "").trim() === sourcePlanId)
+      : candidatePlans.find((item) => {
+        const journeyFlow = item?.output?.requirementPlan?.journeyFlow;
+        if (!isExecutableJourneyFlow(journeyFlow)) return false;
+        const planJourneyId = String(item?.input?.userInput?.journeyId || journeyFlow?.journeyId || "").trim();
+        if (expectedJourneyId && planJourneyId !== expectedJourneyId) return false;
+        return (Array.isArray(journeyFlow.pages) ? journeyFlow.pages : [])
+          .some((page) => String(page?.pageId || "").trim() === sourcePageId);
+      });
+    const journeyFlow = sourcePlan?.output?.requirementPlan?.journeyFlow;
+    if (!sourcePlan || !isExecutableJourneyFlow(journeyFlow)) return;
+    const validation = validateJourneyFlowForSource({
+      sourcePageId,
+      journeyId: sourcePlan?.input?.userInput?.journeyId,
+      journeyFlow,
+    });
+    if (!validation.ok) return;
+    saveRequirementPlan(user.userId, {
+      ...sourcePlan,
+      output: {
+        ...(sourcePlan.output || {}),
+        toolContext: {
+          ...((sourcePlan.output && sourcePlan.output.toolContext) || {}),
+          workflowMeta: {
+            ...(((sourcePlan.output && sourcePlan.output.toolContext) || {}).workflowMeta || {}),
+            restoredAfterJourneyBuildAt: new Date().toISOString(),
+            restoredAfterJourneyBuildId: job.id,
+          },
+        },
+      },
+    });
+  };
+
   (async () => {
-    const runnablePages = pages.filter((item) => item.sourceType !== "reference-based");
-    const skippedPages = pages.filter((item) => item.sourceType === "reference-based");
+    const runnablePages = pages;
+    const skippedPages = [];
     skippedPages.forEach((item) => {
       job.results.push({
         pageId: item.pageId,
@@ -1730,11 +1878,14 @@ function startJourneyBuildJob({ user, req, payload = {} } = {}) {
     job.status = failedCount ? "completed_with_errors" : "completed";
     job.finishedAt = new Date().toISOString();
     job.currentPageId = "";
+    restoreSourceJourneyPlanAsLatest();
     saveJourneyBuildRecord(job);
   })().catch((error) => {
     job.status = "failed";
     job.error = String(error?.message || error);
     job.finishedAt = new Date().toISOString();
+    job.currentPageId = "";
+    restoreSourceJourneyPlanAsLatest();
     saveJourneyBuildRecord(job);
   });
 
@@ -2935,18 +3086,142 @@ function extractSlotImageSourcesFromHtml(html, slotId) {
     .filter(Boolean);
 }
 
+function buildReferenceBasedJourneyPageSpec(pageId = "", viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile = normalizeViewportProfile(viewportProfile, "pc");
+  const common = {
+    viewportProfile: normalizedViewportProfile,
+    shellWidth: normalizedViewportProfile === "mo" ? "430px" : "1180px",
+  };
+  if (normalizedPageId === "checkout") {
+    return {
+      ...common,
+      pageId: normalizedPageId,
+      title: "가전 구독 신청/결제",
+      sourceLabel: "Reference-based checkout shell",
+      slots: [
+        {
+          slotId: "stepper",
+          title: "신청 단계",
+          html: `<section data-codex-slot="stepper" data-codex-component-id="checkout.stepper" data-design-author-source="reference-based-shell" class="codex-ref-stepper"><p class="eyebrow">가전 구독 신청</p><h1>신청 정보를 확인하고 결제를 준비합니다</h1><ol><li>상품 확인</li><li class="active">신청/결제</li><li>완료</li></ol></section>`,
+        },
+        {
+          slotId: "order-summary",
+          title: "구독 상품 요약",
+          html: `<section data-codex-slot="order-summary" data-codex-component-id="checkout.order-summary" data-design-author-source="reference-based-shell" class="codex-ref-card"><p class="eyebrow">선택 상품</p><h2>LG 퓨리케어 오브제컬렉션 정수기</h2><p>월 구독료, 케어 서비스, 방문 관리 조건을 한 번에 확인합니다.</p><dl><div><dt>월 구독료</dt><dd>월 31,900원</dd></div><div><dt>케어 서비스</dt><dd>정기 방문 관리 포함</dd></div><div><dt>약정 안내</dt><dd>상담 후 최종 확정</dd></div></dl></section>`,
+        },
+        {
+          slotId: "customer-form",
+          title: "신청자 정보",
+          html: `<section data-codex-slot="customer-form" data-codex-component-id="checkout.customer-form" data-design-author-source="reference-based-shell" class="codex-ref-card"><p class="eyebrow">신청 정보</p><h2>연락처와 설치 희망 정보를 입력합니다</h2><div class="field">이름</div><div class="field">휴대폰 번호</div><div class="field">설치 주소</div><div class="field">상담 희망 시간</div></section>`,
+        },
+        {
+          slotId: "payment-trust",
+          title: "결제 안심 안내",
+          html: `<section data-codex-slot="payment-trust" data-codex-component-id="checkout.payment-trust" data-design-author-source="reference-based-shell" class="codex-ref-card"><p class="eyebrow">안심 결제</p><h2>결제 전 확인해야 할 조건을 명확하게 안내합니다</h2><ul><li>상담 후 최종 계약 조건 확정</li><li>개인정보 보호 및 안전한 결제 처리</li><li>구독 시작 전 취소/변경 가능 조건 안내</li></ul><a href="#" class="primary-cta">신청 내용 확인하기</a></section>`,
+        },
+      ],
+    };
+  }
+  if (normalizedPageId === "order-complete") {
+    return {
+      ...common,
+      pageId: normalizedPageId,
+      title: "가전 구독 신청 완료",
+      sourceLabel: "Reference-based completion shell",
+      slots: [
+        {
+          slotId: "complete-hero",
+          title: "완료 확인",
+          html: `<section data-codex-slot="complete-hero" data-codex-component-id="order-complete.complete-hero" data-design-author-source="reference-based-shell" class="codex-ref-complete"><p class="eyebrow">신청 완료</p><h1>가전 구독 신청이 접수되었습니다</h1><p>상담원이 신청 내용을 확인한 뒤 설치와 케어 일정을 안내합니다.</p><div class="checkmark">✓</div></section>`,
+        },
+        {
+          slotId: "next-steps",
+          title: "다음 단계 안내",
+          html: `<section data-codex-slot="next-steps" data-codex-component-id="order-complete.next-steps" data-design-author-source="reference-based-shell" class="codex-ref-card"><p class="eyebrow">다음 단계</p><h2>신청 이후 진행 흐름</h2><ol><li>상담원 신청 내용 확인</li><li>계약 조건 및 설치 일정 안내</li><li>방문 설치와 케어 서비스 시작</li></ol></section>`,
+        },
+        {
+          slotId: "membership-benefits",
+          title: "멤버십 혜택",
+          html: `<section data-codex-slot="membership-benefits" data-codex-component-id="order-complete.membership-benefits" data-design-author-source="reference-based-shell" class="codex-ref-card"><p class="eyebrow">구독 고객 혜택</p><h2>구독 고객을 위한 혜택도 함께 확인하세요</h2><ul><li>정기 케어 알림</li><li>멤버십 포인트 안내</li><li>연관 제품 케어 추천</li></ul></section>`,
+        },
+        {
+          slotId: "support-cta",
+          title: "문의 및 관리 CTA",
+          html: `<section data-codex-slot="support-cta" data-codex-component-id="order-complete.support-cta" data-design-author-source="reference-based-shell" class="codex-ref-card"><p class="eyebrow">도움이 필요하신가요?</p><h2>신청 내역과 상담 진행 상태를 확인할 수 있습니다</h2><div class="cta-row"><a href="#" class="primary-cta">신청 내역 보기</a><a href="#" class="secondary-cta">고객지원 연결</a></div></section>`,
+        },
+      ],
+    };
+  }
+  return null;
+}
+
+function buildReferenceBasedJourneyShellHtml(spec = {}) {
+  const slots = Array.isArray(spec.slots) ? spec.slots : [];
+  const sections = slots.map((slot) => String(slot?.html || "").trim()).filter(Boolean).join("\n");
+  return `<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>${escapeHtml(spec.title || spec.pageId || "Reference based journey page")}</title>
+    <style>
+      html, body { margin:0; min-height:100%; background:#eef2f7; color:#111827; font-family:Pretendard, "Noto Sans KR", Arial, sans-serif; }
+      body { padding:0; }
+      main[data-reference-journey-main] { width:min(${spec.shellWidth || "1180px"}, 100%); min-height:100vh; margin:0 auto; background:#f8fafc; box-sizing:border-box; padding:24px 18px 132px; }
+      .codex-ref-shell-note { margin:0 0 14px; border:1px solid #e5e7eb; background:#fff; color:#64748b; border-radius:18px; padding:12px 14px; font:800 11px/1.4 Arial,sans-serif; letter-spacing:.04em; text-transform:uppercase; }
+      [data-codex-slot] { box-sizing:border-box; margin:0 0 14px; border-radius:28px; background:#fff; border:1px solid #e5e7eb; box-shadow:0 14px 34px rgba(15,23,42,.08); padding:24px; overflow:hidden; }
+      [data-codex-slot] .eyebrow { margin:0 0 8px; color:#a50034; font-size:12px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+      [data-codex-slot] h1, [data-codex-slot] h2 { margin:0 0 10px; letter-spacing:-.04em; line-height:1.08; color:#111827; }
+      [data-codex-slot] h1 { font-size:34px; }
+      [data-codex-slot] h2 { font-size:24px; }
+      [data-codex-slot] p, [data-codex-slot] li, [data-codex-slot] dd, [data-codex-slot] dt { font-size:15px; line-height:1.55; }
+      [data-codex-slot] ol, [data-codex-slot] ul { margin:14px 0 0; padding-left:20px; }
+      .codex-ref-stepper ol { display:flex; gap:8px; padding:0; list-style:none; overflow-x:auto; }
+      .codex-ref-stepper li { white-space:nowrap; border-radius:999px; background:#f1f5f9; padding:9px 12px; font-weight:800; color:#64748b; }
+      .codex-ref-stepper li.active { background:#111827; color:#fff; }
+      .codex-ref-card dl { margin:16px 0 0; display:grid; gap:8px; }
+      .codex-ref-card dl div { display:flex; justify-content:space-between; gap:12px; border-top:1px solid #eef2f7; padding-top:10px; }
+      .primary-cta, .secondary-cta { display:inline-flex; align-items:center; justify-content:center; min-height:44px; border-radius:999px; padding:0 16px; font-weight:900; text-decoration:none; }
+      .primary-cta { margin-top:18px; background:#a50034; color:#fff; }
+      .secondary-cta { margin-top:18px; background:#f1f5f9; color:#111827; }
+      .field { border:1px solid #e5e7eb; border-radius:16px; background:#f8fafc; padding:14px; margin-top:10px; color:#64748b; font-weight:800; }
+      .checkmark { width:64px; height:64px; border-radius:999px; display:flex; align-items:center; justify-content:center; background:#a50034; color:#fff; font-size:34px; font-weight:900; margin-top:18px; }
+      .cta-row { display:flex; gap:8px; flex-wrap:wrap; }
+      @media (max-width: 520px) {
+        main[data-reference-journey-main] { padding:18px 12px 132px; }
+        [data-codex-slot] { border-radius:24px; padding:20px; }
+        [data-codex-slot] h1 { font-size:30px; }
+        [data-codex-slot] h2 { font-size:22px; }
+      }
+    </style>
+  </head>
+  <body data-runtime-page-id="${escapeHtml(spec.pageId || "")}" data-runtime-viewport-profile="${escapeHtml(spec.viewportProfile || "pc")}" data-reference-based-page="true">
+    <main data-reference-journey-main="true">
+      <div class="codex-ref-shell-note">${escapeHtml(spec.sourceLabel || "Reference-based shell")}</div>
+${sections}
+    </main>
+  </body>
+</html>`;
+}
+
 function buildRuntimeReferenceArtifacts(pageId, viewportProfile = "pc", slotIds = []) {
   const normalizedPageId = String(pageId || "").trim();
   const normalizedViewportProfile =
     normalizedPageId === "home"
       ? normalizeHomeViewportProfile(viewportProfile, "pc")
       : normalizeViewportProfile(viewportProfile, "pc");
-  const rawHtml = readCloneSourceHtmlByPageId(normalizedPageId, normalizedViewportProfile);
+  const referenceBasedSpec = buildReferenceBasedJourneyPageSpec(normalizedPageId, normalizedViewportProfile);
+  const rawHtml = referenceBasedSpec
+    ? buildReferenceBasedJourneyShellHtml(referenceBasedSpec)
+    : readCloneSourceHtmlByPageId(normalizedPageId, normalizedViewportProfile);
   if (!rawHtml) return null;
-  const referenceHtml = rewriteReferenceHtml(rawHtml, normalizedPageId, normalizedViewportProfile);
+  const referenceHtml = referenceBasedSpec
+    ? rawHtml
+    : rewriteReferenceHtml(rawHtml, normalizedPageId, normalizedViewportProfile);
   if (!referenceHtml) return null;
   const normalizedSlotIds = Array.from(new Set(
-    (Array.isArray(slotIds) ? slotIds : [])
+    (Array.isArray(slotIds) && slotIds.length ? slotIds : (referenceBasedSpec?.slots || []).map((slot) => slot.slotId))
       .map((slotId) => String(slotId || "").trim())
       .filter(Boolean)
   ));
@@ -3004,6 +3279,7 @@ function buildRuntimeReferenceArtifacts(pageId, viewportProfile = "pc", slotIds 
   return {
     pageId: normalizedPageId,
     viewportProfile: normalizedViewportProfile,
+    sourceType: referenceBasedSpec ? "reference-based" : "live-clone",
     rawShellHtml: referenceHtml,
     currentSectionHtmlMap,
     currentSectionAssetMap,
@@ -13806,6 +14082,22 @@ function buildPageIdentityBrief(pageId, options = {}) {
       mustPreserve: ["구독 혜택 설명력", "신청 판단 정보", "서비스 신뢰감"],
       shouldAvoid: ["일반 브랜드 쇼케이스처럼 보이는 과장", "신청 정보보다 분위기가 먼저 오는 구성", "과도한 다크 톤 전환"],
       visualGuardrails: ["혜택/가격/신청 근거 우선", "안심감 유지", "설명 구간 가독성 최우선"],
+    },
+    checkout: {
+      role: "구독 신청/결제 전환 페이지",
+      purpose: "사용자가 신청 정보, 구독 조건, 결제 전 확인 사항을 불안 없이 검토하고 다음 단계로 진행하게 하는 전환 페이지입니다.",
+      designIntent: "라이브 클론이 아닌 reference 기반 신청 구조이므로, 폼/요약/안심 안내/CTA의 명확성이 최우선입니다.",
+      mustPreserve: ["신청 단계 인지", "구독 상품 요약", "개인정보/결제 안심 안내", "다음 행동 CTA"],
+      shouldAvoid: ["실제 결제 완료처럼 오해되는 표현", "내부 reference/fallback 문구 노출", "장식이 폼 가독성을 방해하는 구성"],
+      visualGuardrails: ["신뢰와 명료성 우선", "모바일 터치 입력 리듬 유지", "CTA는 신청 확인 중심으로 명확하게"],
+    },
+    "order-complete": {
+      role: "구독 신청 완료 및 다음 행동 안내 페이지",
+      purpose: "신청 접수 완료를 명확히 알려주고 상담/설치/케어 시작까지의 다음 단계를 안심시키는 완료 페이지입니다.",
+      designIntent: "완료 감정과 사후 안내가 함께 보여야 하며, 멤버십/고객지원/신청 내역 확인으로 자연스럽게 이어져야 합니다.",
+      mustPreserve: ["신청 접수 완료 메시지", "다음 단계 안내", "상담/설치 기대 관리", "고객지원 CTA"],
+      shouldAvoid: ["배송 완료처럼 보이는 오해", "과도한 축하 연출", "다음 행동 없이 막히는 종료감"],
+      visualGuardrails: ["완료 신뢰감 우선", "후속 단계가 바로 읽히게 구성", "혜택/지원 CTA를 보조로 제공"],
     },
     "homestyle-home": {
       role: "홈스타일 큐레이션 허브",
@@ -30622,10 +30914,12 @@ function route(req, res) {
     const beforeParams = new URLSearchParams();
     beforeParams.set("snapshotState", "before");
     beforeParams.set("viewportProfile", compareViewportProfile);
+    beforeParams.set("journeyWidget", "1");
     if (sectionPreviewSlot) beforeParams.set("sectionPreviewSlot", sectionPreviewSlot);
     const afterParams = new URLSearchParams();
     afterParams.set("snapshotState", "after");
     afterParams.set("viewportProfile", compareViewportProfile);
+    afterParams.set("highlightChanges", "1");
     if (sectionPreviewSlot) afterParams.set("sectionPreviewSlot", sectionPreviewSlot);
     const beforeSrc = `/runtime-draft/${encodeURIComponent(draftBuildId)}?${beforeParams.toString()}`;
     const afterSrc = `/runtime-draft/${encodeURIComponent(draftBuildId)}?${afterParams.toString()}`;
@@ -30658,6 +30952,8 @@ function route(req, res) {
       .runtime-share-btn { border:1px solid rgba(255,255,255,.28); border-radius:999px; background:rgba(255,255,255,.1); color:#fff; padding:7px 11px; font:700 12px/1 Arial,sans-serif; cursor:pointer; }
       .runtime-share-btn:disabled { cursor:wait; opacity:.64; }
       .runtime-compare-id { opacity:.7; }
+      .runtime-compare-legend { display:inline-flex; align-items:center; gap:6px; border:1px solid rgba(255,255,255,.2); border-radius:999px; padding:6px 10px; background:rgba(255,255,255,.08); color:#fff; opacity:.9; }
+      .runtime-compare-legend::before { content:""; width:9px; height:9px; border-radius:999px; background:#a50034; box-shadow:0 0 0 3px rgba(165,0,52,.24); }
       .runtime-compare-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: calc(100vh - 49px); }
       .runtime-compare-pane { display:grid; grid-template-rows: 40px 1fr; border-right:1px solid #e5e7eb; background:#fff; }
       .runtime-compare-pane:last-child { border-right:0; }
@@ -30683,6 +30979,7 @@ function route(req, res) {
             <a class="${compareViewportProfile === "mo" ? "active" : ""}" href="${escapeHtml(moCompareHref)}">Mobile</a>
           </nav>
           <button class="runtime-share-btn" type="button" data-draft-build-id="${escapeHtml(String(draftBuild.id || "").trim())}" data-page-id="${escapeHtml(String(draftBuild.pageId || "").trim())}" data-viewport-profile="${escapeHtml(compareViewportProfile)}">공유 링크</button>
+          <span class="runtime-compare-legend">오른쪽 생성 영역 하이라이트</span>
           <span class="runtime-compare-id">${escapeHtml(String(draftBuild.id || "").trim())}</span>
         </div>
       </div>
@@ -30778,6 +31075,8 @@ function route(req, res) {
     const draftBuildId = decodeURIComponent(pathname.slice("/runtime-draft/".length));
     const snapshotState = String(requestUrl.searchParams.get("snapshotState") || "after").trim().toLowerCase();
     const sectionPreviewSlot = String(requestUrl.searchParams.get("sectionPreviewSlot") || "").trim();
+    const includeJourneyWidget = String(requestUrl.searchParams.get("journeyWidget") || "").trim() === "1";
+    const highlightChanges = String(requestUrl.searchParams.get("highlightChanges") || "").trim() === "1";
     const selectMode = String(requestUrl.searchParams.get("selectMode") || "").trim().toLowerCase();
     const enableComponentSelection = selectMode === "component" || selectMode === "revision" || selectMode === "revise";
     const draftBuild = findDraftBuildById(user.userId, draftBuildId);
@@ -30802,15 +31101,20 @@ function route(req, res) {
       const interactiveHtml = snapshotState === "before"
         ? lightweightPreviewHtml
         : injectInteractionComponentRuntimeIntoHtml(lightweightPreviewHtml);
+      const decoratedHtml = snapshotState === "before" && includeJourneyWidget
+        ? injectRuntimeCompareJourneyWidget(interactiveHtml, draftBuild)
+        : snapshotState !== "before" && highlightChanges
+          ? injectRuntimeGeneratedHighlight(interactiveHtml)
+          : interactiveHtml;
       const nextHtml = enableComponentSelection
-        ? injectComponentSelectionRuntime(interactiveHtml, {
+        ? injectComponentSelectionRuntime(decoratedHtml, {
             pageId: draftBuild.pageId || "",
             viewportProfile: draftBuild.viewportProfile || "pc",
             draftBuildId,
             source: "runtime-draft",
             selectMode,
           })
-        : interactiveHtml;
+        : decoratedHtml;
       return sendRawHtml(res, 200, nextHtml);
     }
     const html = snapshotState === "before"
@@ -30826,15 +31130,20 @@ function route(req, res) {
     const interactiveHtml = snapshotState === "before"
       ? html
       : injectInteractionComponentRuntimeIntoHtml(html);
+    const decoratedHtml = snapshotState === "before" && includeJourneyWidget
+      ? injectRuntimeCompareJourneyWidget(interactiveHtml, draftBuild)
+      : snapshotState !== "before" && highlightChanges
+        ? injectRuntimeGeneratedHighlight(interactiveHtml)
+        : interactiveHtml;
     const nextHtml = enableComponentSelection
-      ? injectComponentSelectionRuntime(interactiveHtml, {
+      ? injectComponentSelectionRuntime(decoratedHtml, {
           pageId: draftBuild.pageId || "",
           viewportProfile: draftBuild.viewportProfile || "pc",
           draftBuildId,
           source: "runtime-draft",
           selectMode,
         })
-      : interactiveHtml;
+      : decoratedHtml;
     return sendRawHtml(res, 200, nextHtml);
   }
   if (pathname.startsWith("/clone-content/")) {

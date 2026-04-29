@@ -28,6 +28,18 @@ const DEFAULT_COMPONENTS = {
     "home.lg-best-care",
     "home.bestshop-guide",
   ],
+  "checkout/mo": [
+    "checkout.stepper",
+    "checkout.order-summary",
+    "checkout.customer-form",
+    "checkout.payment-trust",
+  ],
+  "order-complete/mo": [
+    "order-complete.complete-hero",
+    "order-complete.next-steps",
+    "order-complete.membership-benefits",
+    "order-complete.support-cta",
+  ],
 };
 
 function parseArgs(argv = []) {

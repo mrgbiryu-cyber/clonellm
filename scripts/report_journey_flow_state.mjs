@@ -64,7 +64,6 @@ function pageIdsFromFlow(flow) {
 
 function runnablePageIdsFromFlow(flow) {
   return (Array.isArray(flow?.pages) ? flow.pages : [])
-    .filter((item) => String(item?.sourceType || "live-clone").trim() !== "reference-based")
     .map((item) => String(item?.pageId || "").trim())
     .filter(Boolean);
 }
@@ -195,11 +194,17 @@ function buildReport(args) {
     .sort((a, b) => String(b.updatedAt || b.finishedAt || b.startedAt || "").localeCompare(String(a.updatedAt || a.finishedAt || a.startedAt || "")))
     .slice(0, args.limit);
 
-  const latestPlan = summarizePlan(plans[0]);
+  const expectedJourney = String(args.expectJourney || "").trim();
+  const preferredPlan = plans.find((plan) => {
+    const summary = summarizePlan(plan);
+    if (!summary?.id) return false;
+    const journeyMatches = !expectedJourney || summary.inputJourneyId === expectedJourney || summary.flowJourneyId === expectedJourney;
+    return journeyMatches && summary.flowPageIds.includes(args.page);
+  }) || plans[0];
+  const latestPlan = summarizePlan(preferredPlan);
   const latestFlow = summarizeFlowRecord(flowRecords[0]);
   const latestDraft = summarizeDraft(drafts[0]);
   const latestBuild = summarizeJourneyBuild(journeyBuilds[0]);
-  const expectedJourney = String(args.expectJourney || "").trim();
 
   const checks = [
     {
