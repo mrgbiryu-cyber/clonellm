@@ -1,0 +1,175 @@
+{
+  "generatedAt": "2026-04-24T09:07:31.327Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "loginId": "mrgbiryu",
+  "targetSet": "admin",
+  "buildExecuted": true,
+  "results": [
+    {
+      "pageId": "care-solutions",
+      "viewportProfile": "pc",
+      "label": "가전 구독 메인 - PC",
+      "cloneStatus": 200,
+      "editableComponentCount": 5,
+      "editableSlots": [
+        "hero",
+        "ranking",
+        "benefit",
+        "tabs",
+        "careBanner"
+      ],
+      "sidecarSectionCount": 5,
+      "sidecarMissingReferenceMarkupCount": 0,
+      "assetSectionCount": 5,
+      "assetAvailableCounts": {
+        "images": 52,
+        "iconFamilies": 7,
+        "interactionComponents": 5
+      },
+      "assetEmptySections": [
+        "benefit"
+      ],
+      "build": {
+        "ok": false,
+        "status": 422,
+        "error": "design_author_output_not_ready",
+        "validation": {
+          "deliveryReadiness": {
+            "summary": "authored result에 runtime 전달 차단 사유가 있습니다.",
+            "readyForRuntime": false,
+            "blockingReasons": [
+              "asset_role_reoverlay_blocked:hero:promo-complete",
+              "background_asset_role_mismatch:hero:hero-main"
+            ]
+          },
+          "checkRecords": [
+            "target group 확인: page",
+            "authored sections 존재 확인: 5",
+            "declared section keys 확인: hero,ranking,benefit,tabs,careBanner",
+            "projected section keys 확인: hero,ranking,benefit,tabs,careBanner",
+            "hero html 존재 확인",
+            "hero asset registry 확인: image=8, iconFamily=0, interaction=2",
+            "ranking html 존재 확인",
+            "ranking asset registry 확인: image=0, iconFamily=3, interaction=1",
+            "benefit html 존재 확인",
+            "tabs html 존재 확인",
+            "tabs asset registry 확인: image=0, iconFamily=2, interaction=1",
+            "careBanner html 존재 확인",
+            "careBanner asset registry 확인: image=8, iconFamily=2, interaction=1"
+          ],
+          "advisory": [],
+          "assetRegistryDiagnostics": [
+            {
+              "slotId": "hero",
+              "componentId": "care-solutions.hero",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 8,
+                "imageStatus": {
+                  "approved": 6,
+                  "candidate": 1,
+                  "blocked": 1
+                },
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 2,
+                "interactionStatus": {
+                  "approved": 2
+                }
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "ranking",
+              "componentId": "care-solutions.ranking",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 3,
+                "iconFamilyStatus": {
+                  "approved": 3
+                },
+                "interactionComponentCount": 1,
+                "interactionStatus": {
+                  "approved": 1
+                }
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "benefit",
+              "componentId": "care-solutions.benefit",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "tabs",
+              "componentId": "care-solutions.tabs",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 2,
+                "iconFamilyStatus": {
+                  "approved": 2
+                },
+                "interactionComponentCount": 1,
+                "interactionStatus": {
+                  "approved": 1
+                }
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "careBanner",
+              "componentId": "care-solutions.careBanner",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 8,
+                "imageStatus": {
+                  "approved": 1,
+                  "candidate": 7
+                },
+                "iconFamilyCount": 2,
+                "iconFamilyStatus": {
+                  "approved": 2
+                },
+                "interactionComponentCount": 1,
+                "interactionStatus": {
+                  "approved": 1
+                }
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            }
+          ]
+        },
+        "draftBuildId": "",
+        "previewPath": "",
+        "comparePath": "",
+        "authoredSectionCount": 0,
+        "authoredSlotIds": [],
+        "missingAuthoredSlots": [
+          "hero",
+          "ranking",
+          "benefit",
+          "tabs",
+          "careBanner"
+        ]
+      }
+    }
+  ]
+}

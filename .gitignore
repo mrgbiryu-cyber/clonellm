@@ -15,3 +15,5 @@ data/reports/
 
 .DS_Store
 Thumbs.db
+
+*.tar.gz

@@ -22,6 +22,16 @@
       "collectFor": ["homepage", "product_listing", "product_detail", "cart", "checkout", "onboarding"]
     },
     {
+      "id": "component-gallery",
+      "name": "Component Gallery",
+      "url": "https://component.gallery/",
+      "bucket": "component_pattern",
+      "sampleClass": "practical",
+      "priority": 1,
+      "role": "실서비스 컴포넌트 구조와 패턴 수집",
+      "collectFor": ["homepage", "navigation", "product_listing", "product_detail", "visual_reference"]
+    },
+    {
       "id": "pageflows",
       "name": "Page Flows",
       "url": "https://pageflows.com/",
@@ -102,6 +112,17 @@
       "role": "컨셉샷 참고용",
       "note": "실제 운영 UX 표본과 분리 필요",
       "collectFor": ["concept_shot", "visual_reference"]
+    },
+    {
+      "id": "working-ref-ui-ux-pro-max-skill",
+      "name": "Working Ref UI/UX Pro Max Skill",
+      "url": "https://www.working-ref.com/reference/ui-ux-pro-max-skill",
+      "bucket": "system_reference",
+      "sampleClass": "showcase",
+      "priority": 2,
+      "role": "디자인 스킬과 시각 방향성 참고용 큐레이션",
+      "note": "무드와 스킬 참고에 쓰되 직접 복제 기준으로 사용하지 않음",
+      "collectFor": ["visual_reference", "art_direction", "brand_tone", "layout_reference"]
     }
   ]
 }

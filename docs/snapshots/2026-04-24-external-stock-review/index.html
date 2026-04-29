@@ -1,0 +1,1730 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>External Stock Review Pack</title>
+  <style>
+    :root { --ink:#171717; --muted:#6f675f; --paper:#f3efe7; --card:#fffaf2; --line:#dfd4c6; --ok:#155c3b; --warn:#8a5b00; --bad:#8b1e2d; }
+    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background:var(--paper); color:var(--ink); }
+    header { padding:30px 34px; background:var(--ink); color:#fff; }
+    h1 { margin:0 0 10px; font-size:28px; }
+    header p { max-width:980px; line-height:1.6; color:#e8dfd2; }
+    .summary { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+    .pill { background:#fff; color:var(--ink); border-radius:999px; padding:8px 12px; font-size:13px; font-weight:700; }
+    .links { margin-top:18px; display:flex; gap:14px; flex-wrap:wrap; }
+    .links a { color:#fff; }
+    main { padding:28px; display:grid; grid-template-columns:repeat(auto-fit,minmax(420px,1fr)); gap:22px; }
+    .card { border:1px solid var(--line); border-radius:22px; background:var(--card); overflow:hidden; box-shadow:0 16px 38px rgba(0,0,0,.08); }
+    .card.approved { border-color:rgba(21,92,59,.45); }
+    .card.blocked { border-color:rgba(139,30,45,.45); opacity:.78; }
+    .image-wrap { background:#ebe5dc; min-height:220px; display:flex; align-items:center; justify-content:center; }
+    img { width:100%; max-height:360px; object-fit:contain; display:block; }
+    .body { padding:18px; }
+    .topline { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; }
+    .topline strong { font-size:15px; }
+    .topline span { color:var(--muted); font-size:12px; text-align:right; }
+    h2 { margin:14px 0 6px; font-size:20px; line-height:1.25; }
+    .tone { margin:0 0 14px; color:var(--muted); font-size:13px; }
+    dl { margin:0; display:grid; grid-template-columns:92px 1fr; gap:8px 12px; font-size:12px; }
+    dt { font-weight:800; color:#4f463c; }
+    dd { margin:0; word-break:break-all; }
+    details { margin-top:16px; border-top:1px solid var(--line); padding-top:12px; }
+    summary { cursor:pointer; font-weight:800; }
+    pre { padding:12px; border-radius:12px; background:#171717; color:#f8ead5; overflow:auto; font-size:12px; }
+    a { color:#8b1e2d; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>External Stock Review Pack</h1>
+    <p>외부/무료 이미지 후보를 PC/MO variant 단위로 승인/차단하기 위한 리뷰 패키지입니다. 현재 candidate 이미지는 최종 HTML 사용 시 validation에서 막히므로, 실제 빌드에 쓰려면 variant별 approval이 필요합니다.</p>
+    <div class="summary">
+      <span class="pill">rows 46</span>
+      <span class="pill">assets 23</span>
+      <span class="pill">candidate 0</span>
+      <span class="pill">background 12</span>
+      <span class="pill">object 32</span>
+      <span class="pill">reference 2</span>
+    </div>
+    <div class="links">
+      
+      
+      <a href="review-pack.json">review-pack.json</a>
+      <a href="review-decisions.template.json">review-decisions.template.json</a>
+    </div>
+  </header>
+  <main>
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>1. home-living-stage / mo</strong>
+          <span>approved · object-only · priority 19</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1281</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf</dd>
+          <dt>sourceTitle</dt><dd>File:Living room (Unsplash).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>CC0 / cc0 <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">license</a></dd>
+          <dt>attribution</dt><dd>false Jarosław Ceborski jarson / https://unsplash.com/photos/jn7uVeCdf6U
+Image at the Wayback Machine
+
+Gallery at the Wayback Machine / Living room (Unsplash)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Living_room_(Unsplash).jpg">https://commons.wikimedia.org/wiki/File:Living_room_(Unsplash).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__living-room-unsplash__efef9af45dbf.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>2. home-living-stage / pc</strong>
+          <span>approved · object-only · priority 19</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1281</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf</dd>
+          <dt>sourceTitle</dt><dd>File:Living room (Unsplash).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>CC0 / cc0 <a href="http://creativecommons.org/publicdomain/zero/1.0/deed.en">license</a></dd>
+          <dt>attribution</dt><dd>false Jarosław Ceborski jarson / https://unsplash.com/photos/jn7uVeCdf6U
+Image at the Wayback Machine
+
+Gallery at the Wayback Machine / Living room (Unsplash)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Living_room_(Unsplash).jpg">https://commons.wikimedia.org/wiki/File:Living_room_(Unsplash).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__living-room-unsplash__efef9af45dbf.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>3. home-living-stage / mo</strong>
+          <span>approved · object-only · priority 15</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1282</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8</dd>
+          <dt>sourceTitle</dt><dd>File:Modern kitchen and dining area with stylish furnishings and natural light in a contemporary home setting.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Shixart1985 / Own work / Modern kitchen and dining area with stylish furnishings and natural light in a contemporary home setting</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Modern_kitchen_and_dining_area_with_stylish_furnishings_and_natural_light_in_a_contemporary_home_setting.jpg">https://commons.wikimedia.org/wiki/File:Modern_kitchen_and_dining_area_with_stylish_furnishings_and_natural_light_in_a_contemporary_home_setting.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__modern-kitchen-and-dining-area-with-stylish-furn__3dbb04d2a8d8.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>4. home-living-stage / pc</strong>
+          <span>approved · object-only · priority 15</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1282</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8</dd>
+          <dt>sourceTitle</dt><dd>File:Modern kitchen and dining area with stylish furnishings and natural light in a contemporary home setting.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Shixart1985 / Own work / Modern kitchen and dining area with stylish furnishings and natural light in a contemporary home setting</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Modern_kitchen_and_dining_area_with_stylish_furnishings_and_natural_light_in_a_contemporary_home_setting.jpg">https://commons.wikimedia.org/wiki/File:Modern_kitchen_and_dining_area_with_stylish_furnishings_and_natural_light_in_a_contemporary_home_setting.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__modern-kitchen-and-dining-area-with-stylish-furn__3dbb04d2a8d8.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>5. home-living-stage / mo</strong>
+          <span>approved · object-only · priority 15</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1281</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6</dd>
+          <dt>sourceTitle</dt><dd>File:Modern living room with stylish furniture and a view of the outdoors in a cozy apartment setting.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Shixart1985 / Own work / Modern living room with stylish furniture and a view of the outdoors in a cozy apartment setting</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Modern_living_room_with_stylish_furniture_and_a_view_of_the_outdoors_in_a_cozy_apartment_setting.jpg">https://commons.wikimedia.org/wiki/File:Modern_living_room_with_stylish_furniture_and_a_view_of_the_outdoors_in_a_cozy_apartment_setting.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__modern-living-room-with-stylish-furniture-and-a-__0029f5526cd6.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>6. home-living-stage / pc</strong>
+          <span>approved · object-only · priority 15</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1281</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6</dd>
+          <dt>sourceTitle</dt><dd>File:Modern living room with stylish furniture and a view of the outdoors in a cozy apartment setting.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Shixart1985 / Own work / Modern living room with stylish furniture and a view of the outdoors in a cozy apartment setting</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Modern_living_room_with_stylish_furniture_and_a_view_of_the_outdoors_in_a_cozy_apartment_setting.jpg">https://commons.wikimedia.org/wiki/File:Modern_living_room_with_stylish_furniture_and_a_view_of_the_outdoors_in_a_cozy_apartment_setting.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__modern-living-room-with-stylish-furniture-and-a-__0029f5526cd6.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/kitchen-appliance-stage.external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>7. kitchen-appliance-stage / mo</strong>
+          <span>approved · object-only · priority 15</span>
+        </div>
+        <h2>text-free kitchen and refrigerator stage candidate</h2>
+        <p class="tone">clean kitchen appliance stage · 960x638</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79</dd>
+          <dt>sourceTitle</dt><dd>File:Sustainable Kitchen - Flickr - Jeremy Levine Design.jpg</dd>
+          <dt>pages</dt><dd>home, category-refrigerators, pdp-refrigerator-general, pdp-refrigerator-glass, pdp-refrigerator-knockon</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, product-grid</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Jeremy Levine from Los Angeles, United States / Sustainable Kitchen / Sustainable Kitchen - Flickr - Jeremy Levine Design</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Sustainable_Kitchen_-_Flickr_-_Jeremy_Levine_Design.jpg">https://commons.wikimedia.org/wiki/File:Sustainable_Kitchen_-_Flickr_-_Jeremy_Levine_Design.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__sustainable-kitchen-flickr-jeremy-levine-design__180e854c1e79.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>kitchen-appliance-stage / modern kitchen interior refrigerator filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=kitchen-appliance-stage; role=object-only; semantic=text-free kitchen and refrigerator stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/kitchen-appliance-stage.external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>8. kitchen-appliance-stage / pc</strong>
+          <span>approved · object-only · priority 15</span>
+        </div>
+        <h2>text-free kitchen and refrigerator stage candidate</h2>
+        <p class="tone">clean kitchen appliance stage · 960x638</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79</dd>
+          <dt>sourceTitle</dt><dd>File:Sustainable Kitchen - Flickr - Jeremy Levine Design.jpg</dd>
+          <dt>pages</dt><dd>home, category-refrigerators, pdp-refrigerator-general, pdp-refrigerator-glass, pdp-refrigerator-knockon</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, product-grid</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Jeremy Levine from Los Angeles, United States / Sustainable Kitchen / Sustainable Kitchen - Flickr - Jeremy Levine Design</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Sustainable_Kitchen_-_Flickr_-_Jeremy_Levine_Design.jpg">https://commons.wikimedia.org/wiki/File:Sustainable_Kitchen_-_Flickr_-_Jeremy_Levine_Design.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__sustainable-kitchen-flickr-jeremy-levine-design__180e854c1e79.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>kitchen-appliance-stage / modern kitchen interior refrigerator filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=kitchen-appliance-stage; role=object-only; semantic=text-free kitchen and refrigerator stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/laundry-utility-stage.external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>9. laundry-utility-stage / mo</strong>
+          <span>approved · object-only · priority 15</span>
+        </div>
+        <h2>text-free laundry or utility room stage candidate</h2>
+        <p class="tone">clean utility room stage · 960x698</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389</dd>
+          <dt>sourceTitle</dt><dd>File:Finnish laundry room from 1990.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, careBanner</dd>
+          <dt>license</dt><dd>CC BY 4.0 / cc-by-4.0 <a href="https://creativecommons.org/licenses/by/4.0">license</a></dd>
+          <dt>attribution</dt><dd>true Ilari Järvinen / https://www.helsinkikuvia.fi/record/hkm.HKMS000005:000003yp/Image record page in Finna: hkm.EF84CBBF-8526-4091-A61D-B4D68AF6EE78 / Finnish laundry room from 1990</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Finnish_laundry_room_from_1990.jpg">https://commons.wikimedia.org/wiki/File:Finnish_laundry_room_from_1990.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__finnish-laundry-room-from-1990__c242420e9389.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>laundry-utility-stage / laundry room washing machine interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=laundry-utility-stage; role=object-only; semantic=text-free laundry or utility room stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card approved">
+      <div class="image-wrap">
+        <img src="thumbs/laundry-utility-stage.external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>10. laundry-utility-stage / pc</strong>
+          <span>approved · object-only · priority 15</span>
+        </div>
+        <h2>text-free laundry or utility room stage candidate</h2>
+        <p class="tone">clean utility room stage · 960x698</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389</dd>
+          <dt>sourceTitle</dt><dd>File:Finnish laundry room from 1990.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, careBanner</dd>
+          <dt>license</dt><dd>CC BY 4.0 / cc-by-4.0 <a href="https://creativecommons.org/licenses/by/4.0">license</a></dd>
+          <dt>attribution</dt><dd>true Ilari Järvinen / https://www.helsinkikuvia.fi/record/hkm.HKMS000005:000003yp/Image record page in Finna: hkm.EF84CBBF-8526-4091-A61D-B4D68AF6EE78 / Finnish laundry room from 1990</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Finnish_laundry_room_from_1990.jpg">https://commons.wikimedia.org/wiki/File:Finnish_laundry_room_from_1990.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__finnish-laundry-room-from-1990__c242420e9389.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>laundry-utility-stage / laundry room washing machine interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=laundry-utility-stage; role=object-only; semantic=text-free laundry or utility room stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>11. home-wide-interior-stage / mo</strong>
+          <span>blocked · background-only · priority 35</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 1920x764</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3</dd>
+          <dt>sourceTitle</dt><dd>File:American homes and gardens (1910) (17970996789).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>No restrictions <a href="https://www.flickr.com/commons/usage/">license</a></dd>
+          <dt>attribution</dt><dd>false Internet Archive Book Images / https://www.flickr.com/photos/internetarchivebookimages/17970996789/ / American homes and gardens (1910) (17970996789)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1910)_(17970996789).jpg">https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1910)_(17970996789).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__american-homes-and-gardens-1910-17970996789__8194fa73d7b3.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=background-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>12. home-wide-interior-stage / pc</strong>
+          <span>blocked · background-only · priority 35</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 1920x764</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3</dd>
+          <dt>sourceTitle</dt><dd>File:American homes and gardens (1910) (17970996789).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>No restrictions <a href="https://www.flickr.com/commons/usage/">license</a></dd>
+          <dt>attribution</dt><dd>false Internet Archive Book Images / https://www.flickr.com/photos/internetarchivebookimages/17970996789/ / American homes and gardens (1910) (17970996789)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1910)_(17970996789).jpg">https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1910)_(17970996789).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__american-homes-and-gardens-1910-17970996789__8194fa73d7b3.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=background-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>13. home-wide-interior-stage / mo</strong>
+          <span>blocked · background-only · priority 35</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 960x577</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe</dd>
+          <dt>sourceTitle</dt><dd>File:Chief of Mission&#39;s Residence (4857444112).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false Embajada de los Estados Unidos en Uruguay from Montevideo, Uruguay / Chief of Mission&#39;s Residence / Chief of Mission&#39;s Residence (4857444112)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Chief_of_Mission%27s_Residence_(4857444112).jpg">https://commons.wikimedia.org/wiki/File:Chief_of_Mission%27s_Residence_(4857444112).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__chief-of-mission-s-residence-4857444112__493ec8854fbe.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=background-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>14. home-wide-interior-stage / pc</strong>
+          <span>blocked · background-only · priority 35</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 960x577</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe</dd>
+          <dt>sourceTitle</dt><dd>File:Chief of Mission&#39;s Residence (4857444112).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false Embajada de los Estados Unidos en Uruguay from Montevideo, Uruguay / Chief of Mission&#39;s Residence / Chief of Mission&#39;s Residence (4857444112)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Chief_of_Mission%27s_Residence_(4857444112).jpg">https://commons.wikimedia.org/wiki/File:Chief_of_Mission%27s_Residence_(4857444112).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__chief-of-mission-s-residence-4857444112__493ec8854fbe.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=background-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/kitchen-appliance-stage.external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>15. kitchen-appliance-stage / mo</strong>
+          <span>blocked · background-only · priority 35</span>
+        </div>
+        <h2>text-free kitchen and refrigerator stage candidate</h2>
+        <p class="tone">clean kitchen appliance stage · 960x580</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84</dd>
+          <dt>sourceTitle</dt><dd>File:Honor bilt modern homes. (1921) (14740923406).jpg</dd>
+          <dt>pages</dt><dd>home, category-refrigerators, pdp-refrigerator-general, pdp-refrigerator-glass, pdp-refrigerator-knockon</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, product-grid</dd>
+          <dt>license</dt><dd>No restrictions <a href="https://www.flickr.com/commons/usage/">license</a></dd>
+          <dt>attribution</dt><dd>false Sears. Roebuck and Co. / https://www.flickr.com/photos/internetarchivebookimages/14740923406/
+
+Source book page: https://archive.org/stream/HonorBiltModernHomes/HonorBuiltModernHomes0001#page/n23/mode/1up / Honor bilt modern homes. (1921) (14740923406)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Honor_bilt_modern_homes._(1921)_(14740923406).jpg">https://commons.wikimedia.org/wiki/File:Honor_bilt_modern_homes._(1921)_(14740923406).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__honor-bilt-modern-homes-1921-14740923406__ca163823ef84.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>kitchen-appliance-stage / modern kitchen interior refrigerator filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=kitchen-appliance-stage; role=background-only; semantic=text-free kitchen and refrigerator stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/kitchen-appliance-stage.external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>16. kitchen-appliance-stage / pc</strong>
+          <span>blocked · background-only · priority 35</span>
+        </div>
+        <h2>text-free kitchen and refrigerator stage candidate</h2>
+        <p class="tone">clean kitchen appliance stage · 960x580</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84</dd>
+          <dt>sourceTitle</dt><dd>File:Honor bilt modern homes. (1921) (14740923406).jpg</dd>
+          <dt>pages</dt><dd>home, category-refrigerators, pdp-refrigerator-general, pdp-refrigerator-glass, pdp-refrigerator-knockon</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, product-grid</dd>
+          <dt>license</dt><dd>No restrictions <a href="https://www.flickr.com/commons/usage/">license</a></dd>
+          <dt>attribution</dt><dd>false Sears. Roebuck and Co. / https://www.flickr.com/photos/internetarchivebookimages/14740923406/
+
+Source book page: https://archive.org/stream/HonorBiltModernHomes/HonorBuiltModernHomes0001#page/n23/mode/1up / Honor bilt modern homes. (1921) (14740923406)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Honor_bilt_modern_homes._(1921)_(14740923406).jpg">https://commons.wikimedia.org/wiki/File:Honor_bilt_modern_homes._(1921)_(14740923406).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__honor-bilt-modern-homes-1921-14740923406__ca163823ef84.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>kitchen-appliance-stage / modern kitchen interior refrigerator filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=kitchen-appliance-stage; role=background-only; semantic=text-free kitchen and refrigerator stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/service-care-soft-stage.external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>17. service-care-soft-stage / mo</strong>
+          <span>blocked · background-only · priority 35</span>
+        </div>
+        <h2>support and care service background candidate</h2>
+        <p class="tone">soft service and care stage · 960x270</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1</dd>
+          <dt>sourceTitle</dt><dd>File:American homes and gardens (1911) (18157123091).jpg</dd>
+          <dt>pages</dt><dd>support, care-solutions, care-solutions-pdp</dd>
+          <dt>slots</dt><dd>mainService, careBanner, bestcare, banner</dd>
+          <dt>license</dt><dd>No restrictions <a href="https://www.flickr.com/commons/usage/">license</a></dd>
+          <dt>attribution</dt><dd>false Internet Archive Book Images / https://www.flickr.com/photos/internetarchivebookimages/18157123091/ / American homes and gardens (1911) (18157123091)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1911)_(18157123091).jpg">https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1911)_(18157123091).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__american-homes-and-gardens-1911-18157123091__32e78473f7d1.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>service-care-soft-stage / clean home care service interior filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=service-care-soft-stage; role=background-only; semantic=support and care service background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/service-care-soft-stage.external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>18. service-care-soft-stage / pc</strong>
+          <span>blocked · background-only · priority 35</span>
+        </div>
+        <h2>support and care service background candidate</h2>
+        <p class="tone">soft service and care stage · 960x270</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1</dd>
+          <dt>sourceTitle</dt><dd>File:American homes and gardens (1911) (18157123091).jpg</dd>
+          <dt>pages</dt><dd>support, care-solutions, care-solutions-pdp</dd>
+          <dt>slots</dt><dd>mainService, careBanner, bestcare, banner</dd>
+          <dt>license</dt><dd>No restrictions <a href="https://www.flickr.com/commons/usage/">license</a></dd>
+          <dt>attribution</dt><dd>false Internet Archive Book Images / https://www.flickr.com/photos/internetarchivebookimages/18157123091/ / American homes and gardens (1911) (18157123091)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1911)_(18157123091).jpg">https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1911)_(18157123091).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__american-homes-and-gardens-1911-18157123091__32e78473f7d1.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>service-care-soft-stage / clean home care service interior filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=service-care-soft-stage; role=background-only; semantic=support and care service background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>19. home-wide-interior-stage / mo</strong>
+          <span>blocked · background-only · priority 31</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 1920x487</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e</dd>
+          <dt>sourceTitle</dt><dd>File:The Citadel of Aleppo, Syria, panoramic.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true James Gordon from Los Angeles, California, USA / The Citadel of Aleppo, Syria, panoramic</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_Citadel_of_Aleppo,_Syria,_panoramic.jpg">https://commons.wikimedia.org/wiki/File:The_Citadel_of_Aleppo,_Syria,_panoramic.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__the-citadel-of-aleppo-syria-panoramic__9894de0adc2e.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=background-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>20. home-wide-interior-stage / pc</strong>
+          <span>blocked · background-only · priority 31</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 1920x487</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e</dd>
+          <dt>sourceTitle</dt><dd>File:The Citadel of Aleppo, Syria, panoramic.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true James Gordon from Los Angeles, California, USA / The Citadel of Aleppo, Syria, panoramic</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_Citadel_of_Aleppo,_Syria,_panoramic.jpg">https://commons.wikimedia.org/wiki/File:The_Citadel_of_Aleppo,_Syria,_panoramic.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__the-citadel-of-aleppo-syria-panoramic__9894de0adc2e.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=background-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>21. home-wide-interior-stage / mo</strong>
+          <span>blocked · background-only · priority 26</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 599x383</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd</dd>
+          <dt>sourceTitle</dt><dd>File:Roomic - Flickr - uberculture.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Jeremy Noble from St. Paul, United States / roomic / Roomic - Flickr - uberculture</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Roomic_-_Flickr_-_uberculture.jpg">https://commons.wikimedia.org/wiki/File:Roomic_-_Flickr_-_uberculture.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__roomic-flickr-uberculture__1c65364bb5cd.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=background-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>22. home-wide-interior-stage / pc</strong>
+          <span>blocked · background-only · priority 26</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 599x383</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd</dd>
+          <dt>sourceTitle</dt><dd>File:Roomic - Flickr - uberculture.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>CC BY 2.0 / cc-by-2.0 <a href="https://creativecommons.org/licenses/by/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Jeremy Noble from St. Paul, United States / roomic / Roomic - Flickr - uberculture</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Roomic_-_Flickr_-_uberculture.jpg">https://commons.wikimedia.org/wiki/File:Roomic_-_Flickr_-_uberculture.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__roomic-flickr-uberculture__1c65364bb5cd.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / background-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=background-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>23. home-living-stage / mo</strong>
+          <span>blocked · object-only · priority 19</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1312</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a</dd>
+          <dt>sourceTitle</dt><dd>File:The Living Room at 219 North Delaware Street, a Larger View (ac08866d-68b8-487b-937b-fbf1e29e9f65).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false National Park Service / NPGallery / The Living Room at 219 North Delaware Street, a Larger View</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_Living_Room_at_219_North_Delaware_Street,_a_Larger_View_(ac08866d-68b8-487b-937b-fbf1e29e9f65).jpg">https://commons.wikimedia.org/wiki/File:The_Living_Room_at_219_North_Delaware_Street,_a_Larger_View_(ac08866d-68b8-487b-937b-fbf1e29e9f65).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-living-room-at-219-north-delaware-street-a-l__28076c7d157a.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>24. home-living-stage / pc</strong>
+          <span>blocked · object-only · priority 19</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1312</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a</dd>
+          <dt>sourceTitle</dt><dd>File:The Living Room at 219 North Delaware Street, a Larger View (ac08866d-68b8-487b-937b-fbf1e29e9f65).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false National Park Service / NPGallery / The Living Room at 219 North Delaware Street, a Larger View</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_Living_Room_at_219_North_Delaware_Street,_a_Larger_View_(ac08866d-68b8-487b-937b-fbf1e29e9f65).jpg">https://commons.wikimedia.org/wiki/File:The_Living_Room_at_219_North_Delaware_Street,_a_Larger_View_(ac08866d-68b8-487b-937b-fbf1e29e9f65).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-living-room-at-219-north-delaware-street-a-l__28076c7d157a.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>25. home-living-stage / mo</strong>
+          <span>blocked · object-only · priority 19</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1280</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618</dd>
+          <dt>sourceTitle</dt><dd>File:The sitting room is where the Lincoln family would spend their evenings together, like a modern living room or family room. (43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false NPS / NPGallery / Sitting room</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG">https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-sitting-room-is-where-the-lincoln-family-wou__1716534fe618.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>26. home-living-stage / pc</strong>
+          <span>blocked · object-only · priority 19</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1280</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618</dd>
+          <dt>sourceTitle</dt><dd>File:The sitting room is where the Lincoln family would spend their evenings together, like a modern living room or family room. (43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false NPS / NPGallery / Sitting room</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG">https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-sitting-room-is-where-the-lincoln-family-wou__1716534fe618.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>27. home-living-stage / mo</strong>
+          <span>blocked · object-only · priority 19</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1280</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3</dd>
+          <dt>sourceTitle</dt><dd>File:The sitting room is where the Lincoln family would spend their evenings together, like a modern living room or family room. (7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false NPS / NPGallery / Sitting room</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG">https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-sitting-room-is-where-the-lincoln-family-wou__5930b09022f3.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>28. home-living-stage / pc</strong>
+          <span>blocked · object-only · priority 19</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1920x1280</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3</dd>
+          <dt>sourceTitle</dt><dd>File:The sitting room is where the Lincoln family would spend their evenings together, like a modern living room or family room. (7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false NPS / NPGallery / Sitting room</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG">https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-sitting-room-is-where-the-lincoln-family-wou__5930b09022f3.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/service-care-soft-stage.external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>29. service-care-soft-stage / mo</strong>
+          <span>blocked · object-only · priority 19</span>
+        </div>
+        <h2>support and care service background candidate</h2>
+        <p class="tone">soft service and care stage · 960x640</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d</dd>
+          <dt>sourceTitle</dt><dd>File:This bedroom belonged to the Lincoln family’s hired staff member if they needed a place to stay. The Lincolns hired and paid (8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG</dd>
+          <dt>pages</dt><dd>support, care-solutions, care-solutions-pdp</dd>
+          <dt>slots</dt><dd>mainService, careBanner, bestcare, banner</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false NPS / NPGallery / Hired staff&#39;s room</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:This_bedroom_belonged_to_the_Lincoln_family%E2%80%99s_hired_staff_member_if_they_needed_a_place_to_stay._The_Lincolns_hired_and_paid_(8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG">https://commons.wikimedia.org/wiki/File:This_bedroom_belonged_to_the_Lincoln_family%E2%80%99s_hired_staff_member_if_they_needed_a_place_to_stay._The_Lincolns_hired_and_paid_(8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__this-bedroom-belonged-to-the-lincoln-family-s-hi__e2127dbb614d.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>service-care-soft-stage / clean home care service interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=service-care-soft-stage; role=object-only; semantic=support and care service background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/service-care-soft-stage.external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>30. service-care-soft-stage / pc</strong>
+          <span>blocked · object-only · priority 19</span>
+        </div>
+        <h2>support and care service background candidate</h2>
+        <p class="tone">soft service and care stage · 960x640</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d</dd>
+          <dt>sourceTitle</dt><dd>File:This bedroom belonged to the Lincoln family’s hired staff member if they needed a place to stay. The Lincolns hired and paid (8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG</dd>
+          <dt>pages</dt><dd>support, care-solutions, care-solutions-pdp</dd>
+          <dt>slots</dt><dd>mainService, careBanner, bestcare, banner</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false NPS / NPGallery / Hired staff&#39;s room</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:This_bedroom_belonged_to_the_Lincoln_family%E2%80%99s_hired_staff_member_if_they_needed_a_place_to_stay._The_Lincolns_hired_and_paid_(8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG">https://commons.wikimedia.org/wiki/File:This_bedroom_belonged_to_the_Lincoln_family%E2%80%99s_hired_staff_member_if_they_needed_a_place_to_stay._The_Lincolns_hired_and_paid_(8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__this-bedroom-belonged-to-the-lincoln-family-s-hi__e2127dbb614d.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>service-care-soft-stage / clean home care service interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=service-care-soft-stage; role=object-only; semantic=support and care service background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>31. home-living-stage / mo</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1020x680</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40</dd>
+          <dt>sourceTitle</dt><dd>File:Kitchen and Living Room Singlewide.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>CC BY-SA 3.0 / cc-by-sa-3.0 <a href="https://creativecommons.org/licenses/by-sa/3.0">license</a></dd>
+          <dt>attribution</dt><dd>true Riverview Homes, Inc. / Own work / Kitchen and Living Room Singlewide</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Kitchen_and_Living_Room_Singlewide.jpg">https://commons.wikimedia.org/wiki/File:Kitchen_and_Living_Room_Singlewide.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__kitchen-and-living-room-singlewide__b702a1222f40.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>32. home-living-stage / pc</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 1020x680</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40</dd>
+          <dt>sourceTitle</dt><dd>File:Kitchen and Living Room Singlewide.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>CC BY-SA 3.0 / cc-by-sa-3.0 <a href="https://creativecommons.org/licenses/by-sa/3.0">license</a></dd>
+          <dt>attribution</dt><dd>true Riverview Homes, Inc. / Own work / Kitchen and Living Room Singlewide</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Kitchen_and_Living_Room_Singlewide.jpg">https://commons.wikimedia.org/wiki/File:Kitchen_and_Living_Room_Singlewide.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__kitchen-and-living-room-singlewide__b702a1222f40.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>33. home-wide-interior-stage / mo</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 1920x1440</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d</dd>
+          <dt>sourceTitle</dt><dd>File:House at Caulfield.JPG</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>CC BY-SA 3.0 / cc-by-sa-3.0 <a href="https://creativecommons.org/licenses/by-sa/3.0">license</a></dd>
+          <dt>attribution</dt><dd>true Rhys Mcfarlane / Own work / House at Caulfield</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:House_at_Caulfield.JPG">https://commons.wikimedia.org/wiki/File:House_at_Caulfield.JPG</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__house-at-caulfield__9a8a2775831d.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=object-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-wide-interior-stage.external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>34. home-wide-interior-stage / pc</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>wide home interior background candidate</h2>
+        <p class="tone">wide editorial home interior · 1920x1440</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d</dd>
+          <dt>sourceTitle</dt><dd>File:House at Caulfield.JPG</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, story</dd>
+          <dt>license</dt><dd>CC BY-SA 3.0 / cc-by-sa-3.0 <a href="https://creativecommons.org/licenses/by-sa/3.0">license</a></dd>
+          <dt>attribution</dt><dd>true Rhys Mcfarlane / Own work / House at Caulfield</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:House_at_Caulfield.JPG">https://commons.wikimedia.org/wiki/File:House_at_Caulfield.JPG</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__house-at-caulfield__9a8a2775831d.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-wide-interior-stage / wide angle interior living room filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-wide-interior-stage; role=object-only; semantic=wide home interior background candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/media-wall-stage.external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>35. media-wall-stage / mo</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>home theater and media wall candidate</h2>
+        <p class="tone">dark media wall stage · 960x720</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8</dd>
+          <dt>sourceTitle</dt><dd>File:Christian Laube House, Buffalo, New York - 20211218.jpg</dd>
+          <dt>pages</dt><dd>home, category-tvs, pdp-tv-general, pdp-tv-premium</dd>
+          <dt>slots</dt><dd>hero, banner, gallery, product-grid</dd>
+          <dt>license</dt><dd>CC BY-SA 4.0 / cc-by-sa-4.0 <a href="https://creativecommons.org/licenses/by-sa/4.0">license</a></dd>
+          <dt>attribution</dt><dd>true Andre Carrotflower / Own work / Christian Laube House, Buffalo, New York - 20211218</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Christian_Laube_House,_Buffalo,_New_York_-_20211218.jpg">https://commons.wikimedia.org/wiki/File:Christian_Laube_House,_Buffalo,_New_York_-_20211218.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__media-wall-stage__christian-laube-house-buffalo-new-york-20211218__5542ff08e9e8.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>media-wall-stage / home theater living room interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=media-wall-stage; role=object-only; semantic=home theater and media wall candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/media-wall-stage.external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>36. media-wall-stage / pc</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>home theater and media wall candidate</h2>
+        <p class="tone">dark media wall stage · 960x720</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8</dd>
+          <dt>sourceTitle</dt><dd>File:Christian Laube House, Buffalo, New York - 20211218.jpg</dd>
+          <dt>pages</dt><dd>home, category-tvs, pdp-tv-general, pdp-tv-premium</dd>
+          <dt>slots</dt><dd>hero, banner, gallery, product-grid</dd>
+          <dt>license</dt><dd>CC BY-SA 4.0 / cc-by-sa-4.0 <a href="https://creativecommons.org/licenses/by-sa/4.0">license</a></dd>
+          <dt>attribution</dt><dd>true Andre Carrotflower / Own work / Christian Laube House, Buffalo, New York - 20211218</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Christian_Laube_House,_Buffalo,_New_York_-_20211218.jpg">https://commons.wikimedia.org/wiki/File:Christian_Laube_House,_Buffalo,_New_York_-_20211218.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__media-wall-stage__christian-laube-house-buffalo-new-york-20211218__5542ff08e9e8.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>media-wall-stage / home theater living room interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=media-wall-stage; role=object-only; semantic=home theater and media wall candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/tv-living-stage.external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>37. tv-living-stage / mo</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>text-free TV living room stage candidate</h2>
+        <p class="tone">premium living room media stage · 960x636</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22</dd>
+          <dt>sourceTitle</dt><dd>File:Modern Living Room.jpg</dd>
+          <dt>pages</dt><dd>home, pdp-tv-general, pdp-tv-premium</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, gallery</dd>
+          <dt>license</dt><dd>CC BY-SA 4.0 / cc-by-sa-4.0 <a href="https://creativecommons.org/licenses/by-sa/4.0">license</a></dd>
+          <dt>attribution</dt><dd>true Fatma005 / Own work / Modern Living Room</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Modern_Living_Room.jpg">https://commons.wikimedia.org/wiki/File:Modern_Living_Room.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__tv-living-stage__modern-living-room__9f7789fb9d22.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>tv-living-stage / modern living room television filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=tv-living-stage; role=object-only; semantic=text-free TV living room stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/tv-living-stage.external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>38. tv-living-stage / pc</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>text-free TV living room stage candidate</h2>
+        <p class="tone">premium living room media stage · 960x636</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22</dd>
+          <dt>sourceTitle</dt><dd>File:Modern Living Room.jpg</dd>
+          <dt>pages</dt><dd>home, pdp-tv-general, pdp-tv-premium</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, gallery</dd>
+          <dt>license</dt><dd>CC BY-SA 4.0 / cc-by-sa-4.0 <a href="https://creativecommons.org/licenses/by-sa/4.0">license</a></dd>
+          <dt>attribution</dt><dd>true Fatma005 / Own work / Modern Living Room</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Modern_Living_Room.jpg">https://commons.wikimedia.org/wiki/File:Modern_Living_Room.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__tv-living-stage__modern-living-room__9f7789fb9d22.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>tv-living-stage / modern living room television filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=tv-living-stage; role=object-only; semantic=text-free TV living room stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/tv-living-stage.external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>39. tv-living-stage / mo</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>text-free TV living room stage candidate</h2>
+        <p class="tone">premium living room media stage · 960x720</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f</dd>
+          <dt>sourceTitle</dt><dd>File:Turning Technology into Furniture - Stove(1886), Radiola60 in Cab.(1927-28), Predicta TV(1958-60), RCA TV(1949), Edison Phonograph(1919), Sewing Machine(1950-55,1860-65) - Fully Furnished - Historic Furniture Exhibit - Henry Ford Museum.jpg</dd>
+          <dt>pages</dt><dd>home, pdp-tv-general, pdp-tv-premium</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, gallery</dd>
+          <dt>license</dt><dd>CC BY-SA 2.0 / cc-by-sa-2.0 <a href="https://creativecommons.org/licenses/by-sa/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Michael Steeber from USA / Fully Furnished At The Henry Ford- Dearborn, MI / Turning Technology into Furniture - Stove(1886), Radiola60 in Cab.(1927-28), Predicta TV(1958-60), RCA TV(1949), Edison Phonograph(1919), Sewing Machine(1950-55,1860-65) - Fully Furnished - Historic Furniture Exhibit - Henry Ford Museum</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Turning_Technology_into_Furniture_-_Stove(1886),_Radiola60_in_Cab.(1927-28),_Predicta_TV(1958-60),_RCA_TV(1949),_Edison_Phonograph(1919),_Sewing_Machine(1950-55,1860-65)_-_Fully_Furnished_-_Historic_Furniture_Exhibit_-_Henry_Ford_Museum.jpg">https://commons.wikimedia.org/wiki/File:Turning_Technology_into_Furniture_-_Stove(1886),_Radiola60_in_Cab.(1927-28),_Predicta_TV(1958-60),_RCA_TV(1949),_Edison_Phonograph(1919),_Sewing_Machine(1950-55,1860-65)_-_Fully_Furnished_-_Historic_Furniture_Exhibit_-_Henry_Ford_Museum.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__tv-living-stage__turning-technology-into-furniture-stove-1886-rad__c6487c2a592f.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>tv-living-stage / modern living room television filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=tv-living-stage; role=object-only; semantic=text-free TV living room stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/tv-living-stage.external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>40. tv-living-stage / pc</strong>
+          <span>blocked · object-only · priority 15</span>
+        </div>
+        <h2>text-free TV living room stage candidate</h2>
+        <p class="tone">premium living room media stage · 960x720</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f</dd>
+          <dt>sourceTitle</dt><dd>File:Turning Technology into Furniture - Stove(1886), Radiola60 in Cab.(1927-28), Predicta TV(1958-60), RCA TV(1949), Edison Phonograph(1919), Sewing Machine(1950-55,1860-65) - Fully Furnished - Historic Furniture Exhibit - Henry Ford Museum.jpg</dd>
+          <dt>pages</dt><dd>home, pdp-tv-general, pdp-tv-premium</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, gallery</dd>
+          <dt>license</dt><dd>CC BY-SA 2.0 / cc-by-sa-2.0 <a href="https://creativecommons.org/licenses/by-sa/2.0">license</a></dd>
+          <dt>attribution</dt><dd>true Michael Steeber from USA / Fully Furnished At The Henry Ford- Dearborn, MI / Turning Technology into Furniture - Stove(1886), Radiola60 in Cab.(1927-28), Predicta TV(1958-60), RCA TV(1949), Edison Phonograph(1919), Sewing Machine(1950-55,1860-65) - Fully Furnished - Historic Furniture Exhibit - Henry Ford Museum</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Turning_Technology_into_Furniture_-_Stove(1886),_Radiola60_in_Cab.(1927-28),_Predicta_TV(1958-60),_RCA_TV(1949),_Edison_Phonograph(1919),_Sewing_Machine(1950-55,1860-65)_-_Fully_Furnished_-_Historic_Furniture_Exhibit_-_Henry_Ford_Museum.jpg">https://commons.wikimedia.org/wiki/File:Turning_Technology_into_Furniture_-_Stove(1886),_Radiola60_in_Cab.(1927-28),_Predicta_TV(1958-60),_RCA_TV(1949),_Edison_Phonograph(1919),_Sewing_Machine(1950-55,1860-65)_-_Fully_Furnished_-_Historic_Furniture_Exhibit_-_Henry_Ford_Museum.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__tv-living-stage__turning-technology-into-furniture-stove-1886-rad__c6487c2a592f.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>tv-living-stage / modern living room television filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=tv-living-stage; role=object-only; semantic=text-free TV living room stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>41. home-living-stage / mo</strong>
+          <span>blocked · object-only · priority 14</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 768x621</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972</dd>
+          <dt>sourceTitle</dt><dd>File:Gene Zema house showing living room, Seattle (4669580613).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>No restrictions <a href="https://www.flickr.com/commons/usage/">license</a></dd>
+          <dt>attribution</dt><dd>false UW Digital Collections / https://www.flickr.com/photos/uw_digital_images/4669580613/ / Gene Zema house showing living room, Seattle (4669580613)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Gene_Zema_house_showing_living_room,_Seattle_(4669580613).jpg">https://commons.wikimedia.org/wiki/File:Gene_Zema_house_showing_living_room,_Seattle_(4669580613).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__gene-zema-house-showing-living-room-seattle-4669__b956565f0972.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/home-living-stage.external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>42. home-living-stage / pc</strong>
+          <span>blocked · object-only · priority 14</span>
+        </div>
+        <h2>text-free home living interior stage candidate</h2>
+        <p class="tone">warm modern living stage · 768x621</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972</dd>
+          <dt>sourceTitle</dt><dd>File:Gene Zema house showing living room, Seattle (4669580613).jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area</dd>
+          <dt>license</dt><dd>No restrictions <a href="https://www.flickr.com/commons/usage/">license</a></dd>
+          <dt>attribution</dt><dd>false UW Digital Collections / https://www.flickr.com/photos/uw_digital_images/4669580613/ / Gene Zema house showing living room, Seattle (4669580613)</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Gene_Zema_house_showing_living_room,_Seattle_(4669580613).jpg">https://commons.wikimedia.org/wiki/File:Gene_Zema_house_showing_living_room,_Seattle_(4669580613).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__home-living-stage__gene-zema-house-showing-living-room-seattle-4669__b956565f0972.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>home-living-stage / modern living room interior / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=home-living-stage; role=object-only; semantic=text-free home living interior stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/laundry-utility-stage.external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>43. laundry-utility-stage / mo</strong>
+          <span>blocked · object-only · priority 3</span>
+        </div>
+        <h2>text-free laundry or utility room stage candidate</h2>
+        <p class="tone">clean utility room stage · 960x727</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c</dd>
+          <dt>sourceTitle</dt><dd>File:StateLibQld 2 75473 Prisoners using the laundry facilities at the new female division of Boggo Road Gaol, Brisbane, 1903.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, careBanner</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false The Queenslander, 28 November, 1903, p. 21 / StateLibQld 2 75473 Prisoners using the laundry facilities at the new female division of Boggo Road Gaol, Brisbane, 1903</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:StateLibQld_2_75473_Prisoners_using_the_laundry_facilities_at_the_new_female_division_of_Boggo_Road_Gaol,_Brisbane,_1903.jpg">https://commons.wikimedia.org/wiki/File:StateLibQld_2_75473_Prisoners_using_the_laundry_facilities_at_the_new_female_division_of_Boggo_Road_Gaol,_Brisbane,_1903.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__statelibqld-2-75473-prisoners-using-the-laundry-__bb3007a71c4c.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>laundry-utility-stage / laundry room washing machine interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=laundry-utility-stage; role=object-only; semantic=text-free laundry or utility room stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/laundry-utility-stage.external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>44. laundry-utility-stage / pc</strong>
+          <span>blocked · object-only · priority 3</span>
+        </div>
+        <h2>text-free laundry or utility room stage candidate</h2>
+        <p class="tone">clean utility room stage · 960x727</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c</dd>
+          <dt>sourceTitle</dt><dd>File:StateLibQld 2 75473 Prisoners using the laundry facilities at the new female division of Boggo Road Gaol, Brisbane, 1903.jpg</dd>
+          <dt>pages</dt><dd>home, care-solutions</dd>
+          <dt>slots</dt><dd>hero, banner, marketing-area, careBanner</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false The Queenslander, 28 November, 1903, p. 21 / StateLibQld 2 75473 Prisoners using the laundry facilities at the new female division of Boggo Road Gaol, Brisbane, 1903</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:StateLibQld_2_75473_Prisoners_using_the_laundry_facilities_at_the_new_female_division_of_Boggo_Road_Gaol,_Brisbane,_1903.jpg">https://commons.wikimedia.org/wiki/File:StateLibQld_2_75473_Prisoners_using_the_laundry_facilities_at_the_new_female_division_of_Boggo_Road_Gaol,_Brisbane,_1903.jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__statelibqld-2-75473-prisoners-using-the-laundry-__bb3007a71c4c.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>laundry-utility-stage / laundry room washing machine interior filetype:bitmap / object-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=laundry-utility-stage; role=object-only; semantic=text-free laundry or utility room stage candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/media-wall-stage.external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e.mo.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>45. media-wall-stage / mo</strong>
+          <span>blocked · reference-only · priority -7</span>
+        </div>
+        <h2>home theater and media wall candidate</h2>
+        <p class="tone">dark media wall stage · 960x1292</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e</dd>
+          <dt>sourceTitle</dt><dd>File:The Town Crier, v.15, no.50, Dec. 11, 1920 - DPLA - 37f26783bbd274eca9a46efa6e846211 (page 32).jpg</dd>
+          <dt>pages</dt><dd>home, category-tvs, pdp-tv-general, pdp-tv-premium</dd>
+          <dt>slots</dt><dd>hero, banner, gallery, product-grid</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false Wood &amp;amp; Reber, Inc / This file was contributed to Wikimedia Commons by Seattle Public Library as part of a cooperation project. The donation was facilitated by the Digital Public Library of America, via its partner Northwest Digital Heritage.
+Record in source catalog
+DPLA identifier: 37f26783bbd274eca9a46efa6e846211
+Seattle Public Library identifier: spl_tc_915126_1920_15_50 / The Town Crier, v.15, no.50, Dec. 11, 1920</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_Town_Crier,_v.15,_no.50,_Dec._11,_1920_-_DPLA_-_37f26783bbd274eca9a46efa6e846211_(page_32).jpg">https://commons.wikimedia.org/wiki/File:The_Town_Crier,_v.15,_no.50,_Dec._11,_1920_-_DPLA_-_37f26783bbd274eca9a46efa6e846211_(page_32).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__media-wall-stage__the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26__b1ccbcb0675e.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Mobile crop and safe area must be reviewed before approval.&quot;}</dd>
+          <dt>hints</dt><dd>media-wall-stage / home theater living room interior filetype:bitmap / reference-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e&quot;,
+  &quot;viewportProfile&quot;: &quot;mo&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=media-wall-stage; role=reference-only; semantic=home theater and media wall candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  
+
+    <article class="card blocked">
+      <div class="image-wrap">
+        <img src="thumbs/media-wall-stage.external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e.pc.jpg" alt="">
+      </div>
+      <div class="body">
+        <div class="topline">
+          <strong>46. media-wall-stage / pc</strong>
+          <span>blocked · reference-only · priority -7</span>
+        </div>
+        <h2>home theater and media wall candidate</h2>
+        <p class="tone">dark media wall stage · 960x1292</p>
+        <dl>
+          <dt>assetId</dt><dd>external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e</dd>
+          <dt>sourceTitle</dt><dd>File:The Town Crier, v.15, no.50, Dec. 11, 1920 - DPLA - 37f26783bbd274eca9a46efa6e846211 (page 32).jpg</dd>
+          <dt>pages</dt><dd>home, category-tvs, pdp-tv-general, pdp-tv-premium</dd>
+          <dt>slots</dt><dd>hero, banner, gallery, product-grid</dd>
+          <dt>license</dt><dd>Public domain / pd </dd>
+          <dt>attribution</dt><dd>false Wood &amp;amp; Reber, Inc / This file was contributed to Wikimedia Commons by Seattle Public Library as part of a cooperation project. The donation was facilitated by the Digital Public Library of America, via its partner Northwest Digital Heritage.
+Record in source catalog
+DPLA identifier: 37f26783bbd274eca9a46efa6e846211
+Seattle Public Library identifier: spl_tc_915126_1920_15_50 / The Town Crier, v.15, no.50, Dec. 11, 1920</dd>
+          <dt>source</dt><dd><a href="https://commons.wikimedia.org/wiki/File:The_Town_Crier,_v.15,_no.50,_Dec._11,_1920_-_DPLA_-_37f26783bbd274eca9a46efa6e846211_(page_32).jpg">https://commons.wikimedia.org/wiki/File:The_Town_Crier,_v.15,_no.50,_Dec._11,_1920_-_DPLA_-_37f26783bbd274eca9a46efa6e846211_(page_32).jpg</a></dd>
+          <dt>local</dt><dd>data/raw/assets/external-free/wikimedia-commons__media-wall-stage__the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26__b1ccbcb0675e.jpg</dd>
+          <dt>safeArea</dt><dd>{&quot;copyZone&quot;:&quot;review-required&quot;,&quot;primarySubjectZone&quot;:&quot;review-required&quot;,&quot;avoidOverlayZones&quot;:[&quot;unknown until visual review&quot;],&quot;notes&quot;:&quot;External free candidate. Human review must check license, attribution, embedded text, trademarks, and crop fit before approval.&quot;}</dd>
+          <dt>hints</dt><dd>media-wall-stage / home theater living room interior filetype:bitmap / reference-only</dd>
+        </dl>
+        <details>
+          <summary>decision JSON snippet</summary>
+          <pre>{
+  &quot;assetId&quot;: &quot;external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e&quot;,
+  &quot;viewportProfile&quot;: &quot;pc&quot;,
+  &quot;decision&quot;: &quot;pending&quot;,
+  &quot;reviewNotes&quot;: &quot;sourceProfile=media-wall-stage; role=reference-only; semantic=home theater and media wall candidate; Replace decision with approved or blocked before applying.&quot;
+}</pre>
+        </details>
+      </div>
+    </article>
+  </main>
+</body>
+</html>

@@ -1,0 +1,50 @@
+{
+  "journeys": [
+    {
+      "id": "general-purchase",
+      "label": "일반 구매 여정",
+      "description": "홈에서 제품 탐색, PDP 설득, 장바구니/결제 전환까지 이어지는 기본 커머스 여정입니다.",
+      "pages": [
+        { "pageId": "home", "role": "brand-entry", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "category-tvs", "role": "category-discovery", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "category-refrigerators", "role": "category-discovery", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "pdp-tv-general", "role": "product-persuasion", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "pdp-refrigerator-general", "role": "product-persuasion", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "cart", "role": "conversion-decision", "viewportProfiles": ["pc", "mo"], "sourceType": "reference-based" },
+        { "pageId": "checkout", "role": "payment-confidence", "viewportProfiles": ["pc", "mo"], "sourceType": "reference-based" },
+        { "pageId": "order-complete", "role": "completion-next-action", "viewportProfiles": ["pc", "mo"], "sourceType": "reference-based" }
+      ]
+    },
+    {
+      "id": "care-subscription",
+      "label": "케어 구독 여정",
+      "description": "홈에서 케어솔루션 탐색, 구독 PDP, 신청/결제까지 이어지는 구독 전환 여정입니다.",
+      "pages": [
+        { "pageId": "home", "role": "brand-entry", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "care-solutions", "role": "service-discovery", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "care-solutions-pdp", "role": "subscription-persuasion", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "checkout", "role": "payment-confidence", "viewportProfiles": ["pc", "mo"], "sourceType": "reference-based" },
+        { "pageId": "order-complete", "role": "completion-next-action", "viewportProfiles": ["pc", "mo"], "sourceType": "reference-based" }
+      ]
+    },
+    {
+      "id": "brand-discovery",
+      "label": "브랜드 발견 여정",
+      "description": "홈, 홈스타일, 브랜드형 PDP로 이어지는 감성/세계관 중심 여정입니다.",
+      "pages": [
+        { "pageId": "home", "role": "brand-entry", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "homestyle-home", "role": "lifestyle-discovery", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "homestyle-pdp", "role": "lifestyle-persuasion", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" }
+      ]
+    },
+    {
+      "id": "support-as",
+      "label": "지원/AS 여정",
+      "description": "고객지원 진입 후 문제 해결과 서비스 신청으로 이어지는 task-first 여정입니다.",
+      "pages": [
+        { "pageId": "home", "role": "entry", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" },
+        { "pageId": "support", "role": "support-hub", "viewportProfiles": ["pc", "mo"], "sourceType": "live-clone" }
+      ]
+    }
+  ]
+}

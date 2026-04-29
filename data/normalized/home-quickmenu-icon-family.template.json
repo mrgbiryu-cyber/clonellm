@@ -1,0 +1,72 @@
+{
+  "assetFamilyId": "home.quickmenu.icon.family.v1",
+  "familyId": "home-quickmenu-line-v1",
+  "generatedAt": "2026-04-22T00:00:00.000Z",
+  "status": "ready",
+  "styleSummary": "soft rounded mono outline icon family for a premium appliance quickmenu",
+  "styleSpec": {
+    "viewport": "28x28",
+    "strokeWeight": "1.75px-2px",
+    "cornerStyle": "rounded",
+    "fillMode": "outline-first",
+    "visualDensity": "medium",
+    "backgroundUsage": "none",
+    "palette": ["#111111"]
+  },
+  "members": [
+    {
+      "label": "구독 Days",
+      "assetId": "quickmenu-icon-subscription-days",
+      "assetUrl": "/assets/quickmenu-icon-subscription-days.svg",
+      "format": "svg"
+    },
+    {
+      "label": "혜택/이벤트",
+      "assetId": "quickmenu-icon-benefit-event",
+      "assetUrl": "/assets/quickmenu-icon-benefit-event.svg",
+      "format": "svg"
+    },
+    {
+      "label": "웨딩&이사",
+      "assetId": "quickmenu-icon-wedding-move",
+      "assetUrl": "/assets/quickmenu-icon-wedding-move.svg",
+      "format": "svg"
+    },
+    {
+      "label": "다품목 할인",
+      "assetId": "quickmenu-icon-bundle-discount",
+      "assetUrl": "/assets/quickmenu-icon-bundle-discount.svg",
+      "format": "svg"
+    },
+    {
+      "label": "라이브",
+      "assetId": "quickmenu-icon-live",
+      "assetUrl": "/assets/quickmenu-icon-live.svg",
+      "format": "svg"
+    },
+    {
+      "label": "카드혜택",
+      "assetId": "quickmenu-icon-card-benefit",
+      "assetUrl": "/assets/quickmenu-icon-card-benefit.svg",
+      "format": "svg"
+    },
+    {
+      "label": "가전 구독",
+      "assetId": "quickmenu-icon-appliance-subscription",
+      "assetUrl": "/assets/quickmenu-icon-appliance-subscription.svg",
+      "format": "svg"
+    },
+    {
+      "label": "소모품",
+      "assetId": "quickmenu-icon-consumables",
+      "assetUrl": "/assets/quickmenu-icon-consumables.svg",
+      "format": "svg"
+    },
+    {
+      "label": "SALE 홈스타일",
+      "assetId": "quickmenu-icon-sale-homestyle",
+      "assetUrl": "/assets/quickmenu-icon-sale-homestyle.svg",
+      "format": "svg"
+    }
+  ]
+}

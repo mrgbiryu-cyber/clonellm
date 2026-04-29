@@ -1,0 +1,628 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-24T07:28:04.313Z",
+  "registryKind": "interaction-component-registry",
+  "adapterInterface": [
+    "mount",
+    "update",
+    "getState",
+    "verify",
+    "destroy"
+  ],
+  "components": [
+    {
+      "interactionId": "carousel.snap.basic-v1",
+      "assetKind": "interaction-component",
+      "status": "approved",
+      "componentType": "carousel",
+      "sourceType": "internal-adapter-required",
+      "runtimeModule": "web/interaction-components/carousel.snap.basic-v1.js",
+      "pageFamilies": [
+        "home",
+        "pdp",
+        "care-solutions",
+        "category-refrigerators",
+        "category-tvs",
+        "pdp-tv-general",
+        "pdp-tv-premium",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "gallery",
+        "quickmenu",
+        "careBanner",
+        "product-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "semanticRole": "controlled horizontal rotation with active index and indicators",
+      "llmDescription": "Reusable carousel behavior. Select this when a slot needs controlled horizontal rotation, not arbitrary inline JavaScript.",
+      "llmDo": [
+        "choose controls and timing",
+        "keep active state inspectable",
+        "use only within the provided root"
+      ],
+      "llmDont": [
+        "write inline JavaScript",
+        "attach global listeners directly",
+        "replace unrelated DOM outside the slot"
+      ],
+      "selectionHints": [
+        "hero carousel",
+        "banner rotation",
+        "gallery image switching"
+      ],
+      "conflictHints": [
+        "conflicts with static-only sections",
+        "requires item count greater than one"
+      ],
+      "stateSchema": {
+        "activeIndex": "number",
+        "paused": "boolean",
+        "itemCount": "number"
+      },
+      "controlSchema": {
+        "showPrevNext": "boolean",
+        "showIndicator": "boolean",
+        "intervalMs": "number",
+        "transitionMs": "number",
+        "hoverPause": "boolean",
+        "swipe": "boolean"
+      },
+      "verificationSchema": [
+        "activeItemVisible",
+        "indicatorSync",
+        "destroyCleanup",
+        "noHorizontalOverflow"
+      ],
+      "reviewedAt": "2026-04-24T00:00:00.000Z",
+      "reviewNotes": "Runtime adapter file added at web/interaction-components/carousel.snap.basic-v1.js.",
+      "provenanceNotes": "First target is home.hero.carousel. Adapter module now provides mount/update/getState/verify/destroy."
+    },
+    {
+      "interactionId": "tabs.switch.basic-v1",
+      "assetKind": "interaction-component",
+      "status": "approved",
+      "componentType": "tabs",
+      "sourceType": "internal-adapter-required",
+      "runtimeModule": "web/interaction-components/tabs.switch.basic-v1.js",
+      "pageFamilies": [
+        "home",
+        "support",
+        "plp",
+        "care-solutions",
+        "category-refrigerators",
+        "category-tvs"
+      ],
+      "slotFamilies": [
+        "tabs",
+        "ranking",
+        "support-tab",
+        "category-tabs",
+        "sort"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "semanticRole": "single-active tab switch with panel visibility sync",
+      "llmDescription": "Reusable tab switch behavior with inspectable active state. Use this instead of generating one-off tab JavaScript.",
+      "llmDo": [
+        "define default active index",
+        "keep selected tab visible without hover",
+        "sync active tab and panel"
+      ],
+      "llmDont": [
+        "attach document-wide click handlers",
+        "hide all panels without fallback",
+        "invent selectors"
+      ],
+      "selectionHints": [
+        "ranking tabs",
+        "support category tabs",
+        "PLP sort/filter tabs"
+      ],
+      "conflictHints": [
+        "requires a finite tab list and panels"
+      ],
+      "stateSchema": {
+        "activeIndex": "number",
+        "itemCount": "number"
+      },
+      "controlSchema": {
+        "defaultIndex": "number",
+        "keyboardNavigation": "boolean"
+      },
+      "verificationSchema": [
+        "activePanelVisible",
+        "tabAriaSync",
+        "destroyCleanup"
+      ],
+      "reviewedAt": "2026-04-24T06:31:53.000Z",
+      "reviewNotes": "Runtime adapter file added at web/interaction-components/tabs.switch.basic-v1.js. Uses scoped data-tabs-* selectors and exposes mount/update/getState/verify/destroy."
+    },
+    {
+      "interactionId": "accordion.disclosure.basic-v1",
+      "assetKind": "interaction-component",
+      "status": "approved",
+      "componentType": "accordion",
+      "sourceType": "internal-adapter-required",
+      "runtimeModule": "web/interaction-components/accordion.disclosure.basic-v1.js",
+      "pageFamilies": [
+        "support",
+        "pdp",
+        "care-solutions",
+        "care-solutions-pdp",
+        "pdp-tv-general",
+        "pdp-tv-premium",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "accordion",
+        "faq",
+        "notice",
+        "qna",
+        "bestcare"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "semanticRole": "disclosure list with controlled expanded state",
+      "llmDescription": "Reusable accordion behavior for FAQ, notice, and support disclosure sections.",
+      "llmDo": [
+        "choose single or multiple open mode",
+        "keep expanded state inspectable"
+      ],
+      "llmDont": [
+        "write inline event handlers",
+        "hide critical information behind inaccessible controls"
+      ],
+      "selectionHints": [
+        "support accordion",
+        "PDP Q&A",
+        "notice disclosure"
+      ],
+      "conflictHints": [
+        "not for carousel or gallery behavior"
+      ],
+      "stateSchema": {
+        "openIndexes": "number[]",
+        "itemCount": "number"
+      },
+      "controlSchema": {
+        "allowMultiple": "boolean",
+        "defaultOpenIndexes": "number[]"
+      },
+      "verificationSchema": [
+        "openedPanelVisible",
+        "ariaExpandedSync",
+        "destroyCleanup"
+      ],
+      "reviewedAt": "2026-04-24T06:31:53.000Z",
+      "reviewNotes": "Runtime adapter file added at web/interaction-components/accordion.disclosure.basic-v1.js. Uses scoped data-accordion-* selectors and exposes mount/update/getState/verify/destroy."
+    },
+    {
+      "interactionId": "drawer.filter.basic-v1",
+      "assetKind": "interaction-component",
+      "status": "approved",
+      "componentType": "drawer",
+      "sourceType": "internal-adapter-required",
+      "runtimeModule": "web/interaction-components/drawer.filter.basic-v1.js",
+      "pageFamilies": [
+        "plp",
+        "category-refrigerators",
+        "category-tvs"
+      ],
+      "slotFamilies": [
+        "filter",
+        "drawer",
+        "sort"
+      ],
+      "viewportProfiles": [
+        "mo",
+        "pc"
+      ],
+      "semanticRole": "filter drawer with open state, focus boundary, and close path",
+      "llmDescription": "Reusable filter drawer behavior. Use for PLP filter surfaces instead of inline overlay scripts.",
+      "llmDo": [
+        "define open trigger and close trigger",
+        "keep focus and overlay scoped to root"
+      ],
+      "llmDont": [
+        "lock body scroll without cleanup",
+        "attach unscoped global listeners"
+      ],
+      "selectionHints": [
+        "mobile PLP filter drawer",
+        "sort/filter panel"
+      ],
+      "conflictHints": [
+        "not for static card grids"
+      ],
+      "stateSchema": {
+        "open": "boolean"
+      },
+      "controlSchema": {
+        "placement": "left|right|bottom",
+        "closeOnBackdrop": "boolean"
+      },
+      "verificationSchema": [
+        "openStateVisible",
+        "closePathWorks",
+        "destroyCleanup",
+        "noHorizontalOverflow"
+      ],
+      "reviewedAt": "2026-04-24T07:03:20.862Z",
+      "reviewedBy": "codex",
+      "reviewNotes": "Runtime adapter implemented, browser-smoke verified, and concrete page scope mapped."
+    },
+    {
+      "interactionId": "sticky.buybox.basic-v1",
+      "assetKind": "interaction-component",
+      "status": "approved",
+      "componentType": "sticky-cta",
+      "sourceType": "internal-adapter-required",
+      "runtimeModule": "web/interaction-components/sticky.buybox.basic-v1.js",
+      "pageFamilies": [
+        "pdp",
+        "pdp-tv-general",
+        "pdp-tv-premium",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "sticky",
+        "buybox",
+        "summary"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "semanticRole": "persistent purchase action surface with scroll-aware visibility",
+      "llmDescription": "Reusable sticky buybox behavior for PDP purchase action surfaces.",
+      "llmDo": [
+        "keep primary CTA accessible",
+        "verify no content overlap at viewport edges"
+      ],
+      "llmDont": [
+        "cover product information without safe offset",
+        "use decorative media unless required"
+      ],
+      "selectionHints": [
+        "PDP sticky purchase area"
+      ],
+      "conflictHints": [
+        "not for hero or quickmenu slots"
+      ],
+      "stateSchema": {
+        "visible": "boolean",
+        "stuck": "boolean"
+      },
+      "controlSchema": {
+        "threshold": "number",
+        "safeArea": "boolean"
+      },
+      "verificationSchema": [
+        "ctaVisible",
+        "safeAreaOffset",
+        "destroyCleanup"
+      ],
+      "reviewedAt": "2026-04-24T07:03:20.869Z",
+      "reviewedBy": "codex",
+      "reviewNotes": "Runtime adapter implemented, browser-smoke verified, and concrete page scope mapped."
+    },
+    {
+      "interactionId": "modal.dialog.basic-v1",
+      "componentType": "modal",
+      "runtimeModule": "web/interaction-components/modal.dialog.basic-v1.js",
+      "pageFamilies": [
+        "support",
+        "pdp",
+        "home"
+      ],
+      "slotFamilies": [
+        "modal",
+        "popup",
+        "qna",
+        "review",
+        "notice"
+      ],
+      "semanticRole": "scoped dialog modal with open, close, escape, and backdrop behavior",
+      "llmDescription": "Reusable modal dialog behavior for review, inquiry, and notice surfaces. Uses scoped open, close, escape, and backdrop controls.",
+      "stateSchema": {
+        "open": "boolean"
+      },
+      "controlSchema": {
+        "closeOnBackdrop": "boolean",
+        "closeOnEscape": "boolean"
+      },
+      "verificationSchema": [
+        "openStateVisible",
+        "closePathWorks",
+        "focusReturn",
+        "destroyCleanup"
+      ],
+      "selectionHints": [
+        "review modal",
+        "inquiry modal",
+        "notice popup"
+      ],
+      "assetKind": "interaction-component",
+      "status": "approved",
+      "sourceType": "internal-adapter",
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "llmDo": [
+        "use scoped data attributes",
+        "keep state inspectable",
+        "use only within the provided root"
+      ],
+      "llmDont": [
+        "write inline JavaScript",
+        "attach unscoped document listeners",
+        "replace unrelated DOM outside the slot"
+      ],
+      "conflictHints": [
+        "requires matching data attributes in authored HTML"
+      ],
+      "provenanceNotes": "Seeded as approved internal interaction adapter after runtime module implementation.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Runtime adapter file added at web/interaction-components/modal.dialog.basic-v1.js. Uses scoped selectors and exposes mount/update/getState/verify/destroy."
+    },
+    {
+      "interactionId": "tooltip.popover.basic-v1",
+      "componentType": "tooltip",
+      "runtimeModule": "web/interaction-components/tooltip.popover.basic-v1.js",
+      "pageFamilies": [
+        "pdp",
+        "support",
+        "plp"
+      ],
+      "slotFamilies": [
+        "tooltip",
+        "info",
+        "summary",
+        "filter"
+      ],
+      "semanticRole": "small contextual popover with hover, focus, and click disclosure",
+      "llmDescription": "Reusable tooltip/popover behavior for helper copy and product spec explanations. Supports click, focus, and hover disclosure.",
+      "stateSchema": {
+        "open": "boolean",
+        "activeIndex": "number"
+      },
+      "controlSchema": {
+        "triggerMode": "hover|click|focus",
+        "closeOnEscape": "boolean"
+      },
+      "verificationSchema": [
+        "popoverVisible",
+        "ariaExpandedSync",
+        "destroyCleanup"
+      ],
+      "selectionHints": [
+        "spec info tooltip",
+        "filter helper popover",
+        "price benefit hint"
+      ],
+      "assetKind": "interaction-component",
+      "status": "approved",
+      "sourceType": "internal-adapter",
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "llmDo": [
+        "use scoped data attributes",
+        "keep state inspectable",
+        "use only within the provided root"
+      ],
+      "llmDont": [
+        "write inline JavaScript",
+        "attach unscoped document listeners",
+        "replace unrelated DOM outside the slot"
+      ],
+      "conflictHints": [
+        "requires matching data attributes in authored HTML"
+      ],
+      "provenanceNotes": "Seeded as approved internal interaction adapter after runtime module implementation.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Runtime adapter file added at web/interaction-components/tooltip.popover.basic-v1.js. Uses scoped selectors and exposes mount/update/getState/verify/destroy."
+    },
+    {
+      "interactionId": "compare.slider.basic-v1",
+      "componentType": "compare-slider",
+      "runtimeModule": "web/interaction-components/compare.slider.basic-v1.js",
+      "pageFamilies": [
+        "home",
+        "pdp",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "compare",
+        "before-after",
+        "story",
+        "hero"
+      ],
+      "semanticRole": "before-after comparison slider with inspectable position state",
+      "llmDescription": "Reusable before/after visual comparison slider with CSS variable position sync and keyboard controls.",
+      "stateSchema": {
+        "position": "number"
+      },
+      "controlSchema": {
+        "defaultPosition": "number",
+        "keyboardStep": "number"
+      },
+      "verificationSchema": [
+        "positionSync",
+        "keyboardWorks",
+        "destroyCleanup"
+      ],
+      "selectionHints": [
+        "before after story",
+        "product comparison visual",
+        "care effect comparison"
+      ],
+      "assetKind": "interaction-component",
+      "status": "approved",
+      "sourceType": "internal-adapter",
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "llmDo": [
+        "use scoped data attributes",
+        "keep state inspectable",
+        "use only within the provided root"
+      ],
+      "llmDont": [
+        "write inline JavaScript",
+        "attach unscoped document listeners",
+        "replace unrelated DOM outside the slot"
+      ],
+      "conflictHints": [
+        "requires matching data attributes in authored HTML"
+      ],
+      "provenanceNotes": "Seeded as approved internal interaction adapter after runtime module implementation.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Runtime adapter file added at web/interaction-components/compare.slider.basic-v1.js. Uses scoped selectors and exposes mount/update/getState/verify/destroy."
+    },
+    {
+      "interactionId": "segmented.control.basic-v1",
+      "componentType": "segmented-control",
+      "runtimeModule": "web/interaction-components/segmented.control.basic-v1.js",
+      "pageFamilies": [
+        "plp",
+        "support",
+        "home"
+      ],
+      "slotFamilies": [
+        "tabs",
+        "sort",
+        "filter",
+        "ranking"
+      ],
+      "semanticRole": "single selected segmented control for sort, ranking, and option choices",
+      "llmDescription": "Reusable segmented control behavior for sort, ranking, and option choices with one selected state.",
+      "stateSchema": {
+        "selectedIndex": "number",
+        "itemCount": "number"
+      },
+      "controlSchema": {
+        "defaultIndex": "number"
+      },
+      "verificationSchema": [
+        "selectedStateSync",
+        "keyboardWorks",
+        "destroyCleanup"
+      ],
+      "selectionHints": [
+        "ranking segment",
+        "sort segment",
+        "category chip selection"
+      ],
+      "assetKind": "interaction-component",
+      "status": "approved",
+      "sourceType": "internal-adapter",
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "llmDo": [
+        "use scoped data attributes",
+        "keep state inspectable",
+        "use only within the provided root"
+      ],
+      "llmDont": [
+        "write inline JavaScript",
+        "attach unscoped document listeners",
+        "replace unrelated DOM outside the slot"
+      ],
+      "conflictHints": [
+        "requires matching data attributes in authored HTML"
+      ],
+      "provenanceNotes": "Seeded as approved internal interaction adapter after runtime module implementation.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Runtime adapter file added at web/interaction-components/segmented.control.basic-v1.js. Uses scoped selectors and exposes mount/update/getState/verify/destroy."
+    }
+  ],
+  "auditLog": [
+    {
+      "type": "interaction-status-update",
+      "interactionId": "tabs.switch.basic-v1",
+      "status": "approved",
+      "reviewedBy": "codex",
+      "reviewNotes": "Adapter implemented and browser-smoke verified.",
+      "updatedAt": "2026-04-24T06:31:53.000Z"
+    },
+    {
+      "type": "interaction-status-update",
+      "interactionId": "accordion.disclosure.basic-v1",
+      "status": "approved",
+      "reviewedBy": "codex",
+      "reviewNotes": "Adapter implemented and browser-smoke verified.",
+      "updatedAt": "2026-04-24T06:31:53.000Z"
+    },
+    {
+      "type": "interaction-diversity-candidate-seed",
+      "count": 4,
+      "updatedAt": "2026-04-24T06:59:01.243Z"
+    },
+    {
+      "type": "interaction-status-update",
+      "interactionId": "drawer.filter.basic-v1",
+      "status": "approved",
+      "reviewedBy": "codex",
+      "reviewNotes": "Runtime adapter implemented and browser-smoke verified for diversity expansion.",
+      "updatedAt": "2026-04-24T06:59:10.757Z"
+    },
+    {
+      "type": "interaction-status-update",
+      "interactionId": "sticky.buybox.basic-v1",
+      "status": "approved",
+      "reviewedBy": "codex",
+      "reviewNotes": "Runtime adapter implemented and browser-smoke verified for diversity expansion.",
+      "updatedAt": "2026-04-24T06:59:10.761Z"
+    },
+    {
+      "type": "interaction-diversity-candidate-seed",
+      "count": 4,
+      "updatedAt": "2026-04-24T07:03:20.611Z"
+    },
+    {
+      "type": "interaction-status-update",
+      "interactionId": "drawer.filter.basic-v1",
+      "status": "approved",
+      "reviewedBy": "codex",
+      "reviewNotes": "Runtime adapter implemented, browser-smoke verified, and concrete page scope mapped.",
+      "updatedAt": "2026-04-24T07:03:20.862Z"
+    },
+    {
+      "type": "interaction-status-update",
+      "interactionId": "sticky.buybox.basic-v1",
+      "status": "approved",
+      "reviewedBy": "codex",
+      "reviewNotes": "Runtime adapter implemented, browser-smoke verified, and concrete page scope mapped.",
+      "updatedAt": "2026-04-24T07:03:20.869Z"
+    },
+    {
+      "type": "interaction-diversity-seed",
+      "count": 4,
+      "approved": 4,
+      "candidate": 0,
+      "updatedAt": "2026-04-24T07:28:04.313Z"
+    }
+  ]
+}

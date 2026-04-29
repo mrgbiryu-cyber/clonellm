@@ -1,0 +1,64 @@
+{
+  "generatedAt": "2026-04-27T00:00:00.000Z",
+  "version": 1,
+  "policies": [
+    {
+      "policyId": "hero-visual-image-router",
+      "targetSlots": ["hero", "visual", "banner", "brandBanner", "labelBanner", "brandStory", "marketing-area", "brand-showroom"],
+      "preferred": "asset-first",
+      "fallback": "image-router",
+      "finalFallback": "css-composition",
+      "requiredApprovedAssetRoles": ["background-only"],
+      "allowedGeneratedAssetRoles": ["background-only"],
+      "allowGeneratedTextInImage": false,
+      "notes": [
+        "Use approved viewport-matched background-only assets first.",
+        "If none exist, request image-router generation only as draft-generated/candidate material.",
+        "If image generation is unavailable or fails, render a complete CSS/Tailwind composition."
+      ]
+    },
+    {
+      "policyId": "icon-family-router",
+      "targetSlots": ["quickmenu", "quickMenu", "shortcut", "tabs"],
+      "preferred": "asset-first",
+      "fallback": "icon-family-router",
+      "finalFallback": "css-composition",
+      "requiredApprovedAssetRoles": ["icon-only"],
+      "allowedGeneratedAssetRoles": ["icon-only"],
+      "allowGeneratedTextInImage": false,
+      "notes": [
+        "Use one approved icon-only family when available.",
+        "If missing, request a generated icon family package, not individual mismatched thumbnails.",
+        "If generation is unavailable, use CSS chips/glyphs without promo-complete thumbnails."
+      ]
+    },
+    {
+      "policyId": "commerce-card-css-first",
+      "targetSlots": ["md-choice", "timedeal", "best-ranking", "productGrid", "product-grid", "bestProduct", "firstRow", "firstProduct", "latest-product-news", "subscription"],
+      "preferred": "asset-first",
+      "fallback": "css-composition",
+      "finalFallback": "image-router-when-safe",
+      "requiredApprovedAssetRoles": ["background-only", "object-only", "reference-only"],
+      "allowedGeneratedAssetRoles": ["object-only", "reference-only"],
+      "allowGeneratedTextInImage": false,
+      "notes": [
+        "Commerce cards may render as CSS/Tailwind product shells when safe scoped media is absent.",
+        "Image-router is secondary because product imagery can be misleading if generated too freely."
+      ]
+    },
+    {
+      "policyId": "utility-content-css",
+      "targetSlots": ["gallery", "mainService", "bestcare", "price", "option", "review", "reviewInfo", "qna", "guides", "seller", "benefit", "noticeBanner", "detailInfo", "header-top", "header-bottom", "smart-life", "lg-best-care", "bestshop-guide"],
+      "preferred": "css-composition",
+      "fallback": "css-composition",
+      "finalFallback": "css-composition",
+      "requiredApprovedAssetRoles": [],
+      "allowedGeneratedAssetRoles": [],
+      "allowGeneratedTextInImage": false,
+      "notes": [
+        "Utility/content sections should be completed with typography, cards, badges, layout, and state styling.",
+        "Do not call image generation by default for these slots."
+      ]
+    }
+  ]
+}

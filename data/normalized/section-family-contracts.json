@@ -1,0 +1,360 @@
+{
+  "generatedAt": "2026-04-20T00:00:00.000Z",
+  "version": 1,
+  "global": {
+    "principles": [
+      "Treat the page as a connected visual system, not isolated slot cards.",
+      "Prefer strong first-pass hierarchy over repeated corrective loops.",
+      "If a section changes, make the hierarchy, focal point, and rhythm visibly clearer than before.",
+      "Use contrast, scale, spacing, and massing to create dominance before adding decorative detail.",
+      "Preserve clone identity according to scope: broad page work may move more, but narrower component work must stay more faithful to the surrounding page identity."
+    ],
+    "successSignals": [
+      "The first screen reads in a clear order without scanning confusion.",
+      "Primary message, primary action, and primary visual do not compete equally.",
+      "Adjacent sections feel intentionally staged rather than independently decorated."
+    ],
+    "identityProfiles": {
+      "page": {
+        "band": "light",
+        "label": "Page Identity Guardrail",
+        "intent": "Preserve the product and brand channel identity while allowing broader page-level staging changes.",
+        "preserve": [
+          "Keep the page recognizably within the same brand and product family.",
+          "Keep overall palette family, surface cadence, and trust level consistent with the original clone.",
+          "Allow large hierarchy and layout movement if the page still feels like the same site."
+        ],
+        "allow": [
+          "You may restage sections, cadence, spacing scale, and emphasis structure across the page.",
+          "You may introduce stronger section contrast if it still feels native to the page identity."
+        ],
+        "avoid": [
+          "Do not make the page feel like a different campaign, magazine, or unrelated product channel.",
+          "Do not introduce isolated theme shocks that overwrite the site identity."
+        ]
+      },
+      "section-group": {
+        "band": "balanced",
+        "label": "Cluster Identity Guardrail",
+        "intent": "Preserve the local cluster identity while allowing coordinated redesign inside the selected zone.",
+        "preserve": [
+          "Keep the selected cluster feeling native to its surrounding page.",
+          "Keep palette family, icon treatment family, and section cadence compatible with adjacent sections.",
+          "Allow the cluster to become clearer and more staged without breaking page continuity."
+        ],
+        "allow": [
+          "You may reorganize the selected sections together and create stronger lead/support hierarchy.",
+          "You may simplify or replace mismatched local visual treatments inside the target zone."
+        ],
+        "avoid": [
+          "Do not turn one cluster into a visually unrelated mini-site.",
+          "Do not create a disconnected color regime or icon language just to force more change."
+        ]
+      },
+      "component": {
+        "band": "strong",
+        "label": "Component Identity Guardrail",
+        "intent": "Preserve the surrounding page and local cluster identity strongly while redesigning the target component itself.",
+        "preserve": [
+          "Keep the component consistent with neighboring sections in palette family, density, and visual attitude.",
+          "Preserve surrounding shell rhythm and page-level tone.",
+          "Keep component changes targeted to hierarchy, usability, and clarity rather than channel identity shift."
+        ],
+        "allow": [
+          "You may rebuild the internal component structure, hierarchy, and emphasis.",
+          "You may replace mismatched local assets or icon treatment if the replacement fits the surrounding identity better."
+        ],
+        "avoid": [
+          "Do not overcorrect into a foreign campaign look.",
+          "Do not use local redesign as a reason to break page-level visual continuity."
+        ]
+      },
+      "element": {
+        "band": "strict",
+        "label": "Element Identity Guardrail",
+        "intent": "Preserve the existing component and page identity almost entirely while improving only the selected micro-area.",
+        "preserve": [
+          "Keep the existing component shell, palette family, and neighboring visual rhythm.",
+          "Only refine local readability, emphasis, spacing, or interaction clarity."
+        ],
+        "allow": [
+          "You may improve contrast, spacing, and micro hierarchy inside the selected element."
+        ],
+        "avoid": [
+          "Do not introduce a new visual language for a micro edit.",
+          "Do not escalate a small edit into a section-level theme shift."
+        ]
+      }
+    },
+    "pageIdentityHints": {
+      "default": {
+        "preserve": [
+          "Stay inside the original clone's brand tone and product-channel identity.",
+          "Prefer continuity of palette family, spacing discipline, and trust level unless the scope explicitly permits broader movement."
+        ],
+        "avoid": [
+          "Avoid visual directions that make the page feel like a different company or editorial property."
+        ]
+      },
+      "home": {
+        "preserve": [
+          "Keep home visually aligned to a clean premium commerce homepage rather than a campaign microsite.",
+          "Prefer restrained bright neutrals, controlled blue-gray support tones, and trust-oriented surfaces over theatrical dark-theme shocks."
+        ],
+        "avoid": [
+          "Avoid isolated cinematic dark blocks that overpower adjacent bright commerce sections.",
+          "Avoid over-styled gradients or unrelated promotional color systems that break the home page identity."
+        ]
+      }
+    }
+  },
+  "clusters": {
+    "home.top-stage": {
+      "label": "Home Top-Stage Cluster",
+      "targetSlots": ["hero", "quickmenu"],
+      "goal": "The first screen should read as a coordinated entry stage, not two disconnected widgets.",
+      "rules": [
+        "Hero must dominate the top-stage cluster and establish the main focal point.",
+        "Quickmenu must support the hero by improving scanability and entry choice, not by visually overpowering it.",
+        "The cluster should create one clear narrative: primary promise first, fast navigation second."
+      ],
+      "criticRules": [
+        "Judge hero and quickmenu together for top-stage hierarchy.",
+        "Penalize outputs where quickmenu competes equally with the hero headline or lead visual.",
+        "Penalize outputs where the top-stage still feels like a plain white block with weak focal contrast."
+      ]
+    },
+    "support.service-entry": {
+      "label": "Support Service Entry Cluster",
+      "targetSlots": ["service-intro", "service-tabs"],
+      "goal": "The first screen should guide the user toward the right service path with trust before complexity.",
+      "rules": [
+        "service-intro must establish a trust tone and clear headline before tab exploration starts.",
+        "Service tabs must follow the intro without creating visual competition at the same hierarchy level.",
+        "One primary guidance action must be visible above the fold."
+      ],
+      "criticRules": [
+        "Penalize outputs where tabs visually outweigh the intro headline.",
+        "Penalize outputs with ambiguous entry state — the user must have a clear 'start here' signal.",
+        "Penalize outputs that feel like two separate modules rather than one guidance cluster."
+      ]
+    },
+    "care-solutions.service-value": {
+      "label": "Care Solutions Service Value Cluster",
+      "targetSlots": ["service-intro", "plan-compare", "commerce"],
+      "goal": "Subscription value and plan comparison must read together as one conversion-oriented band.",
+      "rules": [
+        "Subscription value must be readable in the first card scan without paragraph-level reading.",
+        "Plan comparison must be visually scanable — key differences visible at a glance.",
+        "The application CTA must be visible without scrolling past the comparison section."
+      ],
+      "criticRules": [
+        "Penalize plan cards that require reading to distinguish between options.",
+        "Penalize CTAs that are buried below the fold or visually recede.",
+        "Penalize a value intro that runs long before reaching the comparison."
+      ]
+    },
+    "pdp.summary-buy": {
+      "label": "PDP Summary and Buy Cluster",
+      "targetSlots": ["gallery", "summary", "buybox"],
+      "goal": "Product decision — gallery, key value, and purchase action — must occupy a single readable viewport band.",
+      "rules": [
+        "Gallery and summary must occupy the primary viewport split without either crowding the other.",
+        "The buybox CTA must be the loudest action element in the cluster.",
+        "Price must be readable without interaction or scrolling."
+      ],
+      "criticRules": [
+        "Penalize gallery layouts that crowd or obscure the summary copy.",
+        "Penalize soft CTA styling that makes the buy action visually secondary.",
+        "Penalize price placements that require scrolling to reach."
+      ]
+    }
+  },
+  "families": {
+    "hero": {
+      "label": "Hero Generation Contract",
+      "targetSlots": ["hero"],
+      "requiredOutcomes": [
+        "Create a dominant visual or typographic focal point.",
+        "Make the headline visibly dominate supporting copy by at least one clear scale tier.",
+        "Ensure the primary action is readable without needing to inspect support cards."
+      ],
+      "visualRules": [
+        "Use one primary stage treatment: strong visual mass, strong type mass, or both.",
+        "Avoid neutral white-on-white surfaces unless the contrast system still creates a strong focal hierarchy.",
+        "Support cards or rails must feel secondary to the hero stage."
+      ],
+      "avoid": [
+        "Flat white slabs with weak contrast",
+        "Headline and support cards competing at equal weight",
+        "Tiny visual placeholders that collapse the stage"
+      ],
+      "criticRules": [
+        "Fail hierarchy if the hero headline does not visually dominate the first read.",
+        "Fail changeStrength if the top stage still resembles the original clone at a glance.",
+        "Fail brand fit if a dark or cinematic treatment appears isolated and unsupported by the page rhythm."
+      ]
+    },
+    "quickmenu": {
+      "label": "Quickmenu Generation Contract",
+      "targetSlots": ["quickmenu", "quickMenu", "tabs"],
+      "requiredOutcomes": [
+        "Create a scanable navigation rhythm with at least one clearly dominant entry or lead grouping.",
+        "Keep icon or thumbnail treatment consistent across sibling entries.",
+        "Support the hero by clarifying choice density instead of flattening all entries equally."
+      ],
+      "visualRules": [
+        "Use lead/support differentiation when the recipe supports it.",
+        "Keep tiles or panels visually coherent as one family.",
+        "Use spacing and grouping to improve scanability before adding extra ornament."
+      ],
+      "avoid": [
+        "Uniform cards with no dominant entry",
+        "Inconsistent icon shells or image sizing",
+        "Dense grids that compete with the hero stage"
+      ],
+      "criticRules": [
+        "Fail hierarchy if all entries read with equal weight and no lead/support structure.",
+        "Fail alignment if icons, labels, and card shells do not feel like one family.",
+        "Fail top-stage cluster quality if quickmenu visually overpowers the hero."
+      ]
+    },
+    "ranking": {
+      "label": "Ranking Contract",
+      "targetSlots": ["best-ranking", "ranking"],
+      "requiredOutcomes": [
+        "Preserve scanability while giving ranked items a clear dominance pattern.",
+        "Rank numbers must be visually prominent — not decorative.",
+        "Top-ranked item must read as clearly distinct from the rest of the list."
+      ],
+      "visualRules": [
+        "Rank number scale must exceed body text by at least one clear tier.",
+        "Thumbnail sizing must be consistent across all items.",
+        "Card surface should provide enough contrast to separate items without dividers."
+      ],
+      "avoid": [
+        "Flat list with no visual rank hierarchy",
+        "Rank numbers that are too small to register",
+        "Equal-weight item treatment that removes the ranking intent"
+      ],
+      "criticRules": [
+        "Fail hierarchy if the top-ranked item does not visually stand out.",
+        "Fail alignment if thumbnail sizes or card shells are inconsistent."
+      ]
+    },
+    "banner": {
+      "label": "Banner Contract",
+      "targetSlots": ["summary-banner-2", "carebanner", "labelbanner"],
+      "requiredOutcomes": [
+        "Banner must feel like a decisive staged punctuation between content clusters — not an undecided card.",
+        "Headline must read as action-oriented or value-declarative (not descriptive filler).",
+        "Visual must earn its space — not function as a decorative placeholder.",
+        "One clear CTA without equal-weight secondary action competing for attention."
+      ],
+      "visualRules": [
+        "Background surface must contrast with immediately adjacent sections above and below.",
+        "Min-height must be sufficient for headline and visual to co-exist without crowding.",
+        "Text overlay must maintain legibility — no unreadable text on complex background."
+      ],
+      "avoid": [
+        "Undecided card with soft headline and no visual weight",
+        "Equal-size headline and visual that split attention without a focal winner",
+        "Text-only banner that uses the slot as a paragraph container"
+      ],
+      "criticRules": [
+        "Fail hierarchy if the headline reads as a description rather than a staged message.",
+        "Fail brand fit if the banner surface blends invisibly into adjacent section backgrounds."
+      ]
+    },
+    "commerce": {
+      "label": "Commerce Grid Contract",
+      "targetSlots": ["md-choice", "timedeal", "subscription", "space-renewal", "latest-product-news", "brand-showroom", "marketing-area"],
+      "requiredOutcomes": [
+        "Preserve product browse clarity while increasing editorial or promotional emphasis intentionally.",
+        "Card grid must read as one scanable family — not a random assortment.",
+        "Lead item or featured card must be distinguishable from sibling items."
+      ],
+      "visualRules": [
+        "Card surface, thumbnail sizing, and typography must be consistent across the grid.",
+        "Lead or featured card may use scale, color, or depth to create focal hierarchy.",
+        "Grid density must match the promotional intent — editorial tone uses more breathing room."
+      ],
+      "avoid": [
+        "Uniform cards with no lead/support distinction in promo contexts",
+        "Dense thumbnail grids that eliminate product identity",
+        "Mixed card styles within the same grid family"
+      ]
+    },
+    "benefit-hub": {
+      "label": "Benefit Hub Contract",
+      "targetSlots": ["benefit", "benefit-highlight", "mainService", "bestcare", "service-benefit"],
+      "requiredOutcomes": [
+        "Benefit items must scan in under 3 seconds — icon + short heading per item.",
+        "Each item must have a visually distinct icon paired with a concise heading.",
+        "Tone must match the page trust register — practical proof, not marketing jargon."
+      ],
+      "visualRules": [
+        "Icon scale must be consistent across all benefit items in the grid.",
+        "No more than 6 benefit items without visual grouping or sectional break.",
+        "Copy must be compressed to decision-grade proof — one sentence per benefit maximum."
+      ],
+      "avoid": [
+        "Benefit blocks with long paragraph descriptions per item",
+        "Icons at inconsistent scales that break grid rhythm",
+        "Generic benefit language that could apply to any brand"
+      ],
+      "criticRules": [
+        "Fail hierarchy if benefit headings require reading rather than scanning.",
+        "Fail alignment if icon scales are visually inconsistent across the grid."
+      ]
+    },
+    "service-hero": {
+      "label": "Service Hero Contract",
+      "targetSlots": ["service-intro", "hero"],
+      "requiredOutcomes": [
+        "Headline must communicate service value directly — not a brand tagline or campaign slogan.",
+        "Support cards must provide 2–3 fast-access paths without competing with the headline.",
+        "Visual must support the service message without dominating the information hierarchy."
+      ],
+      "visualRules": [
+        "Support card text must be legible at body-text scale — no micro-text on support cards.",
+        "Visual element must occupy no more than 45% of the section width on desktop.",
+        "Section surface must use a service-appropriate tone: light, trust-oriented, not theatrical."
+      ],
+      "avoid": [
+        "Campaign glamour tone that replaces service clarity with visual drama",
+        "Support cards that visually compete with the headline at equal scale",
+        "Dark cinematic surfaces that conflict with the service-trust context"
+      ],
+      "criticRules": [
+        "Fail hierarchy if support cards visually overpower the main headline.",
+        "Fail brand fit if the surface tone is cinematic or campaign-style rather than service-trust."
+      ]
+    },
+    "service-tabs": {
+      "label": "Service Tabs Contract",
+      "targetSlots": ["quickMenu", "tabs"],
+      "requiredOutcomes": [
+        "Tabs or service shortcuts must prioritize clarity, trust, and guided choice over visual decoration.",
+        "Active or selected state must be immediately distinguishable without hover.",
+        "Tab labels must be legible at 1 line — no wrapping in the primary tab row."
+      ],
+      "visualRules": [
+        "Tab surface must feel secondary to the section headline above it.",
+        "Active tab must use a visible state change — not just a subtle underline."
+      ],
+      "avoid": [
+        "Tabs that visually compete with the intro headline above",
+        "Tab labels that wrap to 2 lines in the default layout",
+        "Tab styling that introduces a new color system disconnected from the page palette"
+      ]
+    },
+    "page-shell": {
+      "label": "Page Shell Contract",
+      "targetSlots": ["page-shell"],
+      "requiredOutcomes": [
+        "Page-level rhythm should feel staged, with clear sectional cadence and no isolated theme shocks."
+      ]
+    }
+  }
+}

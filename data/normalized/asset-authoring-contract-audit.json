@@ -1,0 +1,3311 @@
+{
+  "generatedAt": "2026-04-27T04:28:54.262Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "loginId": "mrgbiryu",
+  "viewports": [
+    "pc",
+    "mo"
+  ],
+  "summary": {
+    "componentRows": 174,
+    "rowsWithAssets": 82,
+    "rowsWithApprovedImage": 12,
+    "rowsWithApprovedIconFamily": 38,
+    "rowsWithApprovedInteraction": 72,
+    "rowsNeedingReview": 0
+  },
+  "pages": [
+    {
+      "pageId": "home",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 14,
+          "rowsWithAssets": 3,
+          "rowsWithApprovedImage": 2,
+          "rowsWithApprovedIconFamily": 3,
+          "rowsWithApprovedInteraction": 2,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "home.header-top",
+              "slotId": "header-top",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "home.header-bottom",
+              "slotId": "header-bottom",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "home.hero",
+              "slotId": "hero",
+              "totalAssets": 11,
+              "imageStatus": {
+                "approved": 8
+              },
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 8,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "home.quickmenu",
+              "slotId": "quickmenu",
+              "totalAssets": 3,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "icon-family-router"
+            },
+            {
+              "componentId": "home.md-choice",
+              "slotId": "md-choice",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.timedeal",
+              "slotId": "timedeal",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.best-ranking",
+              "slotId": "best-ranking",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.marketing-area",
+              "slotId": "marketing-area",
+              "totalAssets": 9,
+              "imageStatus": {
+                "approved": 8
+              },
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {},
+              "approvedImages": 8,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "home.subscription",
+              "slotId": "subscription",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.brand-showroom",
+              "slotId": "brand-showroom",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "home.latest-product-news",
+              "slotId": "latest-product-news",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.smart-life",
+              "slotId": "smart-life",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "home.lg-best-care",
+              "slotId": "lg-best-care",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "home.bestshop-guide",
+              "slotId": "bestshop-guide",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 14,
+          "rowsWithAssets": 3,
+          "rowsWithApprovedImage": 2,
+          "rowsWithApprovedIconFamily": 3,
+          "rowsWithApprovedInteraction": 2,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "home.header-top",
+              "slotId": "header-top",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "home.header-bottom",
+              "slotId": "header-bottom",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "home.hero",
+              "slotId": "hero",
+              "totalAssets": 11,
+              "imageStatus": {
+                "approved": 5,
+                "candidate": 3
+              },
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 5,
+              "candidateImages": 3,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "home.quickmenu",
+              "slotId": "quickmenu",
+              "totalAssets": 3,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "icon-family-router"
+            },
+            {
+              "componentId": "home.md-choice",
+              "slotId": "md-choice",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.timedeal",
+              "slotId": "timedeal",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.best-ranking",
+              "slotId": "best-ranking",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.marketing-area",
+              "slotId": "marketing-area",
+              "totalAssets": 9,
+              "imageStatus": {
+                "approved": 5,
+                "candidate": 3
+              },
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {},
+              "approvedImages": 5,
+              "candidateImages": 3,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "home.subscription",
+              "slotId": "subscription",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.brand-showroom",
+              "slotId": "brand-showroom",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "home.latest-product-news",
+              "slotId": "latest-product-news",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "home.smart-life",
+              "slotId": "smart-life",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "home.lg-best-care",
+              "slotId": "lg-best-care",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "home.bestshop-guide",
+              "slotId": "bestshop-guide",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "support",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 4,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 4,
+          "rowsWithApprovedInteraction": 2,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "support.mainService",
+              "slotId": "mainService",
+              "totalAssets": 4,
+              "imageStatus": {
+                "blocked": 2
+              },
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:utility-content-css"
+              ],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "support.notice",
+              "slotId": "notice",
+              "totalAssets": 4,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "support.tipsBanner",
+              "slotId": "tipsBanner",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "support.bestcare",
+              "slotId": "bestcare",
+              "totalAssets": 5,
+              "imageStatus": {
+                "blocked": 2
+              },
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:utility-content-css"
+              ],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 4,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 4,
+          "rowsWithApprovedInteraction": 2,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "support.mainService",
+              "slotId": "mainService",
+              "totalAssets": 4,
+              "imageStatus": {
+                "blocked": 2
+              },
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:utility-content-css"
+              ],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "support.notice",
+              "slotId": "notice",
+              "totalAssets": 4,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "support.tipsBanner",
+              "slotId": "tipsBanner",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "support.bestcare",
+              "slotId": "bestcare",
+              "totalAssets": 5,
+              "imageStatus": {
+                "blocked": 2
+              },
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:utility-content-css"
+              ],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "bestshop",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 4,
+          "rowsWithAssets": 1,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 1,
+          "rowsWithApprovedInteraction": 0,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "bestshop.hero",
+              "slotId": "hero",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "bestshop.shortcut",
+              "slotId": "shortcut",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "icon-family-router"
+            },
+            {
+              "componentId": "bestshop.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "bestshop.brandBanner",
+              "slotId": "brandBanner",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 4,
+          "rowsWithAssets": 1,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 1,
+          "rowsWithApprovedInteraction": 0,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "bestshop.hero",
+              "slotId": "hero",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "bestshop.shortcut",
+              "slotId": "shortcut",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "icon-family-router"
+            },
+            {
+              "componentId": "bestshop.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "bestshop.brandBanner",
+              "slotId": "brandBanner",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "care-solutions",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 5,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 2,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "care-solutions.hero",
+              "slotId": "hero",
+              "totalAssets": 10,
+              "imageStatus": {
+                "approved": 6,
+                "candidate": 1,
+                "blocked": 1
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 6,
+              "candidateImages": 1,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "care-solutions.ranking",
+              "slotId": "ranking",
+              "totalAssets": 3,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "care-solutions.benefit",
+              "slotId": "benefit",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "care-solutions.tabs",
+              "slotId": "tabs",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "icon-family-router"
+            },
+            {
+              "componentId": "care-solutions.careBanner",
+              "slotId": "careBanner",
+              "totalAssets": 11,
+              "imageStatus": {
+                "approved": 1,
+                "candidate": 7
+              },
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 1,
+              "candidateImages": 7,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 5,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 2,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "care-solutions.hero",
+              "slotId": "hero",
+              "totalAssets": 10,
+              "imageStatus": {
+                "approved": 4,
+                "blocked": 4
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 4,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "care-solutions.ranking",
+              "slotId": "ranking",
+              "totalAssets": 3,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "care-solutions.benefit",
+              "slotId": "benefit",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "care-solutions.tabs",
+              "slotId": "tabs",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "icon-family-router"
+            },
+            {
+              "componentId": "care-solutions.careBanner",
+              "slotId": "careBanner",
+              "totalAssets": 11,
+              "imageStatus": {
+                "approved": 1,
+                "candidate": 7
+              },
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 1,
+              "candidateImages": 7,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "care-solutions-pdp",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 4,
+          "rowsWithAssets": 0,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 0,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "care-solutions-pdp.visual",
+              "slotId": "visual",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "care-solutions-pdp.detailInfo",
+              "slotId": "detailInfo",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "care-solutions-pdp.noticeBanner",
+              "slotId": "noticeBanner",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "care-solutions-pdp.reviewInfo",
+              "slotId": "reviewInfo",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 4,
+          "rowsWithAssets": 0,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 0,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "care-solutions-pdp.visual",
+              "slotId": "visual",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "care-solutions-pdp.detailInfo",
+              "slotId": "detailInfo",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "care-solutions-pdp.noticeBanner",
+              "slotId": "noticeBanner",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "care-solutions-pdp.reviewInfo",
+              "slotId": "reviewInfo",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 3,
+          "rowsWithAssets": 1,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 1,
+          "rowsWithApprovedInteraction": 0,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "homestyle-home.quickMenu",
+              "slotId": "quickMenu",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "icon-family-router"
+            },
+            {
+              "componentId": "homestyle-home.labelBanner",
+              "slotId": "labelBanner",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "homestyle-home.brandStory",
+              "slotId": "brandStory",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 3,
+          "rowsWithAssets": 1,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 1,
+          "rowsWithApprovedInteraction": 0,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "homestyle-home.quickMenu",
+              "slotId": "quickMenu",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 2
+              },
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 2,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "icon-family-router"
+            },
+            {
+              "componentId": "homestyle-home.labelBanner",
+              "slotId": "labelBanner",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            },
+            {
+              "componentId": "homestyle-home.brandStory",
+              "slotId": "brandStory",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 6,
+          "rowsWithAssets": 0,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 0,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "homestyle-pdp.detailInfo",
+              "slotId": "detailInfo",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "homestyle-pdp.bestProduct",
+              "slotId": "bestProduct",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "homestyle-pdp.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "homestyle-pdp.qna",
+              "slotId": "qna",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "homestyle-pdp.guides",
+              "slotId": "guides",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "homestyle-pdp.seller",
+              "slotId": "seller",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 6,
+          "rowsWithAssets": 0,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 0,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "homestyle-pdp.detailInfo",
+              "slotId": "detailInfo",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "homestyle-pdp.bestProduct",
+              "slotId": "bestProduct",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "homestyle-pdp.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "homestyle-pdp.qna",
+              "slotId": "qna",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "homestyle-pdp.guides",
+              "slotId": "guides",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "homestyle-pdp.seller",
+              "slotId": "seller",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "category-tvs",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 6,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "category-tvs.filter",
+              "slotId": "filter",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "category-tvs.sort",
+              "slotId": "sort",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "category-tvs.productGrid",
+              "slotId": "productGrid",
+              "totalAssets": 4,
+              "imageStatus": {
+                "blocked": 2
+              },
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:commerce-card-css-first"
+              ],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-tvs.firstRow",
+              "slotId": "firstRow",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-tvs.firstProduct",
+              "slotId": "firstProduct",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-tvs.banner",
+              "slotId": "banner",
+              "totalAssets": 3,
+              "imageStatus": {
+                "blocked": 2
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:hero-visual-image-router"
+              ],
+              "fallbackPolicyId": "hero-visual-image-router"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 6,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "category-tvs.filter",
+              "slotId": "filter",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "category-tvs.sort",
+              "slotId": "sort",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "category-tvs.productGrid",
+              "slotId": "productGrid",
+              "totalAssets": 4,
+              "imageStatus": {
+                "blocked": 2
+              },
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:commerce-card-css-first"
+              ],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-tvs.firstRow",
+              "slotId": "firstRow",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-tvs.firstProduct",
+              "slotId": "firstProduct",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-tvs.banner",
+              "slotId": "banner",
+              "totalAssets": 4,
+              "imageStatus": {
+                "blocked": 3
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:hero-visual-image-router"
+              ],
+              "fallbackPolicyId": "hero-visual-image-router"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 6,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 2,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "category-refrigerators.filter",
+              "slotId": "filter",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "category-refrigerators.sort",
+              "slotId": "sort",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "category-refrigerators.productGrid",
+              "slotId": "productGrid",
+              "totalAssets": 4,
+              "imageStatus": {
+                "approved": 1,
+                "blocked": 1
+              },
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 1,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-refrigerators.firstRow",
+              "slotId": "firstRow",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-refrigerators.firstProduct",
+              "slotId": "firstProduct",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-refrigerators.banner",
+              "slotId": "banner",
+              "totalAssets": 4,
+              "imageStatus": {
+                "approved": 1,
+                "blocked": 2
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 1,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 6,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 2,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "category-refrigerators.filter",
+              "slotId": "filter",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "category-refrigerators.sort",
+              "slotId": "sort",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 2
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 2,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "category-refrigerators.productGrid",
+              "slotId": "productGrid",
+              "totalAssets": 4,
+              "imageStatus": {
+                "approved": 1,
+                "blocked": 1
+              },
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 1,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-refrigerators.firstRow",
+              "slotId": "firstRow",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-refrigerators.firstProduct",
+              "slotId": "firstProduct",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "commerce-card-css-first"
+            },
+            {
+              "componentId": "category-refrigerators.banner",
+              "slotId": "banner",
+              "totalAssets": 4,
+              "imageStatus": {
+                "approved": 1,
+                "blocked": 2
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 1,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "hero-visual-image-router"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-tv-general",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-tv-general.gallery",
+              "slotId": "gallery",
+              "totalAssets": 5,
+              "imageStatus": {
+                "blocked": 4
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:utility-content-css"
+              ],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-general.summary",
+              "slotId": "summary",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-tv-general.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-general.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-general.sticky",
+              "slotId": "sticky",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-tv-general.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-general.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-tv-general.gallery",
+              "slotId": "gallery",
+              "totalAssets": 5,
+              "imageStatus": {
+                "blocked": 4
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:utility-content-css"
+              ],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-general.summary",
+              "slotId": "summary",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-tv-general.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-general.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-general.sticky",
+              "slotId": "sticky",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-tv-general.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-general.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-tv-premium",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-tv-premium.gallery",
+              "slotId": "gallery",
+              "totalAssets": 5,
+              "imageStatus": {
+                "blocked": 4
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:utility-content-css"
+              ],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-premium.summary",
+              "slotId": "summary",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-tv-premium.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-premium.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-premium.sticky",
+              "slotId": "sticky",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-tv-premium.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-premium.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-tv-premium.gallery",
+              "slotId": "gallery",
+              "totalAssets": 5,
+              "imageStatus": {
+                "blocked": 4
+              },
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [
+                "image-css-fallback:utility-content-css"
+              ],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-premium.summary",
+              "slotId": "summary",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-tv-premium.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-premium.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-premium.sticky",
+              "slotId": "sticky",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-tv-premium.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-tv-premium.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-refrigerator-general",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-refrigerator-general.gallery",
+              "slotId": "gallery",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-general.summary",
+              "slotId": "summary",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-general.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-general.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-general.sticky",
+              "slotId": "sticky",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-general.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-general.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 2,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-refrigerator-general.gallery",
+              "slotId": "gallery",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-general.summary",
+              "slotId": "summary",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-general.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-general.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-general.sticky",
+              "slotId": "sticky",
+              "totalAssets": 2,
+              "imageStatus": {},
+              "iconFamilyStatus": {
+                "approved": 1
+              },
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 1,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-general.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-general.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-refrigerator-knockon",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-refrigerator-knockon.gallery",
+              "slotId": "gallery",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.summary",
+              "slotId": "summary",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.sticky",
+              "slotId": "sticky",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-refrigerator-knockon.gallery",
+              "slotId": "gallery",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.summary",
+              "slotId": "summary",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.sticky",
+              "slotId": "sticky",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-knockon.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-refrigerator-glass",
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-refrigerator-glass.gallery",
+              "slotId": "gallery",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.summary",
+              "slotId": "summary",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.sticky",
+              "slotId": "sticky",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        },
+        {
+          "viewportProfile": "mo",
+          "componentCount": 7,
+          "rowsWithAssets": 4,
+          "rowsWithApprovedImage": 0,
+          "rowsWithApprovedIconFamily": 0,
+          "rowsWithApprovedInteraction": 4,
+          "rowsNeedingReview": 0,
+          "sections": [
+            {
+              "componentId": "pdp-refrigerator-glass.gallery",
+              "slotId": "gallery",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.summary",
+              "slotId": "summary",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.price",
+              "slotId": "price",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.option",
+              "slotId": "option",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.sticky",
+              "slotId": "sticky",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": ""
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.review",
+              "slotId": "review",
+              "totalAssets": 0,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {},
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 0,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            },
+            {
+              "componentId": "pdp-refrigerator-glass.qna",
+              "slotId": "qna",
+              "totalAssets": 1,
+              "imageStatus": {},
+              "iconFamilyStatus": {},
+              "interactionStatus": {
+                "approved": 1
+              },
+              "approvedImages": 0,
+              "candidateImages": 0,
+              "approvedIconFamilies": 0,
+              "approvedInteractions": 1,
+              "needs": [],
+              "advisories": [],
+              "fallbackPolicyId": "utility-content-css"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "reviewTargets": []
+}

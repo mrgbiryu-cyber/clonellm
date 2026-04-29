@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-24T06:31:53.000Z",
+  "registryKind": "external-free-image-source-profiles",
+  "defaultStatus": "candidate",
+  "providerProfiles": [
+    {
+      "providerId": "wikimedia-commons",
+      "providerName": "Wikimedia Commons",
+      "sourceType": "external-stock",
+      "apiBaseUrl": "https://commons.wikimedia.org/w/api.php",
+      "licensePolicy": "Use API extmetadata only. Keep every imported asset as candidate until human approval checks license, attribution, text, trademark, and runtime fit.",
+      "defaultLicenseProfile": "wikimedia-commons-metadata-required",
+      "requiredMetadata": [
+        "sourceUrl",
+        "pageUrl",
+        "licenseProfile",
+        "licenseUrl",
+        "licenseCheckedAt",
+        "attribution"
+      ],
+      "searchProfiles": [
+        {
+          "profileId": "home-living-stage",
+          "query": "modern living room interior filetype:bitmap",
+          "pageFamilies": ["home", "care-solutions"],
+          "slotFamilies": ["hero", "banner", "marketing-area"],
+          "visualTone": "warm modern living stage",
+          "semanticRole": "text-free home living interior stage candidate"
+        },
+        {
+          "profileId": "home-wide-interior-stage",
+          "query": "wide angle interior living room filetype:bitmap",
+          "pageFamilies": ["home", "care-solutions"],
+          "slotFamilies": ["hero", "banner", "marketing-area", "story"],
+          "visualTone": "wide editorial home interior",
+          "semanticRole": "wide home interior background candidate"
+        },
+        {
+          "profileId": "kitchen-appliance-stage",
+          "query": "modern kitchen interior refrigerator filetype:bitmap",
+          "pageFamilies": ["home", "category-refrigerators", "pdp-refrigerator-general", "pdp-refrigerator-glass", "pdp-refrigerator-knockon"],
+          "slotFamilies": ["hero", "banner", "marketing-area", "product-grid"],
+          "visualTone": "clean kitchen appliance stage",
+          "semanticRole": "text-free kitchen and refrigerator stage candidate"
+        },
+        {
+          "profileId": "kitchen-detail-surface",
+          "query": "minimal kitchen counter interior filetype:bitmap",
+          "pageFamilies": ["home", "category-refrigerators", "pdp-refrigerator-general", "pdp-refrigerator-glass", "pdp-refrigerator-knockon"],
+          "slotFamilies": ["banner", "marketing-area", "product-grid", "summary"],
+          "visualTone": "calm kitchen surface detail",
+          "semanticRole": "kitchen detail and surface media candidate"
+        },
+        {
+          "profileId": "tv-living-stage",
+          "query": "modern living room television filetype:bitmap",
+          "pageFamilies": ["home", "pdp-tv-general", "pdp-tv-premium"],
+          "slotFamilies": ["hero", "banner", "marketing-area", "gallery"],
+          "visualTone": "premium living room media stage",
+          "semanticRole": "text-free TV living room stage candidate"
+        },
+        {
+          "profileId": "media-wall-stage",
+          "query": "home theater living room interior filetype:bitmap",
+          "pageFamilies": ["home", "category-tvs", "pdp-tv-general", "pdp-tv-premium"],
+          "slotFamilies": ["hero", "banner", "gallery", "product-grid"],
+          "visualTone": "dark media wall stage",
+          "semanticRole": "home theater and media wall candidate"
+        },
+        {
+          "profileId": "laundry-utility-stage",
+          "query": "laundry room washing machine interior filetype:bitmap",
+          "pageFamilies": ["home", "care-solutions"],
+          "slotFamilies": ["hero", "banner", "marketing-area", "careBanner"],
+          "visualTone": "clean utility room stage",
+          "semanticRole": "text-free laundry or utility room stage candidate"
+        },
+        {
+          "profileId": "service-care-soft-stage",
+          "query": "clean home care service interior filetype:bitmap",
+          "pageFamilies": ["support", "care-solutions", "care-solutions-pdp"],
+          "slotFamilies": ["mainService", "careBanner", "bestcare", "banner"],
+          "visualTone": "soft service and care stage",
+          "semanticRole": "support and care service background candidate"
+        },
+        {
+          "profileId": "soft-fabric-texture",
+          "query": "soft fabric texture macro filetype:bitmap",
+          "pageFamilies": ["home", "support", "care-solutions"],
+          "slotFamilies": ["banner", "hero", "careBanner", "mainService", "notice"],
+          "visualTone": "soft tactile neutral texture",
+          "semanticRole": "neutral texture background candidate"
+        },
+        {
+          "profileId": "metal-glass-texture",
+          "query": "brushed metal glass texture filetype:bitmap",
+          "pageFamilies": ["category-refrigerators", "category-tvs", "pdp-tv-general", "pdp-tv-premium", "pdp-refrigerator-general"],
+          "slotFamilies": ["hero", "banner", "summary", "gallery", "product-grid"],
+          "visualTone": "premium technical material texture",
+          "semanticRole": "premium material and product texture candidate"
+        },
+        {
+          "profileId": "water-air-cleanliness",
+          "query": "water droplet air clean macro filetype:bitmap",
+          "pageFamilies": ["care-solutions", "care-solutions-pdp", "support"],
+          "slotFamilies": ["hero", "careBanner", "bestcare", "banner"],
+          "visualTone": "clean water air wellness macro",
+          "semanticRole": "clean water and air care visual candidate"
+        }
+      ]
+    }
+  ]
+}

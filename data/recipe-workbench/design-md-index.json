@@ -1,0 +1,114 @@
+{
+  "generatedAt": "2026-04-20T00:00:00Z",
+  "purpose": "Recipe authoring input index for DESIGN.md-style sources",
+  "entries": [
+    {
+      "id": "local-chef-genesis",
+      "kind": "local-design-md",
+      "title": "Genesis",
+      "path": "/home/mrgbiryu/clonellm/data/design-md/chef/genesis.md",
+      "familyTargets": ["hero", "story", "page-shell"],
+      "notes": [
+        "Editorial precision interface reference",
+        "Useful for type scale, spacing, card surface, restrained shadow system"
+      ],
+      "recommendedFor": ["hero", "card-surface", "editorial", "type-scale"]
+    },
+    {
+      "id": "designmd-nordic-yellow",
+      "kind": "remote-design-md",
+      "title": "Nordic Yellow",
+      "url": "https://designmd.ai/chef/nordic-yellow",
+      "familyTargets": ["hero", "banner", "story", "page-shell"],
+      "notes": [
+        "Warm premium editorial direction",
+        "Section rhythm and light-surface premium reference"
+      ],
+      "recommendedFor": ["hero", "banner", "section-rhythm", "brand-story"]
+    },
+    {
+      "id": "getdesign-ferrari",
+      "kind": "remote-design-md",
+      "title": "Design System Inspired by Ferrari",
+      "url": "https://getdesign.md/design-md/ferrari/preview.html",
+      "familyTargets": ["hero", "banner", "page-shell"],
+      "notes": [
+        "High-contrast, hero-led, cinematic",
+        "Useful for premium spotlight hero and strong CTA staging"
+      ],
+      "recommendedFor": ["hero", "cta", "premium-message", "dark-surface"]
+    },
+    {
+      "id": "getdesign-wise",
+      "kind": "remote-design-md",
+      "title": "Design System Inspired by Wise",
+      "url": "https://getdesign.md/design-md/wise/preview.html",
+      "familyTargets": ["quickmenu", "benefit", "commerce"],
+      "notes": [
+        "Friendly utility, bold CTA, conversion clarity",
+        "Useful for quickmenu, card grids, benefit sections"
+      ],
+      "recommendedFor": ["quickmenu", "cta", "grid", "benefit-section"]
+    },
+    {
+      "id": "getdesign-hashicorp",
+      "kind": "remote-design-md",
+      "title": "Design System Inspired by HashiCorp",
+      "url": "https://getdesign.md/design-md/hashicorp/preview",
+      "familyTargets": ["service-tabs", "benefit", "page-shell"],
+      "notes": [
+        "Enterprise structure, trust, documentation-friendly",
+        "Useful for service-oriented layouts and structured information"
+      ],
+      "recommendedFor": ["service-info", "trust", "utility-layout"]
+    },
+    {
+      "id": "getdesign-cursor",
+      "kind": "remote-design-md",
+      "title": "Design System Inspired by Cursor",
+      "url": "https://getdesign.md/design-md/cursor/preview.html",
+      "familyTargets": ["story", "banner", "page-shell"],
+      "notes": [
+        "Warm-neo tech editorial",
+        "Useful for soft surfaces and section background variation"
+      ],
+      "recommendedFor": ["feature-block", "storytelling", "card-surface"]
+    },
+    {
+      "id": "getdesign-notion",
+      "kind": "remote-design-md",
+      "title": "Design System Inspired by Notion",
+      "url": "https://getdesign.md/design-md/notion/preview.html",
+      "familyTargets": ["story", "benefit", "service-tabs"],
+      "notes": [
+        "Warm neutral document-like system",
+        "Useful for information sections and soft callout patterns"
+      ],
+      "recommendedFor": ["guide", "soft-callout", "information-section"]
+    },
+    {
+      "id": "getdesign-xai",
+      "kind": "remote-design-md",
+      "title": "Design System Inspired by xAI",
+      "url": "https://getdesign.md/design-md/x.ai/preview.html",
+      "familyTargets": ["hero", "banner", "page-shell"],
+      "notes": [
+        "Dark system, mono-tech, high clarity",
+        "Useful for dark-surface hero and contrast system studies"
+      ],
+      "recommendedFor": ["dark-hero", "headline", "contrast-system"]
+    },
+    {
+      "id": "getdesign-mongodb",
+      "kind": "remote-design-md",
+      "title": "Design System Inspired by MongoDB",
+      "url": "https://getdesign.md/design-md/mongodb/preview.html",
+      "familyTargets": ["benefit", "service-tabs", "commerce"],
+      "notes": [
+        "Developer trust, spec clarity, structured copy",
+        "Useful for benefit blocks and trust-heavy sections"
+      ],
+      "recommendedFor": ["trust-section", "benefit-block", "structured-copy"]
+    }
+  ]
+}

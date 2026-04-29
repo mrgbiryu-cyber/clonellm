@@ -1,0 +1,106 @@
+{
+  "generatedAt": "2026-04-20T00:00:00Z",
+  "purpose": "Recipe authoring input index for practical and showcase reference URLs",
+  "entries": [
+    {
+      "id": "baymard-ecommerce-design-examples",
+      "kind": "practical-ux-pattern",
+      "title": "Baymard Ecommerce Design Examples",
+      "url": "https://baymard.com/ecommerce-design-examples",
+      "priority": 1,
+      "familyTargets": ["commerce", "ranking", "page-shell"],
+      "recommendedFor": ["homepage", "plp", "pdp", "cart", "checkout", "navigation"],
+      "notes": ["Primary source for practical ecommerce UX patterns"]
+    },
+    {
+      "id": "mobbin",
+      "kind": "practical-ux-pattern",
+      "title": "Mobbin",
+      "url": "https://mobbin.com/",
+      "priority": 1,
+      "familyTargets": ["quickmenu", "ranking", "commerce", "benefit"],
+      "recommendedFor": ["homepage", "product-listing", "product-detail", "onboarding"],
+      "notes": ["Real product interface pattern collection"]
+    },
+    {
+      "id": "component-gallery",
+      "kind": "component-pattern",
+      "title": "Component Gallery",
+      "url": "https://component.gallery/",
+      "priority": 1,
+      "familyTargets": ["quickmenu", "ranking", "service-tabs", "benefit"],
+      "recommendedFor": ["component-pattern", "navigation", "card", "visual-reference"],
+      "notes": ["Use to break down real component structures, not to copy exact styling"]
+    },
+    {
+      "id": "pageflows",
+      "kind": "practical-ux-pattern",
+      "title": "Page Flows",
+      "url": "https://pageflows.com/",
+      "priority": 1,
+      "familyTargets": ["page-shell", "commerce", "service-tabs"],
+      "recommendedFor": ["browse-flow", "cart-flow", "checkout-flow"],
+      "notes": ["Flow-level UX reference, useful for cluster rhythm and continuity"]
+    },
+    {
+      "id": "commerce-cream",
+      "kind": "showcase-ecommerce",
+      "title": "Commerce Cream",
+      "url": "https://commercecream.com/",
+      "priority": 2,
+      "familyTargets": ["commerce", "hero", "quickmenu"],
+      "recommendedFor": ["homepage", "collection-page", "product-page", "brand-tone"],
+      "notes": ["Shopify-heavy ecommerce showcase source"]
+    },
+    {
+      "id": "ecomm-design",
+      "kind": "showcase-ecommerce",
+      "title": "ecomm.design",
+      "url": "https://ecomm.design/",
+      "priority": 2,
+      "familyTargets": ["commerce", "ranking", "page-shell"],
+      "recommendedFor": ["homepage", "category-page", "product-page"],
+      "notes": ["Large volume ecommerce showcase source"]
+    },
+    {
+      "id": "land-book-ecommerce",
+      "kind": "showcase-ecommerce",
+      "title": "Land-book Ecommerce",
+      "url": "https://land-book.com/design/ecommerce",
+      "priority": 2,
+      "familyTargets": ["hero", "banner", "page-shell"],
+      "recommendedFor": ["hero", "banner", "layout-reference"],
+      "notes": ["Useful for high-level visual composition references"]
+    },
+    {
+      "id": "awwwards-ecommerce",
+      "kind": "visual-showcase",
+      "title": "Awwwards Ecommerce",
+      "url": "https://www.awwwards.com/websites/e-commerce/",
+      "priority": 3,
+      "familyTargets": ["hero", "banner", "page-shell"],
+      "recommendedFor": ["art-direction", "premium-tone", "interaction-reference"],
+      "notes": ["Use as mood/art-direction input only, not baseline UX"]
+    },
+    {
+      "id": "best-website-gallery",
+      "kind": "visual-showcase",
+      "title": "Best Website Gallery",
+      "url": "https://bestwebsite.gallery/",
+      "priority": 3,
+      "familyTargets": ["story", "banner", "page-shell"],
+      "recommendedFor": ["visual-style", "layout-reference"],
+      "notes": ["Secondary visual showcase input"]
+    },
+    {
+      "id": "working-ref-ui-ux-pro-max-skill",
+      "kind": "system-reference",
+      "title": "Working Ref UI/UX Pro Max Skill",
+      "url": "https://www.working-ref.com/reference/ui-ux-pro-max-skill",
+      "priority": 2,
+      "familyTargets": ["hero", "quickmenu", "page-shell", "story"],
+      "recommendedFor": ["visual-reference", "art-direction", "brand-tone"],
+      "notes": ["Mood and skill direction reference, not direct clone target"]
+    }
+  ]
+}

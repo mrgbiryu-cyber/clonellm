@@ -1,0 +1,1136 @@
+{
+  "generatedAt": "2026-04-16T13:53:22.343Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "accountIsolation": {
+    "mrgbiryu": {
+      "planCount": 5,
+      "draftCount": 7,
+      "versionCount": 1
+    },
+    "codexreview": {
+      "planCount": 0,
+      "draftCount": 0,
+      "versionCount": 0
+    }
+  },
+  "pages": [
+    {
+      "pageId": "home",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 17,
+        "repeaterCount": 1,
+        "totalRepeaterItems": 10
+      },
+      "builder": {
+        "renderableComponentCount": 17,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "utility",
+          "conversion",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-wise",
+            "score": 235,
+            "identityOverlap": [
+              "utility",
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-ferrari",
+            "score": 200,
+            "identityOverlap": [
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "mobbin",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 165,
+            "identityOverlap": [
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 5,
+        "latestPlanId": "c4f4f8d8-e3ea-46d8-b68e-55c82a9f366b",
+        "builderMarkdownLength": 7032,
+        "layoutMockupMarkdownLength": 11302,
+        "designSpecMarkdownLength": 5099,
+        "sectionBlueprintCount": 6
+      }
+    },
+    {
+      "pageId": "home",
+      "viewportProfile": "ta",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 17,
+        "repeaterCount": 1,
+        "totalRepeaterItems": 10
+      },
+      "builder": {
+        "renderableComponentCount": 17,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "utility",
+          "conversion",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-wise",
+            "score": 235,
+            "identityOverlap": [
+              "utility",
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-ferrari",
+            "score": 200,
+            "identityOverlap": [
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 165,
+            "identityOverlap": [
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-hashicorp",
+            "score": 165,
+            "identityOverlap": [
+              "trust",
+              "utility",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-spacex",
+            "score": 165,
+            "identityOverlap": [
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "7d38e784-b1a9-4af1-aa07-c86caf19938c",
+        "builderMarkdownLength": 7032,
+        "layoutMockupMarkdownLength": 11302,
+        "designSpecMarkdownLength": 5099,
+        "sectionBlueprintCount": 6
+      }
+    },
+    {
+      "pageId": "support",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 4,
+        "repeaterCount": 0,
+        "totalRepeaterItems": 0
+      },
+      "builder": {
+        "renderableComponentCount": 4,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "conversion",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-hashicorp",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-mongodb",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-cal",
+            "score": 165,
+            "identityOverlap": [
+              "trust"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-notion",
+            "score": 130,
+            "identityOverlap": [],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-ferrari",
+            "score": 100,
+            "identityOverlap": [
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 2,
+        "latestPlanId": "75ec5968-f558-4048-8a59-54e4f0c17e7e",
+        "builderMarkdownLength": 5546,
+        "layoutMockupMarkdownLength": 7972,
+        "designSpecMarkdownLength": 3490,
+        "sectionBlueprintCount": 4
+      }
+    },
+    {
+      "pageId": "bestshop",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 4,
+        "repeaterCount": 1,
+        "totalRepeaterItems": 3
+      },
+      "builder": {
+        "renderableComponentCount": 4,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "utility",
+          "conversion"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-cal",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "utility"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-superhuman",
+            "score": 165,
+            "identityOverlap": [
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-mongodb",
+            "score": 135,
+            "identityOverlap": [
+              "trust",
+              "utility",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-hashicorp",
+            "score": 130,
+            "identityOverlap": [
+              "trust",
+              "utility"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-notion",
+            "score": 130,
+            "identityOverlap": [],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 2,
+        "latestPlanId": "3de92f27-1f73-4496-a595-67b548f039be",
+        "builderMarkdownLength": 5741,
+        "layoutMockupMarkdownLength": 8092,
+        "designSpecMarkdownLength": 3568,
+        "sectionBlueprintCount": 4
+      }
+    },
+    {
+      "pageId": "care-solutions",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 5,
+        "repeaterCount": 0,
+        "totalRepeaterItems": 0
+      },
+      "builder": {
+        "renderableComponentCount": 5,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "utility",
+          "conversion"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-mongodb",
+            "score": 235,
+            "identityOverlap": [
+              "trust",
+              "utility",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-hashicorp",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "utility"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-cal",
+            "score": 130,
+            "identityOverlap": [
+              "trust",
+              "utility"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-wise",
+            "score": 100,
+            "identityOverlap": [
+              "utility",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-kraken",
+            "score": 95,
+            "identityOverlap": [
+              "utility"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "a3e951bd-0f89-4c9f-afb7-fc83ea050c30",
+        "builderMarkdownLength": 6238,
+        "layoutMockupMarkdownLength": 9671,
+        "designSpecMarkdownLength": 4184,
+        "sectionBlueprintCount": 5
+      }
+    },
+    {
+      "pageId": "care-solutions-pdp",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 4,
+        "repeaterCount": 0,
+        "totalRepeaterItems": 0
+      },
+      "builder": {
+        "renderableComponentCount": 4,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "conversion"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-mongodb",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "mobbin",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "getdesign-ferrari",
+            "score": 165,
+            "identityOverlap": [
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-revolut",
+            "score": 165,
+            "identityOverlap": [
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 2,
+        "latestPlanId": "4cd2310c-429f-4988-842f-139b92e8c3da",
+        "builderMarkdownLength": 6582,
+        "layoutMockupMarkdownLength": 8763,
+        "designSpecMarkdownLength": 3823,
+        "sectionBlueprintCount": 4
+      }
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 3,
+        "repeaterCount": 0,
+        "totalRepeaterItems": 0
+      },
+      "builder": {
+        "renderableComponentCount": 3,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "editorial"
+        ],
+        "topEntries": [
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "mobbin",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "getdesign-cursor",
+            "score": 165,
+            "identityOverlap": [
+              "editorial"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 165,
+            "identityOverlap": [
+              "editorial"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-ferrari",
+            "score": 165,
+            "identityOverlap": [
+              "editorial"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "a3b092fb-7570-4bfb-bc2c-d57a51af54f8",
+        "builderMarkdownLength": 5362,
+        "layoutMockupMarkdownLength": 6582,
+        "designSpecMarkdownLength": 3040,
+        "sectionBlueprintCount": 3
+      }
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 6,
+        "repeaterCount": 2,
+        "totalRepeaterItems": 3
+      },
+      "builder": {
+        "renderableComponentCount": 6,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "conversion",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-ferrari",
+            "score": 200,
+            "identityOverlap": [
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-mongodb",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "mobbin",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 165,
+            "identityOverlap": [
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "78ccaff5-fde4-4b5c-be35-b0396dbc1751",
+        "builderMarkdownLength": 7521,
+        "layoutMockupMarkdownLength": 11841,
+        "designSpecMarkdownLength": 5037,
+        "sectionBlueprintCount": 6
+      }
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 6,
+        "repeaterCount": 3,
+        "totalRepeaterItems": 73
+      },
+      "builder": {
+        "renderableComponentCount": 6,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "editorial",
+          "utility",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-wise",
+            "score": 200,
+            "identityOverlap": [
+              "utility",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "mobbin",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "getdesign-kraken",
+            "score": 165,
+            "identityOverlap": [
+              "utility"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 130,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "ab4029ff-a5c8-4668-bfca-6402478d6e40",
+        "builderMarkdownLength": 7010,
+        "layoutMockupMarkdownLength": 11466,
+        "designSpecMarkdownLength": 4868,
+        "sectionBlueprintCount": 6
+      }
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 6,
+        "repeaterCount": 3,
+        "totalRepeaterItems": 73
+      },
+      "builder": {
+        "renderableComponentCount": 6,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "utility",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-wise",
+            "score": 200,
+            "identityOverlap": [
+              "utility",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "mobbin",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          },
+          {
+            "id": "getdesign-kraken",
+            "score": 165,
+            "identityOverlap": [
+              "utility"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-hashicorp",
+            "score": 130,
+            "identityOverlap": [
+              "utility",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "73b8cae5-c2c7-4d82-9bba-a172c82d7c65",
+        "builderMarkdownLength": 6886,
+        "layoutMockupMarkdownLength": 11370,
+        "designSpecMarkdownLength": 4840,
+        "sectionBlueprintCount": 6
+      }
+    },
+    {
+      "pageId": "pdp-tv-general",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 7,
+        "repeaterCount": 3,
+        "totalRepeaterItems": 147
+      },
+      "builder": {
+        "renderableComponentCount": 7,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "editorial",
+          "conversion",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-ferrari",
+            "score": 235,
+            "identityOverlap": [
+              "editorial",
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 200,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-mongodb",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-spacex",
+            "score": 200,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "1372eb37-917e-4644-b54d-71033fa38852",
+        "builderMarkdownLength": 6819,
+        "layoutMockupMarkdownLength": 11323,
+        "designSpecMarkdownLength": 4773,
+        "sectionBlueprintCount": 6
+      }
+    },
+    {
+      "pageId": "pdp-tv-premium",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 7,
+        "repeaterCount": 3,
+        "totalRepeaterItems": 121
+      },
+      "builder": {
+        "renderableComponentCount": 7,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "premium",
+          "trust",
+          "editorial",
+          "conversion",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-ferrari",
+            "score": 270,
+            "identityOverlap": [
+              "premium",
+              "editorial",
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 235,
+            "identityOverlap": [
+              "premium",
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-mongodb",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-revolut",
+            "score": 200,
+            "identityOverlap": [
+              "premium",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-spacex",
+            "score": 200,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "f690c9ae-7f08-42f3-b963-bad5e76c9fd3",
+        "builderMarkdownLength": 6855,
+        "layoutMockupMarkdownLength": 11351,
+        "designSpecMarkdownLength": 4785,
+        "sectionBlueprintCount": 6
+      }
+    },
+    {
+      "pageId": "pdp-refrigerator-general",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 7,
+        "repeaterCount": 3,
+        "totalRepeaterItems": 138
+      },
+      "builder": {
+        "renderableComponentCount": 7,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "editorial",
+          "conversion",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-ferrari",
+            "score": 235,
+            "identityOverlap": [
+              "editorial",
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 200,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-mongodb",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-spacex",
+            "score": 200,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "6bd324a5-0958-4e11-9f05-2cd1bf611c09",
+        "builderMarkdownLength": 6837,
+        "layoutMockupMarkdownLength": 11337,
+        "designSpecMarkdownLength": 4779,
+        "sectionBlueprintCount": 6
+      }
+    },
+    {
+      "pageId": "pdp-refrigerator-knockon",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 7,
+        "repeaterCount": 3,
+        "totalRepeaterItems": 18
+      },
+      "builder": {
+        "renderableComponentCount": 7,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "editorial",
+          "conversion",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-ferrari",
+            "score": 235,
+            "identityOverlap": [
+              "editorial",
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 200,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-mongodb",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-spacex",
+            "score": 200,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "88a85689-b7b5-4db1-b598-5207147644d9",
+        "builderMarkdownLength": 6855,
+        "layoutMockupMarkdownLength": 11351,
+        "designSpecMarkdownLength": 4785,
+        "sectionBlueprintCount": 6
+      }
+    },
+    {
+      "pageId": "pdp-refrigerator-glass",
+      "viewportProfile": "pc",
+      "cloneStatus": 200,
+      "sidecar": {
+        "sectionCount": 7,
+        "repeaterCount": 3,
+        "totalRepeaterItems": 110
+      },
+      "builder": {
+        "renderableComponentCount": 7,
+        "emptyPatchSchemaCount": 0,
+        "issueCount": 0
+      },
+      "references": {
+        "count": 12,
+        "identitySignals": [
+          "trust",
+          "editorial",
+          "conversion",
+          "bold"
+        ],
+        "topEntries": [
+          {
+            "id": "getdesign-ferrari",
+            "score": 235,
+            "identityOverlap": [
+              "editorial",
+              "conversion",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-elevenlabs",
+            "score": 200,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-mongodb",
+            "score": 200,
+            "identityOverlap": [
+              "trust",
+              "conversion"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "getdesign-spacex",
+            "score": 200,
+            "identityOverlap": [
+              "editorial",
+              "bold"
+            ],
+            "sampleClass": "system-reference"
+          },
+          {
+            "id": "baymard-ecommerce-design-examples",
+            "score": 170,
+            "identityOverlap": [],
+            "sampleClass": "practical"
+          }
+        ]
+      },
+      "planDocs": {
+        "count": 1,
+        "latestPlanId": "e3bff48e-64c8-48cb-a5ce-d5db1c03991c",
+        "builderMarkdownLength": 6855,
+        "layoutMockupMarkdownLength": 11351,
+        "designSpecMarkdownLength": 4785,
+        "sectionBlueprintCount": 6
+      }
+    }
+  ]
+}

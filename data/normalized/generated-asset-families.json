@@ -1,0 +1,867 @@
+{
+  "updatedAt": "2026-04-24T07:28:04.313Z",
+  "families": {
+    "home.quickmenu.icon.family.v1": {
+      "assetFamilyId": "home.quickmenu.icon.family.v1",
+      "familyId": "home-quickmenu-line-v1",
+      "generatedAt": "2026-04-22T16:10:43.377Z",
+      "status": "ready",
+      "styleSummary": "rounded mono line icon family for home quickmenu",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only"
+      },
+      "members": [
+        {
+          "label": "구독 Days",
+          "assetId": "home.quickmenu.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%227%22%20width%3D%2218%22%20height%3D%2214%22%20rx%3D%224%22%2F%3E%3Cpath%20d%3D%22M9%205v4M19%205v4M9%2014h10%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "혜택/이벤트",
+          "assetId": "home.quickmenu.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M14%204v20M4%2014h20%22%2F%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%229%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "웨딩&이사",
+          "assetId": "home.quickmenu.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2019l5-8%204%205%205-8%22%2F%3E%3Cpath%20d%3D%22M8%209h12%22%2F%3E%3Cpath%20d%3D%22M14%205v4%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "다품목 할인",
+          "assetId": "home.quickmenu.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16%22%2F%3E%3Cpath%20d%3D%22M9%2014h10%22%2F%3E%3Cpath%20d%3D%22M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "라이브",
+          "assetId": "home.quickmenu.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M12%2011l5%203-5%203z%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "카드혜택",
+          "assetId": "home.quickmenu.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%228%22%20width%3D%2218%22%20height%3D%2212%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M9%2014h10%22%2F%3E%3Cpath%20d%3D%22M9%2011h4%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "가전 구독",
+          "assetId": "home.quickmenu.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12a3%203%200%200%201%203%203v7H5v-7a3%203%200%200%201%203-3z%22%2F%3E%3Cpath%20d%3D%22M10%2018v2a2%202%200%200%200%202%202h4a2%202%200%200%200%202-2v-2%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "소모품",
+          "assetId": "home.quickmenu.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%2010h12%22%2F%3E%3Cpath%20d%3D%22M10%2010V8a4%204%200%200%201%208%200v2%22%2F%3E%3Crect%20x%3D%227%22%20y%3D%2210%22%20width%3D%2214%22%20height%3D%2210%22%20rx%3D%222%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "SALE 홈스타일",
+          "assetId": "home.quickmenu.icon.9",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12%22%2F%3E%3Cpath%20d%3D%22M10%2012h8%22%2F%3E%3Cpath%20d%3D%22M12%2016h4%22%2F%3E%3Cpath%20d%3D%22M6%2020h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "support.service.icon.family.v1": {
+      "assetFamilyId": "support.service.icon.family.v1",
+      "familyId": "support-service-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "rounded service utility line icon family for support entry points",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "제품 등록",
+          "assetId": "support.service.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M10%2012h8M10%2016h5%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "AS 신청",
+          "assetId": "support.service.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22M14%208v6l4%203%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "매장 찾기",
+          "assetId": "support.service.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020V9l7-4%207%204v11%22%2F%3E%3Cpath%20d%3D%22M10%2020v-6h8v6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "소모품 구매",
+          "assetId": "support.service.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%229%22%20width%3D%2218%22%20height%3D%2211%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M9%209V7h10v2M9%2014h10%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "설치/철거",
+          "assetId": "support.service.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018l4-8%204%206%203-4%203%206%22%2F%3E%3Cpath%20d%3D%22M6%2021h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "상담 예약",
+          "assetId": "support.service.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16M8%2014h12M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "사용설명서",
+          "assetId": "support.service.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "보증/케어",
+          "assetId": "support.service.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "plp.filter.utility.icon.family.v1": {
+      "assetFamilyId": "plp.filter.utility.icon.family.v1",
+      "familyId": "plp-filter-utility-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "compact utility icon family for PLP filter, sort, and compare controls",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "필터",
+          "assetId": "plp.filter.utility.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M10%2012h8M10%2016h5%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "정렬",
+          "assetId": "plp.filter.utility.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22M14%208v6l4%203%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "비교",
+          "assetId": "plp.filter.utility.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020V9l7-4%207%204v11%22%2F%3E%3Cpath%20d%3D%22M10%2020v-6h8v6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "배송",
+          "assetId": "plp.filter.utility.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%229%22%20width%3D%2218%22%20height%3D%2211%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M9%209V7h10v2M9%2014h10%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "에너지",
+          "assetId": "plp.filter.utility.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018l4-8%204%206%203-4%203%206%22%2F%3E%3Cpath%20d%3D%22M6%2021h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "색상",
+          "assetId": "plp.filter.utility.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16M8%2014h12M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "크기",
+          "assetId": "plp.filter.utility.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "할인",
+          "assetId": "plp.filter.utility.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "pdp.commerce.utility.icon.family.v1": {
+      "assetFamilyId": "pdp.commerce.utility.icon.family.v1",
+      "familyId": "pdp-commerce-utility-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "commerce action icon family for PDP purchase and utility surfaces",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "장바구니",
+          "assetId": "pdp.commerce.utility.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M10%2012h8M10%2016h5%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "바로구매",
+          "assetId": "pdp.commerce.utility.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22M14%208v6l4%203%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "공유",
+          "assetId": "pdp.commerce.utility.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020V9l7-4%207%204v11%22%2F%3E%3Cpath%20d%3D%22M10%2020v-6h8v6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "찜",
+          "assetId": "pdp.commerce.utility.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%229%22%20width%3D%2218%22%20height%3D%2211%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M9%209V7h10v2M9%2014h10%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "배송",
+          "assetId": "pdp.commerce.utility.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018l4-8%204%206%203-4%203%206%22%2F%3E%3Cpath%20d%3D%22M6%2021h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "설치",
+          "assetId": "pdp.commerce.utility.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16M8%2014h12M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "리뷰",
+          "assetId": "pdp.commerce.utility.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "문의",
+          "assetId": "pdp.commerce.utility.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "비교",
+          "assetId": "pdp.commerce.utility.icon.icon.9",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2014h16%22%2F%3E%3Cpath%20d%3D%22M14%206v16%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010M19%209L9%2019%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "care.solution.service.icon.family.v1": {
+      "assetFamilyId": "care.solution.service.icon.family.v1",
+      "familyId": "care-solution-service-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "soft appliance-care icon family for rental and care solution categories",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "정수기",
+          "assetId": "care.solution.service.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M10%2012h8M10%2016h5%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "공기청정",
+          "assetId": "care.solution.service.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22M14%208v6l4%203%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "청소",
+          "assetId": "care.solution.service.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020V9l7-4%207%204v11%22%2F%3E%3Cpath%20d%3D%22M10%2020v-6h8v6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "안마의자",
+          "assetId": "care.solution.service.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%229%22%20width%3D%2218%22%20height%3D%2211%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M9%209V7h10v2M9%2014h10%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "식기세척",
+          "assetId": "care.solution.service.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018l4-8%204%206%203-4%203%206%22%2F%3E%3Cpath%20d%3D%22M6%2021h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "제습",
+          "assetId": "care.solution.service.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16M8%2014h12M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "렌탈",
+          "assetId": "care.solution.service.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "상담",
+          "assetId": "care.solution.service.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "mobile.nav.action.icon.family.v1": {
+      "assetFamilyId": "mobile.nav.action.icon.family.v1",
+      "familyId": "mobile-nav-action-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "mobile navigation action icon family for touch-first utility controls",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "홈",
+          "assetId": "mobile.nav.action.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M10%2012h8M10%2016h5%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "검색",
+          "assetId": "mobile.nav.action.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22M14%208v6l4%203%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "카테고리",
+          "assetId": "mobile.nav.action.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020V9l7-4%207%204v11%22%2F%3E%3Cpath%20d%3D%22M10%2020v-6h8v6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "최근본",
+          "assetId": "mobile.nav.action.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%229%22%20width%3D%2218%22%20height%3D%2211%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M9%209V7h10v2M9%2014h10%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "알림",
+          "assetId": "mobile.nav.action.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018l4-8%204%206%203-4%203%206%22%2F%3E%3Cpath%20d%3D%22M6%2021h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "메뉴",
+          "assetId": "mobile.nav.action.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16M8%2014h12M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "닫기",
+          "assetId": "mobile.nav.action.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "뒤로",
+          "assetId": "mobile.nav.action.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111111%22%20stroke-width%3D%221.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "home.quickmenu.premium.arc.icon.family.v1": {
+      "assetFamilyId": "home.quickmenu.premium.arc.icon.family.v1",
+      "familyId": "home-quickmenu-premium-arc-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "premium rounded arc icon family for home quickmenu redesigns",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "2.1",
+        "corner": "soft-rounded",
+        "tone": "warm-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "구독 Days",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%232a211d%22%20stroke-width%3D%222.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020V9l7-4%207%204v11%22%2F%3E%3Cpath%20d%3D%22M10%2020v-6h8v6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "혜택/이벤트",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%232a211d%22%20stroke-width%3D%222.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%229%22%20width%3D%2218%22%20height%3D%2211%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M9%209V7h10v2M9%2014h10%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "웨딩&이사",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%232a211d%22%20stroke-width%3D%222.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018l4-8%204%206%203-4%203%206%22%2F%3E%3Cpath%20d%3D%22M6%2021h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "다품목 할인",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%232a211d%22%20stroke-width%3D%222.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16M8%2014h12M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "라이브",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%232a211d%22%20stroke-width%3D%222.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "카드혜택",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%232a211d%22%20stroke-width%3D%222.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "가전 구독",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%232a211d%22%20stroke-width%3D%222.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2014h16%22%2F%3E%3Cpath%20d%3D%22M14%206v16%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010M19%209L9%2019%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "소모품",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%232a211d%22%20stroke-width%3D%222.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%2010h12l-2%2010H10z%22%2F%3E%3Cpath%20d%3D%22M11%2010a3%203%200%200%201%206%200%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "SALE 홈스타일",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.9",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%232a211d%22%20stroke-width%3D%222.1%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%207h12v14H8z%22%2F%3E%3Cpath%20d%3D%22M11%2011h6M11%2015h6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "home.story.micro.cue.icon.family.v1": {
+      "assetFamilyId": "home.story.micro.cue.icon.family.v1",
+      "familyId": "home-story-micro-cue-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "small editorial cue icon family for home hero and story support chips",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.55",
+        "corner": "editorial-rounded",
+        "tone": "muted-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "신제품",
+          "assetId": "home.story.micro.cue.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%2345413d%22%20stroke-width%3D%221.55%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018l4-8%204%206%203-4%203%206%22%2F%3E%3Cpath%20d%3D%22M6%2021h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "프리미엄",
+          "assetId": "home.story.micro.cue.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%2345413d%22%20stroke-width%3D%221.55%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16M8%2014h12M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "라이프",
+          "assetId": "home.story.micro.cue.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%2345413d%22%20stroke-width%3D%221.55%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "케어",
+          "assetId": "home.story.micro.cue.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%2345413d%22%20stroke-width%3D%221.55%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "혜택",
+          "assetId": "home.story.micro.cue.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%2345413d%22%20stroke-width%3D%221.55%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2014h16%22%2F%3E%3Cpath%20d%3D%22M14%206v16%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010M19%209L9%2019%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "설치",
+          "assetId": "home.story.micro.cue.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%2345413d%22%20stroke-width%3D%221.55%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%2010h12l-2%2010H10z%22%2F%3E%3Cpath%20d%3D%22M11%2010a3%203%200%200%201%206%200%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "상담",
+          "assetId": "home.story.micro.cue.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%2345413d%22%20stroke-width%3D%221.55%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%207h12v14H8z%22%2F%3E%3Cpath%20d%3D%22M11%2011h6M11%2015h6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "공유",
+          "assetId": "home.story.micro.cue.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%2345413d%22%20stroke-width%3D%221.55%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2014h18%22%2F%3E%3Cpath%20d%3D%22M14%205v18%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "support.status.badge.icon.family.v1": {
+      "assetFamilyId": "support.status.badge.icon.family.v1",
+      "familyId": "support-status-badge-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "compact status badge icon family for support service states",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.8",
+        "corner": "compact-rounded",
+        "tone": "cool-utility",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "접수",
+          "assetId": "support.status.badge.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23263544%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16M8%2014h12M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "진행",
+          "assetId": "support.status.badge.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23263544%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "완료",
+          "assetId": "support.status.badge.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23263544%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "예약",
+          "assetId": "support.status.badge.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23263544%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2014h16%22%2F%3E%3Cpath%20d%3D%22M14%206v16%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010M19%209L9%2019%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "긴급",
+          "assetId": "support.status.badge.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23263544%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%2010h12l-2%2010H10z%22%2F%3E%3Cpath%20d%3D%22M11%2010a3%203%200%200%201%206%200%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "문의",
+          "assetId": "support.status.badge.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23263544%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%207h12v14H8z%22%2F%3E%3Cpath%20d%3D%22M11%2011h6M11%2015h6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "보증",
+          "assetId": "support.status.badge.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23263544%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2014h18%22%2F%3E%3Cpath%20d%3D%22M14%205v18%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "알림",
+          "assetId": "support.status.badge.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23263544%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M10%2012h8M10%2016h5%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "plp.product.signal.icon.family.v1": {
+      "assetFamilyId": "plp.product.signal.icon.family.v1",
+      "familyId": "plp-product-signal-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "sharp product signal icon family for PLP cards, rankings, and feature chips",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.7",
+        "corner": "technical",
+        "tone": "graphite",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "인기",
+          "assetId": "plp.product.signal.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111827%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "신제품",
+          "assetId": "plp.product.signal.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111827%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2014h16%22%2F%3E%3Cpath%20d%3D%22M14%206v16%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010M19%209L9%2019%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "에너지",
+          "assetId": "plp.product.signal.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111827%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%2010h12l-2%2010H10z%22%2F%3E%3Cpath%20d%3D%22M11%2010a3%203%200%200%201%206%200%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "배송",
+          "assetId": "plp.product.signal.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111827%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%207h12v14H8z%22%2F%3E%3Cpath%20d%3D%22M11%2011h6M11%2015h6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "할인",
+          "assetId": "plp.product.signal.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111827%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2014h18%22%2F%3E%3Cpath%20d%3D%22M14%205v18%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "비교",
+          "assetId": "plp.product.signal.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111827%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M10%2012h8M10%2016h5%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "리뷰",
+          "assetId": "plp.product.signal.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111827%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22M14%208v6l4%203%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "색상",
+          "assetId": "plp.product.signal.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23111827%22%20stroke-width%3D%221.7%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020V9l7-4%207%204v11%22%2F%3E%3Cpath%20d%3D%22M10%2020v-6h8v6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "pdp.benefit.chip.icon.family.v1": {
+      "assetFamilyId": "pdp.benefit.chip.icon.family.v1",
+      "familyId": "pdp-benefit-chip-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "commerce benefit chip icon family for PDP reassurance and purchase rails",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "2.0",
+        "corner": "confident-rounded",
+        "tone": "commerce-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "무이자",
+          "assetId": "pdp.benefit.chip.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233b0a18%22%20stroke-width%3D%222.0%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%2010h12l-2%2010H10z%22%2F%3E%3Cpath%20d%3D%22M11%2010a3%203%200%200%201%206%200%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "배송",
+          "assetId": "pdp.benefit.chip.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233b0a18%22%20stroke-width%3D%222.0%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%207h12v14H8z%22%2F%3E%3Cpath%20d%3D%22M11%2011h6M11%2015h6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "설치",
+          "assetId": "pdp.benefit.chip.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233b0a18%22%20stroke-width%3D%222.0%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2014h18%22%2F%3E%3Cpath%20d%3D%22M14%205v18%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "케어",
+          "assetId": "pdp.benefit.chip.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233b0a18%22%20stroke-width%3D%222.0%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M10%2012h8M10%2016h5%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "리뷰",
+          "assetId": "pdp.benefit.chip.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233b0a18%22%20stroke-width%3D%222.0%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22M14%208v6l4%203%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "공유",
+          "assetId": "pdp.benefit.chip.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233b0a18%22%20stroke-width%3D%222.0%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020V9l7-4%207%204v11%22%2F%3E%3Cpath%20d%3D%22M10%2020v-6h8v6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "혜택",
+          "assetId": "pdp.benefit.chip.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233b0a18%22%20stroke-width%3D%222.0%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%229%22%20width%3D%2218%22%20height%3D%2211%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M9%209V7h10v2M9%2014h10%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "상담",
+          "assetId": "pdp.benefit.chip.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233b0a18%22%20stroke-width%3D%222.0%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018l4-8%204%206%203-4%203%206%22%2F%3E%3Cpath%20d%3D%22M6%2021h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "care.wellness.rounded.icon.family.v1": {
+      "assetFamilyId": "care.wellness.rounded.icon.family.v1",
+      "familyId": "care-wellness-rounded-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "warm rounded wellness icon family for care solution categories and reassurance cards",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.85",
+        "corner": "soft-organic",
+        "tone": "warm-service",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "정수",
+          "assetId": "care.wellness.rounded.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233f342c%22%20stroke-width%3D%221.85%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22M14%208v6l4%203%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "공기",
+          "assetId": "care.wellness.rounded.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233f342c%22%20stroke-width%3D%221.85%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2020V9l7-4%207%204v11%22%2F%3E%3Cpath%20d%3D%22M10%2020v-6h8v6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "청소",
+          "assetId": "care.wellness.rounded.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233f342c%22%20stroke-width%3D%221.85%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%225%22%20y%3D%229%22%20width%3D%2218%22%20height%3D%2211%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M9%209V7h10v2M9%2014h10%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "수면",
+          "assetId": "care.wellness.rounded.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233f342c%22%20stroke-width%3D%221.85%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M7%2018l4-8%204%206%203-4%203%206%22%2F%3E%3Cpath%20d%3D%22M6%2021h16%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "안심",
+          "assetId": "care.wellness.rounded.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233f342c%22%20stroke-width%3D%221.85%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%209h16M8%2014h12M11%2019h6%22%2F%3E%3Ccircle%20cx%3D%227%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3Ccircle%20cx%3D%2221%22%20cy%3D%229%22%20r%3D%221%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "상담",
+          "assetId": "care.wellness.rounded.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233f342c%22%20stroke-width%3D%221.85%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "렌탈",
+          "assetId": "care.wellness.rounded.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233f342c%22%20stroke-width%3D%221.85%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "관리",
+          "assetId": "care.wellness.rounded.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%233f342c%22%20stroke-width%3D%221.85%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2014h16%22%2F%3E%3Cpath%20d%3D%22M14%206v16%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010M19%209L9%2019%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    },
+    "mobile.gesture.utility.icon.family.v1": {
+      "assetFamilyId": "mobile.gesture.utility.icon.family.v1",
+      "familyId": "mobile-gesture-utility-line-v1",
+      "generatedAt": "2026-04-24T07:28:04.313Z",
+      "status": "ready",
+      "styleSummary": "mobile gesture utility icon family for touch-first states and controls",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "2.05",
+        "corner": "touch-rounded",
+        "tone": "mobile-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "members": [
+        {
+          "label": "열기",
+          "assetId": "mobile.gesture.utility.icon.icon.1",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23151515%22%20stroke-width%3D%222.05%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%226%22%20width%3D%2216%22%20height%3D%2216%22%20rx%3D%225%22%2F%3E%3Cpath%20d%3D%22M10%2014h8M14%2010v8%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "닫기",
+          "assetId": "mobile.gesture.utility.icon.icon.2",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23151515%22%20stroke-width%3D%222.05%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%208h12v12H8z%22%2F%3E%3Cpath%20d%3D%22M11%208V5h6v3M11%2020v3h6v-3%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "필터",
+          "assetId": "mobile.gesture.utility.icon.icon.3",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23151515%22%20stroke-width%3D%222.05%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%2014h16%22%2F%3E%3Cpath%20d%3D%22M14%206v16%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010M19%209L9%2019%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "정렬",
+          "assetId": "mobile.gesture.utility.icon.icon.4",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23151515%22%20stroke-width%3D%222.05%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%2010h12l-2%2010H10z%22%2F%3E%3Cpath%20d%3D%22M11%2010a3%203%200%200%201%206%200%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "탭",
+          "assetId": "mobile.gesture.utility.icon.icon.5",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23151515%22%20stroke-width%3D%222.05%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%207h12v14H8z%22%2F%3E%3Cpath%20d%3D%22M11%2011h6M11%2015h6%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "스와이프",
+          "assetId": "mobile.gesture.utility.icon.icon.6",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23151515%22%20stroke-width%3D%222.05%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%2014h18%22%2F%3E%3Cpath%20d%3D%22M14%205v18%22%2F%3E%3Cpath%20d%3D%22M9%209l10%2010%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "고정",
+          "assetId": "mobile.gesture.utility.icon.icon.7",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23151515%22%20stroke-width%3D%222.05%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%226%22%20y%3D%227%22%20width%3D%2216%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M10%2012h8M10%2016h5%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        },
+        {
+          "label": "선택",
+          "assetId": "mobile.gesture.utility.icon.icon.8",
+          "assetUrl": "data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20stroke%3D%22%23151515%22%20stroke-width%3D%222.05%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2214%22%20cy%3D%2214%22%20r%3D%228%22%2F%3E%3Cpath%20d%3D%22M14%208v6l4%203%22%2F%3E%3C%2Fsvg%3E",
+          "format": "image/svg+xml"
+        }
+      ]
+    }
+  }
+}

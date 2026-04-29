@@ -1,0 +1,224 @@
+{
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "version": 1,
+  "primitives": [
+    {
+      "id": "SplitHero",
+      "category": "component",
+      "description": "좌우 분할형 히어로. 카피와 비주얼, 보조 카드 레일을 함께 구성한다.",
+      "allowedVariants": ["carousel", "editorial", "premium-stage"],
+      "allowedProps": {
+        "tone": ["neutral", "editorial", "premium", "cinematic"],
+        "align": ["left", "center"],
+        "density": ["comfortable", "compact", "immersive"]
+      }
+    },
+    {
+      "id": "CenteredHero",
+      "category": "component",
+      "description": "중앙 집중형 히어로. 메시지를 가운데 정렬하고 메인 비주얼을 단일 초점으로 사용한다.",
+      "allowedVariants": ["centered"],
+      "allowedProps": {
+        "tone": ["neutral", "editorial", "premium"],
+        "density": ["comfortable", "compact"]
+      }
+    },
+    {
+      "id": "StackedHero",
+      "category": "component",
+      "description": "상하 레이어형 히어로. 메인 비주얼 아래에 카드 레일을 둔다.",
+      "allowedVariants": ["stacked"],
+      "allowedProps": {
+        "tone": ["neutral", "editorial", "premium"],
+        "density": ["comfortable", "compact", "immersive"]
+      }
+    },
+    {
+      "id": "QuickmenuGrid",
+      "category": "component",
+      "description": "균등 아이콘 그리드형 바로가기.",
+      "allowedVariants": ["grid"],
+      "allowedProps": {
+        "tone": ["neutral", "editorial", "premium"],
+        "density": ["comfortable", "compact"]
+      }
+    },
+    {
+      "id": "QuickmenuPanel",
+      "category": "component",
+      "description": "대표 카드 + 보조 아이콘 카드 그리드.",
+      "allowedVariants": ["panel"],
+      "allowedProps": {
+        "tone": ["neutral", "editorial", "premium"],
+        "density": ["comfortable", "compact", "immersive"]
+      }
+    },
+    {
+      "id": "QuickmenuEditorialStrip",
+      "category": "component",
+      "description": "에디토리얼 리드 카드 + 칩 레일형 바로가기.",
+      "allowedVariants": ["editorial-strip"],
+      "allowedProps": {
+        "tone": ["editorial", "premium"],
+        "density": ["comfortable", "compact"]
+      }
+    },
+    {
+      "id": "RankingList",
+      "category": "component",
+      "description": "랭킹 리스트/포스터 카드형 섹션.",
+      "allowedVariants": ["compact", "poster"],
+      "allowedProps": {
+        "tone": ["neutral", "editorial", "premium"],
+        "density": ["comfortable", "compact"]
+      }
+    },
+    {
+      "id": "CommerceGrid",
+      "category": "component",
+      "description": "상품/콘텐츠 카드 그리드.",
+      "allowedVariants": ["grid", "featured"],
+      "allowedProps": {
+        "tone": ["neutral", "editorial", "premium"],
+        "density": ["comfortable", "compact", "immersive"]
+      }
+    },
+    {
+      "id": "PromoBanner",
+      "category": "component",
+      "description": "프로모션 배너/스트립.",
+      "allowedVariants": ["clean", "cinematic"],
+      "allowedProps": {
+        "tone": ["neutral", "editorial", "premium", "cinematic"],
+        "density": ["comfortable", "compact"]
+      }
+    },
+    {
+      "id": "EditorialStoryGrid",
+      "category": "component",
+      "description": "스토리/에디토리얼 카드 그리드.",
+      "allowedVariants": ["editorial", "portrait"],
+      "allowedProps": {
+        "tone": ["editorial", "premium"],
+        "density": ["comfortable", "compact"]
+      }
+    },
+    {
+      "id": "BenefitHub",
+      "category": "component",
+      "description": "혜택/서비스 진입 허브.",
+      "allowedVariants": ["benefits", "service"],
+      "allowedProps": {
+        "tone": ["neutral", "editorial", "premium"],
+        "density": ["comfortable", "compact"]
+      }
+    },
+    {
+      "id": "TopCompositionShell",
+      "category": "group",
+      "description": "상단 진입부 전용 셸. hero/quickmenu/promotion을 한 리듬으로 배치한다.",
+      "allowedVariants": ["hero-led-top", "split-top", "immersive-top"],
+      "allowedProps": {
+        "density": ["comfortable", "compact", "immersive"]
+      }
+    },
+    {
+      "id": "PageCompositionShell",
+      "category": "page",
+      "description": "페이지 전체 셸. 상단/밴드/하단 그리드 리듬을 재구성한다.",
+      "allowedVariants": ["hero-led-page", "editorial-band-page", "showcase-page"],
+      "allowedProps": {
+        "density": ["comfortable", "compact", "immersive"]
+      }
+    }
+  ],
+  "templateMappings": {
+    "hero-carousel-composition-v1": {
+      "primitiveId": "SplitHero",
+      "variant": "carousel"
+    },
+    "hero-editorial-v1": {
+      "primitiveId": "SplitHero",
+      "variant": "editorial"
+    },
+    "hero-premium-stage-v1": {
+      "primitiveId": "SplitHero",
+      "variant": "premium-stage"
+    },
+    "hero-centered-v1": {
+      "primitiveId": "CenteredHero",
+      "variant": "centered"
+    },
+    "hero-stacked-v1": {
+      "primitiveId": "StackedHero",
+      "variant": "stacked"
+    },
+    "icon-link-grid-composition-v1": {
+      "primitiveId": "QuickmenuGrid",
+      "variant": "grid"
+    },
+    "quickmenu-panel-v1": {
+      "primitiveId": "QuickmenuPanel",
+      "variant": "panel"
+    },
+    "quickmenu-editorial-strip-v1": {
+      "primitiveId": "QuickmenuEditorialStrip",
+      "variant": "editorial-strip"
+    }
+  },
+  "pageAssignments": {
+    "home": {
+      "pageShell": {
+        "primitiveId": "PageCompositionShell",
+        "variant": "hero-led-page"
+      },
+      "groupShells": {
+        "top": {
+          "primitiveId": "TopCompositionShell",
+          "variant": "hero-led-top"
+        }
+      },
+      "components": {
+        "home.hero": ["SplitHero", "CenteredHero", "StackedHero"],
+        "home.quickmenu": ["QuickmenuGrid", "QuickmenuPanel", "QuickmenuEditorialStrip"],
+        "home.best-ranking": ["RankingList"],
+        "home.md-choice": ["CommerceGrid"],
+        "home.timedeal": ["CommerceGrid"],
+        "home.subscription": ["CommerceGrid"],
+        "home.space-renewal": ["CommerceGrid"],
+        "home.marketing-area": ["PromoBanner", "CommerceGrid"],
+        "home.brand-showroom": ["CommerceGrid"],
+        "home.latest-product-news": ["CommerceGrid"],
+        "home.smart-life": ["EditorialStoryGrid"],
+        "home.summary-banner-2": ["PromoBanner"],
+        "home.missed-benefits": ["BenefitHub", "PromoBanner"],
+        "home.lg-best-care": ["BenefitHub", "PromoBanner"],
+        "home.bestshop-guide": ["BenefitHub", "PromoBanner"]
+      }
+    },
+    "homestyle-home": {
+      "pageShell": {
+        "primitiveId": "PageCompositionShell",
+        "variant": "editorial-band-page"
+      },
+      "components": {
+        "homestyle-home.quickMenu": ["QuickmenuGrid", "QuickmenuPanel", "QuickmenuEditorialStrip"],
+        "homestyle-home.labelBanner": ["PromoBanner"],
+        "homestyle-home.brandStory": ["EditorialStoryGrid"]
+      }
+    },
+    "care-solutions": {
+      "pageShell": {
+        "primitiveId": "PageCompositionShell",
+        "variant": "editorial-band-page"
+      },
+      "components": {
+        "care-solutions.hero": ["SplitHero", "CenteredHero", "StackedHero"],
+        "care-solutions.ranking": ["RankingList"],
+        "care-solutions.benefit": ["BenefitHub"],
+        "care-solutions.tabs": ["QuickmenuGrid", "QuickmenuPanel"],
+        "care-solutions.careBanner": ["PromoBanner"]
+      }
+    }
+  }
+}

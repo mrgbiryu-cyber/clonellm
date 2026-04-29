@@ -1,0 +1,989 @@
+{
+  "generatedAt": "2026-04-27T04:29:26.488Z",
+  "sourceAudit": "data/normalized/admin-design-target-audit-final.json",
+  "sourceAssetContractAudit": "data/normalized/asset-authoring-contract-audit.json",
+  "principle": "Runtime pass, source asset sufficiency, and authoring contract readiness are separate statuses.",
+  "viewports": [
+    "pc",
+    "mo"
+  ],
+  "summary": {
+    "pageCount": 14,
+    "runtimeStatus": {
+      "runtime-pass": 14
+    },
+    "assetStatus": {
+      "asset-empty": 4,
+      "asset-insufficient": 9,
+      "asset-sufficient": 1
+    },
+    "assetContractStatus": {
+      "asset-contract-pass": 14
+    },
+    "staleBlueprintSignals": 14
+  },
+  "pages": [
+    {
+      "pageId": "bestshop",
+      "label": "베스트샵",
+      "targetKind": "service",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-empty",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-empty",
+          "cloneStatus": 200,
+          "editableComponentCount": 4,
+          "authoredSectionCount": 4,
+          "assetEmptySectionCount": 4,
+          "assetEmptySections": [
+            "hero",
+            "shortcut",
+            "review",
+            "brandBanner"
+          ],
+          "draftBuildId": "runtime-draft-1777022560580",
+          "previewPath": "/runtime-draft/runtime-draft-1777022560580",
+          "comparePath": "/runtime-compare/runtime-draft-1777022560580",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 4,
+            "rowsWithAssets": 1,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 1,
+            "rowsWithApprovedInteraction": 0,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-empty",
+          "cloneStatus": 200,
+          "editableComponentCount": 4,
+          "authoredSectionCount": 4,
+          "assetEmptySectionCount": 4,
+          "assetEmptySections": [
+            "hero",
+            "shortcut",
+            "review",
+            "brandBanner"
+          ],
+          "draftBuildId": "runtime-draft-1777022686353",
+          "previewPath": "/runtime-draft/runtime-draft-1777022686353",
+          "comparePath": "/runtime-compare/runtime-draft-1777022686353",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 4,
+            "rowsWithAssets": 1,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 1,
+            "rowsWithApprovedInteraction": 0,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "care-solutions",
+      "label": "가전 구독 메인",
+      "targetKind": "service",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-insufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 5,
+          "authoredSectionCount": 5,
+          "assetEmptySectionCount": 1,
+          "assetEmptySections": [
+            "benefit"
+          ],
+          "draftBuildId": "runtime-draft-1777022607772",
+          "previewPath": "/runtime-draft/runtime-draft-1777022607772",
+          "comparePath": "/runtime-compare/runtime-draft-1777022607772",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 5,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 2,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 5,
+          "authoredSectionCount": 5,
+          "assetEmptySectionCount": 1,
+          "assetEmptySections": [
+            "benefit"
+          ],
+          "draftBuildId": "runtime-draft-1777020517129",
+          "previewPath": "/runtime-draft/runtime-draft-1777020517129",
+          "comparePath": "/runtime-compare/runtime-draft-1777020517129",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 5,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 2,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "care-solutions-pdp",
+      "label": "가전 구독 PDP",
+      "targetKind": "service",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-empty",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-empty",
+          "cloneStatus": 200,
+          "editableComponentCount": 4,
+          "authoredSectionCount": 4,
+          "assetEmptySectionCount": 4,
+          "assetEmptySections": [
+            "visual",
+            "detailInfo",
+            "noticeBanner",
+            "reviewInfo"
+          ],
+          "draftBuildId": "runtime-draft-1777020557635",
+          "previewPath": "/runtime-draft/runtime-draft-1777020557635",
+          "comparePath": "/runtime-compare/runtime-draft-1777020557635",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 4,
+            "rowsWithAssets": 0,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 0,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-empty",
+          "cloneStatus": 200,
+          "editableComponentCount": 4,
+          "authoredSectionCount": 4,
+          "assetEmptySectionCount": 4,
+          "assetEmptySections": [
+            "visual",
+            "detailInfo",
+            "noticeBanner",
+            "reviewInfo"
+          ],
+          "draftBuildId": "runtime-draft-1777020599119",
+          "previewPath": "/runtime-draft/runtime-draft-1777020599119",
+          "comparePath": "/runtime-compare/runtime-draft-1777020599119",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 4,
+            "rowsWithAssets": 0,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 0,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "category-refrigerators",
+      "label": "PLP - 냉장고 카테고리",
+      "targetKind": "plp",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-insufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 6,
+          "authoredSectionCount": 6,
+          "assetEmptySectionCount": 2,
+          "assetEmptySections": [
+            "firstRow",
+            "firstProduct"
+          ],
+          "draftBuildId": "runtime-draft-1777020899566",
+          "previewPath": "/runtime-draft/runtime-draft-1777020899566",
+          "comparePath": "/runtime-compare/runtime-draft-1777020899566",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 6,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 2,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 6,
+          "authoredSectionCount": 6,
+          "assetEmptySectionCount": 2,
+          "assetEmptySections": [
+            "firstRow",
+            "firstProduct"
+          ],
+          "draftBuildId": "runtime-draft-1777020943034",
+          "previewPath": "/runtime-draft/runtime-draft-1777020943034",
+          "comparePath": "/runtime-compare/runtime-draft-1777020943034",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 6,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 2,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "category-tvs",
+      "label": "PLP - TV 카테고리",
+      "targetKind": "plp",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-insufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 6,
+          "authoredSectionCount": 6,
+          "assetEmptySectionCount": 2,
+          "assetEmptySections": [
+            "firstRow",
+            "firstProduct"
+          ],
+          "draftBuildId": "runtime-draft-1777020814232",
+          "previewPath": "/runtime-draft/runtime-draft-1777020814232",
+          "comparePath": "/runtime-compare/runtime-draft-1777020814232",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 6,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 6,
+          "authoredSectionCount": 6,
+          "assetEmptySectionCount": 2,
+          "assetEmptySections": [
+            "firstRow",
+            "firstProduct"
+          ],
+          "draftBuildId": "runtime-draft-1777020857129",
+          "previewPath": "/runtime-draft/runtime-draft-1777020857129",
+          "comparePath": "/runtime-compare/runtime-draft-1777020857129",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 6,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "home",
+      "label": "홈 - 태블릿",
+      "targetKind": "home",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-insufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 14,
+          "authoredSectionCount": 14,
+          "assetEmptySectionCount": 11,
+          "assetEmptySections": [
+            "header-top",
+            "header-bottom",
+            "md-choice",
+            "timedeal",
+            "best-ranking",
+            "subscription",
+            "brand-showroom",
+            "latest-product-news",
+            "smart-life",
+            "lg-best-care",
+            "bestshop-guide"
+          ],
+          "draftBuildId": "runtime-draft-1777022586659",
+          "previewPath": "/runtime-draft/runtime-draft-1777022586659",
+          "comparePath": "/runtime-compare/runtime-draft-1777022586659",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 14,
+            "rowsWithAssets": 3,
+            "rowsWithApprovedImage": 2,
+            "rowsWithApprovedIconFamily": 3,
+            "rowsWithApprovedInteraction": 2,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 14,
+          "authoredSectionCount": 14,
+          "assetEmptySectionCount": 11,
+          "assetEmptySections": [
+            "header-top",
+            "header-bottom",
+            "md-choice",
+            "timedeal",
+            "best-ranking",
+            "subscription",
+            "brand-showroom",
+            "latest-product-news",
+            "smart-life",
+            "lg-best-care",
+            "bestshop-guide"
+          ],
+          "draftBuildId": "runtime-draft-1777022779734",
+          "previewPath": "/runtime-draft/runtime-draft-1777022779734",
+          "comparePath": "/runtime-compare/runtime-draft-1777022779734",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 14,
+            "rowsWithAssets": 3,
+            "rowsWithApprovedImage": 2,
+            "rowsWithApprovedIconFamily": 3,
+            "rowsWithApprovedInteraction": 2,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "homestyle-home",
+      "label": "홈스타일 메인",
+      "targetKind": "service",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-empty",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-empty",
+          "cloneStatus": 200,
+          "editableComponentCount": 3,
+          "authoredSectionCount": 3,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "quickMenu",
+            "labelBanner",
+            "brandStory"
+          ],
+          "draftBuildId": "runtime-draft-1777020640405",
+          "previewPath": "/runtime-draft/runtime-draft-1777020640405",
+          "comparePath": "/runtime-compare/runtime-draft-1777020640405",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 3,
+            "rowsWithAssets": 1,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 1,
+            "rowsWithApprovedInteraction": 0,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-empty",
+          "cloneStatus": 200,
+          "editableComponentCount": 3,
+          "authoredSectionCount": 3,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "quickMenu",
+            "labelBanner",
+            "brandStory"
+          ],
+          "draftBuildId": "runtime-draft-1777020684067",
+          "previewPath": "/runtime-draft/runtime-draft-1777020684067",
+          "comparePath": "/runtime-compare/runtime-draft-1777020684067",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 3,
+            "rowsWithAssets": 1,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 1,
+            "rowsWithApprovedInteraction": 0,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "label": "홈스타일 PDP",
+      "targetKind": "service",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-empty",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-empty",
+          "cloneStatus": 200,
+          "editableComponentCount": 6,
+          "authoredSectionCount": 6,
+          "assetEmptySectionCount": 6,
+          "assetEmptySections": [
+            "detailInfo",
+            "bestProduct",
+            "review",
+            "qna",
+            "guides",
+            "seller"
+          ],
+          "draftBuildId": "runtime-draft-1777020726532",
+          "previewPath": "/runtime-draft/runtime-draft-1777020726532",
+          "comparePath": "/runtime-compare/runtime-draft-1777020726532",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 6,
+            "rowsWithAssets": 0,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 0,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-empty",
+          "cloneStatus": 200,
+          "editableComponentCount": 6,
+          "authoredSectionCount": 6,
+          "assetEmptySectionCount": 6,
+          "assetEmptySections": [
+            "detailInfo",
+            "bestProduct",
+            "review",
+            "qna",
+            "guides",
+            "seller"
+          ],
+          "draftBuildId": "runtime-draft-1777020769245",
+          "previewPath": "/runtime-draft/runtime-draft-1777020769245",
+          "comparePath": "/runtime-compare/runtime-draft-1777020769245",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 6,
+            "rowsWithAssets": 0,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 0,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-refrigerator-general",
+      "label": "PDP - 냉장고 일반형",
+      "targetKind": "pdp",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-insufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777021178220",
+          "previewPath": "/runtime-draft/runtime-draft-1777021178220",
+          "comparePath": "/runtime-compare/runtime-draft-1777021178220",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777021226735",
+          "previewPath": "/runtime-draft/runtime-draft-1777021226735",
+          "comparePath": "/runtime-compare/runtime-draft-1777021226735",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-refrigerator-glass",
+      "label": "PDP - 냉장고 글라스형",
+      "targetKind": "pdp",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-insufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777021379225",
+          "previewPath": "/runtime-draft/runtime-draft-1777021379225",
+          "comparePath": "/runtime-compare/runtime-draft-1777021379225",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777021435418",
+          "previewPath": "/runtime-draft/runtime-draft-1777021435418",
+          "comparePath": "/runtime-compare/runtime-draft-1777021435418",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-refrigerator-knockon",
+      "label": "PDP - 냉장고 노크온형",
+      "targetKind": "pdp",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-insufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777021275295",
+          "previewPath": "/runtime-draft/runtime-draft-1777021275295",
+          "comparePath": "/runtime-compare/runtime-draft-1777021275295",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777021324780",
+          "previewPath": "/runtime-draft/runtime-draft-1777021324780",
+          "comparePath": "/runtime-compare/runtime-draft-1777021324780",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-tv-general",
+      "label": "PDP - TV 일반형",
+      "targetKind": "pdp",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-insufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777020994776",
+          "previewPath": "/runtime-draft/runtime-draft-1777020994776",
+          "comparePath": "/runtime-compare/runtime-draft-1777020994776",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777021039878",
+          "previewPath": "/runtime-draft/runtime-draft-1777021039878",
+          "comparePath": "/runtime-compare/runtime-draft-1777021039878",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 2,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "pdp-tv-premium",
+      "label": "PDP - TV 프리미엄형",
+      "targetKind": "pdp",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-insufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777021085349",
+          "previewPath": "/runtime-draft/runtime-draft-1777021085349",
+          "comparePath": "/runtime-compare/runtime-draft-1777021085349",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-insufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 7,
+          "authoredSectionCount": 7,
+          "assetEmptySectionCount": 3,
+          "assetEmptySections": [
+            "price",
+            "option",
+            "review"
+          ],
+          "draftBuildId": "runtime-draft-1777021131338",
+          "previewPath": "/runtime-draft/runtime-draft-1777021131338",
+          "comparePath": "/runtime-compare/runtime-draft-1777021131338",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 7,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 0,
+            "rowsWithApprovedInteraction": 4,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    },
+    {
+      "pageId": "support",
+      "label": "고객지원 - 태블릿",
+      "targetKind": "service",
+      "blueprintStatus": "blueprint-only",
+      "runtimeStatus": "runtime-pass",
+      "assetStatus": "asset-sufficient",
+      "assetContractStatus": "asset-contract-pass",
+      "staleBlueprintSignal": true,
+      "viewports": [
+        {
+          "viewportProfile": "pc",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-sufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 4,
+          "authoredSectionCount": 4,
+          "assetEmptySectionCount": 0,
+          "assetEmptySections": [],
+          "draftBuildId": "runtime-draft-1777020335463",
+          "previewPath": "/runtime-draft/runtime-draft-1777020335463",
+          "comparePath": "/runtime-compare/runtime-draft-1777020335463",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "pc",
+            "componentCount": 4,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 4,
+            "rowsWithApprovedInteraction": 2,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        },
+        {
+          "viewportProfile": "mo",
+          "runtimeStatus": "runtime-pass",
+          "assetStatus": "asset-sufficient",
+          "cloneStatus": 200,
+          "editableComponentCount": 4,
+          "authoredSectionCount": 4,
+          "assetEmptySectionCount": 0,
+          "assetEmptySections": [],
+          "draftBuildId": "runtime-draft-1777020382343",
+          "previewPath": "/runtime-draft/runtime-draft-1777020382343",
+          "comparePath": "/runtime-compare/runtime-draft-1777020382343",
+          "assetContractStatus": "asset-contract-pass",
+          "assetContract": {
+            "viewportProfile": "mo",
+            "componentCount": 4,
+            "rowsWithAssets": 4,
+            "rowsWithApprovedImage": 0,
+            "rowsWithApprovedIconFamily": 4,
+            "rowsWithApprovedInteraction": 2,
+            "rowsNeedingReview": 0,
+            "contractStatus": "asset-contract-pass"
+          }
+        }
+      ]
+    }
+  ]
+}

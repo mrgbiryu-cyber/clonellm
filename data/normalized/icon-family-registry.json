@@ -1,0 +1,1398 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-27T03:53:58.269Z",
+  "registryKind": "icon-family-registry",
+  "families": [
+    {
+      "familyId": "home.quickmenu.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/home.quickmenu.icon.family.v1",
+      "pageFamilies": [
+        "home"
+      ],
+      "slotFamilies": [
+        "quickmenu",
+        "shortcut"
+      ],
+      "componentIds": [
+        "home.quickmenu"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 9,
+      "styleSummary": "rounded mono line icon family for home quickmenu",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "quick access navigation icon family",
+      "llmDescription": "Consistent icon-only family for home quickmenu navigation. Use the family as a package and map members by label.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "keep icons secondary to text labels"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "choose for home quickmenu or shortcut navigation"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language"
+      ],
+      "members": [
+        {
+          "label": "구독 Days",
+          "assetId": "home.quickmenu.icon.1"
+        },
+        {
+          "label": "혜택/이벤트",
+          "assetId": "home.quickmenu.icon.2"
+        },
+        {
+          "label": "웨딩&이사",
+          "assetId": "home.quickmenu.icon.3"
+        },
+        {
+          "label": "다품목 할인",
+          "assetId": "home.quickmenu.icon.4"
+        },
+        {
+          "label": "라이브",
+          "assetId": "home.quickmenu.icon.5"
+        },
+        {
+          "label": "카드혜택",
+          "assetId": "home.quickmenu.icon.6"
+        },
+        {
+          "label": "가전 구독",
+          "assetId": "home.quickmenu.icon.7"
+        },
+        {
+          "label": "소모품",
+          "assetId": "home.quickmenu.icon.8"
+        },
+        {
+          "label": "SALE 홈스타일",
+          "assetId": "home.quickmenu.icon.9"
+        }
+      ],
+      "provenanceNotes": "Promoted from generated-asset-families after the quickmenu role-policy fix succeeded."
+    },
+    {
+      "familyId": "support.service.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/support.service.icon.family.v1",
+      "pageFamilies": [
+        "support"
+      ],
+      "slotFamilies": [
+        "service-intro",
+        "support-tab",
+        "tabs",
+        "shortcut",
+        "mainService",
+        "bestcare",
+        "tipsBanner",
+        "notice"
+      ],
+      "componentIds": [
+        "support.service-intro",
+        "support.support-tab",
+        "support.mainService",
+        "support.bestcare",
+        "support.tipsBanner",
+        "support.notice"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "rounded service utility line icon family for support entry points",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "support service shortcut icon family",
+      "llmDescription": "rounded service utility line icon family for support entry points. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "support tab icons",
+        "service shortcut icons",
+        "support quick access"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "제품 등록",
+          "assetId": "support.service.icon.icon.1"
+        },
+        {
+          "label": "AS 신청",
+          "assetId": "support.service.icon.icon.2"
+        },
+        {
+          "label": "매장 찾기",
+          "assetId": "support.service.icon.icon.3"
+        },
+        {
+          "label": "소모품 구매",
+          "assetId": "support.service.icon.icon.4"
+        },
+        {
+          "label": "설치/철거",
+          "assetId": "support.service.icon.icon.5"
+        },
+        {
+          "label": "상담 예약",
+          "assetId": "support.service.icon.icon.6"
+        },
+        {
+          "label": "사용설명서",
+          "assetId": "support.service.icon.icon.7"
+        },
+        {
+          "label": "보증/케어",
+          "assetId": "support.service.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "plp.filter.utility.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/plp.filter.utility.icon.family.v1",
+      "pageFamilies": [
+        "category-refrigerators",
+        "category-tvs",
+        "plp"
+      ],
+      "slotFamilies": [
+        "filter",
+        "sort",
+        "tabs",
+        "product-grid",
+        "drawer"
+      ],
+      "componentIds": [
+        "category-refrigerators.filter",
+        "category-tvs.filter"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "compact utility icon family for PLP filter, sort, and compare controls",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "PLP browse utility icon family",
+      "llmDescription": "compact utility icon family for PLP filter, sort, and compare controls. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "PLP filter icons",
+        "sort utility",
+        "compare chip icons"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "필터",
+          "assetId": "plp.filter.utility.icon.icon.1"
+        },
+        {
+          "label": "정렬",
+          "assetId": "plp.filter.utility.icon.icon.2"
+        },
+        {
+          "label": "비교",
+          "assetId": "plp.filter.utility.icon.icon.3"
+        },
+        {
+          "label": "배송",
+          "assetId": "plp.filter.utility.icon.icon.4"
+        },
+        {
+          "label": "에너지",
+          "assetId": "plp.filter.utility.icon.icon.5"
+        },
+        {
+          "label": "색상",
+          "assetId": "plp.filter.utility.icon.icon.6"
+        },
+        {
+          "label": "크기",
+          "assetId": "plp.filter.utility.icon.icon.7"
+        },
+        {
+          "label": "할인",
+          "assetId": "plp.filter.utility.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "pdp.commerce.utility.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/pdp.commerce.utility.icon.family.v1",
+      "pageFamilies": [
+        "pdp",
+        "pdp-tv-general",
+        "pdp-tv-premium",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "summary",
+        "sticky",
+        "buybox",
+        "qna",
+        "gallery",
+        "review"
+      ],
+      "componentIds": [
+        "pdp-tv-general.sticky",
+        "pdp-refrigerator-general.sticky"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 9,
+      "styleSummary": "commerce action icon family for PDP purchase and utility surfaces",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "PDP commerce action icon family",
+      "llmDescription": "commerce action icon family for PDP purchase and utility surfaces. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "PDP sticky CTA icons",
+        "buybox utility icons",
+        "review and inquiry icons"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "장바구니",
+          "assetId": "pdp.commerce.utility.icon.icon.1"
+        },
+        {
+          "label": "바로구매",
+          "assetId": "pdp.commerce.utility.icon.icon.2"
+        },
+        {
+          "label": "공유",
+          "assetId": "pdp.commerce.utility.icon.icon.3"
+        },
+        {
+          "label": "찜",
+          "assetId": "pdp.commerce.utility.icon.icon.4"
+        },
+        {
+          "label": "배송",
+          "assetId": "pdp.commerce.utility.icon.icon.5"
+        },
+        {
+          "label": "설치",
+          "assetId": "pdp.commerce.utility.icon.icon.6"
+        },
+        {
+          "label": "리뷰",
+          "assetId": "pdp.commerce.utility.icon.icon.7"
+        },
+        {
+          "label": "문의",
+          "assetId": "pdp.commerce.utility.icon.icon.8"
+        },
+        {
+          "label": "비교",
+          "assetId": "pdp.commerce.utility.icon.icon.9"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "care.solution.service.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/care.solution.service.icon.family.v1",
+      "pageFamilies": [
+        "care-solutions",
+        "care-solutions-pdp"
+      ],
+      "slotFamilies": [
+        "careBanner",
+        "hero",
+        "ranking",
+        "category",
+        "shortcut"
+      ],
+      "componentIds": [
+        "care-solutions.careBanner",
+        "care-solutions.ranking"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "soft appliance-care icon family for rental and care solution categories",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "care solution category icon family",
+      "llmDescription": "soft appliance-care icon family for rental and care solution categories. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "care solution category icons",
+        "rental service icons",
+        "care ranking icons"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "정수기",
+          "assetId": "care.solution.service.icon.icon.1"
+        },
+        {
+          "label": "공기청정",
+          "assetId": "care.solution.service.icon.icon.2"
+        },
+        {
+          "label": "청소",
+          "assetId": "care.solution.service.icon.icon.3"
+        },
+        {
+          "label": "안마의자",
+          "assetId": "care.solution.service.icon.icon.4"
+        },
+        {
+          "label": "식기세척",
+          "assetId": "care.solution.service.icon.icon.5"
+        },
+        {
+          "label": "제습",
+          "assetId": "care.solution.service.icon.icon.6"
+        },
+        {
+          "label": "렌탈",
+          "assetId": "care.solution.service.icon.icon.7"
+        },
+        {
+          "label": "상담",
+          "assetId": "care.solution.service.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "mobile.nav.action.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/mobile.nav.action.icon.family.v1",
+      "pageFamilies": [
+        "home",
+        "support",
+        "care-solutions",
+        "category-refrigerators",
+        "category-tvs",
+        "pdp",
+        "bestshop",
+        "homestyle-home"
+      ],
+      "slotFamilies": [
+        "quickmenu",
+        "shortcut",
+        "tabs",
+        "filter",
+        "drawer",
+        "sticky",
+        "gnb",
+        "quickMenu"
+      ],
+      "componentIds": [
+        "bestshop.shortcut",
+        "homestyle-home.quickMenu"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "mobile navigation action icon family for touch-first utility controls",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "mobile navigation and action icon family",
+      "llmDescription": "mobile navigation action icon family for touch-first utility controls. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "mobile GNB icons",
+        "drawer controls",
+        "touch action icons"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "홈",
+          "assetId": "mobile.nav.action.icon.icon.1"
+        },
+        {
+          "label": "검색",
+          "assetId": "mobile.nav.action.icon.icon.2"
+        },
+        {
+          "label": "카테고리",
+          "assetId": "mobile.nav.action.icon.icon.3"
+        },
+        {
+          "label": "최근본",
+          "assetId": "mobile.nav.action.icon.icon.4"
+        },
+        {
+          "label": "알림",
+          "assetId": "mobile.nav.action.icon.icon.5"
+        },
+        {
+          "label": "메뉴",
+          "assetId": "mobile.nav.action.icon.icon.6"
+        },
+        {
+          "label": "닫기",
+          "assetId": "mobile.nav.action.icon.icon.7"
+        },
+        {
+          "label": "뒤로",
+          "assetId": "mobile.nav.action.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage. Scoped to bestshop shortcut and homestyle quickMenu as generic approved navigation/action icon families.",
+      "updatedAt": "2026-04-27T03:53:58.268Z"
+    },
+    {
+      "familyId": "home.quickmenu.premium.arc.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/home.quickmenu.premium.arc.icon.family.v1",
+      "pageFamilies": [
+        "home"
+      ],
+      "slotFamilies": [
+        "quickmenu",
+        "shortcut"
+      ],
+      "componentIds": [
+        "home.quickmenu"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 9,
+      "styleSummary": "premium rounded arc icon family for home quickmenu redesigns",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "2.1",
+        "corner": "soft-rounded",
+        "tone": "warm-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "home quickmenu premium navigation icon family",
+      "llmDescription": "premium rounded arc icon family for home quickmenu redesigns. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "home quickmenu icons",
+        "premium shortcut set",
+        "rounded arc navigation"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "구독 Days",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.1"
+        },
+        {
+          "label": "혜택/이벤트",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.2"
+        },
+        {
+          "label": "웨딩&이사",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.3"
+        },
+        {
+          "label": "다품목 할인",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.4"
+        },
+        {
+          "label": "라이브",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.5"
+        },
+        {
+          "label": "카드혜택",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.6"
+        },
+        {
+          "label": "가전 구독",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.7"
+        },
+        {
+          "label": "소모품",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.8"
+        },
+        {
+          "label": "SALE 홈스타일",
+          "assetId": "home.quickmenu.premium.arc.icon.icon.9"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "home.story.micro.cue.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/home.story.micro.cue.icon.family.v1",
+      "pageFamilies": [
+        "home"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "componentIds": [
+        "home.hero",
+        "home.marketing-area"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "small editorial cue icon family for home hero and story support chips",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.55",
+        "corner": "editorial-rounded",
+        "tone": "muted-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "home editorial support cue icon family",
+      "llmDescription": "small editorial cue icon family for home hero and story support chips. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "hero support chips",
+        "editorial cue icons",
+        "story metadata icons"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "신제품",
+          "assetId": "home.story.micro.cue.icon.icon.1"
+        },
+        {
+          "label": "프리미엄",
+          "assetId": "home.story.micro.cue.icon.icon.2"
+        },
+        {
+          "label": "라이프",
+          "assetId": "home.story.micro.cue.icon.icon.3"
+        },
+        {
+          "label": "케어",
+          "assetId": "home.story.micro.cue.icon.icon.4"
+        },
+        {
+          "label": "혜택",
+          "assetId": "home.story.micro.cue.icon.icon.5"
+        },
+        {
+          "label": "설치",
+          "assetId": "home.story.micro.cue.icon.icon.6"
+        },
+        {
+          "label": "상담",
+          "assetId": "home.story.micro.cue.icon.icon.7"
+        },
+        {
+          "label": "공유",
+          "assetId": "home.story.micro.cue.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "support.status.badge.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/support.status.badge.icon.family.v1",
+      "pageFamilies": [
+        "support"
+      ],
+      "slotFamilies": [
+        "mainService",
+        "bestcare",
+        "notice",
+        "tabs",
+        "support-tab"
+      ],
+      "componentIds": [
+        "support.mainService",
+        "support.bestcare",
+        "support.notice"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "compact status badge icon family for support service states",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.8",
+        "corner": "compact-rounded",
+        "tone": "cool-utility",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "support status and service state icon family",
+      "llmDescription": "compact status badge icon family for support service states. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "support status icons",
+        "service state badges",
+        "notice cue icons"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "접수",
+          "assetId": "support.status.badge.icon.icon.1"
+        },
+        {
+          "label": "진행",
+          "assetId": "support.status.badge.icon.icon.2"
+        },
+        {
+          "label": "완료",
+          "assetId": "support.status.badge.icon.icon.3"
+        },
+        {
+          "label": "예약",
+          "assetId": "support.status.badge.icon.icon.4"
+        },
+        {
+          "label": "긴급",
+          "assetId": "support.status.badge.icon.icon.5"
+        },
+        {
+          "label": "문의",
+          "assetId": "support.status.badge.icon.icon.6"
+        },
+        {
+          "label": "보증",
+          "assetId": "support.status.badge.icon.icon.7"
+        },
+        {
+          "label": "알림",
+          "assetId": "support.status.badge.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "plp.product.signal.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/plp.product.signal.icon.family.v1",
+      "pageFamilies": [
+        "category-refrigerators",
+        "category-tvs",
+        "plp"
+      ],
+      "slotFamilies": [
+        "product-grid",
+        "bestProduct",
+        "ranking",
+        "filter",
+        "sort"
+      ],
+      "componentIds": [
+        "category-refrigerators.product-grid",
+        "category-tvs.product-grid"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "sharp product signal icon family for PLP cards, rankings, and feature chips",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.7",
+        "corner": "technical",
+        "tone": "graphite",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "PLP product feature signal icon family",
+      "llmDescription": "sharp product signal icon family for PLP cards, rankings, and feature chips. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "PLP card chips",
+        "ranking badges",
+        "product feature cues"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "인기",
+          "assetId": "plp.product.signal.icon.icon.1"
+        },
+        {
+          "label": "신제품",
+          "assetId": "plp.product.signal.icon.icon.2"
+        },
+        {
+          "label": "에너지",
+          "assetId": "plp.product.signal.icon.icon.3"
+        },
+        {
+          "label": "배송",
+          "assetId": "plp.product.signal.icon.icon.4"
+        },
+        {
+          "label": "할인",
+          "assetId": "plp.product.signal.icon.icon.5"
+        },
+        {
+          "label": "비교",
+          "assetId": "plp.product.signal.icon.icon.6"
+        },
+        {
+          "label": "리뷰",
+          "assetId": "plp.product.signal.icon.icon.7"
+        },
+        {
+          "label": "색상",
+          "assetId": "plp.product.signal.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "pdp.benefit.chip.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/pdp.benefit.chip.icon.family.v1",
+      "pageFamilies": [
+        "pdp",
+        "pdp-tv-general",
+        "pdp-tv-premium",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "summary",
+        "sticky",
+        "buybox",
+        "review",
+        "qna"
+      ],
+      "componentIds": [
+        "pdp-tv-general.summary",
+        "pdp-refrigerator-general.summary"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "commerce benefit chip icon family for PDP reassurance and purchase rails",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "2.0",
+        "corner": "confident-rounded",
+        "tone": "commerce-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "PDP benefit and purchase reassurance icon family",
+      "llmDescription": "commerce benefit chip icon family for PDP reassurance and purchase rails. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "PDP benefit chips",
+        "sticky buybox icons",
+        "purchase reassurance cues"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "무이자",
+          "assetId": "pdp.benefit.chip.icon.icon.1"
+        },
+        {
+          "label": "배송",
+          "assetId": "pdp.benefit.chip.icon.icon.2"
+        },
+        {
+          "label": "설치",
+          "assetId": "pdp.benefit.chip.icon.icon.3"
+        },
+        {
+          "label": "케어",
+          "assetId": "pdp.benefit.chip.icon.icon.4"
+        },
+        {
+          "label": "리뷰",
+          "assetId": "pdp.benefit.chip.icon.icon.5"
+        },
+        {
+          "label": "공유",
+          "assetId": "pdp.benefit.chip.icon.icon.6"
+        },
+        {
+          "label": "혜택",
+          "assetId": "pdp.benefit.chip.icon.icon.7"
+        },
+        {
+          "label": "상담",
+          "assetId": "pdp.benefit.chip.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "care.wellness.rounded.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/care.wellness.rounded.icon.family.v1",
+      "pageFamilies": [
+        "care-solutions",
+        "care-solutions-pdp"
+      ],
+      "slotFamilies": [
+        "careBanner",
+        "hero",
+        "ranking",
+        "category",
+        "shortcut",
+        "bestcare"
+      ],
+      "componentIds": [
+        "care-solutions.careBanner",
+        "care-solutions.ranking",
+        "care-solutions-pdp.summary"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "warm rounded wellness icon family for care solution categories and reassurance cards",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.85",
+        "corner": "soft-organic",
+        "tone": "warm-service",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "care solution wellness category icon family",
+      "llmDescription": "warm rounded wellness icon family for care solution categories and reassurance cards. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "care wellness icons",
+        "rental reassurance icons",
+        "service category icons"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "정수",
+          "assetId": "care.wellness.rounded.icon.icon.1"
+        },
+        {
+          "label": "공기",
+          "assetId": "care.wellness.rounded.icon.icon.2"
+        },
+        {
+          "label": "청소",
+          "assetId": "care.wellness.rounded.icon.icon.3"
+        },
+        {
+          "label": "수면",
+          "assetId": "care.wellness.rounded.icon.icon.4"
+        },
+        {
+          "label": "안심",
+          "assetId": "care.wellness.rounded.icon.icon.5"
+        },
+        {
+          "label": "상담",
+          "assetId": "care.wellness.rounded.icon.icon.6"
+        },
+        {
+          "label": "렌탈",
+          "assetId": "care.wellness.rounded.icon.icon.7"
+        },
+        {
+          "label": "관리",
+          "assetId": "care.wellness.rounded.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage."
+    },
+    {
+      "familyId": "mobile.gesture.utility.icon.family.v1",
+      "assetKind": "icon-family",
+      "status": "approved",
+      "role": "icon-only",
+      "sourceType": "generated",
+      "sourceRef": "data/normalized/generated-asset-families.json#/families/mobile.gesture.utility.icon.family.v1",
+      "pageFamilies": [
+        "home",
+        "support",
+        "care-solutions",
+        "category-refrigerators",
+        "category-tvs",
+        "pdp",
+        "bestshop",
+        "homestyle-home"
+      ],
+      "slotFamilies": [
+        "quickmenu",
+        "shortcut",
+        "tabs",
+        "filter",
+        "drawer",
+        "sticky",
+        "gnb",
+        "ranking",
+        "quickMenu"
+      ],
+      "componentIds": [
+        "bestshop.shortcut",
+        "homestyle-home.quickMenu"
+      ],
+      "viewportProfiles": [
+        "pc",
+        "mo"
+      ],
+      "memberCount": 8,
+      "styleSummary": "mobile gesture utility icon family for touch-first states and controls",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "2.05",
+        "corner": "touch-rounded",
+        "tone": "mobile-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "semanticRole": "mobile gesture and control state icon family",
+      "llmDescription": "mobile gesture utility icon family for touch-first states and controls. Use this as a consistent icon-only package, not as independent mixed thumbnails.",
+      "llmDo": [
+        "use members together as one family",
+        "preserve stroke, corner, and density consistency",
+        "map members by label"
+      ],
+      "llmDont": [
+        "mix with promo thumbnails",
+        "use members as hero art",
+        "invent missing member ids",
+        "embed text inside icons"
+      ],
+      "selectionHints": [
+        "mobile control icons",
+        "drawer state icons",
+        "touch gesture cues"
+      ],
+      "conflictHints": [
+        "conflicts with promo-complete thumbnails",
+        "conflicts with full-bleed background slots"
+      ],
+      "validationTags": [
+        "icon-only",
+        "family-consistent",
+        "no-text",
+        "same-stroke-language",
+        "diversity-seed"
+      ],
+      "members": [
+        {
+          "label": "열기",
+          "assetId": "mobile.gesture.utility.icon.icon.1"
+        },
+        {
+          "label": "닫기",
+          "assetId": "mobile.gesture.utility.icon.icon.2"
+        },
+        {
+          "label": "필터",
+          "assetId": "mobile.gesture.utility.icon.icon.3"
+        },
+        {
+          "label": "정렬",
+          "assetId": "mobile.gesture.utility.icon.icon.4"
+        },
+        {
+          "label": "탭",
+          "assetId": "mobile.gesture.utility.icon.icon.5"
+        },
+        {
+          "label": "스와이프",
+          "assetId": "mobile.gesture.utility.icon.icon.6"
+        },
+        {
+          "label": "고정",
+          "assetId": "mobile.gesture.utility.icon.icon.7"
+        },
+        {
+          "label": "선택",
+          "assetId": "mobile.gesture.utility.icon.icon.8"
+        }
+      ],
+      "provenanceNotes": "Seeded as internal generated SVG icon family to expand reusable icon diversity without external licensing risk.",
+      "reviewedAt": "2026-04-24T07:28:04.313Z",
+      "reviewNotes": "Internal generated mono-line SVG package. Approved for icon-only usage. Scoped to bestshop shortcut and homestyle quickMenu as generic approved navigation/action icon families.",
+      "updatedAt": "2026-04-27T03:53:58.269Z"
+    }
+  ],
+  "auditLog": [
+    {
+      "type": "diverse-icon-family-seed",
+      "count": 5,
+      "updatedAt": "2026-04-24T06:59:01.243Z"
+    },
+    {
+      "type": "diverse-icon-family-seed",
+      "count": 5,
+      "updatedAt": "2026-04-24T07:03:20.611Z"
+    },
+    {
+      "type": "diverse-icon-family-seed",
+      "count": 12,
+      "updatedAt": "2026-04-24T07:28:04.313Z"
+    }
+  ]
+}

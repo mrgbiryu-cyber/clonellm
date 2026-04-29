@@ -1,0 +1,490 @@
+{
+  "generatedAt": "2026-04-24T05:51:10.785Z",
+  "candidateCount": 222,
+  "addedCount": 0,
+  "updatedCount": 158,
+  "skippedCount": 64,
+  "added": [],
+  "updated": [
+    "lge.care-solutions.careBanner.1760x360-pc-20260407-093645.27204ced33",
+    "lge.care-solutions.careBanner.img-rental-category-puri20240319-144350.1267ed607c",
+    "lge.care-solutions.careBanner.quick-menu-pc-88x88-20260310-125602.128e148e51",
+    "lge.care-solutions.careBanner.img-rental-category-wash20240319-145849.8095dcd7e0",
+    "lge.care-solutions.careBanner.img-rental-category-tower20240319-145755.53acebe4e4",
+    "lge.care-solutions.careBanner.img-rental-category-washcombo2024040920240409-153837.7478f441be",
+    "lge.care-solutions.careBanner.img-rental-category-dry20240319-145942.daf953fb91",
+    "lge.care-solutions.careBanner.img-rental-category-styler20240319-150032.6b2612ed18",
+    "lge.care-solutions.careBanner.img-rental-category-refriger20240319-144801.6f5fb209cb",
+    "lge.care-solutions.careBanner.img-rental-category-icerefriger20240319-144701.d2a5ee9e3a",
+    "lge.care-solutions.careBanner.img-rental-category-kimchi20240319-144854.6db6518c85",
+    "lge.care-solutions.careBanner.img-rental-category-tv20240319-144532.99366e64c3",
+    "lge.care-solutions.careBanner.img-rental-category-pc20240319-144439.4c85b8b4e3",
+    "lge.care-solutions.careBanner.img-rental-category-airpuri20240319-145046.994e74588e",
+    "lge.care-solutions.careBanner.img-rental-category-dishwash20240319-145709.2f5b6e83b0",
+    "lge.care-solutions.careBanner.img-rental-category-airo20240319-145134.2d61939770",
+    "lge.care-solutions.careBanner.img-rental-category-humidi20240319-145532.e6520f5587",
+    "lge.care-solutions.careBanner.img-rental-category-dehumidifier20240610-172223.4322475887",
+    "lge.care-solutions.careBanner.img-rental-category-cook20240319-145621.7e21e0ca29",
+    "lge.care-solutions.careBanner.img-rental-category-cleaner20240319-150158.8c02a19ad2",
+    "lge.care-solutions.careBanner.img-rental-category-chair20240319-150243.1d37423cd6",
+    "lge.care-solutions.careBanner.img-rental-category-shoes20240319-150118.68a393c738",
+    "lge.category-stan-by-me.md-choice.2-md초이스-20260331-141619.683e70b33b",
+    "lge.category-tumbler-cleaner.md-choice.md-20250903-143152.65556b91fc",
+    "lge.category-tvs.md-choice.2-md초이스-20260331-140941.e0f5000bc4",
+    "lge.home.marketing-area.가전구독r-20260130-175316.6cba0728a0",
+    "lge.home.marketing-area.01r-20260407-154645.9dfc7bdbe0",
+    "lge.home.marketing-area.01r-20251014-111653.b5d18ed0d6",
+    "lge.home.marketing-area.bath-pc-20260126-163123.f820e124d8",
+    "lge.home.marketing-area.01r-20260303-142033.369ca02161",
+    "lge.home.marketing-area.06r-20251217-111246.ec3b68df82",
+    "lge.home.marketing-area.06r-20260407-132937.4f78326a4d",
+    "lge.home.marketing-area.라이브-20251120-133405.6cff8d7f27",
+    "lge.home.marketing-area.가전구독-20250826-165534.0c13cb8ac6",
+    "lge.home.marketing-area.소모품-20250826-165621.1bfb03d3c9",
+    "lge.home.marketing-area.홈스타일-20251119-160746.09fee0ff77",
+    "lge.home.marketing-area.고객지원-20250826-165716.ca72048b9f",
+    "lge.home.marketing-area.businessmall-20250826-170056.16ab7369c7",
+    "lge.home.hero.img-homemain-pc-1380x180-260331-20260331-153150.ca6459629f",
+    "lge.home.marketing-area.2-promotion-v1-pc-20250806-114037.5576e18bfa",
+    "lge.care-solutions.careBanner.1760x360-pc-20260407-093645.27204ced33",
+    "lge.care-solutions.careBanner.img-rental-category-puri20240319-144352.b97cd1edc3",
+    "lge.care-solutions.careBanner.quick-menu-mo-64x64-20260310-125603.762eabf863",
+    "lge.care-solutions.careBanner.img-rental-category-wash20240319-145849.8095dcd7e0",
+    "lge.care-solutions.careBanner.img-rental-category-tower20240319-145755.53acebe4e4",
+    "lge.care-solutions.careBanner.img-rental-category-washcombo2024040920240409-153837.7478f441be",
+    "lge.care-solutions.careBanner.img-rental-category-dry20240319-145943.ac4e780677",
+    "lge.care-solutions.careBanner.img-rental-category-styler20240319-150032.6b2612ed18",
+    "lge.care-solutions.careBanner.img-rental-category-refriger20240319-144801.6f5fb209cb",
+    "lge.care-solutions.careBanner.img-rental-category-icerefriger20240319-144701.d2a5ee9e3a",
+    "lge.care-solutions.careBanner.img-rental-category-kimchi20240319-144854.6db6518c85",
+    "lge.care-solutions.careBanner.img-rental-category-tv20240319-144532.99366e64c3",
+    "lge.care-solutions.careBanner.img-rental-category-pc20240319-144439.4c85b8b4e3",
+    "lge.care-solutions.careBanner.img-rental-category-airpuri20240319-145046.994e74588e",
+    "lge.care-solutions.careBanner.img-rental-category-dishwash20240319-145709.2f5b6e83b0",
+    "lge.care-solutions.careBanner.img-rental-category-airo20240319-145134.2d61939770",
+    "lge.care-solutions.careBanner.img-rental-category-humidi20240319-145532.e6520f5587",
+    "lge.care-solutions.careBanner.img-rental-category-dehumidifier20240610-172223.4322475887",
+    "lge.care-solutions.careBanner.img-rental-category-cook20240319-145621.7e21e0ca29",
+    "lge.care-solutions.careBanner.img-rental-category-cleaner20240319-150158.8c02a19ad2",
+    "lge.care-solutions.careBanner.img-rental-category-chair20240319-150243.1d37423cd6",
+    "lge.care-solutions.careBanner.img-rental-category-shoes20240319-150118.68a393c738",
+    "lge.category-tvs.md-choice.2-md초이스-20260331-140941.15d7f5d49b",
+    "lge.home.hero.img-homemain-mo-720x472-20260420-190704.5bcab0ff43",
+    "lge.home.marketing-area.04r-20260421-140839.de8cbe1d48",
+    "lge.home.marketing-area.mo-20260421-144939.d3b3eeb6b0",
+    "lge.home.marketing-area.04r-20260306-173744.da63076433",
+    "lge.home.marketing-area.mo-20260306-185815.e8834ba5f1",
+    "lge.home.marketing-area.가전구독r-20260130-175316.9a67abe1c9",
+    "lge.home.marketing-area.mo-20260421-165853.b6da70ea6f",
+    "lge.home.marketing-area.08r-20260421-151809.e47c703842",
+    "lge.home.marketing-area.04r-20260416-111927.fc6aa71971",
+    "lge.home.marketing-area.mo-20260416-111927.c5a8356d42",
+    "lge.home.marketing-area.01w-20260421-153328.fcd4091107",
+    "lge.home.hero.homemain-hero-mo-v2-20260421-171551.ce40096b29",
+    "lge.home.hero.homemain-hero-mo-780x780-20260331-144053.817591b297",
+    "lge.home.marketing-area.01r-20260407-154645.9dfc7bdbe0",
+    "lge.home.hero.homemain-hero-mo-260403-20260403-173224.d0e6dd7013",
+    "lge.home.marketing-area.01r-20251014-111653.b5d18ed0d6",
+    "lge.home.marketing-area.bath-mo-2x-780-780-20260126-163123.3681efe745",
+    "lge.home.marketing-area.01r-20260303-142033.369ca02161",
+    "lge.home.hero.homemain-hero-mo-260224-20260303-142033.362f9ebb7c",
+    "lge.home.marketing-area.04r-20260309-155028.79668f9ca1",
+    "lge.home.marketing-area.06r-20251217-111246.ec3b68df82",
+    "lge.home.marketing-area.obs-홈히어로-메인배너-mo-문구제외-20260203-154656.e93596b64b",
+    "lge.home.marketing-area.06r-20260407-132937.4f78326a4d",
+    "lge.home.marketing-area.mo-20260331-151127.b776f43669",
+    "lge.home.marketing-area.260421-standbyme2-quick-full-mo-20260421-164021.034e6035ca",
+    "lge.home.marketing-area.라이브-20251120-133516.e90bf40a5a",
+    "lge.home.marketing-area.가전구독-20251023-160616.f289afc0e0",
+    "lge.home.marketing-area.소모품-20251023-160543.a563b9ccc6",
+    "lge.home.marketing-area.홈스타일-20251119-160123.3f3cc2d20a",
+    "lge.home.marketing-area.고객지원-20251023-160514.308cb86ffa",
+    "lge.home.marketing-area.businessmall-20251023-160349.90c644558c",
+    "lge.home.marketing-area.에어컨-20250812-160203.5bb19730a0",
+    "lge.home.marketing-area.냉장고-20250812-160542.129aa2f43a",
+    "lge.home.marketing-area.김치냉장고-20250812-160732.120b720476",
+    "lge.home.marketing-area.컨버터블패키지-20250812-161018.8f35a6deb6",
+    "lge.home.marketing-area.tv-20250812-160130.45d670f7dd",
+    "lge.home.marketing-area.세탁기-20250812-160219.b60f2e7caf",
+    "lge.home.marketing-area.워시타워-20250812-160629.c7ad9a4d18",
+    "lge.home.marketing-area.워시콤보-20250812-160837.803bfbcca1",
+    "lge.home.marketing-area.의류건조기-20250812-160643.9d2e21ba31",
+    "lge.home.marketing-area.청소기-20250812-160230.a25d91727c",
+    "lge.home.marketing-area.공기청정기-20250812-160701.8c66cd16f1",
+    "lge.home.marketing-area.제습기-20250812-160944.6907c1a7a3",
+    "lge.home.marketing-area.의류관리기-20250812-160615.776fd0ce16",
+    "lge.home.marketing-area.식기세척기-20250812-160824.bb61fada1b",
+    "lge.home.marketing-area.전기레인지-20250812-160750.473fc250d9",
+    "lge.home.marketing-area.광파오븐-20250812-160716.e7e2113590",
+    "lge.home.marketing-area.노트북-20250812-160557.a88835e34b",
+    "lge.home.marketing-area.모니터-20250812-160144.60ad65a9cd",
+    "lge.home.marketing-area.프로젝터-20250812-160857.3f170593a3",
+    "lge.home.marketing-area.스탠바이미-20250812-161050.ae8158f563",
+    "lge.home.marketing-area.정수기-20250812-161004.7ebd358917",
+    "lge.home.marketing-area.오디오-20250812-160916.e67e83a6a2",
+    "lge.home.marketing-area.와인셀러-20250812-161034.00a8dc67a3",
+    "lge.home.marketing-area.가습기-20250812-160930.5fa3755ac0",
+    "lge.home.hero.1-homemain-bn-20251215-161443.2bee0ae31f",
+    "lge.home.hero.2-homemain-bn-20251215-161530.e72d6e9bc1",
+    "lge.home.hero.3-homemain-bn-20251215-165644.ee9797353f",
+    "lge.home.hero.4-homemain-bn-20251215-161809.77e38ad4e8",
+    "lge.home.marketing-area.5-style-tip-20251215-161912.277d0fe5db",
+    "lge.home.marketing-area.img-mo-1313x718-20260320-152211.443f910db4",
+    "lge.home.marketing-area.mo-정수기-270-180-20250807-154248.1ea5b47089",
+    "lge.home.marketing-area.mo-에어컨-270-180-20260106-141230.fcc364f4bb",
+    "lge.home.marketing-area.mo-워시타워-270-180-20250807-154420.555e02f6e7",
+    "lge.home.marketing-area.mo-콤보-270-180-20250807-154321.6f2908af7d",
+    "lge.home.marketing-area.mo-건조기-270x180-20260106-143841.81cb0d5075",
+    "lge.home.marketing-area.mo-스타일러-270-180-20250807-154331.a115a17a91",
+    "lge.home.marketing-area.mo-냉장-270-180-20250807-154344.f1e0567c79",
+    "lge.home.marketing-area.mo-김치냉장고-270-180-20260106-143918.c111804843",
+    "lge.home.marketing-area.mo-tv-270-180-20250807-154434.117439886b",
+    "lge.home.marketing-area.mo-그램-270x180-20260106-143859.505f68b93c",
+    "lge.home.marketing-area.mo-공기청정기-270-180-20250807-154309.97cea83842",
+    "lge.home.marketing-area.mo-가습기-270x180-20260106-143816.473361febb",
+    "lge.home.marketing-area.mo-식기세척기-270x180-20260106-143939.96cfa7abc0",
+    "lge.home.marketing-area.mo-전기레인지-270x180-20260106-144003.395c63a2e4",
+    "lge.home.marketing-area.mo-로청기-270-180-20250807-154355.0501dee5fe",
+    "lge.home.marketing-area.mo-안마의자-270-180-20250807-154406.29942da0bd",
+    "lge.home.marketing-area.dimension-5-20251216-20251216-160002.e3145c179e",
+    "lge.home.marketing-area.lg시그니처-20250806-155222.67af4d5018",
+    "lge.home.marketing-area.lg오브제컬렉션-20250806-155250.7081b91364",
+    "lge.home.marketing-area.이미지-11-20250811-150404.27e7738a87",
+    "lge.home.marketing-area.lg스마트코티지-20250806-155339.e62934f29a",
+    "lge.home.marketing-area.렛츠그램-20250806-155423.d814d67dd6",
+    "lge.home.marketing-area.32lx6bpga-v2-20260420-134122.29604a1e7e",
+    "lge.home.marketing-area.100mrgb96bk-wallv3-20260407-102703.87936b6ee1",
+    "lge.home.marketing-area.oled-654x654-20260317-153054.48b55e1795",
+    "lge.home.marketing-area.system-ironing-654x654-20260129-155433.0cadfbeb8f",
+    "lge.home.marketing-area.air-purifier-654x654-20260122-102840.7113fb88b1",
+    "lge.home.marketing-area.air-conditioners-654x654-ver2-20260122-160156.fc8635fe22",
+    "lge.home.marketing-area.최신제품소식-2026-그램-20260107-144305.ba8660736c",
+    "lge.home.marketing-area.styler-2-20260107-172548.fc7ff127ef",
+    "lge.home.marketing-area.01-하이드로에센셜-20251027-151058.7c1cbad431",
+    "lge.home.marketing-area.02-사계절에어컨-20251027-161252.d172cdb400",
+    "lge.home.marketing-area.img-1-20250731-154323.ef2e3450e1",
+    "lge.home.marketing-area.img-2-20250731-154342.ed0f87978a"
+  ],
+  "skipped": [
+    {
+      "assetId": "lge.care-solutions.hero.subscribedays-hero-pc-20260409-102017.f19137ad79",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.herobanner-1760-360pc-260330-20260331-101429-20260401-.14b8520aba",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172217.3f93ae5ce1",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172043.decf2e52c8",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.img-hero-pc-1760x360-20260303-143905.58c405c256",
+      "viewport": "pc",
+      "reason": "approved-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172129.c21a7bfb0c",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.pc-herobanner-gooddog-20251216-132215.480accc89b",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.herobanner-1760x360-20260112-134326.50585a4288",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.homemain-hero-subs-changeupfesta-pc-20260106-135517.740151c6de",
+      "viewport": "pc",
+      "reason": "approved-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.hero-banner-pc-img-20260401-135149.1ff6cb9ff6",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.category-refrigerators.banner.category-plp-banner-680x435-20260403-140419.3063890b1f",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.category-refrigerators.marketing-area.1-함께-사면-가전-번들-할인-20260331-113629.946d36b4ee",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.category-stan-by-me.marketing-area.6-다품목-기획전-20260331-141814.848c741283",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.category-tumbler-cleaner.marketing-area.6-다품목-기획전-20260401-095526.9c534d9728",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.category-tvs.marketing-area.6-다품목-기획전-20260331-141050.fb606ff553",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.home-hero-pc-1760x500-20260331-153421.4cff64f7ee",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.03r-20260331-153016.f62b23a31f",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.homemainhero-pc-1760x500-homestylebrand-260331-v2-2026.0b9be3553b",
+      "viewport": "pc",
+      "reason": "approved-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260306-173744.da63076433",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-20260306-185815.336ddad9e0",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-pc-1-20260227-164209.aba44eb17b",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260113-151034.69e3ca0c00",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-20260123-180808.d5bdf741d0",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.benefit.07r-20260320-163707.4b680bb567",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-pc-4-20260401-171950.cbca60c3f8",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.01r-20260402-173215.56d9354473",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.herobanner-pc-20260402-173215.2972d4d8d5",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-pc-260403-20260403-173224.c21062a37b",
+      "viewport": "pc",
+      "reason": "approved-existing"
+    },
+    {
+      "assetId": "lge.home.hero.homemain-hero-pc-260224-20260303-142033.8297ccc711",
+      "viewport": "pc",
+      "reason": "approved-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260309-155028.79668f9ca1",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.pc-home-main-herobanner-20260309-155028.8348128580",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.04r-20260331-155333.ef45a5dd70",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.pc-homemain-hero-20260407-133435.4c80269949",
+      "viewport": "pc",
+      "reason": "approved-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.06r-20260407-132957.0e42f1ddff",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-20260331-150932.8daffd0b70",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.obs-홈히어로-메인배너-pc-copy-20260203-154656.fc7f11f3ea",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-20260331-151127.92740d39a7",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.pc-allnew-20260330-140416.e6a74af055",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.benefit.혜택이벤트-20251120-133323.eee7cd32df",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.다품목할인-20251120-133343.bf7ff62085",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.benefit.카드혜택-20251120-133423.07d39e052f",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.banner.02-01-promotion-banner-pc-img-20260407-160827.1d73842dc1",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.banner.home-pc-banner-promotion-1-20260325-135524.e7b739d9e5",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.hero-banner-pc-img-20260401-135149.1ff6cb9ff6",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.img-hero-pc-1760x360-20260303-143905.58c405c256",
+      "viewport": "pc",
+      "reason": "approved-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172217.3f93ae5ce1",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172043.decf2e52c8",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172129.c21a7bfb0c",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.pc-herobanner-gooddog-20251216-132215.480accc89b",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.herobanner-1760x360-20260112-134326.50585a4288",
+      "viewport": "pc",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.care-solutions.hero.homemain-hero-subs-changeupfesta-pc-20260106-135517.740151c6de",
+      "viewport": "pc",
+      "reason": "approved-existing"
+    },
+    {
+      "assetId": "lge.category-refrigerators.banner.category-plp-banner-680x435-20260403-140419.3063890b1f",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.category-refrigerators.marketing-area.1-함께-사면-가전-번들-할인-20260331-113629.4f86115f50",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.category-tvs.banner.category-plp-banner-680x435-4-20260414-104543.49064fe588",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.mo-home-main-herobanner-view-1-20260422-143550.3f5316a11f",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.herobanner-mo-20260421-151809.c9065cc50b",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.구매혜택-red-20260331-144053.a03b804dcb",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.hero.mo-home-main-herobanner-20260309-155028.1385d7798d",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.혜택이벤트-20251120-133446.d3755048e7",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.다품목할인-20251120-133501.c7f9a4c8e8",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.marketing-area.카드혜택-20251120-133531.57a572a580",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.banner.home-mo-banner-270x220-20260417-152538.a9eca33f4d",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.banner.02-01-promotion-banner-mo-img-b1a7ba-20260422-102332.3cf7e2ebf5",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    },
+    {
+      "assetId": "lge.home.banner.home-mo-banner-270-220-v2-20260326-103108.3498371365",
+      "viewport": "mo",
+      "reason": "blocked-existing"
+    }
+  ]
+}

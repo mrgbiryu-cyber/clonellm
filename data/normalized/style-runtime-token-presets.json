@@ -1,0 +1,299 @@
+{
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "version": 1,
+  "presets": [
+    {
+      "id": "hero-editorial-spotlight",
+      "slotGroup": "hero",
+      "label": "Hero Editorial Spotlight",
+      "surfaceTone": "editorial-bright",
+      "density": "low",
+      "hierarchyEmphasis": "headline-centered-spotlight",
+      "tokenHints": {
+        "titleSize": "58",
+        "descriptionSize": "18",
+        "titleLineHeight": "1.02",
+        "descriptionLineHeight": "1.58",
+        "titleLetterSpacing": "-0.04em",
+        "descriptionLetterSpacing": "-0.01em",
+        "cardRadius": "26",
+        "iconScale": "1",
+        "emphasisMode": "spotlight"
+      }
+    },
+    {
+      "id": "hero-premium-stage",
+      "slotGroup": "hero",
+      "label": "Hero Premium Stage",
+      "surfaceTone": "premium-contrast",
+      "density": "medium",
+      "hierarchyEmphasis": "headline-dominant-stage",
+      "tokenHints": {
+        "titleSize": "62",
+        "descriptionSize": "18",
+        "titleLineHeight": "0.98",
+        "descriptionLineHeight": "1.55",
+        "titleLetterSpacing": "-0.05em",
+        "descriptionLetterSpacing": "-0.01em",
+        "cardRadius": "30",
+        "iconScale": "1.05",
+        "emphasisMode": "stage"
+      }
+    },
+    {
+      "id": "quickmenu-solid-showcase",
+      "slotGroup": "quickmenu",
+      "label": "Quickmenu Solid Showcase",
+      "surfaceTone": "solid-icon",
+      "density": "low",
+      "hierarchyEmphasis": "lead-card",
+      "interactionTone": "hover-emphasis",
+      "tokenHints": {
+        "titleSize": "17",
+        "descriptionSize": "14",
+        "titleLineHeight": "1.32",
+        "descriptionLineHeight": "1.5",
+        "titleLetterSpacing": "-0.02em",
+        "descriptionLetterSpacing": "-0.01em",
+        "cardRadius": "28",
+        "iconScale": "1.08",
+        "emphasisMode": "panel"
+      }
+    },
+    {
+      "id": "quickmenu-editorial-strip",
+      "slotGroup": "quickmenu",
+      "label": "Quickmenu Editorial Strip",
+      "surfaceTone": "editorial-line",
+      "density": "medium",
+      "hierarchyEmphasis": "strip-rhythm",
+      "interactionTone": "hover-emphasis",
+      "tokenHints": {
+        "titleSize": "15",
+        "descriptionSize": "13",
+        "titleLineHeight": "1.34",
+        "descriptionLineHeight": "1.48",
+        "titleLetterSpacing": "-0.015em",
+        "descriptionLetterSpacing": "-0.01em",
+        "cardRadius": "22",
+        "iconScale": "0.95",
+        "emphasisMode": "strip"
+      }
+    },
+    {
+      "id": "ranking-poster-stack",
+      "slotGroup": "ranking",
+      "label": "Ranking Poster Stack",
+      "surfaceTone": "poster-dark",
+      "density": "medium",
+      "hierarchyEmphasis": "rank-dominant",
+      "tokenHints": {
+        "titleSize": "28",
+        "descriptionSize": "15",
+        "titleLineHeight": "1.08",
+        "descriptionLineHeight": "1.5",
+        "titleLetterSpacing": "-0.03em",
+        "descriptionLetterSpacing": "-0.01em",
+        "cardRadius": "18",
+        "emphasisMode": "poster"
+      }
+    },
+    {
+      "id": "commerce-editorial-grid",
+      "slotGroup": "commerce",
+      "label": "Commerce Editorial Grid",
+      "surfaceTone": "editorial-soft",
+      "density": "medium",
+      "hierarchyEmphasis": "story-card",
+      "tokenHints": {
+        "titleSize": "18",
+        "descriptionSize": "14",
+        "titleLineHeight": "1.28",
+        "descriptionLineHeight": "1.5",
+        "titleLetterSpacing": "-0.02em",
+        "descriptionLetterSpacing": "-0.01em",
+        "cardRadius": "22",
+        "emphasisMode": "editorial-grid"
+      }
+    },
+    {
+      "id": "banner-cinematic-stage",
+      "slotGroup": "banner",
+      "label": "Banner Cinematic Stage",
+      "surfaceTone": "cinematic-dark",
+      "density": "low",
+      "hierarchyEmphasis": "cta-dominant",
+      "tokenHints": {
+        "titleSize": "30",
+        "descriptionSize": "15",
+        "titleLineHeight": "1.08",
+        "descriptionLineHeight": "1.52",
+        "titleLetterSpacing": "-0.03em",
+        "descriptionLetterSpacing": "-0.01em",
+        "cardRadius": "24",
+        "emphasisMode": "cinematic"
+      }
+    },
+    {
+      "id": "hero-service-trust-stage",
+      "slotGroup": "hero",
+      "label": "Hero Service Trust Stage",
+      "surfaceTone": "service-soft",
+      "density": "medium",
+      "hierarchyEmphasis": "headline-dominant-stage",
+      "tokenHints": {
+        "titleSize": "56",
+        "descriptionSize": "18",
+        "titleLineHeight": "1.02",
+        "descriptionLineHeight": "1.6",
+        "titleLetterSpacing": "-0.035em",
+        "descriptionLetterSpacing": "-0.01em",
+        "titleFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "descriptionFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "cardRadius": "28",
+        "iconScale": "1.02",
+        "emphasisMode": "service-stage"
+      }
+    },
+    {
+      "id": "quickmenu-service-tabs",
+      "slotGroup": "quickmenu",
+      "label": "Quickmenu Service Tabs",
+      "surfaceTone": "service-tabs",
+      "density": "low",
+      "hierarchyEmphasis": "lead-card",
+      "interactionTone": "hover-emphasis",
+      "tokenHints": {
+        "titleSize": "16",
+        "descriptionSize": "13",
+        "titleLineHeight": "1.3",
+        "descriptionLineHeight": "1.5",
+        "titleLetterSpacing": "-0.015em",
+        "descriptionLetterSpacing": "-0.01em",
+        "titleFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "descriptionFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "cardRadius": "24",
+        "iconScale": "1",
+        "emphasisMode": "service-tabs"
+      }
+    },
+    {
+      "id": "banner-service-ribbon",
+      "slotGroup": "banner",
+      "label": "Banner Service Ribbon",
+      "surfaceTone": "service-ribbon",
+      "density": "low",
+      "hierarchyEmphasis": "cta-dominant",
+      "tokenHints": {
+        "titleSize": "28",
+        "descriptionSize": "15",
+        "titleLineHeight": "1.12",
+        "descriptionLineHeight": "1.52",
+        "titleLetterSpacing": "-0.025em",
+        "descriptionLetterSpacing": "-0.01em",
+        "titleFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "descriptionFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "cardRadius": "22",
+        "emphasisMode": "service-ribbon"
+      }
+    },
+    {
+      "id": "commerce-brand-story-spread",
+      "slotGroup": "commerce",
+      "label": "Commerce Brand Story Spread",
+      "surfaceTone": "editorial-soft",
+      "density": "low",
+      "hierarchyEmphasis": "story-card",
+      "tokenHints": {
+        "titleSize": "20",
+        "descriptionSize": "14",
+        "titleLineHeight": "1.24",
+        "descriptionLineHeight": "1.56",
+        "titleLetterSpacing": "-0.02em",
+        "descriptionLetterSpacing": "-0.01em",
+        "titleFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "descriptionFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "cardRadius": "24",
+        "emphasisMode": "story-spread"
+      }
+    },
+    {
+      "id": "benefit-hub-trust-soft",
+      "slotGroup": "benefit",
+      "label": "Benefit Hub Trust Soft",
+      "surfaceTone": "service-soft",
+      "density": "medium",
+      "hierarchyEmphasis": "icon-lead",
+      "tokenHints": {
+        "titleSize": "16",
+        "descriptionSize": "14",
+        "titleLineHeight": "1.32",
+        "descriptionLineHeight": "1.52",
+        "titleLetterSpacing": "-0.018em",
+        "descriptionLetterSpacing": "-0.01em",
+        "titleFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "descriptionFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "cardRadius": "20",
+        "iconScale": "1",
+        "emphasisMode": "icon-title"
+      }
+    },
+    {
+      "id": "service-hero-trust-stage",
+      "slotGroup": "service-hero",
+      "label": "Service Hero Trust Stage",
+      "surfaceTone": "service-soft",
+      "density": "medium",
+      "hierarchyEmphasis": "headline-dominant-stage",
+      "tokenHints": {
+        "titleSize": "52",
+        "descriptionSize": "17",
+        "titleLineHeight": "1.04",
+        "descriptionLineHeight": "1.58",
+        "titleLetterSpacing": "-0.035em",
+        "descriptionLetterSpacing": "-0.01em",
+        "titleFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "descriptionFontFamily": "\"SUIT Variable\", \"Pretendard\", Arial, sans-serif",
+        "cardRadius": "26",
+        "iconScale": "1",
+        "emphasisMode": "service-stage"
+      }
+    },
+    {
+      "id": "pdp-summary-compact",
+      "slotGroup": "pdp-summary",
+      "label": "PDP Summary Compact",
+      "surfaceTone": "neutral-light",
+      "density": "medium",
+      "hierarchyEmphasis": "title-price-action",
+      "tokenHints": {
+        "titleSize": "26",
+        "descriptionSize": "15",
+        "titleLineHeight": "1.14",
+        "descriptionLineHeight": "1.55",
+        "titleLetterSpacing": "-0.028em",
+        "descriptionLetterSpacing": "-0.01em",
+        "cardRadius": "18",
+        "emphasisMode": "pdp-compact"
+      }
+    },
+    {
+      "id": "ranking-editorial-compact",
+      "slotGroup": "ranking",
+      "label": "Ranking Editorial Compact",
+      "surfaceTone": "editorial-soft",
+      "density": "packed",
+      "hierarchyEmphasis": "rank-title-compact",
+      "tokenHints": {
+        "titleSize": "16",
+        "descriptionSize": "13",
+        "titleLineHeight": "1.3",
+        "descriptionLineHeight": "1.48",
+        "titleLetterSpacing": "-0.018em",
+        "descriptionLetterSpacing": "-0.01em",
+        "cardRadius": "14",
+        "emphasisMode": "compact-list"
+      }
+    }
+  ]
+}

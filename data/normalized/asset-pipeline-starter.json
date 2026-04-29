@@ -1,0 +1,1414 @@
+{
+  "generatedAt": "2026-04-19T00:00:00.000Z",
+  "assetCatalog": [
+    {
+      "id": "home-hero-premium-stage-visual-a",
+      "label": "홈 프리미엄 스테이지 히어로 A",
+      "assetUrl": "/assets/home__0e543daa3aa8__005.png",
+      "format": "jpeg",
+      "width": 1760,
+      "height": 500,
+      "aspectRatio": "1760:500",
+      "role": "hero",
+      "tags": [
+        "home",
+        "hero",
+        "premium",
+        "stage"
+      ]
+    },
+    {
+      "id": "home-hero-editorial-visual-a",
+      "label": "홈 에디토리얼 히어로 A",
+      "assetUrl": "/assets/home__0e543daa3aa8__017.jpg",
+      "format": "jpeg",
+      "width": 1760,
+      "height": 500,
+      "aspectRatio": "1760:500",
+      "role": "hero",
+      "tags": [
+        "home",
+        "hero",
+        "editorial",
+        "story"
+      ]
+    },
+    {
+      "id": "home-hero-editorial-visual-b",
+      "label": "홈 에디토리얼 히어로 B",
+      "assetUrl": "/assets/home__0e543daa3aa8__023.jpg",
+      "format": "jpeg",
+      "width": 1760,
+      "height": 500,
+      "aspectRatio": "1760:500",
+      "role": "hero",
+      "tags": [
+        "home",
+        "hero",
+        "editorial",
+        "clean"
+      ]
+    },
+    {
+      "id": "home-banner-cinematic-visual-a",
+      "label": "홈 시네마틱 배너 A",
+      "assetUrl": "/assets/home__0e543daa3aa8__043.jpg",
+      "format": "jpeg",
+      "width": 2070,
+      "height": 270,
+      "aspectRatio": "2070:270",
+      "role": "banner",
+      "tags": [
+        "home",
+        "banner",
+        "cinematic",
+        "wide"
+      ]
+    },
+    {
+      "id": "home-banner-cinematic-visual-b",
+      "label": "홈 시네마틱 배너 B",
+      "assetUrl": "/assets/home__0e543daa3aa8__045.jpg",
+      "format": "jpeg",
+      "width": 2760,
+      "height": 360,
+      "aspectRatio": "2760:360",
+      "role": "banner",
+      "tags": [
+        "home",
+        "banner",
+        "cinematic",
+        "wide"
+      ]
+    },
+    {
+      "id": "home-story-editorial-visual-a",
+      "label": "홈 스토리 에디토리얼 비주얼",
+      "assetUrl": "/assets/home__0e543daa3aa8__055.png",
+      "format": "jpeg",
+      "width": 340,
+      "height": 144,
+      "aspectRatio": "340:144",
+      "role": "story",
+      "tags": [
+        "home",
+        "story",
+        "editorial",
+        "thumbnail"
+      ]
+    },
+    {
+      "id": "home-banner-editorial-visual-a",
+      "label": "홈 에디토리얼 배너 비주얼",
+      "assetUrl": "/assets/home__0e543daa3aa8__042.jpg",
+      "format": "jpeg",
+      "width": 1380,
+      "height": 180,
+      "aspectRatio": "1380:180",
+      "role": "banner",
+      "tags": [
+        "home",
+        "banner",
+        "editorial",
+        "wide"
+      ]
+    },
+    {
+      "id": "home-premium-chip-visual-a",
+      "label": "홈 프리미엄 칩 그래픽",
+      "assetUrl": "/assets/home__0e543daa3aa8__054.png",
+      "format": "png",
+      "width": 120,
+      "height": 120,
+      "aspectRatio": "1:1",
+      "role": "chip",
+      "tags": [
+        "home",
+        "chip",
+        "premium",
+        "badge"
+      ]
+    },
+    {
+      "id": "home-quickmenu-line-icon-047",
+      "label": "홈 퀵메뉴 라인 아이콘 1",
+      "assetUrl": "/assets/home__0e543daa3aa8__047.svg",
+      "format": "svg",
+      "width": 28,
+      "height": 28,
+      "aspectRatio": "1:1",
+      "role": "icon",
+      "tags": [
+        "home",
+        "quickmenu",
+        "icon",
+        "line"
+      ]
+    },
+    {
+      "id": "home-quickmenu-line-icon-048",
+      "label": "홈 퀵메뉴 라인 아이콘 2",
+      "assetUrl": "/assets/home__0e543daa3aa8__048.svg",
+      "format": "svg",
+      "width": 28,
+      "height": 28,
+      "aspectRatio": "1:1",
+      "role": "icon",
+      "tags": [
+        "home",
+        "quickmenu",
+        "icon",
+        "line"
+      ]
+    },
+    {
+      "id": "home-quickmenu-line-icon-049",
+      "label": "홈 퀵메뉴 라인 아이콘 3",
+      "assetUrl": "/assets/home__0e543daa3aa8__049.svg",
+      "format": "svg",
+      "width": 28,
+      "height": 28,
+      "aspectRatio": "1:1",
+      "role": "icon",
+      "tags": [
+        "home",
+        "quickmenu",
+        "icon",
+        "line"
+      ]
+    },
+    {
+      "id": "home-quickmenu-solid-icon-050",
+      "label": "홈 퀵메뉴 솔리드 아이콘 1",
+      "assetUrl": "/assets/home__0e543daa3aa8__050.svg",
+      "format": "svg",
+      "width": 28,
+      "height": 28,
+      "aspectRatio": "1:1",
+      "role": "icon",
+      "tags": [
+        "home",
+        "quickmenu",
+        "icon",
+        "solid"
+      ]
+    },
+    {
+      "id": "home-quickmenu-solid-icon-051",
+      "label": "홈 퀵메뉴 솔리드 아이콘 2",
+      "assetUrl": "/assets/home__0e543daa3aa8__051.svg",
+      "format": "svg",
+      "width": 28,
+      "height": 28,
+      "aspectRatio": "1:1",
+      "role": "icon",
+      "tags": [
+        "home",
+        "quickmenu",
+        "icon",
+        "solid"
+      ]
+    },
+    {
+      "id": "home-quickmenu-solid-icon-052",
+      "label": "홈 퀵메뉴 솔리드 아이콘 3",
+      "assetUrl": "/assets/home__0e543daa3aa8__052.svg",
+      "format": "svg",
+      "width": 28,
+      "height": 28,
+      "aspectRatio": "1:1",
+      "role": "icon",
+      "tags": [
+        "home",
+        "quickmenu",
+        "icon",
+        "solid"
+      ]
+    }
+  ],
+  "iconFamilyContracts": {
+    "home-quickmenu-line": {
+      "strokeStyle": "line",
+      "strokeWeight": "light",
+      "grid": "28x28",
+      "palette": "mono-neutral",
+      "deliveryMode": "set-only"
+    },
+    "home-quickmenu-solid": {
+      "strokeStyle": "solid",
+      "strokeWeight": "filled",
+      "grid": "28x28",
+      "palette": "mono-high-contrast",
+      "deliveryMode": "set-only"
+    },
+    "editorial-accent-glyph": {
+      "strokeStyle": "accent",
+      "strokeWeight": "medium",
+      "grid": "28x28",
+      "palette": "editorial-accent",
+      "deliveryMode": "set-only"
+    }
+  },
+  "assetFamilies": [
+    {
+      "id": "home.quickmenu.icon.family.v1",
+      "familyId": "home-quickmenu-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "home.quickmenu"
+      ],
+      "status": "generation-required",
+      "memberCount": 9,
+      "memberLabels": [
+        "구독 Days",
+        "혜택/이벤트",
+        "웨딩&이사",
+        "다품목 할인",
+        "라이브",
+        "카드혜택",
+        "가전 구독",
+        "소모품",
+        "SALE 홈스타일"
+      ],
+      "styleSummary": "soft rounded mono outline icon family for a premium appliance quickmenu",
+      "styleSpec": {
+        "viewport": "28x28",
+        "strokeWeight": "1.75px-2px",
+        "cornerStyle": "rounded",
+        "fillMode": "outline-first",
+        "visualDensity": "medium",
+        "backgroundUsage": "none",
+        "palette": [
+          "#111111"
+        ]
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "support.service.icon.family.v1",
+      "familyId": "support-service-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "support.service-intro",
+        "support.support-tab",
+        "support.tabs",
+        "support.mainService",
+        "support.bestcare",
+        "support.tipsBanner",
+        "support.notice"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "제품 등록",
+        "AS 신청",
+        "매장 찾기",
+        "소모품 구매",
+        "설치/철거",
+        "상담 예약",
+        "사용설명서",
+        "보증/케어"
+      ],
+      "styleSummary": "rounded service utility line icon family for support entry points",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "plp.filter.utility.icon.family.v1",
+      "familyId": "plp-filter-utility-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "category-refrigerators.filter",
+        "category-refrigerators.sort",
+        "category-refrigerators.tabs",
+        "category-tvs.filter",
+        "category-tvs.sort",
+        "category-tvs.tabs"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "필터",
+        "정렬",
+        "비교",
+        "배송",
+        "에너지",
+        "색상",
+        "크기",
+        "할인"
+      ],
+      "styleSummary": "compact utility icon family for PLP filter, sort, and compare controls",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "pdp.commerce.utility.icon.family.v1",
+      "familyId": "pdp-commerce-utility-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "pdp-tv-general.sticky",
+        "pdp-tv-general.buybox",
+        "pdp-tv-general.summary",
+        "pdp-tv-premium.sticky",
+        "pdp-refrigerator-general.sticky",
+        "pdp-refrigerator-general.buybox",
+        "pdp-refrigerator-glass.sticky",
+        "pdp-refrigerator-knockon.sticky"
+      ],
+      "status": "ready",
+      "memberCount": 9,
+      "memberLabels": [
+        "장바구니",
+        "바로구매",
+        "공유",
+        "찜",
+        "배송",
+        "설치",
+        "리뷰",
+        "문의",
+        "비교"
+      ],
+      "styleSummary": "commerce action icon family for PDP purchase and utility surfaces",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "care.solution.service.icon.family.v1",
+      "familyId": "care-solution-service-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "care-solutions.careBanner",
+        "care-solutions.ranking",
+        "care-solutions.category",
+        "care-solutions-pdp.summary"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "정수기",
+        "공기청정",
+        "청소",
+        "안마의자",
+        "식기세척",
+        "제습",
+        "렌탈",
+        "상담"
+      ],
+      "styleSummary": "soft appliance-care icon family for rental and care solution categories",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "mobile.nav.action.icon.family.v1",
+      "familyId": "mobile-nav-action-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "home.quickmenu",
+        "support.support-tab",
+        "category-refrigerators.filter",
+        "category-tvs.filter",
+        "care-solutions.careBanner",
+        "pdp-tv-general.sticky"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "홈",
+        "검색",
+        "카테고리",
+        "최근본",
+        "알림",
+        "메뉴",
+        "닫기",
+        "뒤로"
+      ],
+      "styleSummary": "mobile navigation action icon family for touch-first utility controls",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.9",
+        "corner": "rounded",
+        "tone": "mono-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "home.quickmenu.premium.arc.icon.family.v1",
+      "familyId": "home-quickmenu-premium-arc-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "home.quickmenu",
+        "home.shortcut"
+      ],
+      "status": "ready",
+      "memberCount": 9,
+      "memberLabels": [
+        "구독 Days",
+        "혜택/이벤트",
+        "웨딩&이사",
+        "다품목 할인",
+        "라이브",
+        "카드혜택",
+        "가전 구독",
+        "소모품",
+        "SALE 홈스타일"
+      ],
+      "styleSummary": "premium rounded arc icon family for home quickmenu redesigns",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "2.1",
+        "corner": "soft-rounded",
+        "tone": "warm-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "home.story.micro.cue.icon.family.v1",
+      "familyId": "home-story-micro-cue-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "home.hero",
+        "home.banner",
+        "home.marketing-area",
+        "home.story"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "신제품",
+        "프리미엄",
+        "라이프",
+        "케어",
+        "혜택",
+        "설치",
+        "상담",
+        "공유"
+      ],
+      "styleSummary": "small editorial cue icon family for home hero and story support chips",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.55",
+        "corner": "editorial-rounded",
+        "tone": "muted-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "support.status.badge.icon.family.v1",
+      "familyId": "support-status-badge-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "support.mainService",
+        "support.bestcare",
+        "support.notice",
+        "support.support-tab"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "접수",
+        "진행",
+        "완료",
+        "예약",
+        "긴급",
+        "문의",
+        "보증",
+        "알림"
+      ],
+      "styleSummary": "compact status badge icon family for support service states",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.8",
+        "corner": "compact-rounded",
+        "tone": "cool-utility",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "plp.product.signal.icon.family.v1",
+      "familyId": "plp-product-signal-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "category-refrigerators.product-grid",
+        "category-refrigerators.ranking",
+        "category-tvs.product-grid",
+        "category-tvs.ranking"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "인기",
+        "신제품",
+        "에너지",
+        "배송",
+        "할인",
+        "비교",
+        "리뷰",
+        "색상"
+      ],
+      "styleSummary": "sharp product signal icon family for PLP cards, rankings, and feature chips",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.7",
+        "corner": "technical",
+        "tone": "graphite",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "pdp.benefit.chip.icon.family.v1",
+      "familyId": "pdp-benefit-chip-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "pdp-tv-general.summary",
+        "pdp-tv-general.sticky",
+        "pdp-refrigerator-general.summary",
+        "pdp-refrigerator-general.sticky"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "무이자",
+        "배송",
+        "설치",
+        "케어",
+        "리뷰",
+        "공유",
+        "혜택",
+        "상담"
+      ],
+      "styleSummary": "commerce benefit chip icon family for PDP reassurance and purchase rails",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "2.0",
+        "corner": "confident-rounded",
+        "tone": "commerce-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "care.wellness.rounded.icon.family.v1",
+      "familyId": "care-wellness-rounded-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "care-solutions.careBanner",
+        "care-solutions.ranking",
+        "care-solutions.category",
+        "care-solutions-pdp.summary"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "정수",
+        "공기",
+        "청소",
+        "수면",
+        "안심",
+        "상담",
+        "렌탈",
+        "관리"
+      ],
+      "styleSummary": "warm rounded wellness icon family for care solution categories and reassurance cards",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "1.85",
+        "corner": "soft-organic",
+        "tone": "warm-service",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    },
+    {
+      "id": "mobile.gesture.utility.icon.family.v1",
+      "familyId": "mobile-gesture-utility-line-v1",
+      "role": "icon-only",
+      "usage": [
+        "home.quickmenu",
+        "support.support-tab",
+        "category-refrigerators.filter",
+        "category-tvs.filter",
+        "care-solutions.careBanner",
+        "pdp-tv-general.sticky"
+      ],
+      "status": "ready",
+      "memberCount": 8,
+      "memberLabels": [
+        "열기",
+        "닫기",
+        "필터",
+        "정렬",
+        "탭",
+        "스와이프",
+        "고정",
+        "선택"
+      ],
+      "styleSummary": "mobile gesture utility icon family for touch-first states and controls",
+      "styleSpec": {
+        "viewport": "28x28",
+        "stroke": "2.05",
+        "corner": "touch-rounded",
+        "tone": "mobile-ink",
+        "fillMode": "outline-only",
+        "backgroundUsage": "none"
+      },
+      "generationMode": "batch-consistent",
+      "restrictedUse": [
+        "do not replace with promo-complete thumbnails",
+        "do not mix unrelated svg sources in one family",
+        "do not embed text or badge background in icon members"
+      ]
+    }
+  ],
+  "geometrySpecs": {
+    "home.hero": {
+      "slotId": "hero",
+      "preferredAspectRatio": "1760:500",
+      "minWidth": 1440,
+      "minHeight": 400,
+      "fit": "cover",
+      "allowedRoles": [
+        "hero",
+        "banner"
+      ]
+    },
+    "home.quickmenu": {
+      "slotId": "quickmenu",
+      "preferredAspectRatio": "1:1",
+      "minWidth": 24,
+      "minHeight": 24,
+      "fit": "contain",
+      "allowedRoles": [
+        "icon"
+      ]
+    },
+    "home.md-choice": {
+      "slotId": "md-choice",
+      "preferredAspectRatio": "16:9",
+      "fit": "cover",
+      "allowedRoles": [
+        "story",
+        "banner",
+        "hero"
+      ]
+    },
+    "home.best-ranking": {
+      "slotId": "best-ranking",
+      "fit": "cover",
+      "allowedRoles": [
+        "story",
+        "banner",
+        "hero"
+      ]
+    },
+    "home.summary-banner-2": {
+      "slotId": "summary-banner-2",
+      "preferredAspectRatio": "1380:180",
+      "minWidth": 1200,
+      "minHeight": 150,
+      "fit": "cover",
+      "allowedRoles": [
+        "banner",
+        "hero"
+      ]
+    },
+    "home.latest-product-news": {
+      "slotId": "latest-product-news",
+      "fit": "cover",
+      "allowedRoles": [
+        "story",
+        "banner",
+        "hero"
+      ]
+    }
+  },
+  "iconSets": [
+    {
+      "id": "home-quickmenu-line",
+      "label": "홈 퀵메뉴 라인 아이콘",
+      "usage": [
+        "home.quickmenu"
+      ],
+      "style": "clean-line",
+      "assetIds": [
+        "home-quickmenu-line-icon-047",
+        "home-quickmenu-line-icon-048",
+        "home-quickmenu-line-icon-049"
+      ]
+    },
+    {
+      "id": "commerce-feature-outline",
+      "label": "커머스 기능 아웃라인 아이콘",
+      "usage": [
+        "home.hero",
+        "home.best-ranking",
+        "category.*"
+      ],
+      "style": "commerce-outline",
+      "assetIds": [
+        "home-quickmenu-line-icon-047",
+        "home-quickmenu-line-icon-048",
+        "home-quickmenu-line-icon-049"
+      ]
+    },
+    {
+      "id": "service-benefit-duotone",
+      "label": "서비스 혜택 듀오톤 아이콘",
+      "usage": [
+        "care-solutions.hero",
+        "care-solutions.*"
+      ],
+      "style": "service-duotone",
+      "assetIds": []
+    },
+    {
+      "id": "home-quickmenu-solid",
+      "label": "홈 퀵메뉴 솔리드 아이콘",
+      "usage": [
+        "home.quickmenu",
+        "home.marketing-area"
+      ],
+      "style": "solid-panel",
+      "assetIds": [
+        "home-quickmenu-solid-icon-050",
+        "home-quickmenu-solid-icon-051",
+        "home-quickmenu-solid-icon-052"
+      ]
+    },
+    {
+      "id": "editorial-accent-glyph",
+      "label": "에디토리얼 액센트 글리프",
+      "usage": [
+        "home.hero",
+        "home.summary-banner-2",
+        "homestyle-home.hero"
+      ],
+      "style": "editorial-accent",
+      "assetIds": [
+        "home-quickmenu-line-icon-047",
+        "home-quickmenu-line-icon-048",
+        "home-quickmenu-line-icon-049"
+      ]
+    }
+  ],
+  "badgePresets": [
+    {
+      "id": "soft-brand-pill",
+      "label": "소프트 브랜드 필",
+      "usage": [
+        "hero",
+        "summary-banner-2"
+      ],
+      "tone": "brand-soft",
+      "assetIds": [
+        "home-premium-chip-visual-a"
+      ]
+    },
+    {
+      "id": "ranking-badge-stack",
+      "label": "랭킹 배지 스택",
+      "usage": [
+        "best-ranking",
+        "product-card"
+      ],
+      "tone": "commerce-utility",
+      "assetIds": [
+        "home-premium-chip-visual-a"
+      ]
+    },
+    {
+      "id": "care-trust-chip",
+      "label": "구독 신뢰 칩",
+      "usage": [
+        "care-solutions.hero",
+        "care-solutions-pdp"
+      ],
+      "tone": "trust",
+      "assetIds": [
+        "home-premium-chip-visual-a"
+      ]
+    },
+    {
+      "id": "premium-contrast-chip",
+      "label": "프리미엄 콘트라스트 칩",
+      "usage": [
+        "home.hero",
+        "home.quickmenu",
+        "home.summary-banner-2"
+      ],
+      "tone": "premium-contrast",
+      "assetIds": [
+        "home-premium-chip-visual-a"
+      ]
+    },
+    {
+      "id": "editorial-kicker-chip",
+      "label": "에디토리얼 키커 칩",
+      "usage": [
+        "home.latest-product-news",
+        "home.smart-life",
+        "homestyle-home.hero"
+      ],
+      "tone": "editorial-kicker",
+      "assetIds": [
+        "home-premium-chip-visual-a"
+      ]
+    }
+  ],
+  "visualSets": [
+    {
+      "id": "home-hero-editorial",
+      "label": "홈 에디토리얼 히어로 비주얼",
+      "usage": [
+        "home.hero"
+      ],
+      "type": "hero-visual",
+      "assetIds": [
+        "home-hero-editorial-visual-a",
+        "home-hero-editorial-visual-b"
+      ]
+    },
+    {
+      "id": "homestyle-lifestyle-grid",
+      "label": "홈스타일 라이프스타일 비주얼",
+      "usage": [
+        "homestyle-home.hero",
+        "homestyle-home.*"
+      ],
+      "type": "lifestyle-visual",
+      "assetIds": [
+        "home-banner-editorial-visual-a"
+      ]
+    },
+    {
+      "id": "care-service-trust",
+      "label": "구독 서비스 신뢰 비주얼",
+      "usage": [
+        "care-solutions.hero",
+        "care-solutions.*"
+      ],
+      "type": "service-visual",
+      "assetIds": [
+        "home-banner-editorial-visual-a"
+      ]
+    },
+    {
+      "id": "home-hero-premium-stage",
+      "label": "홈 프리미엄 스테이지 히어로",
+      "usage": [
+        "home.hero"
+      ],
+      "type": "hero-visual",
+      "assetIds": [
+        "home-hero-premium-stage-visual-a"
+      ]
+    },
+    {
+      "id": "home-banner-cinematic",
+      "label": "홈 시네마틱 배너 비주얼",
+      "usage": [
+        "home.summary-banner-2",
+        "home.marketing-area",
+        "home.brand-showroom"
+      ],
+      "type": "banner-visual",
+      "assetIds": [
+        "home-banner-cinematic-visual-a",
+        "home-banner-cinematic-visual-b"
+      ]
+    },
+    {
+      "id": "home-story-editorial",
+      "label": "홈 스토리 에디토리얼 비주얼",
+      "usage": [
+        "home.latest-product-news",
+        "home.smart-life",
+        "home.missed-benefits"
+      ],
+      "type": "story-visual",
+      "assetIds": [
+        "home-story-editorial-visual-a"
+      ]
+    }
+  ],
+  "thumbnailPresets": [
+    {
+      "id": "commerce-card-clean",
+      "label": "커머스 카드 썸네일",
+      "usage": [
+        "home.best-ranking",
+        "home.md-choice",
+        "category.*"
+      ],
+      "aspectRatio": "1:1",
+      "assetIds": [
+        "home-story-editorial-visual-a"
+      ]
+    },
+    {
+      "id": "service-card-clean",
+      "label": "서비스 카드 썸네일",
+      "usage": [
+        "care-solutions.*",
+        "support.*"
+      ],
+      "aspectRatio": "4:3",
+      "assetIds": [
+        "home-story-editorial-visual-a"
+      ]
+    },
+    {
+      "id": "editorial-banner-wide",
+      "label": "에디토리얼 배너 썸네일",
+      "usage": [
+        "home.summary-banner-2",
+        "homestyle-home.*"
+      ],
+      "aspectRatio": "16:9",
+      "assetIds": [
+        "home-banner-editorial-visual-a",
+        "home-banner-cinematic-visual-a"
+      ]
+    },
+    {
+      "id": "ranking-card-poster",
+      "label": "랭킹 포스터형 썸네일",
+      "usage": [
+        "home.best-ranking",
+        "home.timedeal"
+      ],
+      "aspectRatio": "4:5",
+      "assetIds": [
+        "home-story-editorial-visual-a"
+      ]
+    },
+    {
+      "id": "story-card-portrait",
+      "label": "스토리 포트레이트 썸네일",
+      "usage": [
+        "home.latest-product-news",
+        "home.smart-life"
+      ],
+      "aspectRatio": "3:4",
+      "assetIds": [
+        "home-story-editorial-visual-a"
+      ]
+    }
+  ],
+  "pageDefaults": {
+    "home": {
+      "iconSetIds": [
+        "home-quickmenu-line",
+        "commerce-feature-outline",
+        "editorial-accent-glyph"
+      ],
+      "badgePresetIds": [
+        "soft-brand-pill",
+        "ranking-badge-stack",
+        "premium-contrast-chip"
+      ],
+      "visualSetIds": [
+        "home-hero-editorial",
+        "home-hero-premium-stage",
+        "home-banner-cinematic"
+      ],
+      "thumbnailPresetIds": [
+        "commerce-card-clean",
+        "editorial-banner-wide",
+        "ranking-card-poster",
+        "story-card-portrait"
+      ]
+    },
+    "homestyle-home": {
+      "iconSetIds": [
+        "commerce-feature-outline"
+      ],
+      "badgePresetIds": [
+        "soft-brand-pill"
+      ],
+      "visualSetIds": [
+        "homestyle-lifestyle-grid"
+      ],
+      "thumbnailPresetIds": [
+        "editorial-banner-wide"
+      ]
+    },
+    "care-solutions": {
+      "iconSetIds": [
+        "service-benefit-duotone"
+      ],
+      "badgePresetIds": [
+        "care-trust-chip"
+      ],
+      "visualSetIds": [
+        "care-service-trust"
+      ],
+      "thumbnailPresetIds": [
+        "service-card-clean"
+      ]
+    }
+  },
+  "familyDefaults": {
+    "hero-carousel-composition": {
+      "iconSetIds": [
+        "commerce-feature-outline",
+        "editorial-accent-glyph"
+      ],
+      "badgePresetIds": [
+        "soft-brand-pill",
+        "premium-contrast-chip"
+      ],
+      "visualSetIds": [
+        "home-hero-editorial",
+        "home-hero-premium-stage"
+      ]
+    },
+    "icon-link-grid-composition": {
+      "iconSetIds": [
+        "home-quickmenu-line",
+        "home-quickmenu-solid"
+      ],
+      "badgePresetIds": [
+        "premium-contrast-chip"
+      ],
+      "visualSetIds": [
+        "home-hero-premium-stage"
+      ],
+      "thumbnailPresetIds": []
+    },
+    "commerce-card-grid-composition": {
+      "iconSetIds": [
+        "commerce-feature-outline"
+      ],
+      "badgePresetIds": [
+        "ranking-badge-stack"
+      ],
+      "visualSetIds": [
+        "home-story-editorial"
+      ],
+      "thumbnailPresetIds": [
+        "commerce-card-clean",
+        "ranking-card-poster",
+        "story-card-portrait"
+      ]
+    },
+    "ranking-list-composition": {
+      "iconSetIds": [
+        "commerce-feature-outline"
+      ],
+      "badgePresetIds": [
+        "ranking-badge-stack"
+      ],
+      "visualSetIds": [
+        "home-hero-premium-stage"
+      ],
+      "thumbnailPresetIds": [
+        "commerce-card-clean",
+        "ranking-card-poster"
+      ]
+    },
+    "service-benefit-hub-composition": {
+      "iconSetIds": [
+        "service-benefit-duotone"
+      ],
+      "badgePresetIds": [
+        "care-trust-chip"
+      ],
+      "visualSetIds": [
+        "care-service-trust"
+      ],
+      "thumbnailPresetIds": [
+        "service-card-clean"
+      ]
+    },
+    "editorial-visual-story-composition": {
+      "badgePresetIds": [
+        "soft-brand-pill",
+        "editorial-kicker-chip"
+      ],
+      "visualSetIds": [
+        "homestyle-lifestyle-grid",
+        "home-story-editorial"
+      ],
+      "thumbnailPresetIds": [
+        "editorial-banner-wide",
+        "story-card-portrait"
+      ]
+    },
+    "pdp-summary-stack-composition": {
+      "iconSetIds": [
+        "commerce-feature-outline"
+      ],
+      "badgePresetIds": [
+        "soft-brand-pill",
+        "premium-contrast-chip"
+      ],
+      "thumbnailPresetIds": [
+        "editorial-banner-wide",
+        "commerce-card-clean"
+      ]
+    },
+    "pdp-sticky-buybox-composition": {
+      "iconSetIds": [
+        "commerce-feature-outline"
+      ],
+      "badgePresetIds": [
+        "premium-contrast-chip",
+        "ranking-badge-stack"
+      ]
+    },
+    "image-banner-strip-composition": {
+      "iconSetIds": [
+        "editorial-accent-glyph"
+      ],
+      "badgePresetIds": [
+        "premium-contrast-chip",
+        "editorial-kicker-chip"
+      ],
+      "visualSetIds": [
+        "home-banner-cinematic"
+      ],
+      "thumbnailPresetIds": [
+        "editorial-banner-wide"
+      ]
+    }
+  },
+  "componentDefaults": {
+    "home.hero": {
+      "familyId": "hero-carousel-composition",
+      "iconSetIds": [
+        "commerce-feature-outline",
+        "editorial-accent-glyph"
+      ],
+      "badgePresetIds": [
+        "soft-brand-pill",
+        "premium-contrast-chip"
+      ],
+      "visualSetIds": [
+        "home-hero-editorial",
+        "home-hero-premium-stage"
+      ]
+    },
+    "home.quickmenu": {
+      "familyId": "icon-link-grid-composition",
+      "iconSetIds": [
+        "home-quickmenu-line",
+        "home-quickmenu-solid"
+      ],
+      "badgePresetIds": [
+        "premium-contrast-chip"
+      ]
+    },
+    "home.md-choice": {
+      "familyId": "commerce-card-grid-composition",
+      "badgePresetIds": [
+        "ranking-badge-stack"
+      ],
+      "visualSetIds": [
+        "home-story-editorial"
+      ],
+      "thumbnailPresetIds": [
+        "commerce-card-clean",
+        "story-card-portrait"
+      ]
+    },
+    "home.best-ranking": {
+      "familyId": "ranking-list-composition",
+      "badgePresetIds": [
+        "ranking-badge-stack"
+      ],
+      "visualSetIds": [
+        "home-hero-premium-stage"
+      ],
+      "thumbnailPresetIds": [
+        "commerce-card-clean",
+        "ranking-card-poster"
+      ]
+    },
+    "home.timedeal": {
+      "familyId": "commerce-card-grid-composition",
+      "badgePresetIds": [
+        "ranking-badge-stack"
+      ],
+      "thumbnailPresetIds": [
+        "ranking-card-poster"
+      ]
+    },
+    "home.summary-banner-2": {
+      "familyId": "image-banner-strip-composition",
+      "iconSetIds": [
+        "editorial-accent-glyph"
+      ],
+      "badgePresetIds": [
+        "premium-contrast-chip",
+        "editorial-kicker-chip"
+      ],
+      "visualSetIds": [
+        "home-banner-cinematic"
+      ],
+      "thumbnailPresetIds": [
+        "editorial-banner-wide"
+      ]
+    },
+    "home.marketing-area": {
+      "familyId": "commerce-card-grid-composition",
+      "iconSetIds": [
+        "home-quickmenu-solid"
+      ],
+      "visualSetIds": [
+        "home-banner-cinematic"
+      ],
+      "thumbnailPresetIds": [
+        "editorial-banner-wide"
+      ]
+    },
+    "home.latest-product-news": {
+      "familyId": "commerce-card-grid-composition",
+      "badgePresetIds": [
+        "editorial-kicker-chip"
+      ],
+      "visualSetIds": [
+        "home-story-editorial"
+      ],
+      "thumbnailPresetIds": [
+        "story-card-portrait"
+      ]
+    },
+    "home.smart-life": {
+      "familyId": "commerce-card-grid-composition",
+      "badgePresetIds": [
+        "editorial-kicker-chip"
+      ],
+      "visualSetIds": [
+        "home-story-editorial"
+      ],
+      "thumbnailPresetIds": [
+        "story-card-portrait"
+      ]
+    },
+    "care-solutions.hero": {
+      "familyId": "service-benefit-hub-composition",
+      "iconSetIds": [
+        "service-benefit-duotone"
+      ],
+      "badgePresetIds": [
+        "care-trust-chip"
+      ],
+      "visualSetIds": [
+        "care-service-trust"
+      ]
+    },
+    "homestyle-home.hero": {
+      "familyId": "editorial-visual-story-composition",
+      "badgePresetIds": [
+        "soft-brand-pill"
+      ],
+      "visualSetIds": [
+        "homestyle-lifestyle-grid"
+      ],
+      "thumbnailPresetIds": [
+        "editorial-banner-wide"
+      ]
+    }
+  },
+  "updatedAt": "2026-04-24T07:28:04.313Z"
+}

@@ -1,0 +1,245 @@
+{
+  "updatedAt": "2026-04-20T01:37:17.741Z",
+  "entries": {
+    "b58f37441cbf871741ae687fc2c1e605584ea70b": {
+      "savedAt": "2026-04-19T09:51:17.740Z",
+      "asset": {
+        "id": "generated-home-hero-98a1d5ae",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-98a1d5ae.jpg",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 히어로를 단순 슬라이드 배너에서 브랜드 스테이지 수준으로 격상시킵니다.\nLayout strategy: 풀와이드 캔버스 기반 시네마틱 배경, 대형 디스플레이 타이포그래피, 명확한 CTA 위계 적용\nEmphasize: 배경 톤 및 비주얼 스케일, 타이포그래피 크기(56px), CTA 버튼 디자인 위계, 배지 스타일\nPreserve: 제품명, 혜택 문구 등 사실 기반 카피, 슬라이드 네비게이션 구조\nDesign direction: 히어로는 풀와이드 프리미엄 스테이지 비주얼(home-hero-premium-stage)을 기반으로 대형 타이포와 브랜드 배지를 전면에 배치하여 시네마틱 진입감을 만든다. | 탐색 바로가기 구간은 히어로 하단과 자연스럽게 연결되는 서피스 톤(밝은 중립 또는 미세 그레이)을 사용하고, 솔리드 아이콘(home-quickmenu-solid)으로 시각 밀도를 높인다. | 히어로 내 CTA는 Wise 레퍼런스의 명확한 버튼 위계에서 영감을 받아 주 CTA와 보조 CTA를 구분하되, LG전자 브랜드 컬러 체계 안에서 운용한다. | Ferrari 레퍼런스의 '한두 구간만 강하게, 나머지는 절제' 원칙을 적용하여 히어로에 시각 에너지를 집중하고 탐색 바로가기는 정돈된 보조 레이어로 처리한다.\nAvoid: 히어로와 탐색 바로가기 외 구간은 이 기획안 범위 밖이다. | 제품명·가격·스펙 등 사실 정보는 임의 변경 금지. | 레퍼런스 레이아웃·카피를 그대로 복제하지 않는다. | 다크 테마 전환은 페이지 전체 컨셉 안에서만 허용한다. | 배경색 변화는 섹션 목적 구분 목적으로만 제한 사용한다. | 단일 슬롯 과장보다 상단 진입부 전체 리듬을 우선한다.\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "jpg",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    },
+    "3da390c7a0ad6dd123eb1f576535efef7fde601b": {
+      "savedAt": "2026-04-19T10:12:59.714Z",
+      "asset": {
+        "id": "generated-home-hero-e7555151",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-e7555151.png",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 히어로를 시네마틱하고 몰입감 있는 프리미엄 스테이지로 연출합니다.\nLayout strategy: Full-bleed 배경과 Oversized 타이포그래피를 활용한 시각 중심 구조\nEmphasize: 배경 톤앤매너, 타이포그래피 스케일, 전체 레이아웃 구조\nPreserve: 핵심 CTA, 브랜드 정체성\nDesign direction: 히어로 영역은 'home-hero-premium-stage' 비주얼 셋을 활용하여 시네마틱하고 몰입감 있는 프리미엄 스테이지로 연출합니다. | 퀵메뉴는 히어로 영역의 톤앤매너와 자연스럽게 이어지도록 'premium-contrast-chip' 배지와 솔리드 아이콘을 활용해 무게감을 더합니다. | 전체적으로 강한 대비를 주어 핵심 메시지와 CTA를 강조하되, 페이지 전체의 정돈된 브랜드 톤을 해치지 않도록 주의합니다. | 타이포그래피 크기와 굵기를 과감하게 조정하여 정보의 위계를 명확히 하고, 가독성을 높여 고객의 시선 이동을 자연스럽게 유도합니다.\nAvoid: 사실 기반 가격/스펙/상품 정보는 임의 변경 금지 | 현재 페이지에서 지원되는 상단 진입부 범위 안에서만 시안 생성 | 레퍼런스는 방향 참고용이며 레이아웃/카피를 그대로 복제하지 않음 | 강한 대비를 쓰더라도 페이지 전체 컨셉 안에서만 사용 | 단일 슬롯 과장보다 페이지 전체 리듬을 우선\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "png",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    },
+    "2aae115d8468a28bcbb4a97ffddea3677830519a": {
+      "savedAt": "2026-04-19T10:18:34.553Z",
+      "asset": {
+        "id": "generated-home-hero-de0b6840",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-de0b6840.jpg",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 히어로를 시네마틱 브랜드 제안 중심 레이아웃으로 재구성합니다.\nLayout strategy: Cinematic Background Visual -> Oversized Headline -> High-Contrast CTA의 수직적 몰입 구조\nEmphasize: 타이포그래피 스케일 (56px로 확대), 배경 및 표면 처리 (시네마틱 톤으로 전환), 여백 및 곡률 (풀블리드 0px radius 적용)\nPreserve: 캐러셀 내비게이션 구조, 핵심 메시지 및 CTA 링크\nDesign direction: 히어로 영역은 'home-hero-premium-stage' 비주얼 셋을 활용하여 시네마틱하고 몰입감 있는 프리미엄 스테이지로 연출합니다. | 퀵메뉴는 히어로 영역의 톤앤매너와 자연스럽게 이어지도록 'premium-contrast-chip' 배지와 솔리드 아이콘을 활용해 무게감을 더합니다. | 전체적으로 강한 대비를 주어 핵심 메시지와 CTA를 강조하되, 페이지 전체의 정돈된 브랜드 톤을 해치지 않도록 주의합니다. | 타이포그래피 크기와 굵기를 과감하게 조정하여 정보의 위계를 명확히 하고, 가독성을 높여 고객의 시선 이동을 자연스럽게 유도합니다.\nAvoid: 사실 기반 가격/스펙/상품 정보는 임의 변경 금지 | 현재 페이지에서 지원되는 상단 진입부 범위 안에서만 시안 생성 | 레퍼런스는 방향 참고용이며 레이아웃/카피를 그대로 복제하지 않음 | 강한 대비를 쓰더라도 페이지 전체 컨셉 안에서만 사용 | 단일 슬롯 과장보다 페이지 전체 리듬을 우선\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "jpg",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    },
+    "f455ef8a3f31d6360767b11e2a1c70fd3f07a6d3": {
+      "savedAt": "2026-04-19T10:22:33.866Z",
+      "asset": {
+        "id": "generated-home-hero-eee4c30a",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-eee4c30a.jpg",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 히어로를 시네마틱한 프리미엄 브랜드 제안형으로 재구성합니다.\nLayout strategy: Cinematic full-bleed stage with bold typography and clear CTA\nEmphasize: 배경 톤(다크/프리미엄 대비), 타이포그래피 스케일(대형/볼드), 전체 정렬 및 여백\nPreserve: 사실 기반 카피, CTA 링크\nDesign direction: 히어로 영역은 'home-hero-premium-stage' 비주얼 셋을 활용하여 시네마틱하고 몰입감 있는 프리미엄 스테이지로 연출합니다. | 퀵메뉴는 히어로 영역의 톤앤매너와 자연스럽게 이어지도록 'premium-contrast-chip' 배지와 솔리드 아이콘을 활용해 무게감을 더합니다. | 전체적으로 강한 대비를 주어 핵심 메시지와 CTA를 강조하되, 페이지 전체의 정돈된 브랜드 톤을 해치지 않도록 주의합니다. | 타이포그래피 크기와 굵기를 과감하게 조정하여 정보의 위계를 명확히 하고, 가독성을 높여 고객의 시선 이동을 자연스럽게 유도합니다.\nAvoid: 사실 기반 가격/스펙/상품 정보는 임의 변경 금지 | 현재 페이지에서 지원되는 상단 진입부 범위 안에서만 시안 생성 | 레퍼런스는 방향 참고용이며 레이아웃/카피를 그대로 복제하지 않음 | 강한 대비를 쓰더라도 페이지 전체 컨셉 안에서만 사용 | 단일 슬롯 과장보다 페이지 전체 리듬을 우선\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "jpg",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    },
+    "975e4baef95d4fbcc1565510a22d50ee5bedffda": {
+      "savedAt": "2026-04-19T10:45:02.699Z",
+      "asset": {
+        "id": "generated-home-hero-16697406",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-16697406.jpg",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 히어로를 화면 전체를 아우르는 시네마틱 배경과 대형 타이포그래피 중심의 구조로 재편합니다.\nLayout strategy: 배경 이미지를 넓게 확장하고, 텍스트 위계를 대폭 키워 시각적 중심을 단단하게 잡습니다.\nEmphasize: 배경 컨테이너 확장 (퀵메뉴 영역까지 포괄), 타이포그래피 스케일 확대, 하단 시각적 단절선 제거\nPreserve: 정확한 가격 및 프로모션 팩트, CTA 링크\nDesign direction: 시네마틱 무드: 고해상도 라이프스타일 이미지와 강한 명도 대비를 활용하여 몰입감 높은 프리미엄 브랜드 톤을 연출합니다. | 통합된 리듬: 히어로 영역의 배경이 퀵메뉴 영역까지 확장되거나 자연스럽게 이어지도록 설계하여 단절감 없는 하나의 섹션으로 표현합니다. | 명확한 유틸리티: 배경이 화려해지더라도 퀵메뉴의 가독성이 떨어지지 않도록, 솔리드 아이콘과 대비감 있는 칩 형태의 UI를 적용합니다. | 타이포그래피 강조: 프로모션 메시지와 브랜드 카피에 크고 대담한 타이포그래피를 적용하여 시각적 중심을 단단하게 잡아줍니다.\nAvoid: 기존 퀵메뉴의 핵심 탐색 링크 및 기능은 누락 없이 유지할 것. | 히어로 비주얼 변경 시 과도한 다크 테마로 전체 톤을 해치지 않을 것. | 프로모션 정보의 정확한 가격 및 혜택 텍스트는 임의로 변경하지 말 것. | 두 컴포넌트의 통합이 하단 섹션들과의 시각적 충돌을 일으키지 않을 것.\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "jpg",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    },
+    "0163dd713b815e73a0516314ffb053b7952ec179": {
+      "savedAt": "2026-04-19T15:30:51.850Z",
+      "asset": {
+        "id": "generated-home-hero-17f57476",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-17f57476.jpg",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 히어로를 브랜드 제안 중심의 스플릿 레이아웃으로 재구성합니다.\nLayout strategy: badge + headline + trust cue + action의 4층 구조로 재정렬\nEmphasize: 풀블리드 오버레이에서 구조화된 스플릿 레이아웃으로 전환, 헤드라인 타이포그래피 크기 및 무게 증가, 배경 대비를 통한 메시지 강조\nPreserve: 캐러셀 기능, 상품 및 혜택 사실 정보, 핵심 CTA 목적지\nDesign direction: 디자인 방향은 home 의 현재 구조를 유지하되, 첫 인상에서 느껴지는 브랜드 밀도와 메시지 집중도를 높이는 쪽으로 정리해야 한다. | 비주얼 해법은 카피 톤, 타이포 위계, 여백, 강조 포인트, CTA 존재감처럼 실제 화면에서 확인 가능한 기준으로 설명되어야 한다. | 가장 먼저 보여야 할 정보와 그 다음에 따라오는 보조 정보의 강약을 분명히 나눠, 사용자가 한 번에 핵심을 읽도록 해야 한다. | 과한 프로모션성 표현이나 할인몰 인상 대신, 이유 있는 프리미엄 톤과 정제된 설득 흐름을 만드는 것이 중요하다.\nAvoid: 사실 기반 가격/스펙/상품 정보는 임의 변경 금지\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "jpg",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    },
+    "661b09f984ef0fe1ab05a222b90e2ff0d01e6ddc": {
+      "savedAt": "2026-04-19T16:40:45.299Z",
+      "asset": {
+        "id": "generated-home-hero-10a01499",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-10a01499.png",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 히어로를 시각적 몰입감이 극대화된 프리미엄 스테이지 형태로 재구성합니다.\nLayout strategy: 대담한 타이포그래피 스케일과 여백을 활용한 럭셔리 무드 연출\nEmphasize: 배경 이미지와 텍스트 영역의 분리 및 대비 강화, 타이포그래피 크기 상향(56px), 여백 리듬 조정\nPreserve: 프로모션/상품의 사실 기반 카피, CTA 링크 목적지\nDesign direction: 디자인 방향은 LGE.COM | LG전자 의 현재 구조를 유지하되, 첫 인상에서 느껴지는 브랜드 밀도와 메시지 집중도를 높이는 쪽으로 정리해야 한다. | 비주얼 해법은 카피 톤, 타이포 위계, 여백, 강조 포인트, CTA 존재감처럼 실제 화면에서 확인 가능한 기준으로 설명되어야 한다. | 가장 먼저 보여야 할 정보와 그 다음에 따라오는 보조 정보의 강약을 분명히 나눠, 사용자가 한 번에 핵심을 읽도록 해야 한다. | 과한 프로모션성 표현이나 할인몰 인상 대신, 이유 있는 프리미엄 톤과 정제된 설득 흐름을 만드는 것이 중요하다.\nAvoid: 사실 기반 가격/스펙/상품 정보는 임의 변경 금지 | 현재 페이지에서 지원되는 slot 범위 안에서만 시안 생성 | 레퍼런스는 방향 참고용이며 레이아웃/카피를 그대로 복제하지 않음\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "png",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    },
+    "8e65fa51723fa814ec362e392cb4633d875af94e": {
+      "savedAt": "2026-04-19T16:59:29.532Z",
+      "asset": {
+        "id": "generated-home-hero-af0772f7",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-af0772f7.png",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 히어로를 시각적 몰입감이 뛰어난 프리미엄 스테이지로 재구성하고 타이포그래피 스케일을 극대화합니다.\nLayout strategy: Cinematic Background Visual -> Bold Headline & Badge -> High-contrast CTA\nEmphasize: 타이포그래피 스케일 대폭 확대 (56px), 프리미엄 라이트 그라데이션 배경 적용, 여백 및 곡률(24px) 확대를 통한 스테이지 감각 부여\nPreserve: 캐러셀 네비게이션 구조, 핵심 프로모션 메시지 내용\nDesign direction: 디자인 방향은 LGE.COM | LG전자 의 현재 구조를 유지하되, 첫 인상에서 느껴지는 브랜드 밀도와 메시지 집중도를 높이는 쪽으로 정리해야 한다. | 비주얼 해법은 카피 톤, 타이포 위계, 여백, 강조 포인트, CTA 존재감처럼 실제 화면에서 확인 가능한 기준으로 설명되어야 한다. | 가장 먼저 보여야 할 정보와 그 다음에 따라오는 보조 정보의 강약을 분명히 나눠, 사용자가 한 번에 핵심을 읽도록 해야 한다. | 과한 프로모션성 표현이나 할인몰 인상 대신, 이유 있는 프리미엄 톤과 정제된 설득 흐름을 만드는 것이 중요하다.\nAvoid: 사실 기반 가격/스펙/상품 정보는 임의 변경 금지 | 현재 페이지에서 지원되는 slot 범위 안에서만 시안 생성 | 레퍼런스는 방향 참고용이며 레이아웃/카피를 그대로 복제하지 않음\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "png",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    },
+    "775c464071d2d731c8818b6f35a673ef2c463ef6": {
+      "savedAt": "2026-04-20T00:00:39.168Z",
+      "asset": {
+        "id": "generated-home-hero-090ea58a",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-090ea58a.png",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 압도적인 스케일과 고대비 타이포그래피를 활용한 시네마틱 히어로 구축\nLayout strategy: 배경 이미지 풀블리드 + 중앙 정렬된 대형 타이포그래피 + 명확한 단일 CTA\nEmphasize: 텍스트 스케일 대폭 확대, 배경 톤 및 대비 강화, 레이아웃 템플릿 변경\nPreserve: 캐러셀 네비게이션 구조, 핵심 프로모션 정보\nDesign direction: 디자인 방향은 LGE.COM | LG전자 의 현재 구조를 유지하되, 첫 인상에서 느껴지는 브랜드 밀도와 메시지 집중도를 높이는 쪽으로 정리해야 한다. | 비주얼 해법은 카피 톤, 타이포 위계, 여백, 강조 포인트, CTA 존재감처럼 실제 화면에서 확인 가능한 기준으로 설명되어야 한다. | 가장 먼저 보여야 할 정보와 그 다음에 따라오는 보조 정보의 강약을 분명히 나눠, 사용자가 한 번에 핵심을 읽도록 해야 한다. | 과한 프로모션성 표현이나 할인몰 인상 대신, 이유 있는 프리미엄 톤과 정제된 설득 흐름을 만드는 것이 중요하다.\nAvoid: 사실 기반 가격/스펙/상품 정보는 임의 변경 금지 | 현재 페이지에서 지원되는 slot 범위 안에서만 시안 생성 | 레퍼런스는 방향 참고용이며 레이아웃/카피를 그대로 복제하지 않음\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "png",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    },
+    "303e87340b367f9023e37c4c91843c3c52dc99a0": {
+      "savedAt": "2026-04-20T01:37:17.741Z",
+      "asset": {
+        "id": "generated-home-hero-44834590",
+        "label": "hero generated asset",
+        "assetUrl": "/assets/generated-home-hero-44834590.jpg",
+        "kind": "visual",
+        "role": "visual",
+        "source": "generated",
+        "model": "google/gemini-3.1-flash-image-preview",
+        "prompt": "Create a polished web-design quality visual asset for the hero area of the LGE.COM | LG전자 page.\nTarget summary: 히어로를 고대비 분할 레이아웃으로 변경하여 메시지와 비주얼의 집중도를 극대화합니다.\nLayout strategy: 타이틀과 리드 비주얼을 분리하는 SplitHero 구조 적용\nEmphasize: 배경 톤 및 표면 질감, 타이포그래피 스케일(56px) 및 위계, 전반적인 레이아웃 구조\nPreserve: 핵심 프로모션 정보, 캐러셀 기능\nDesign direction: 디자인 방향은 home 의 현재 구조를 유지하되, 첫 인상에서 느껴지는 브랜드 밀도와 메시지 집중도를 높이는 쪽으로 정리해야 한다. | 비주얼 해법은 카피 톤, 타이포 위계, 여백, 강조 포인트, CTA 존재감처럼 실제 화면에서 확인 가능한 기준으로 설명되어야 한다. | 가장 먼저 보여야 할 정보와 그 다음에 따라오는 보조 정보의 강약을 분명히 나눠, 사용자가 한 번에 핵심을 읽도록 해야 한다. | 과한 프로모션성 표현이나 할인몰 인상 대신, 이유 있는 프리미엄 톤과 정제된 설득 흐름을 만드는 것이 중요하다.\nAvoid: 사실 기반 가격/스펙/상품 정보는 임의 변경 금지\nDeliver a strong hero visual with premium hierarchy, immediate focal point, and clear editorial staging. Avoid generic stock-photo blandness.\nNo text baked into the image unless it is a tiny supporting accent. Prioritize composition, atmosphere, material contrast, and usable web framing.",
+        "format": "jpg",
+        "width": 8256,
+        "height": 2048,
+        "aspectRatio": "8256:2048",
+        "slotId": "hero",
+        "componentId": "home.hero",
+        "tags": [
+          "generated",
+          "visual",
+          "hero"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,392 @@
+{
+  "generatedAt": "2026-04-24T07:40:13.978Z",
+  "dryRun": false,
+  "limitPerProfile": 6,
+  "maxImports": 12,
+  "maxPerProfile": 2,
+  "delayMs": 5000,
+  "thumbWidth": 800,
+  "collected": 12,
+  "downloaded": 12,
+  "inserted": 12,
+  "updated": 0,
+  "skipped": [
+    {
+      "profileId": "home-living-stage",
+      "skipped": "duplicate_source_url",
+      "assetId": "external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Kitchen_and_Living_Room_Singlewide.jpg"
+    },
+    {
+      "profileId": "home-living-stage",
+      "skipped": "duplicate_source_url",
+      "assetId": "external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Living_room_%28Unsplash%29.jpg"
+    },
+    {
+      "profileId": "home-living-stage",
+      "skipped": "duplicate_source_url",
+      "assetId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/7/70/The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together%2C_like_a_modern_living_room_or_family_room._%2843775bf9-a88e-4a9a-bb5f-51dcbda45aef%29.JPG"
+    },
+    {
+      "profileId": "home-living-stage",
+      "skipped": "duplicate_source_url",
+      "assetId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2b/The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together%2C_like_a_modern_living_room_or_family_room._%287499b3b2-9c73-4c7e-bfbd-0c701663138c%29.JPG"
+    },
+    {
+      "profileId": "home-living-stage",
+      "skipped": "unsupported_mime",
+      "title": "File:Living room decorated by Eero Aarnio 1966 (JOKAOM14AiD KSS01-3).tif",
+      "mime": "image/tiff"
+    },
+    {
+      "profileId": "home-living-stage",
+      "skipped": "duplicate_source_url",
+      "assetId": "external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/4/49/Modern_living_room_with_stylish_furniture_and_a_view_of_the_outdoors_in_a_cozy_apartment_setting.jpg"
+    },
+    {
+      "profileId": "home-wide-interior-stage",
+      "skipped": "duplicate_source_url",
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/2/21/House_at_Caulfield.JPG"
+    },
+    {
+      "profileId": "home-wide-interior-stage",
+      "skipped": "duplicate_source_url",
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0e/American_homes_and_gardens_%281910%29_%2817970996789%29.jpg"
+    }
+  ],
+  "errors": [],
+  "assets": [
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:Chief of Mission's Residence (4857444112).jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__chief-of-mission-s-residence-4857444112__493ec8854fbe.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/4/42/Chief_of_Mission%27s_Residence_%284857444112%29.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Chief_of_Mission%27s_Residence_(4857444112).jpg",
+      "licenseProfile": "Public domain / pd",
+      "licenseUrl": "",
+      "role": "background-only",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "width": 960,
+      "height": 577
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:Roomic - Flickr - uberculture.jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__roomic-flickr-uberculture__1c65364bb5cd.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/7/73/Roomic_-_Flickr_-_uberculture.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Roomic_-_Flickr_-_uberculture.jpg",
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "role": "background-only",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "width": 599,
+      "height": 383
+    },
+    {
+      "assetId": "external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "kitchen-appliance-stage",
+      "sourceTitle": "File:Honor bilt modern homes. (1921) (14740923406).jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__honor-bilt-modern-homes-1921-14740923406__ca163823ef84.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d1/Honor_bilt_modern_homes._%281921%29_%2814740923406%29.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Honor_bilt_modern_homes._(1921)_(14740923406).jpg",
+      "licenseProfile": "No restrictions",
+      "licenseUrl": "https://www.flickr.com/commons/usage/",
+      "role": "background-only",
+      "pageFamilies": [
+        "home",
+        "category-refrigerators",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "product-grid"
+      ],
+      "width": 960,
+      "height": 580
+    },
+    {
+      "assetId": "external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "kitchen-appliance-stage",
+      "sourceTitle": "File:Sustainable Kitchen - Flickr - Jeremy Levine Design.jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__sustainable-kitchen-flickr-jeremy-levine-design__180e854c1e79.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/Sustainable_Kitchen_-_Flickr_-_Jeremy_Levine_Design.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Sustainable_Kitchen_-_Flickr_-_Jeremy_Levine_Design.jpg",
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/2.0",
+      "role": "object-only",
+      "pageFamilies": [
+        "home",
+        "category-refrigerators",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "product-grid"
+      ],
+      "width": 960,
+      "height": 638
+    },
+    {
+      "assetId": "external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "tv-living-stage",
+      "sourceTitle": "File:Modern Living Room.jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__tv-living-stage__modern-living-room__9f7789fb9d22.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/3/38/Modern_Living_Room.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Modern_Living_Room.jpg",
+      "licenseProfile": "CC BY-SA 4.0 / cc-by-sa-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "role": "object-only",
+      "pageFamilies": [
+        "home",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "gallery"
+      ],
+      "width": 960,
+      "height": 636
+    },
+    {
+      "assetId": "external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "tv-living-stage",
+      "sourceTitle": "File:Turning Technology into Furniture - Stove(1886), Radiola60 in Cab.(1927-28), Predicta TV(1958-60), RCA TV(1949), Edison Phonograph(1919), Sewing Machine(1950-55,1860-65) - Fully Furnished - Historic Furniture Exhibit - Henry Ford Museum.jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__tv-living-stage__turning-technology-into-furniture-stove-1886-rad__c6487c2a592f.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/59/Turning_Technology_into_Furniture_-_Stove%281886%29%2C_Radiola60_in_Cab.%281927-28%29%2C_Predicta_TV%281958-60%29%2C_RCA_TV%281949%29%2C_Edison_Phonograph%281919%29%2C_Sewing_Machine%281950-55%2C1860-65%29_-_Fully_Furnished_-_Historic_Furniture_Exhibit_-_Henry_Ford_Museum.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Turning_Technology_into_Furniture_-_Stove(1886),_Radiola60_in_Cab.(1927-28),_Predicta_TV(1958-60),_RCA_TV(1949),_Edison_Phonograph(1919),_Sewing_Machine(1950-55,1860-65)_-_Fully_Furnished_-_Historic_Furniture_Exhibit_-_Henry_Ford_Museum.jpg",
+      "licenseProfile": "CC BY-SA 2.0 / cc-by-sa-2.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+      "role": "object-only",
+      "pageFamilies": [
+        "home",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "gallery"
+      ],
+      "width": 960,
+      "height": 720
+    },
+    {
+      "assetId": "external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "media-wall-stage",
+      "sourceTitle": "File:Christian Laube House, Buffalo, New York - 20211218.jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__media-wall-stage__christian-laube-house-buffalo-new-york-20211218__5542ff08e9e8.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Christian_Laube_House%2C_Buffalo%2C_New_York_-_20211218.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Christian_Laube_House,_Buffalo,_New_York_-_20211218.jpg",
+      "licenseProfile": "CC BY-SA 4.0 / cc-by-sa-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+      "role": "object-only",
+      "pageFamilies": [
+        "home",
+        "category-tvs",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "gallery",
+        "product-grid"
+      ],
+      "width": 960,
+      "height": 720
+    },
+    {
+      "assetId": "external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "media-wall-stage",
+      "sourceTitle": "File:The Town Crier, v.15, no.50, Dec. 11, 1920 - DPLA - 37f26783bbd274eca9a46efa6e846211 (page 32).jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__media-wall-stage__the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26__b1ccbcb0675e.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0c/The_Town_Crier%2C_v.15%2C_no.50%2C_Dec._11%2C_1920_-_DPLA_-_37f26783bbd274eca9a46efa6e846211_%28page_32%29.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_Town_Crier,_v.15,_no.50,_Dec._11,_1920_-_DPLA_-_37f26783bbd274eca9a46efa6e846211_(page_32).jpg",
+      "licenseProfile": "Public domain / pd",
+      "licenseUrl": "",
+      "role": "reference-only",
+      "pageFamilies": [
+        "home",
+        "category-tvs",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "gallery",
+        "product-grid"
+      ],
+      "width": 960,
+      "height": 1292
+    },
+    {
+      "assetId": "external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "laundry-utility-stage",
+      "sourceTitle": "File:StateLibQld 2 75473 Prisoners using the laundry facilities at the new female division of Boggo Road Gaol, Brisbane, 1903.jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__statelibqld-2-75473-prisoners-using-the-laundry-__bb3007a71c4c.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/2/24/StateLibQld_2_75473_Prisoners_using_the_laundry_facilities_at_the_new_female_division_of_Boggo_Road_Gaol%2C_Brisbane%2C_1903.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:StateLibQld_2_75473_Prisoners_using_the_laundry_facilities_at_the_new_female_division_of_Boggo_Road_Gaol,_Brisbane,_1903.jpg",
+      "licenseProfile": "Public domain / pd",
+      "licenseUrl": "",
+      "role": "object-only",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "careBanner"
+      ],
+      "width": 960,
+      "height": 727
+    },
+    {
+      "assetId": "external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "laundry-utility-stage",
+      "sourceTitle": "File:Finnish laundry room from 1990.jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__finnish-laundry-room-from-1990__c242420e9389.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/7/79/Finnish_laundry_room_from_1990.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Finnish_laundry_room_from_1990.jpg",
+      "licenseProfile": "CC BY 4.0 / cc-by-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0",
+      "role": "object-only",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "careBanner"
+      ],
+      "width": 960,
+      "height": 698
+    },
+    {
+      "assetId": "external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "service-care-soft-stage",
+      "sourceTitle": "File:American homes and gardens (1911) (18157123091).jpg",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__american-homes-and-gardens-1911-18157123091__32e78473f7d1.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/9/99/American_homes_and_gardens_%281911%29_%2818157123091%29.jpg",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1911)_(18157123091).jpg",
+      "licenseProfile": "No restrictions",
+      "licenseUrl": "https://www.flickr.com/commons/usage/",
+      "role": "background-only",
+      "pageFamilies": [
+        "support",
+        "care-solutions",
+        "care-solutions-pdp"
+      ],
+      "slotFamilies": [
+        "mainService",
+        "careBanner",
+        "bestcare",
+        "banner"
+      ],
+      "width": 960,
+      "height": 270
+    },
+    {
+      "assetId": "external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d",
+      "status": "candidate",
+      "sourceType": "external-stock",
+      "providerName": "Wikimedia Commons",
+      "sourceProfileId": "service-care-soft-stage",
+      "sourceTitle": "File:This bedroom belonged to the Lincoln family’s hired staff member if they needed a place to stay. The Lincolns hired and paid (8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG",
+      "sourceRef": "data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__this-bedroom-belonged-to-the-lincoln-family-s-hi__e2127dbb614d.jpg",
+      "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cd/This_bedroom_belonged_to_the_Lincoln_family%E2%80%99s_hired_staff_member_if_they_needed_a_place_to_stay._The_Lincolns_hired_and_paid_%288e066c0b-b905-43c5-85b2-ec6cc8efa807%29.JPG",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:This_bedroom_belonged_to_the_Lincoln_family%E2%80%99s_hired_staff_member_if_they_needed_a_place_to_stay._The_Lincolns_hired_and_paid_(8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG",
+      "licenseProfile": "Public domain / pd",
+      "licenseUrl": "",
+      "role": "object-only",
+      "pageFamilies": [
+        "support",
+        "care-solutions",
+        "care-solutions-pdp"
+      ],
+      "slotFamilies": [
+        "mainService",
+        "careBanner",
+        "bestcare",
+        "banner"
+      ],
+      "width": 960,
+      "height": 640
+    }
+  ]
+}

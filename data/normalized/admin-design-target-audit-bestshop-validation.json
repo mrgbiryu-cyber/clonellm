@@ -1,0 +1,261 @@
+{
+  "generatedAt": "2026-04-24T09:08:46.033Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "loginId": "mrgbiryu",
+  "targetSet": "admin",
+  "buildExecuted": true,
+  "results": [
+    {
+      "pageId": "bestshop",
+      "viewportProfile": "pc",
+      "label": "베스트샵 - PC",
+      "cloneStatus": 200,
+      "editableComponentCount": 4,
+      "editableSlots": [
+        "hero",
+        "shortcut",
+        "review",
+        "brandBanner"
+      ],
+      "sidecarSectionCount": 4,
+      "sidecarMissingReferenceMarkupCount": 0,
+      "assetSectionCount": 4,
+      "assetAvailableCounts": {
+        "images": 0,
+        "iconFamilies": 0,
+        "interactionComponents": 0
+      },
+      "assetEmptySections": [
+        "hero",
+        "shortcut",
+        "review",
+        "brandBanner"
+      ],
+      "build": {
+        "ok": false,
+        "status": 422,
+        "error": "design_author_output_not_ready",
+        "validation": {
+          "deliveryReadiness": {
+            "summary": "authored result에 runtime 전달 차단 사유가 있습니다.",
+            "readyForRuntime": false,
+            "blockingReasons": [
+              "asset_role_reoverlay_blocked:hero:promo-complete",
+              "background_asset_role_mismatch:hero:hero-main"
+            ]
+          },
+          "checkRecords": [
+            "target group 확인: page",
+            "authored sections 존재 확인: 4",
+            "declared section keys 확인: hero,shortcut,review,brandBanner",
+            "projected section keys 확인: hero,shortcut,review,brandBanner",
+            "hero html 존재 확인",
+            "shortcut html 존재 확인",
+            "review html 존재 확인",
+            "brandBanner html 존재 확인"
+          ],
+          "advisory": [],
+          "assetRegistryDiagnostics": [
+            {
+              "slotId": "hero",
+              "componentId": "bestshop.hero",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "shortcut",
+              "componentId": "bestshop.shortcut",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "review",
+              "componentId": "bestshop.review",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "brandBanner",
+              "componentId": "bestshop.brandBanner",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            }
+          ]
+        },
+        "draftBuildId": "",
+        "previewPath": "",
+        "comparePath": "",
+        "authoredSectionCount": 0,
+        "authoredSlotIds": [],
+        "missingAuthoredSlots": [
+          "hero",
+          "shortcut",
+          "review",
+          "brandBanner"
+        ]
+      }
+    },
+    {
+      "pageId": "bestshop",
+      "viewportProfile": "mo",
+      "label": "베스트샵 - 모바일",
+      "cloneStatus": 200,
+      "editableComponentCount": 4,
+      "editableSlots": [
+        "hero",
+        "shortcut",
+        "review",
+        "brandBanner"
+      ],
+      "sidecarSectionCount": 4,
+      "sidecarMissingReferenceMarkupCount": 1,
+      "assetSectionCount": 4,
+      "assetAvailableCounts": {
+        "images": 0,
+        "iconFamilies": 0,
+        "interactionComponents": 0
+      },
+      "assetEmptySections": [
+        "hero",
+        "shortcut",
+        "review",
+        "brandBanner"
+      ],
+      "build": {
+        "ok": false,
+        "status": 422,
+        "error": "design_author_output_not_ready",
+        "validation": {
+          "deliveryReadiness": {
+            "summary": "authored result에 runtime 전달 차단 사유가 있습니다.",
+            "readyForRuntime": false,
+            "blockingReasons": [
+              "asset_role_reoverlay_blocked:hero:promo-complete",
+              "background_asset_role_mismatch:hero:hero-main"
+            ]
+          },
+          "checkRecords": [
+            "target group 확인: page",
+            "authored sections 존재 확인: 4",
+            "declared section keys 확인: hero,shortcut,review,brandBanner",
+            "projected section keys 확인: hero,shortcut,review,brandBanner",
+            "hero html 존재 확인",
+            "shortcut html 존재 확인",
+            "review html 존재 확인",
+            "brandBanner html 존재 확인"
+          ],
+          "advisory": [],
+          "assetRegistryDiagnostics": [
+            {
+              "slotId": "hero",
+              "componentId": "bestshop.hero",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "shortcut",
+              "componentId": "bestshop.shortcut",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "review",
+              "componentId": "bestshop.review",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "brandBanner",
+              "componentId": "bestshop.brandBanner",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            }
+          ]
+        },
+        "draftBuildId": "",
+        "previewPath": "",
+        "comparePath": "",
+        "authoredSectionCount": 0,
+        "authoredSlotIds": [],
+        "missingAuthoredSlots": [
+          "hero",
+          "shortcut",
+          "review",
+          "brandBanner"
+        ]
+      }
+    }
+  ]
+}

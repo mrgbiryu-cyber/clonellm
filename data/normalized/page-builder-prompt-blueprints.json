@@ -1,0 +1,616 @@
+{
+  "generatedAt": "2026-04-20T00:00:00.000Z",
+  "version": 1,
+  "global": {
+    "promptOrder": [
+      "page prompt first",
+      "cluster prompt second",
+      "section prompt third",
+      "renderer strategy and replacement constraints last"
+    ],
+    "executionModel": [
+      "Keep the baseline clone fixed and replace only the selected target area.",
+      "Prefer cluster replacement over isolated slot decoration when adjacent sections form one reading system.",
+      "Do not write proposal prose that cannot be translated into executable section or cluster structure."
+    ],
+    "rendererPolicy": [
+      "Use Tailwind replacement blocks as the preferred explicit surface when the page supports replacement rendering.",
+      "Avoid higher-layer wrapper reassembly in pilot replacement mode unless the page blueprint explicitly allows it.",
+      "Preserve page identity through palette, spacing discipline, and information hierarchy before adding stylistic novelty."
+    ],
+    "qualityChecks": [
+      "The replacement must read as one intentional system at the chosen scope.",
+      "Primary action and primary message must remain obvious without scanning the whole page.",
+      "No helper labels or internal guide text may leak into customer-facing output."
+    ]
+  },
+  "pageBlueprints": [
+    {
+      "blueprintId": "home:pc",
+      "pageId": "home",
+      "viewportProfile": "pc",
+      "targetKind": "home",
+      "label": "홈 - PC",
+      "implementationStatus": "implemented",
+      "pagePrompt": {
+        "goal": "Make the home page feel like a premium commerce homepage with one clear first-screen entry sequence.",
+        "mustKeep": ["LG commerce home identity", "bright premium tone", "clear first-scroll trust"],
+        "avoid": ["disconnected campaign look", "equal-weight promo cards at first read", "isolated dark slabs"],
+        "success": ["hero dominates first read", "quickmenu supports scanning under hero", "top-stage reads as one system"]
+      },
+      "clusters": [
+        {
+          "clusterId": "top-stage",
+          "targetGroupId": "top",
+          "goal": "Stage hero and quickmenu as one coordinated top-entry system.",
+          "rules": ["hero first", "quickmenu as companion band", "no peer split between hero and quickmenu"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "hero", "role": "lead stage", "rules": ["badge/headline/support/action hierarchy", "visual supports headline, does not compete"] },
+        { "familyId": "quickmenu", "role": "support band", "rules": ["lead/support scan rhythm", "no helper text", "no oversized icon shells"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "cluster-replacement",
+        "replacementTargets": ["hero", "quickmenu"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "home:mo",
+      "pageId": "home",
+      "viewportProfile": "mo",
+      "targetKind": "home",
+      "label": "홈 - 모바일",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Deliver the premium commerce home identity on mobile — thumb-first navigation, hero visible above the fold without scrolling.",
+        "mustKeep": ["LG commerce home identity", "first-screen hero dominance", "quickmenu thumb-reachability"],
+        "avoid": ["desktop-scale typography carried unmodified to mobile", "4-column quickmenu on small screens", "hero pushed below fold by header elements"],
+        "success": ["hero occupies 60–70% of first-screen height", "quickmenu is reachable with one thumb", "primary CTA has at least 44px touch target"]
+      },
+      "clusters": [
+        {
+          "clusterId": "top-stage-mo",
+          "targetGroupId": "top",
+          "goal": "Hero and quickmenu adapt to mobile without losing the top-stage coordination.",
+          "rules": ["hero takes dominant first-screen height", "quickmenu collapses to 2-row grid or horizontal-scroll band", "no peer-level competition between hero and quickmenu at mobile scale"]
+        }
+      ],
+      "sectionPrompts": [
+        {
+          "familyId": "hero",
+          "role": "full-width focal stage",
+          "rules": ["headline max 3 lines at mobile scale", "CTA minimum 44px touch target", "support slides hidden or reduced on smallest breakpoint", "image fills full width without side margins"]
+        },
+        {
+          "familyId": "quickmenu",
+          "role": "compact navigation band",
+          "rules": ["2-row icon grid with max 4 items per row", "label truncates at 1 line", "icon size 40px", "lead item spans full row width if present"]
+        }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "cluster-replacement",
+        "replacementTargets": ["hero", "quickmenu"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "home:ta",
+      "pageId": "home",
+      "viewportProfile": "ta",
+      "targetKind": "home",
+      "label": "홈 - 태블릿",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Keep the same home identity as PC while tightening rhythm and density for tablet.",
+        "mustKeep": ["home first-screen intent", "brand-first cadence", "navigation clarity"],
+        "avoid": ["desktop shrink-only layout", "overdense top-stage", "cropped hero emphasis"],
+        "success": ["tablet top-stage still reads clearly", "benefit and quick navigation feel balanced"]
+      },
+      "clusters": [
+        {
+          "clusterId": "top-stage",
+          "targetGroupId": "top",
+          "goal": "Adapt the top-stage system for tablet without losing the hero-led reading order.",
+          "rules": ["hero still leads", "support navigation remains secondary", "touch-target rhythm stays calm"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "hero", "role": "lead stage", "rules": ["headline scale adjusted for tablet", "image crop remains controlled"] },
+        { "familyId": "quickmenu", "role": "support band", "rules": ["scanable two-row rhythm when needed", "icons stay visually light"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "cluster-replacement",
+        "replacementTargets": ["hero", "quickmenu"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "support",
+      "pageId": "support",
+      "targetKind": "service",
+      "label": "고객지원",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Make the first screen support-path first, with guided choice and trust before depth.",
+        "mustKeep": ["service trust tone", "search and self-help prominence", "support channel clarity"],
+        "avoid": ["brand campaign tone", "ornamental promo staging", "equal-weight service blocks"],
+        "success": ["one obvious first action", "clear triage between self-help, inquiry, store/service center"]
+      },
+      "clusters": [
+        {
+          "clusterId": "service-entry",
+          "targetGroupId": "top",
+          "goal": "Stage support search and service-entry modules as one guidance cluster.",
+          "rules": ["guided first choice", "search stays visible", "proof and trust cues feel native"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "service-tabs", "role": "guided choice", "rules": ["clarity before density", "tabs and panels share one support tone"] },
+        { "familyId": "benefit", "role": "trust cue", "rules": ["service proofs stay concise", "no visual noise"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["service-intro", "tabs"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "support:ta",
+      "pageId": "support",
+      "viewportProfile": "ta",
+      "targetKind": "service",
+      "label": "고객지원 - 태블릿",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Keep service guidance readable at tablet width — search and channel entry must not overflow or become ambiguous at mid-screen scale.",
+        "mustKeep": ["service trust tone", "search prominence", "support channel clarity"],
+        "avoid": ["4-column grid that overflows at tablet width", "hero image that overwhelms the guidance entry headline", "tab rows that wrap uncontrollably"],
+        "success": ["search input is full-width and clearly the primary action", "service tabs remain scanable in a single or two-row layout", "trust cues remain concise and readable at tablet scale"]
+      },
+      "clusters": [
+        {
+          "clusterId": "service-entry-ta",
+          "targetGroupId": "top",
+          "goal": "Adapt the service entry cluster for tablet without losing guided-choice clarity.",
+          "rules": ["search stays full-width", "tabs collapse to 2-row when count exceeds 5", "intro section takes 2/3 max width at tablet to avoid over-wide text lines"]
+        }
+      ],
+      "sectionPrompts": [
+        {
+          "familyId": "service-hero",
+          "role": "guidance entry stage",
+          "rules": ["headline max 2 lines at tablet scale", "search input full-width below headline", "no 2-column split for intro at tablet — single column preferred"]
+        },
+        {
+          "familyId": "service-tabs",
+          "role": "guided choice band",
+          "rules": ["tab label stays 1 line — truncate rather than wrap", "active state must be visible without hover interaction", "tab row wraps to 2 rows gracefully if count > 5"]
+        }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["service-intro", "tabs"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "care-solutions:ta",
+      "pageId": "care-solutions",
+      "viewportProfile": "ta",
+      "targetKind": "service",
+      "label": "가전 구독 메인 - 태블릿",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Ensure subscription comparison remains scanable at tablet width — 2-column plan cards and a visible application CTA without scrolling.",
+        "mustKeep": ["plan comparison utility", "subscription value framing", "application CTA above fold"],
+        "avoid": ["3-column plan grid that becomes cramped at tablet width", "subscription copy truncating key value due to narrow columns", "CTA pushed below the comparison section at tablet scale"],
+        "success": ["plan differences are visible in a 2-column card layout", "price and application CTA visible without scrolling at tablet width", "subscription value intro stays concise"]
+      },
+      "clusters": [
+        {
+          "clusterId": "service-value-ta",
+          "targetGroupId": "top",
+          "goal": "Adapt subscription value + comparison + CTA cluster for tablet without losing conversion clarity.",
+          "rules": ["plan compare uses 2-col at tablet", "CTA remains visible in first decision band", "value intro compresses to max 2 lines at tablet scale"]
+        }
+      ],
+      "sectionPrompts": [
+        {
+          "familyId": "service-hero",
+          "role": "subscription value statement",
+          "rules": ["headline max 2 lines at tablet scale", "value framing stays in the first 2/3 of section width — no full-width text sprawl"]
+        },
+        {
+          "familyId": "commerce",
+          "role": "plan comparison grid",
+          "rules": ["2-column card grid at tablet — not 3", "price must be visible without card interaction", "compare CTA sticky or pinned near top of comparison section if possible"]
+        }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "cluster-replacement",
+        "replacementTargets": ["service-intro", "plan-compare"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "bestshop",
+      "pageId": "bestshop",
+      "targetKind": "service",
+      "label": "베스트샵",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Present store discovery and booking flow with calm retail trust and locality clarity.",
+        "mustKeep": ["store discovery role", "booking/service trust", "location relevance"],
+        "avoid": ["generic campaign hero", "overbuilt card grids", "unclear local action"],
+        "success": ["store search is obvious", "store-specific benefits are quickly scannable"]
+      },
+      "clusters": [
+        {
+          "clusterId": "store-entry",
+          "targetGroupId": "top",
+          "goal": "Combine store discovery, local proof, and first CTA into one retail entry cluster.",
+          "rules": ["store search or nearest-store CTA stays first", "trust cues remain concise"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "hero", "role": "retail entry stage", "rules": ["headline and local action dominate", "store proof supports the CTA"] },
+        { "familyId": "benefit", "role": "service reassurance", "rules": ["benefits stay short and practical"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["hero", "benefit-highlight"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "care-solutions",
+      "pageId": "care-solutions",
+      "targetKind": "service",
+      "label": "가전 구독 메인",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Lead with subscription value and comparison clarity, not long explanation.",
+        "mustKeep": ["subscription value framing", "comparison utility", "application CTA"],
+        "avoid": ["long intro blocks", "general PDP tone", "buried comparison section"],
+        "success": ["value proposition is readable first", "comparison becomes scanable before commitment"]
+      },
+      "clusters": [
+        {
+          "clusterId": "service-value",
+          "targetGroupId": "top",
+          "goal": "Stage value summary, comparison cue, and application CTA as one conversion cluster.",
+          "rules": ["value first", "comparison second", "apply CTA always visible in first decision range"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "hero", "role": "value proposition stage", "rules": ["subscription value not product glamour", "copy compresses decision"] },
+        { "familyId": "commerce", "role": "comparison/browse support", "rules": ["cards favor compare-first reading"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "cluster-replacement",
+        "replacementTargets": ["service-intro", "plan-compare"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "care-solutions-pdp",
+      "pageId": "care-solutions-pdp",
+      "targetKind": "service",
+      "label": "가전 구독 PDP",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Make subscription benefit, payment model, and apply action clearer than standard product details.",
+        "mustKeep": ["subscription trust", "price/payment clarity", "application route"],
+        "avoid": ["generic product PDP reading order", "overlong feature storytelling"],
+        "success": ["benefit and payment structure are legible before deep details"]
+      },
+      "clusters": [
+        {
+          "clusterId": "conversion-summary",
+          "targetGroupId": "top",
+          "goal": "Treat summary, price, and apply CTA as one conversion cluster.",
+          "rules": ["benefit summary first", "price and payment second", "CTA remains nearby"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "benefit", "role": "subscription summary", "rules": ["compress to decision-grade proof"] },
+        { "familyId": "commerce", "role": "price/plan structure", "rules": ["payment model must read instantly"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["summary", "buybox"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "homestyle-home",
+      "pageId": "homestyle-home",
+      "targetKind": "service",
+      "label": "홈스타일 메인",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Present curation-first lifestyle commerce with warm editorial rhythm and clear browse paths.",
+        "mustKeep": ["homestyle identity", "curation feel", "product discovery clarity"],
+        "avoid": ["cold enterprise service tone", "discount-mall clutter"],
+        "success": ["editorial curation and shopping paths feel balanced"]
+      },
+      "clusters": [
+        {
+          "clusterId": "editorial-entry",
+          "targetGroupId": "top",
+          "goal": "Blend story-led entry and quick product discovery without flattening both.",
+          "rules": ["story leads", "browse follows", "warm but disciplined surface rhythm"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "story", "role": "curation lead", "rules": ["story sets mood", "copy stays concise"] },
+        { "familyId": "commerce", "role": "browse support", "rules": ["product cards remain shoppable, not decorative"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "cluster-replacement",
+        "replacementTargets": ["hero", "md-choice"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "homestyle-pdp",
+      "pageId": "homestyle-pdp",
+      "targetKind": "service",
+      "label": "홈스타일 PDP",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Combine lifestyle mood and purchase clarity without letting mood obscure decision making.",
+        "mustKeep": ["product understanding", "shopping trust", "homestyle tone"],
+        "avoid": ["story-only hero with weak buy path", "cold utilitarian PDP"],
+        "success": ["mood and purchase path coexist without competing equally"]
+      },
+      "clusters": [
+        {
+          "clusterId": "pdp-mood-summary",
+          "targetGroupId": "top",
+          "goal": "Tie gallery, key value summary, and purchase start into one lifestyle PDP cluster.",
+          "rules": ["gallery and summary connect", "buy path remains obvious"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "story", "role": "mood support", "rules": ["mood supports value proposition, not replaces it"] },
+        { "familyId": "commerce", "role": "buy path", "rules": ["pricing and CTA remain explicit"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["gallery", "summary", "buybox"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "category-tvs",
+      "pageId": "category-tvs",
+      "targetKind": "plp",
+      "label": "PLP - TV 카테고리",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Keep browse-first behavior while clarifying recommendation and filter rhythm.",
+        "mustKeep": ["filter/sort utility", "product grid clarity", "category trust"],
+        "avoid": ["promo-first landing page", "heavy editorial interruption"],
+        "success": ["users can scan, filter, and compare without distraction"]
+      },
+      "clusters": [
+        {
+          "clusterId": "browse-stage",
+          "targetGroupId": "top",
+          "goal": "Make category intro, filters, and first product set feel like one browse-start system.",
+          "rules": ["filters remain visible", "intro stays secondary to browse", "promo is support only"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "banner", "role": "category cue", "rules": ["intro/banner must not outrank browse controls"] },
+        { "familyId": "commerce", "role": "product browse", "rules": ["grid remains calm and comparison-friendly"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["banner", "product-list"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "category-refrigerators",
+      "pageId": "category-refrigerators",
+      "targetKind": "plp",
+      "label": "PLP - 냉장고 카테고리",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Stage refrigerator browse with compare-first clarity and restrained premium merchandising.",
+        "mustKeep": ["filter and compare utility", "product card scanability", "category trust"],
+        "avoid": ["visual merchandising that slows comparison", "banner overreach"],
+        "success": ["first screen tells users how to browse and compare immediately"]
+      },
+      "clusters": [
+        {
+          "clusterId": "browse-stage",
+          "targetGroupId": "top",
+          "goal": "Treat intro, filters, and first comparison-ready cards as one system.",
+          "rules": ["intro stays short", "filters and compare cues remain dominant"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "banner", "role": "category cue", "rules": ["support browse, never compete with it"] },
+        { "familyId": "commerce", "role": "compare-ready grid", "rules": ["key specs remain readable at scan speed"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["banner", "product-list"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "pdp-tv-general",
+      "pageId": "pdp-tv-general",
+      "targetKind": "pdp",
+      "label": "PDP - TV 일반형",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Make summary, pricing, and option understanding quicker than long feature reading.",
+        "mustKeep": ["gallery", "price", "option selection", "buy CTA"],
+        "avoid": ["story-first PDP", "visual drama over decision clarity"],
+        "success": ["users understand the product and buying path inside the first decision band"]
+      },
+      "clusters": [
+        {
+          "clusterId": "summary-buy",
+          "targetGroupId": "top",
+          "goal": "Treat gallery, summary, and buybox as one decision cluster.",
+          "rules": ["summary and price are obvious", "buybox is not visually detached"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "hero", "role": "summary lead", "rules": ["headline/spec summary compresses key value"] },
+        { "familyId": "commerce", "role": "buy path", "rules": ["price and CTA remain dominant after summary"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["gallery", "summary", "buybox"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "pdp-tv-premium",
+      "pageId": "pdp-tv-premium",
+      "targetKind": "pdp",
+      "label": "PDP - TV 프리미엄형",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Lead with premium value proposition while keeping summary and purchase action concrete.",
+        "mustKeep": ["premium value framing", "gallery", "buy path", "key spec proof"],
+        "avoid": ["generic standard PDP hierarchy", "overlong premium story before value clarity"],
+        "success": ["premium difference is obvious before deep reading"]
+      },
+      "clusters": [
+        {
+          "clusterId": "value-buy",
+          "targetGroupId": "top",
+          "goal": "Unify premium message, proof, and buy path in one decision cluster.",
+          "rules": ["premium value first", "proof second", "buy CTA stays close to price"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "story", "role": "premium proof", "rules": ["story sharpens value, not bloats it"] },
+        { "familyId": "commerce", "role": "buy path", "rules": ["purchase clarity never yields to styling"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["gallery", "summary", "buybox"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "pdp-refrigerator-general",
+      "pageId": "pdp-refrigerator-general",
+      "targetKind": "pdp",
+      "label": "PDP - 냉장고 일반형",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Present storage value, size fit, and buying path with calm confidence.",
+        "mustKeep": ["product summary", "dimensions/value clarity", "buy path"],
+        "avoid": ["feature sprawl before decision basics", "promo clutter in summary band"],
+        "success": ["core refrigerator value is readable before long detail sections"]
+      },
+      "clusters": [
+        {
+          "clusterId": "summary-buy",
+          "targetGroupId": "top",
+          "goal": "Keep summary, size/value cues, and buybox in one decision frame.",
+          "rules": ["decision basics first", "details after commitment threshold"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "benefit", "role": "value summary", "rules": ["storage/use benefits stay concrete"] },
+        { "familyId": "commerce", "role": "buy path", "rules": ["pricing and CTA remain simple and stable"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["gallery", "summary", "buybox"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "pdp-refrigerator-knockon",
+      "pageId": "pdp-refrigerator-knockon",
+      "targetKind": "pdp",
+      "label": "PDP - 냉장고 노크온형",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Clarify the signature premium feature and purchase value without generic luxury noise.",
+        "mustKeep": ["signature feature focus", "proof of value", "buy path"],
+        "avoid": ["generic premium hero", "weak differentiation in summary band"],
+        "success": ["the unique feature reads instantly and supports buying confidence"]
+      },
+      "clusters": [
+        {
+          "clusterId": "feature-buy",
+          "targetGroupId": "top",
+          "goal": "Unify standout feature explanation, proof, and purchase path.",
+          "rules": ["signature feature first", "proof second", "buy CTA remains practical"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "story", "role": "feature proof", "rules": ["show differentiation clearly, not theatrically"] },
+        { "familyId": "commerce", "role": "buy path", "rules": ["feature story must not bury price/options"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["gallery", "summary", "buybox"],
+        "disableHigherLayerReassembly": true
+      }
+    },
+    {
+      "blueprintId": "pdp-refrigerator-glass",
+      "pageId": "pdp-refrigerator-glass",
+      "targetKind": "pdp",
+      "label": "PDP - 냉장고 글라스형",
+      "implementationStatus": "blueprint-only",
+      "pagePrompt": {
+        "goal": "Balance premium material mood with clear summary, specs, and buy action.",
+        "mustKeep": ["material-led premium value", "summary clarity", "buy path"],
+        "avoid": ["style-only mood page", "summary detached from price and options"],
+        "success": ["premium material identity and purchase clarity coexist"]
+      },
+      "clusters": [
+        {
+          "clusterId": "material-buy",
+          "targetGroupId": "top",
+          "goal": "Tie material-led value proposition to summary and purchase path in one band.",
+          "rules": ["material message supports summary", "buy action stays practical and visible"]
+        }
+      ],
+      "sectionPrompts": [
+        { "familyId": "story", "role": "material-led proof", "rules": ["style tone stays restrained and credible"] },
+        { "familyId": "commerce", "role": "buy path", "rules": ["price and CTA remain anchored to the summary"] }
+      ],
+      "rendererStrategy": {
+        "preferredSurface": "tailwind",
+        "replacementMode": "slot-replacement",
+        "replacementTargets": ["gallery", "summary", "buybox"],
+        "disableHigherLayerReassembly": true
+      }
+    }
+  ]
+}

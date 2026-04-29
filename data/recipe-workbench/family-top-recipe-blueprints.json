@@ -1,0 +1,543 @@
+{
+  "generatedAt": "2026-04-20T00:00:00Z",
+  "purpose": "Quality-first top recipe blueprints for family-wide recipe authoring",
+  "authoringRules": [
+    "Author top recipes before long-tail variants.",
+    "Every recipe must improve hierarchy, scan rhythm, and page-role clarity, not just surface styling.",
+    "Reject filler recipes that only change color or decoration without structural advantage.",
+    "Manual render ceiling should be checked before expanding recipe count.",
+    "If top recipes still fail after contract and critic alignment, stop and run renderer surface compare."
+  ],
+  "families": [
+    {
+      "familyId": "hero",
+      "selectionRule": "Treat hero as the strongest top-stage surface. The first glance must already show dominance.",
+      "topRecipes": [
+        {
+          "recipeId": "hero-cinematic-stage-v1",
+          "status": "runtime-anchor",
+          "priority": 1,
+          "pageRoles": ["home", "campaign-top"],
+          "suggestedPrimitive": "SplitHero/premium-stage",
+          "sourceIds": ["getdesign-ferrari", "land-book-ecommerce"],
+          "qualityObjective": "Create a first-scroll command surface where the visual and headline clearly overpower the support rail.",
+          "structureRules": [
+            "Lead visual should own at least half of the horizontal stage.",
+            "Headline block should read before any support card or badge cluster.",
+            "Support rail should feel secondary and editorial, not equal-width promo cards."
+          ],
+          "copyRules": [
+            "Headline should land in one dominant phrase before descriptive copy starts.",
+            "Primary CTA must be visually louder than any secondary action."
+          ],
+          "qualitySignals": [
+            "Clear split asymmetry",
+            "Immediate focal point",
+            "No 1:1 lead/support balance"
+          ],
+          "avoid": ["small lead image", "flat white promo layout", "crowded CTA row"]
+        },
+        {
+          "recipeId": "hero-premium-spotlight-v1",
+          "status": "runtime-anchor",
+          "priority": 2,
+          "pageRoles": ["home", "commerce-home"],
+          "suggestedPrimitive": "SplitHero/premium-stage",
+          "sourceIds": ["getdesign-ferrari", "working-ref-ui-ux-pro-max-skill"],
+          "qualityObjective": "Lift premium perception without losing product-entry clarity.",
+          "structureRules": [
+            "Lead copy stack should be shorter and more forceful than the utility support zone.",
+            "Premium surface must still preserve a direct path to the main action.",
+            "Support cards should reinforce curation, not compete with the lead card."
+          ],
+          "copyRules": [
+            "Use premium but concrete benefit language.",
+            "Keep the lead message compressed; avoid generic lifestyle filler."
+          ],
+          "qualitySignals": [
+            "Headline dominance survives at first scroll",
+            "Premium tone comes from contrast and spacing, not decoration only"
+          ],
+          "avoid": ["washed-out premium gray", "equal-weight text blocks", "ornamental chrome with weak hierarchy"]
+        },
+        {
+          "recipeId": "hero-editorial-briefing-v1",
+          "status": "runtime-anchor",
+          "priority": 3,
+          "pageRoles": ["home", "editorial-promo"],
+          "suggestedPrimitive": "SplitHero/editorial",
+          "sourceIds": ["getdesign-wise", "designmd-nordic-yellow"],
+          "qualityObjective": "Offer a softer editorial top stage while preserving strong visual entry hierarchy.",
+          "structureRules": [
+            "Lead column should still dominate even when the tone is editorial.",
+            "Support content must read as chapter-like continuation, not equal promo tiles.",
+            "Whitespace should frame the headline instead of diluting it."
+          ],
+          "copyRules": [
+            "Use one editorial hook plus one supporting line.",
+            "Do not let descriptive copy outgrow the headline block."
+          ],
+          "qualitySignals": [
+            "Magazine-like pacing",
+            "Lead/support contrast stays visible",
+            "Soft tone without weak hierarchy"
+          ],
+          "avoid": ["soft but flat layout", "multi-card clutter", "utility microcopy taking over"]
+        }
+      ]
+    },
+    {
+      "familyId": "quickmenu",
+      "selectionRule": "Treat quickmenu as a cluster under hero, not as a flat icon dump.",
+      "topRecipes": [
+        {
+          "recipeId": "quickmenu-lead-panel-v1",
+          "status": "runtime-anchor",
+          "priority": 1,
+          "pageRoles": ["home", "commerce-home"],
+          "suggestedPrimitive": "QuickmenuPanel/panel",
+          "sourceIds": ["getdesign-wise", "mobbin"],
+          "qualityObjective": "Create one obvious lead entry and a clean support grid that scans in under two seconds.",
+          "structureRules": [
+            "Lead panel must be materially larger or higher-contrast than the rest.",
+            "Support entries should share one icon shell logic and one text rhythm.",
+            "The cluster should feel attached to hero, not like a separate tool strip."
+          ],
+          "copyRules": [
+            "Labels must carry context, not bare verbs.",
+            "Support labels should stay compact enough to preserve scan speed."
+          ],
+          "qualitySignals": [
+            "One dominant lead entry",
+            "Fast row/column scan path",
+            "Consistent icon shell and card spacing"
+          ],
+          "avoid": ["all cards same weight", "tiny lead tile", "no visual bridge from hero"]
+        },
+        {
+          "recipeId": "quickmenu-service-tab-cluster-v1",
+          "status": "runtime-anchor",
+          "priority": 2,
+          "pageRoles": ["service", "service-landing"],
+          "suggestedPrimitive": "QuickmenuPanel/panel",
+          "sourceIds": ["getdesign-hashicorp", "component-gallery"],
+          "qualityObjective": "Use the quickmenu cluster as a guided service start surface with strong information scent.",
+          "structureRules": [
+            "Primary route should be visually first and semantically clearest.",
+            "Remaining entries should form a stable support matrix with obvious grouping.",
+            "Card rhythm should favor trust and legibility over visual drama."
+          ],
+          "copyRules": [
+            "Each label should imply a concrete user task or service outcome.",
+            "Avoid marketing slogans in place of service utility."
+          ],
+          "qualitySignals": [
+            "Primary route reads first",
+            "Service trust tone",
+            "No ambiguity in label intent"
+          ],
+          "avoid": ["luxury art direction", "editorial ambiguity", "dense multi-line labels"]
+        },
+        {
+          "recipeId": "quickmenu-editorial-strip-v1",
+          "status": "runtime-anchor",
+          "priority": 3,
+          "pageRoles": ["home", "campaign-top"],
+          "suggestedPrimitive": "QuickmenuEditorialStrip/editorial-strip",
+          "sourceIds": ["getdesign-wise", "commerce-cream"],
+          "qualityObjective": "Support hero with a curated ribbon that feels designed, not merely utilitarian.",
+          "structureRules": [
+            "First editorial card must act as a gateway, not as one of many equal cards.",
+            "Remaining cards should maintain consistent rhythm and restrained copy length.",
+            "Strip pacing should feel horizontal and cinematic, not like a wrapped chip list."
+          ],
+          "copyRules": [
+            "Use short, high-signal labels that still imply meaning.",
+            "Do not let decorative eyebrow text overpower the destination label."
+          ],
+          "qualitySignals": [
+            "Editorial pacing",
+            "Lead-to-support ribbon rhythm",
+            "Strong continuation from hero tone"
+          ],
+          "avoid": ["equal chips", "busy decorative tags", "weak lead/support contrast"]
+        }
+      ]
+    },
+    {
+      "familyId": "ranking",
+      "selectionRule": "Ranking must show order, not just a list of similar cards.",
+      "topRecipes": [
+        {
+          "recipeId": "ranking-poster-command-v1",
+          "status": "planned",
+          "priority": 1,
+          "pageRoles": ["home", "commerce-home"],
+          "suggestedPrimitive": "RankingPosterGrid",
+          "sourceIds": ["mobbin", "ecomm-design"],
+          "qualityObjective": "Make rank 1 feel decisively more important while preserving clean secondary scan.",
+          "structureRules": [
+            "Rank 1 card should be larger or framed with a stronger poster treatment.",
+            "Rank markers must be visible before title parsing begins.",
+            "Secondary ranks should compress into a stable ladder without collapsing into sameness."
+          ],
+          "copyRules": [
+            "Keep title and one supporting merch signal visible at first glance.",
+            "Do not bury rank signal under promotion badges."
+          ],
+          "qualitySignals": [
+            "Rank 1 dominance",
+            "Ordered read path",
+            "Poster-like contrast for the first item"
+          ],
+          "avoid": ["all ranks equal size", "hidden rank badge", "badge clutter"]
+        },
+        {
+          "recipeId": "ranking-contrast-column-v1",
+          "status": "planned",
+          "priority": 2,
+          "pageRoles": ["home"],
+          "suggestedPrimitive": "RankingColumn",
+          "sourceIds": ["component-gallery", "baymard-ecommerce-design-examples"],
+          "qualityObjective": "Use a compact ranking layout that still preserves ordered emphasis and comparison clarity.",
+          "structureRules": [
+            "A clear lead column or lead row should define the entry point.",
+            "Product image, title, and rank marker must align on one predictable axis.",
+            "Comparison fields should stay visually secondary to rank and product identity."
+          ],
+          "copyRules": [
+            "Prefer compact evidence such as rating, price, or tag over long descriptions."
+          ],
+          "qualitySignals": [
+            "Compact but readable ranking ladder",
+            "Stable card rhythm",
+            "No confusion about top item"
+          ],
+          "avoid": ["table-like stiffness", "uneven image crops", "rank signal lost in metadata"]
+        }
+      ]
+    },
+    {
+      "familyId": "banner",
+      "selectionRule": "Banner should compress a campaign idea into one readable action frame.",
+      "topRecipes": [
+        {
+          "recipeId": "banner-fullbleed-cta-frame-v1",
+          "status": "planned",
+          "priority": 1,
+          "pageRoles": ["home", "campaign-top"],
+          "suggestedPrimitive": "FullBleedBanner",
+          "sourceIds": ["getdesign-ferrari", "land-book-ecommerce"],
+          "qualityObjective": "Deliver a single-message banner with strong visual framing and unmissable action.",
+          "structureRules": [
+            "Message block should sit inside a clearly protected readable zone.",
+            "CTA must sit in the same focal region as the message, not detached at the far edge.",
+            "Image treatment must support the campaign frame, not overpower the text."
+          ],
+          "copyRules": [
+            "Use one compressed campaign claim plus one action.",
+            "Avoid multiline marketing stacks that require paragraph reading."
+          ],
+          "qualitySignals": [
+            "Instant campaign read",
+            "High CTA clarity",
+            "Readable text over image"
+          ],
+          "avoid": ["headline spread across too many lines", "decorative art with weak CTA", "multiple competing messages"]
+        },
+        {
+          "recipeId": "banner-benefit-strip-v1",
+          "status": "planned",
+          "priority": 2,
+          "pageRoles": ["home", "service"],
+          "suggestedPrimitive": "BenefitBannerStrip",
+          "sourceIds": ["getdesign-wise", "best-website-gallery"],
+          "qualityObjective": "Use a calmer banner to surface one benefit or event without slowing the browsing rhythm.",
+          "structureRules": [
+            "Banner should read as one compact band with one dominant idea.",
+            "Support iconography or image must only reinforce the message.",
+            "Vertical space should stay controlled so the strip does not feel heavy."
+          ],
+          "copyRules": [
+            "Benefit wording should be concrete and immediately useful.",
+            "Secondary explanation must remain optional, not necessary for understanding."
+          ],
+          "qualitySignals": [
+            "Fast benefit recognition",
+            "Clean strip silhouette",
+            "Low friction insertion between larger sections"
+          ],
+          "avoid": ["thin unreadable text", "too many benefit bullets", "poster-sized height for a simple message"]
+        }
+      ]
+    },
+    {
+      "familyId": "commerce",
+      "selectionRule": "Commerce recipes must improve merchandising clarity before adding tone.",
+      "topRecipes": [
+        {
+          "recipeId": "commerce-featured-merch-grid-v1",
+          "status": "planned",
+          "priority": 1,
+          "pageRoles": ["home", "commerce-home"],
+          "suggestedPrimitive": "CommerceFeaturedGrid",
+          "sourceIds": ["baymard-ecommerce-design-examples", "mobbin"],
+          "qualityObjective": "Create a merch grid with one lead product and a calm, scannable secondary set.",
+          "structureRules": [
+            "Lead card should carry stronger image scale and slightly deeper info density.",
+            "Secondary cards should align on identical image and text baselines.",
+            "Price or offer stack must remain legible without looking noisy."
+          ],
+          "copyRules": [
+            "Prioritize product name, price, and one decision aid.",
+            "Do not stack multiple promotional badges above the title."
+          ],
+          "qualitySignals": [
+            "Merch scan works quickly",
+            "Lead card drives attention",
+            "Price/spec clarity remains intact"
+          ],
+          "avoid": ["badge overload", "masonry chaos", "same-weight lead and support cards"]
+        },
+        {
+          "recipeId": "commerce-editorial-product-story-v1",
+          "status": "planned",
+          "priority": 2,
+          "pageRoles": ["home", "story-commerce"],
+          "suggestedPrimitive": "CommerceStoryRail",
+          "sourceIds": ["commerce-cream", "getdesign-cursor"],
+          "qualityObjective": "Blend product merchandising with editorial context without losing conversion scent.",
+          "structureRules": [
+            "One featured story/product pair should anchor the section.",
+            "Secondary items should form a supporting rail rather than another equal grid.",
+            "Image aspect ratios should feel intentional and not random across cards."
+          ],
+          "copyRules": [
+            "Use story framing in the headline, but keep product utility obvious.",
+            "Secondary cards should remain short and scannable."
+          ],
+          "qualitySignals": [
+            "Editorial warmth with commerce clarity",
+            "One obvious featured story-product anchor",
+            "Balanced browsing tempo"
+          ],
+          "avoid": ["storytelling with no product signal", "utility grid pretending to be editorial", "uneven card crops"]
+        }
+      ]
+    },
+    {
+      "familyId": "story",
+      "selectionRule": "Story recipes must create chapter rhythm, not just card collections.",
+      "topRecipes": [
+        {
+          "recipeId": "story-editorial-chapter-rail-v1",
+          "status": "planned",
+          "priority": 1,
+          "pageRoles": ["home", "brand-story"],
+          "suggestedPrimitive": "EditorialChapterRail",
+          "sourceIds": ["designmd-nordic-yellow", "getdesign-cursor"],
+          "qualityObjective": "Make one lead chapter feel like the editorial entry while the rail supports continuous exploration.",
+          "structureRules": [
+            "Lead story block should be materially larger or visually calmer than the rail.",
+            "Rail items should maintain equal rhythm and restrained metadata.",
+            "Whitespace should create chapter pacing instead of empty space."
+          ],
+          "copyRules": [
+            "Lead story can carry a stronger narrative hook.",
+            "Support stories should stay compact and title-led."
+          ],
+          "qualitySignals": [
+            "Lead chapter dominance",
+            "Editorial continuity",
+            "Magazine-like spacing rhythm"
+          ],
+          "avoid": ["all cards same size", "metadata-heavy rails", "soft editorial tone with no lead focus"]
+        },
+        {
+          "recipeId": "story-portrait-proof-grid-v1",
+          "status": "planned",
+          "priority": 2,
+          "pageRoles": ["home", "service-story"],
+          "suggestedPrimitive": "PortraitStoryGrid",
+          "sourceIds": ["getdesign-notion", "best-website-gallery"],
+          "qualityObjective": "Use portrait-led story cards to convey depth and proof without slowing scan too much.",
+          "structureRules": [
+            "Portrait aspect ratio should be consistent across support cards.",
+            "Headline, category cue, and image must align in a repeatable reading order.",
+            "The section should still preserve one stronger anchor card or opener."
+          ],
+          "copyRules": [
+            "Use titles that suggest a concrete story payoff.",
+            "Keep supporting descriptors short and proof-like."
+          ],
+          "qualitySignals": [
+            "Strong portrait rhythm",
+            "Controlled supporting metadata",
+            "One clear anchor entry"
+          ],
+          "avoid": ["random aspect ratios", "tiny captions under large images", "grid with no entry point"]
+        }
+      ]
+    },
+    {
+      "familyId": "benefit",
+      "selectionRule": "Benefit sections should prove value fast and support conversion with trust.",
+      "topRecipes": [
+        {
+          "recipeId": "benefit-trust-proof-band-v1",
+          "status": "planned",
+          "priority": 1,
+          "pageRoles": ["home", "service"],
+          "suggestedPrimitive": "BenefitProofBand",
+          "sourceIds": ["getdesign-mongodb", "getdesign-wise"],
+          "qualityObjective": "Chunk benefits into proof-led blocks that read quickly and feel credible.",
+          "structureRules": [
+            "Each benefit block should pair one proof cue with one concrete outcome.",
+            "The section should keep a consistent grid or band rhythm across all blocks.",
+            "Trust cues must not be visually smaller than decorative icons."
+          ],
+          "copyRules": [
+            "Benefit copy should be outcome-led, not slogan-led.",
+            "Proof or qualifier text should stay short but visible."
+          ],
+          "qualitySignals": [
+            "Fast trust read",
+            "Consistent benefit chunking",
+            "No ambiguity around user value"
+          ],
+          "avoid": ["icon-only meaning", "long explanation paragraphs", "equal gray text everywhere"]
+        },
+        {
+          "recipeId": "benefit-service-conversion-hub-v1",
+          "status": "planned",
+          "priority": 2,
+          "pageRoles": ["service", "service-landing"],
+          "suggestedPrimitive": "ServiceBenefitHub",
+          "sourceIds": ["getdesign-hashicorp", "component-gallery"],
+          "qualityObjective": "Combine trust, service reassurance, and the next action inside one calm conversion-support surface.",
+          "structureRules": [
+            "One lead reassurance block should frame the section before smaller benefit cells.",
+            "Benefit cells should align to one icon/container system.",
+            "CTA or next step must be visible but not disruptive."
+          ],
+          "copyRules": [
+            "Use reassuring language tied to an action or support outcome.",
+            "Avoid generic corporate trust claims."
+          ],
+          "qualitySignals": [
+            "Trust-first service tone",
+            "Lead reassurance plus support cells",
+            "Clear next-step visibility"
+          ],
+          "avoid": ["benefits with no action path", "inconsistent icon shells", "no lead reassurance block"]
+        }
+      ]
+    },
+    {
+      "familyId": "service-tabs",
+      "selectionRule": "Service tabs should reduce choice friction and clarify selected-state context immediately.",
+      "topRecipes": [
+        {
+          "recipeId": "service-tabs-guided-dashboard-v1",
+          "status": "planned",
+          "priority": 1,
+          "pageRoles": ["service", "service-landing"],
+          "suggestedPrimitive": "GuidedServiceTabs",
+          "sourceIds": ["getdesign-hashicorp", "pageflows"],
+          "qualityObjective": "Create a dashboard-like service selector where the active tab and active panel are unmistakable.",
+          "structureRules": [
+            "Selected tab must be visually and semantically dominant.",
+            "Panel content should begin with the most actionable information, not generic intro copy.",
+            "Tabs and panel should feel like one system, not separate layers."
+          ],
+          "copyRules": [
+            "Tab labels should map to real service tasks or categories.",
+            "Panel headlines should resolve the user question immediately."
+          ],
+          "qualitySignals": [
+            "Instant selected-state clarity",
+            "Action-first panels",
+            "Low friction switching"
+          ],
+          "avoid": ["tiny selected-state change", "generic tab names", "intro-heavy panels"]
+        },
+        {
+          "recipeId": "service-tabs-proof-led-panels-v1",
+          "status": "planned",
+          "priority": 2,
+          "pageRoles": ["service"],
+          "suggestedPrimitive": "ProofLedServicePanels",
+          "sourceIds": ["getdesign-mongodb", "component-gallery"],
+          "qualityObjective": "Use tab panels to surface proof, policy, or reassurance without overwhelming the service journey.",
+          "structureRules": [
+            "Each panel should start with a trust or proof summary before details.",
+            "Dense information should be chunked into calm sub-blocks.",
+            "Tab bar should remain visually stable while panels swap."
+          ],
+          "copyRules": [
+            "Favor structured bullets and short subheads over prose.",
+            "Proof statements should be specific and scannable."
+          ],
+          "qualitySignals": [
+            "Proof-first panels",
+            "Stable tab rhythm",
+            "Structured information density"
+          ],
+          "avoid": ["dense text walls", "jittery tab layout", "panel content with no proof hierarchy"]
+        }
+      ]
+    },
+    {
+      "familyId": "page-shell",
+      "selectionRule": "Page shell recipes must orchestrate clusters and background shifts across the full page, not only one section.",
+      "topRecipes": [
+        {
+          "recipeId": "page-shell-top-cluster-cinematic-v1",
+          "status": "planned",
+          "priority": 1,
+          "pageRoles": ["home", "campaign-top"],
+          "suggestedPrimitive": "TopClusterShell",
+          "sourceIds": ["designmd-nordic-yellow", "getdesign-ferrari", "pageflows"],
+          "qualityObjective": "Make the hero-to-quickmenu-to-next-section transition feel authored as one top-stage cluster.",
+          "structureRules": [
+            "Hero and quickmenu should share spacing logic and visual tempo.",
+            "The first major transition should feel deliberate through background or gap control.",
+            "The shell should avoid stacking many visually loud sections back to back."
+          ],
+          "copyRules": [
+            "Top cluster labels and cues should feel related without repeating the same phrase."
+          ],
+          "qualitySignals": [
+            "Cluster continuity",
+            "Controlled top-stage transitions",
+            "Background variation with purpose"
+          ],
+          "avoid": ["hero and quickmenu feeling unrelated", "identical section backgrounds everywhere", "constant 80px gap with no rhythm change"]
+        },
+        {
+          "recipeId": "page-shell-commerce-story-balance-v1",
+          "status": "planned",
+          "priority": 2,
+          "pageRoles": ["home", "commerce-home"],
+          "suggestedPrimitive": "CommerceStoryShell",
+          "sourceIds": ["getdesign-cursor", "pageflows", "baymard-ecommerce-design-examples"],
+          "qualityObjective": "Balance hard-commerce blocks and softer story blocks so the page does not feel monotonous or noisy.",
+          "structureRules": [
+            "Heavy merch sections should be followed by calmer editorial or benefit breathing rooms.",
+            "Background, gap, and card density should vary by section role.",
+            "The shell must preserve a coherent overall story from top entry to lower browsing modules."
+          ],
+          "copyRules": [
+            "Section headings should clearly telegraph whether the next block is browse, story, or benefit."
+          ],
+          "qualitySignals": [
+            "Pacing variety",
+            "Narrative continuity across sections",
+            "No long run of identical section weight"
+          ],
+          "avoid": ["all-white monotony", "back-to-back loud merch slabs", "story sections with no pacing benefit"]
+        }
+      ]
+    }
+  ]
+}

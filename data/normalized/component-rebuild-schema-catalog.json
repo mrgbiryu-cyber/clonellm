@@ -1,0 +1,139 @@
+{
+  "generatedAt": "2026-04-17T00:00:00.000Z",
+  "families": [
+    {
+      "id": "hero-carousel-composition",
+      "label": "히어로 캐러셀 전면개편",
+      "useWhen": "badge/headline/image/slides 중심의 상단 대표 비주얼을 새 시안 수준으로 재구성할 때",
+      "layoutBlocks": ["badge", "headline", "support", "visual", "action", "nav"],
+      "requiredFields": ["headline", "visual", "action"],
+      "optionalFields": ["badge", "support", "trustCue", "secondaryAction"],
+      "assetNeeds": ["hero-visual", "badge-preset"]
+    },
+    {
+      "id": "icon-link-grid-composition",
+      "label": "아이콘 링크 그리드 전면개편",
+      "useWhen": "quickmenu, shortcut, tabs처럼 아이콘/링크 그리드 리듬을 다시 짜야 할 때",
+      "layoutBlocks": ["intro", "iconGrid", "support", "action"],
+      "requiredFields": ["iconGrid"],
+      "optionalFields": ["intro", "support", "action"],
+      "assetNeeds": ["icon-set", "badge-preset"]
+    },
+    {
+      "id": "commerce-card-grid-composition",
+      "label": "커머스 카드 그리드 전면개편",
+      "useWhen": "상품/서비스 카드 그리드의 밀도, 카드 shell, 정보 위계를 새로 짜야 할 때",
+      "layoutBlocks": ["intro", "cardGrid", "support", "action"],
+      "requiredFields": ["cardGrid"],
+      "optionalFields": ["intro", "support", "action", "badgeRow"],
+      "assetNeeds": ["thumbnail-preset", "badge-preset"]
+    },
+    {
+      "id": "ranking-list-composition",
+      "label": "랭킹 리스트 전면개편",
+      "useWhen": "랭킹, 베스트, 추천 리스트의 순위 체계와 카드 배열을 재설계할 때",
+      "layoutBlocks": ["intro", "tabRow", "rankList", "support", "action"],
+      "requiredFields": ["rankList"],
+      "optionalFields": ["intro", "tabRow", "support", "action", "badgeRow"],
+      "assetNeeds": ["ranking-badge", "thumbnail-preset"]
+    },
+    {
+      "id": "image-banner-strip-composition",
+      "label": "이미지 배너 스트립 전면개편",
+      "useWhen": "labelBanner, summary-banner, brandBanner 같은 가로 배너형 모듈을 재구성할 때",
+      "layoutBlocks": ["headline", "support", "visual", "action"],
+      "requiredFields": ["headline", "visual"],
+      "optionalFields": ["support", "action", "badge"],
+      "assetNeeds": ["banner-visual", "badge-preset"]
+    },
+    {
+      "id": "service-benefit-hub-composition",
+      "label": "서비스 혜택 허브 전면개편",
+      "useWhen": "benefit, mainService, bestcare 같은 서비스 가치 전달 중심 허브를 재구성할 때",
+      "layoutBlocks": ["intro", "benefitGrid", "trustCue", "action"],
+      "requiredFields": ["benefitGrid"],
+      "optionalFields": ["intro", "trustCue", "action", "badgeRow"],
+      "assetNeeds": ["icon-set", "service-visual"]
+    },
+    {
+      "id": "pdp-summary-stack-composition",
+      "label": "PDP 요약 스택 전면개편",
+      "useWhen": "PDP summary처럼 핵심 가치와 구매 유도 위계를 다시 짜야 할 때",
+      "layoutBlocks": ["badge", "title", "support", "benefitRow", "action"],
+      "requiredFields": ["title", "action"],
+      "optionalFields": ["badge", "support", "benefitRow", "trustCue"],
+      "assetNeeds": ["badge-preset"]
+    },
+    {
+      "id": "pdp-sticky-buybox-composition",
+      "label": "PDP 스티키 구매박스 전면개편",
+      "useWhen": "sticky 구매 박스의 전환 레이아웃과 강조 흐름을 재구성할 때",
+      "layoutBlocks": ["price", "benefit", "action", "support"],
+      "requiredFields": ["price", "action"],
+      "optionalFields": ["benefit", "support", "badge"],
+      "assetNeeds": ["badge-preset"]
+    },
+    {
+      "id": "editorial-visual-story-composition",
+      "label": "에디토리얼 비주얼 스토리 전면개편",
+      "useWhen": "visual, brandStory 같은 비주얼 주도 스토리 모듈을 새 구조로 제안할 때",
+      "layoutBlocks": ["headline", "story", "visual", "action"],
+      "requiredFields": ["headline", "story", "visual"],
+      "optionalFields": ["badge", "action", "support"],
+      "assetNeeds": ["hero-visual", "story-visual"]
+    }
+  ],
+  "assignments": [
+    { "componentId": "home.hero", "familyId": "hero-carousel-composition" },
+    { "componentId": "home.quickmenu", "familyId": "icon-link-grid-composition" },
+    { "componentId": "home.md-choice", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.timedeal", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.best-ranking", "familyId": "ranking-list-composition" },
+    { "componentId": "home.marketing-area", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.subscription", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.space-renewal", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.brand-showroom", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.latest-product-news", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.smart-life", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.summary-banner-2", "familyId": "image-banner-strip-composition" },
+    { "componentId": "home.missed-benefits", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.lg-best-care", "familyId": "commerce-card-grid-composition" },
+    { "componentId": "home.bestshop-guide", "familyId": "commerce-card-grid-composition" },
+
+    { "componentId": "support.mainService", "familyId": "service-benefit-hub-composition" },
+    { "componentId": "support.tipsBanner", "familyId": "image-banner-strip-composition" },
+    { "componentId": "support.bestcare", "familyId": "service-benefit-hub-composition" },
+
+    { "componentId": "bestshop.hero", "familyId": "hero-carousel-composition" },
+    { "componentId": "bestshop.shortcut", "familyId": "icon-link-grid-composition" },
+    { "componentId": "bestshop.brandBanner", "familyId": "image-banner-strip-composition" },
+
+    { "componentId": "care-solutions.hero", "familyId": "hero-carousel-composition" },
+    { "componentId": "care-solutions.ranking", "familyId": "ranking-list-composition" },
+    { "componentId": "care-solutions.benefit", "familyId": "service-benefit-hub-composition" },
+    { "componentId": "care-solutions.tabs", "familyId": "icon-link-grid-composition" },
+    { "componentId": "care-solutions.careBanner", "familyId": "image-banner-strip-composition" },
+
+    { "componentId": "care-solutions-pdp.visual", "familyId": "editorial-visual-story-composition" },
+
+    { "componentId": "homestyle-home.quickMenu", "familyId": "icon-link-grid-composition" },
+    { "componentId": "homestyle-home.labelBanner", "familyId": "image-banner-strip-composition" },
+    { "componentId": "homestyle-home.brandStory", "familyId": "editorial-visual-story-composition" },
+
+    { "componentId": "homestyle-pdp.bestProduct", "familyId": "commerce-card-grid-composition" },
+
+    { "componentId": "category-tvs.banner", "familyId": "image-banner-strip-composition" },
+    { "componentId": "category-refrigerators.banner", "familyId": "image-banner-strip-composition" },
+
+    { "componentId": "pdp-tv-general.summary", "familyId": "pdp-summary-stack-composition" },
+    { "componentId": "pdp-tv-general.sticky", "familyId": "pdp-sticky-buybox-composition" },
+    { "componentId": "pdp-tv-premium.summary", "familyId": "pdp-summary-stack-composition" },
+    { "componentId": "pdp-tv-premium.sticky", "familyId": "pdp-sticky-buybox-composition" },
+    { "componentId": "pdp-refrigerator-general.summary", "familyId": "pdp-summary-stack-composition" },
+    { "componentId": "pdp-refrigerator-general.sticky", "familyId": "pdp-sticky-buybox-composition" },
+    { "componentId": "pdp-refrigerator-knockon.summary", "familyId": "pdp-summary-stack-composition" },
+    { "componentId": "pdp-refrigerator-knockon.sticky", "familyId": "pdp-sticky-buybox-composition" },
+    { "componentId": "pdp-refrigerator-glass.summary", "familyId": "pdp-summary-stack-composition" },
+    { "componentId": "pdp-refrigerator-glass.sticky", "familyId": "pdp-sticky-buybox-composition" }
+  ]
+}

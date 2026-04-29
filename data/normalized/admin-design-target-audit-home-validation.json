@@ -1,0 +1,1172 @@
+{
+  "generatedAt": "2026-04-24T09:14:12.746Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "loginId": "mrgbiryu",
+  "targetSet": "admin",
+  "buildExecuted": true,
+  "results": [
+    {
+      "pageId": "home",
+      "viewportProfile": "pc",
+      "label": "홈 - PC",
+      "cloneStatus": 200,
+      "editableComponentCount": 14,
+      "editableSlots": [
+        "header-top",
+        "header-bottom",
+        "hero",
+        "quickmenu",
+        "md-choice",
+        "timedeal",
+        "best-ranking",
+        "marketing-area",
+        "subscription",
+        "brand-showroom",
+        "latest-product-news",
+        "smart-life",
+        "lg-best-care",
+        "bestshop-guide"
+      ],
+      "sidecarSectionCount": 14,
+      "sidecarMissingReferenceMarkupCount": 0,
+      "assetSectionCount": 14,
+      "assetAvailableCounts": {
+        "images": 81,
+        "iconFamilies": 6,
+        "interactionComponents": 3
+      },
+      "assetEmptySections": [
+        "header-top",
+        "header-bottom",
+        "md-choice",
+        "timedeal",
+        "best-ranking",
+        "subscription",
+        "brand-showroom",
+        "latest-product-news",
+        "smart-life",
+        "lg-best-care",
+        "bestshop-guide"
+      ],
+      "build": {
+        "ok": false,
+        "status": 422,
+        "error": "design_author_output_not_ready",
+        "validation": {
+          "deliveryReadiness": {
+            "summary": "authored result에 runtime 전달 차단 사유가 있습니다.",
+            "readyForRuntime": false,
+            "blockingReasons": [
+              "background_asset_role_mismatch:hero:hero-image-1",
+              "section_out_of_scope:lg-best-care",
+              "section_out_of_scope:bestshop-guide"
+            ]
+          },
+          "checkRecords": [
+            "target group 확인: page",
+            "authored sections 존재 확인: 14",
+            "declared section keys 확인: header-top,header-bottom,hero,quickmenu,md-choice,timedeal,best-ranking,marketing-area,subscription,brand-showroom,latest-product-news,smart-life,lg-best-care,bestshop-guide",
+            "projected section keys 확인: header-top,header-bottom,hero,quickmenu,md-choice,timedeal,best-ranking,marketing-area,subscription,brand-showroom,latest-product-news,smart-life,lg-best-care,bestshop-guide",
+            "header-top html 존재 확인",
+            "header-bottom html 존재 확인",
+            "hero html 존재 확인",
+            "hero asset registry 확인: image=8, iconFamily=1, interaction=2",
+            "quickmenu html 존재 확인",
+            "quickmenu asset registry 확인: image=0, iconFamily=4, interaction=1",
+            "md-choice html 존재 확인",
+            "timedeal html 존재 확인",
+            "best-ranking html 존재 확인",
+            "marketing-area html 존재 확인",
+            "marketing-area asset registry 확인: image=8, iconFamily=1, interaction=0",
+            "subscription html 존재 확인",
+            "brand-showroom html 존재 확인",
+            "latest-product-news html 존재 확인",
+            "smart-life html 존재 확인",
+            "lg-best-care html 존재 확인",
+            "bestshop-guide html 존재 확인"
+          ],
+          "advisory": [],
+          "assetRegistryDiagnostics": [
+            {
+              "slotId": "header-top",
+              "componentId": "home.header-top",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "header-bottom",
+              "componentId": "home.header-bottom",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "hero",
+              "componentId": "home.hero",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 8,
+                "imageStatus": {
+                  "approved": 8
+                },
+                "iconFamilyCount": 1,
+                "iconFamilyStatus": {
+                  "approved": 1
+                },
+                "interactionComponentCount": 2,
+                "interactionStatus": {
+                  "approved": 2
+                }
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "quickmenu",
+              "componentId": "home.quickmenu",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 4,
+                "iconFamilyStatus": {
+                  "approved": 4
+                },
+                "interactionComponentCount": 1,
+                "interactionStatus": {
+                  "approved": 1
+                }
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "md-choice",
+              "componentId": "home.md-choice",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "timedeal",
+              "componentId": "home.timedeal",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "best-ranking",
+              "componentId": "home.best-ranking",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "marketing-area",
+              "componentId": "home.marketing-area",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 8,
+                "imageStatus": {
+                  "approved": 8
+                },
+                "iconFamilyCount": 1,
+                "iconFamilyStatus": {
+                  "approved": 1
+                },
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "subscription",
+              "componentId": "home.subscription",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "brand-showroom",
+              "componentId": "home.brand-showroom",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "latest-product-news",
+              "componentId": "home.latest-product-news",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "smart-life",
+              "componentId": "home.smart-life",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "lg-best-care",
+              "componentId": "home.lg-best-care",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "bestshop-guide",
+              "componentId": "home.bestshop-guide",
+              "viewportProfile": "pc",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            }
+          ]
+        },
+        "draftBuildId": "",
+        "previewPath": "",
+        "comparePath": "",
+        "authoredSectionCount": 0,
+        "authoredSlotIds": [],
+        "missingAuthoredSlots": [
+          "header-top",
+          "header-bottom",
+          "hero",
+          "quickmenu",
+          "md-choice",
+          "timedeal",
+          "best-ranking",
+          "marketing-area",
+          "subscription",
+          "brand-showroom",
+          "latest-product-news",
+          "smart-life",
+          "lg-best-care",
+          "bestshop-guide"
+        ]
+      }
+    },
+    {
+      "pageId": "home",
+      "viewportProfile": "ta",
+      "label": "홈 - 테블릿",
+      "cloneStatus": 200,
+      "editableComponentCount": 14,
+      "editableSlots": [
+        "header-top",
+        "header-bottom",
+        "hero",
+        "quickmenu",
+        "md-choice",
+        "timedeal",
+        "best-ranking",
+        "marketing-area",
+        "subscription",
+        "brand-showroom",
+        "latest-product-news",
+        "smart-life",
+        "lg-best-care",
+        "bestshop-guide"
+      ],
+      "sidecarSectionCount": 14,
+      "sidecarMissingReferenceMarkupCount": 0,
+      "assetSectionCount": 14,
+      "assetAvailableCounts": {
+        "images": 0,
+        "iconFamilies": 0,
+        "interactionComponents": 0
+      },
+      "assetEmptySections": [
+        "header-top",
+        "header-bottom",
+        "hero",
+        "quickmenu",
+        "md-choice",
+        "timedeal",
+        "best-ranking",
+        "marketing-area",
+        "subscription",
+        "brand-showroom",
+        "latest-product-news",
+        "smart-life",
+        "lg-best-care",
+        "bestshop-guide"
+      ],
+      "build": {
+        "ok": false,
+        "status": 422,
+        "error": "design_author_output_not_ready",
+        "validation": {
+          "deliveryReadiness": {
+            "summary": "authored result에 runtime 전달 차단 사유가 있습니다.",
+            "readyForRuntime": false,
+            "blockingReasons": [
+              "background_asset_role_mismatch:hero:hero-image-1",
+              "section_out_of_scope:lg-best-care",
+              "section_out_of_scope:bestshop-guide"
+            ]
+          },
+          "checkRecords": [
+            "target group 확인: page",
+            "authored sections 존재 확인: 14",
+            "declared section keys 확인: header-top,header-bottom,hero,quickmenu,md-choice,timedeal,best-ranking,marketing-area,subscription,brand-showroom,latest-product-news,smart-life,lg-best-care,bestshop-guide",
+            "projected section keys 확인: header-top,header-bottom,hero,quickmenu,md-choice,timedeal,best-ranking,marketing-area,subscription,brand-showroom,latest-product-news,smart-life,lg-best-care,bestshop-guide",
+            "header-top html 존재 확인",
+            "header-bottom html 존재 확인",
+            "hero html 존재 확인",
+            "quickmenu html 존재 확인",
+            "md-choice html 존재 확인",
+            "timedeal html 존재 확인",
+            "best-ranking html 존재 확인",
+            "marketing-area html 존재 확인",
+            "subscription html 존재 확인",
+            "brand-showroom html 존재 확인",
+            "latest-product-news html 존재 확인",
+            "smart-life html 존재 확인",
+            "lg-best-care html 존재 확인",
+            "bestshop-guide html 존재 확인"
+          ],
+          "advisory": [],
+          "assetRegistryDiagnostics": [
+            {
+              "slotId": "header-top",
+              "componentId": "home.header-top",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "header-bottom",
+              "componentId": "home.header-bottom",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "hero",
+              "componentId": "home.hero",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "quickmenu",
+              "componentId": "home.quickmenu",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "md-choice",
+              "componentId": "home.md-choice",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "timedeal",
+              "componentId": "home.timedeal",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "best-ranking",
+              "componentId": "home.best-ranking",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "marketing-area",
+              "componentId": "home.marketing-area",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "subscription",
+              "componentId": "home.subscription",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "brand-showroom",
+              "componentId": "home.brand-showroom",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "latest-product-news",
+              "componentId": "home.latest-product-news",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "smart-life",
+              "componentId": "home.smart-life",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "lg-best-care",
+              "componentId": "home.lg-best-care",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "bestshop-guide",
+              "componentId": "home.bestshop-guide",
+              "viewportProfile": "ta",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            }
+          ]
+        },
+        "draftBuildId": "",
+        "previewPath": "",
+        "comparePath": "",
+        "authoredSectionCount": 0,
+        "authoredSlotIds": [],
+        "missingAuthoredSlots": [
+          "header-top",
+          "header-bottom",
+          "hero",
+          "quickmenu",
+          "md-choice",
+          "timedeal",
+          "best-ranking",
+          "marketing-area",
+          "subscription",
+          "brand-showroom",
+          "latest-product-news",
+          "smart-life",
+          "lg-best-care",
+          "bestshop-guide"
+        ]
+      }
+    },
+    {
+      "pageId": "home",
+      "viewportProfile": "mo",
+      "label": "홈 - 모바일",
+      "cloneStatus": 200,
+      "editableComponentCount": 14,
+      "editableSlots": [
+        "header-top",
+        "header-bottom",
+        "hero",
+        "quickmenu",
+        "md-choice",
+        "timedeal",
+        "best-ranking",
+        "marketing-area",
+        "subscription",
+        "brand-showroom",
+        "latest-product-news",
+        "smart-life",
+        "lg-best-care",
+        "bestshop-guide"
+      ],
+      "sidecarSectionCount": 14,
+      "sidecarMissingReferenceMarkupCount": 4,
+      "assetSectionCount": 14,
+      "assetAvailableCounts": {
+        "images": 145,
+        "iconFamilies": 6,
+        "interactionComponents": 3
+      },
+      "assetEmptySections": [
+        "header-top",
+        "header-bottom",
+        "md-choice",
+        "timedeal",
+        "best-ranking",
+        "subscription",
+        "brand-showroom",
+        "latest-product-news",
+        "smart-life",
+        "lg-best-care",
+        "bestshop-guide"
+      ],
+      "build": {
+        "ok": false,
+        "status": 422,
+        "error": "design_author_output_not_ready",
+        "validation": {
+          "deliveryReadiness": {
+            "summary": "authored result에 runtime 전달 차단 사유가 있습니다.",
+            "readyForRuntime": false,
+            "blockingReasons": [
+              "background_asset_role_mismatch:hero:hero-image-1",
+              "section_out_of_scope:lg-best-care",
+              "section_out_of_scope:bestshop-guide"
+            ]
+          },
+          "checkRecords": [
+            "target group 확인: page",
+            "authored sections 존재 확인: 14",
+            "declared section keys 확인: header-top,header-bottom,hero,quickmenu,md-choice,timedeal,best-ranking,marketing-area,subscription,brand-showroom,latest-product-news,smart-life,lg-best-care,bestshop-guide",
+            "projected section keys 확인: header-top,header-bottom,hero,quickmenu,md-choice,timedeal,best-ranking,marketing-area,subscription,brand-showroom,latest-product-news,smart-life,lg-best-care,bestshop-guide",
+            "header-top html 존재 확인",
+            "header-bottom html 존재 확인",
+            "hero html 존재 확인",
+            "hero asset registry 확인: image=8, iconFamily=1, interaction=2",
+            "quickmenu html 존재 확인",
+            "quickmenu asset registry 확인: image=0, iconFamily=4, interaction=1",
+            "md-choice html 존재 확인",
+            "timedeal html 존재 확인",
+            "best-ranking html 존재 확인",
+            "marketing-area html 존재 확인",
+            "marketing-area asset registry 확인: image=8, iconFamily=1, interaction=0",
+            "subscription html 존재 확인",
+            "brand-showroom html 존재 확인",
+            "latest-product-news html 존재 확인",
+            "smart-life html 존재 확인",
+            "lg-best-care html 존재 확인",
+            "bestshop-guide html 존재 확인"
+          ],
+          "advisory": [],
+          "assetRegistryDiagnostics": [
+            {
+              "slotId": "header-top",
+              "componentId": "home.header-top",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "header-bottom",
+              "componentId": "home.header-bottom",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "hero",
+              "componentId": "home.hero",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 8,
+                "imageStatus": {
+                  "approved": 5,
+                  "candidate": 3
+                },
+                "iconFamilyCount": 1,
+                "iconFamilyStatus": {
+                  "approved": 1
+                },
+                "interactionComponentCount": 2,
+                "interactionStatus": {
+                  "approved": 2
+                }
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "quickmenu",
+              "componentId": "home.quickmenu",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 4,
+                "iconFamilyStatus": {
+                  "approved": 4
+                },
+                "interactionComponentCount": 1,
+                "interactionStatus": {
+                  "approved": 1
+                }
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "md-choice",
+              "componentId": "home.md-choice",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "timedeal",
+              "componentId": "home.timedeal",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "best-ranking",
+              "componentId": "home.best-ranking",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "marketing-area",
+              "componentId": "home.marketing-area",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 8,
+                "imageStatus": {
+                  "approved": 5,
+                  "candidate": 3
+                },
+                "iconFamilyCount": 1,
+                "iconFamilyStatus": {
+                  "approved": 1
+                },
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "subscription",
+              "componentId": "home.subscription",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "brand-showroom",
+              "componentId": "home.brand-showroom",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "latest-product-news",
+              "componentId": "home.latest-product-news",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "smart-life",
+              "componentId": "home.smart-life",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "lg-best-care",
+              "componentId": "home.lg-best-care",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            },
+            {
+              "slotId": "bestshop-guide",
+              "componentId": "home.bestshop-guide",
+              "viewportProfile": "mo",
+              "summary": {
+                "imageCount": 0,
+                "imageStatus": {},
+                "iconFamilyCount": 0,
+                "iconFamilyStatus": {},
+                "interactionComponentCount": 0,
+                "interactionStatus": {}
+              },
+              "usedImages": [],
+              "usedInteractions": []
+            }
+          ]
+        },
+        "draftBuildId": "",
+        "previewPath": "",
+        "comparePath": "",
+        "authoredSectionCount": 0,
+        "authoredSlotIds": [],
+        "missingAuthoredSlots": [
+          "header-top",
+          "header-bottom",
+          "hero",
+          "quickmenu",
+          "md-choice",
+          "timedeal",
+          "best-ranking",
+          "marketing-area",
+          "subscription",
+          "brand-showroom",
+          "latest-product-news",
+          "smart-life",
+          "lg-best-care",
+          "bestshop-guide"
+        ]
+      }
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewportProfile": "pc",
+      "label": "홈스타일 메인 - PC",
+      "cloneStatus": 200,
+      "editableComponentCount": 3,
+      "editableSlots": [
+        "quickMenu",
+        "labelBanner",
+        "brandStory"
+      ],
+      "sidecarSectionCount": 3,
+      "sidecarMissingReferenceMarkupCount": 0,
+      "assetSectionCount": 3,
+      "assetAvailableCounts": {
+        "images": 0,
+        "iconFamilies": 0,
+        "interactionComponents": 0
+      },
+      "assetEmptySections": [
+        "quickMenu",
+        "labelBanner",
+        "brandStory"
+      ],
+      "build": {
+        "ok": true,
+        "status": 200,
+        "error": "",
+        "validation": null,
+        "draftBuildId": "runtime-draft-1777021854356",
+        "previewPath": "/runtime-draft/runtime-draft-1777021854356",
+        "comparePath": "/runtime-compare/runtime-draft-1777021854356",
+        "authoredSectionCount": 3,
+        "authoredSlotIds": [
+          "quickMenu",
+          "labelBanner",
+          "brandStory"
+        ],
+        "missingAuthoredSlots": []
+      }
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewportProfile": "mo",
+      "label": "홈스타일 메인 - 모바일",
+      "cloneStatus": 200,
+      "editableComponentCount": 3,
+      "editableSlots": [
+        "quickMenu",
+        "labelBanner",
+        "brandStory"
+      ],
+      "sidecarSectionCount": 3,
+      "sidecarMissingReferenceMarkupCount": 3,
+      "assetSectionCount": 3,
+      "assetAvailableCounts": {
+        "images": 0,
+        "iconFamilies": 0,
+        "interactionComponents": 0
+      },
+      "assetEmptySections": [
+        "quickMenu",
+        "labelBanner",
+        "brandStory"
+      ],
+      "build": {
+        "ok": true,
+        "status": 200,
+        "error": "",
+        "validation": null,
+        "draftBuildId": "runtime-draft-1777021916090",
+        "previewPath": "/runtime-draft/runtime-draft-1777021916090",
+        "comparePath": "/runtime-compare/runtime-draft-1777021916090",
+        "authoredSectionCount": 3,
+        "authoredSlotIds": [
+          "quickMenu",
+          "labelBanner",
+          "brandStory"
+        ],
+        "missingAuthoredSlots": []
+      }
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewportProfile": "pc",
+      "label": "홈스타일 PDP - PC",
+      "cloneStatus": 200,
+      "editableComponentCount": 6,
+      "editableSlots": [
+        "detailInfo",
+        "bestProduct",
+        "review",
+        "qna",
+        "guides",
+        "seller"
+      ],
+      "sidecarSectionCount": 6,
+      "sidecarMissingReferenceMarkupCount": 0,
+      "assetSectionCount": 6,
+      "assetAvailableCounts": {
+        "images": 0,
+        "iconFamilies": 0,
+        "interactionComponents": 0
+      },
+      "assetEmptySections": [
+        "detailInfo",
+        "bestProduct",
+        "review",
+        "qna",
+        "guides",
+        "seller"
+      ],
+      "build": {
+        "ok": true,
+        "status": 200,
+        "error": "",
+        "validation": null,
+        "draftBuildId": "runtime-draft-1777021979671",
+        "previewPath": "/runtime-draft/runtime-draft-1777021979671",
+        "comparePath": "/runtime-compare/runtime-draft-1777021979671",
+        "authoredSectionCount": 6,
+        "authoredSlotIds": [
+          "detailInfo",
+          "bestProduct",
+          "review",
+          "qna",
+          "guides",
+          "seller"
+        ],
+        "missingAuthoredSlots": []
+      }
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewportProfile": "mo",
+      "label": "홈스타일 PDP - 모바일",
+      "cloneStatus": 200,
+      "editableComponentCount": 6,
+      "editableSlots": [
+        "detailInfo",
+        "bestProduct",
+        "review",
+        "qna",
+        "guides",
+        "seller"
+      ],
+      "sidecarSectionCount": 6,
+      "sidecarMissingReferenceMarkupCount": 6,
+      "assetSectionCount": 6,
+      "assetAvailableCounts": {
+        "images": 0,
+        "iconFamilies": 0,
+        "interactionComponents": 0
+      },
+      "assetEmptySections": [
+        "detailInfo",
+        "bestProduct",
+        "review",
+        "qna",
+        "guides",
+        "seller"
+      ],
+      "build": {
+        "ok": true,
+        "status": 200,
+        "error": "",
+        "validation": null,
+        "draftBuildId": "runtime-draft-1777022042434",
+        "previewPath": "/runtime-draft/runtime-draft-1777022042434",
+        "comparePath": "/runtime-compare/runtime-draft-1777022042434",
+        "authoredSectionCount": 6,
+        "authoredSlotIds": [
+          "detailInfo",
+          "bestProduct",
+          "review",
+          "qna",
+          "guides",
+          "seller"
+        ],
+        "missingAuthoredSlots": []
+      }
+    }
+  ]
+}

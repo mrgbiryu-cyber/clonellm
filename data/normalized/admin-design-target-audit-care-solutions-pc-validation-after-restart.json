@@ -1,0 +1,52 @@
+{
+  "generatedAt": "2026-04-24T09:23:37.917Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "loginId": "mrgbiryu",
+  "targetSet": "admin",
+  "buildExecuted": true,
+  "results": [
+    {
+      "pageId": "care-solutions",
+      "viewportProfile": "pc",
+      "label": "가전 구독 메인 - PC",
+      "cloneStatus": 200,
+      "editableComponentCount": 5,
+      "editableSlots": [
+        "hero",
+        "ranking",
+        "benefit",
+        "tabs",
+        "careBanner"
+      ],
+      "sidecarSectionCount": 5,
+      "sidecarMissingReferenceMarkupCount": 0,
+      "assetSectionCount": 5,
+      "assetAvailableCounts": {
+        "images": 52,
+        "iconFamilies": 7,
+        "interactionComponents": 5
+      },
+      "assetEmptySections": [
+        "benefit"
+      ],
+      "build": {
+        "ok": true,
+        "status": 200,
+        "error": "",
+        "validation": null,
+        "draftBuildId": "runtime-draft-1777022607772",
+        "previewPath": "/runtime-draft/runtime-draft-1777022607772",
+        "comparePath": "/runtime-compare/runtime-draft-1777022607772",
+        "authoredSectionCount": 5,
+        "authoredSlotIds": [
+          "hero",
+          "ranking",
+          "benefit",
+          "tabs",
+          "careBanner"
+        ],
+        "missingAuthoredSlots": []
+      }
+    }
+  ]
+}

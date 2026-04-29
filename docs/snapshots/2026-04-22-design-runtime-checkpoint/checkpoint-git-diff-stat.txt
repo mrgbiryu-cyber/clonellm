@@ -1,0 +1,12 @@
+ .env.example                                       |    20 +-
+ auth.js                                            |   394 +-
+ data/normalized/artifact-sidecar-audit.json        |   968 +-
+ data/normalized/artifact-sidecar-audit.md          |    92 +-
+ data/normalized/design-reference-source-seeds.json |    21 +
+ ...admin-builder-visual-architecture-2026-04-17.md |   318 +-
+ llm.js                                             |  5122 +++-
+ package.json                                       |     7 +-
+ server.js                                          | 24947 +++++++++++++------
+ web/admin-research.html                            |  4453 +++-
+ web/admin.html                                     |   735 +-
+ 11 files changed, 28105 insertions(+), 8972 deletions(-)

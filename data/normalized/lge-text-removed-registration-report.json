@@ -1,0 +1,106 @@
+{
+  "generatedAt": "2026-04-24T06:15:25.969Z",
+  "registeredCount": 2,
+  "skippedCount": 17,
+  "failedCount": 0,
+  "registered": [
+    {
+      "workOrderId": "text-remove.79751aa056",
+      "assetId": "lge.home.hero.herobanner-mo-20260421-151809.c9065cc50b.text-removed.mo.v1",
+      "outputRef": "data/raw/assets/text-removed/home-hero-herobanner-mo-20260421-151809-c9065cc50b.mo.text-removed.3c8f8af52a.png"
+    },
+    {
+      "workOrderId": "text-remove.fe1c53b694",
+      "assetId": "lge.care-solutions.hero.event-hero-banner-pc-20260409-172043.decf2e52c8.text-removed.pc.v1",
+      "outputRef": "data/raw/assets/text-removed/care-solutions-hero-event-hero-banner-pc-20260409-172043-decf2e52c8.pc.text-removed.f48cc5aba9.png"
+    }
+  ],
+  "skipped": [
+    {
+      "workOrderId": "text-remove.93c25a5983",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/care-solutions-hero-event-hero-banner-pc-20260409-172129-c21a7bfb0c.pc.text-removed.d385590513.png"
+    },
+    {
+      "workOrderId": "text-remove.57dbb3479a",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/care-solutions-hero-event-hero-banner-pc-20260409-172217-3f93ae5ce1.pc.text-removed.da1261e367.png"
+    },
+    {
+      "workOrderId": "text-remove.137081d6e2",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/care-solutions-hero-hero-banner-pc-img-20260401-135149-1ff6cb9ff6.pc.text-removed.931b08adf7.png"
+    },
+    {
+      "workOrderId": "text-remove.d04b32c0b0",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/care-solutions-hero-herobanner-1760x360-20260112-134326-50585a4288.pc.text-removed.b2c220e7cb.png"
+    },
+    {
+      "workOrderId": "text-remove.fc47ebe481",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/care-solutions-hero-pc-herobanner-gooddog-20251216-132215-480accc89b.pc.text-removed.f69a4b455d.png"
+    },
+    {
+      "workOrderId": "text-remove.609de64854",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-hero-herobanner-pc-20260402-173215-2972d4d8d5.pc.text-removed.8c796a6bca.jpg"
+    },
+    {
+      "workOrderId": "text-remove.6c81e1fe56",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-hero-home-hero-pc-1760x500-20260331-153421-4cff64f7ee.pc.text-removed.53235c117c.png"
+    },
+    {
+      "workOrderId": "text-remove.513e4e662e",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-hero-pc-home-main-herobanner-20260309-155028-8348128580.pc.text-removed.555ae334cc.png"
+    },
+    {
+      "workOrderId": "text-remove.a9ec89fa30",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/category-refrigerators-banner-category-plp-banner-680x435-20260403-140419-3063890b1f.pc.text-removed.b5a64179e0.png"
+    },
+    {
+      "workOrderId": "text-remove.f72f735204",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/category-refrigerators-banner-category-plp-banner-680x435-20260403-140419-3063890b1f.mo.text-removed.0941b6783c.png"
+    },
+    {
+      "workOrderId": "text-remove.bafc8b05e0",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-banner-02-01-promotion-banner-mo-img-b1a7ba-20260422-102332-3cf7e2ebf5.mo.text-removed.39cdd384fa.png"
+    },
+    {
+      "workOrderId": "text-remove.a2d1830692",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-banner-02-01-promotion-banner-pc-img-20260407-160827-1d73842dc1.pc.text-removed.4b5d7f7178.png"
+    },
+    {
+      "workOrderId": "text-remove.3ed80bc8ee",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-banner-home-mo-banner-270-220-v2-20260326-103108-3498371365.mo.text-removed.2197a27dac.png"
+    },
+    {
+      "workOrderId": "text-remove.b29b30f17f",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-banner-home-mo-banner-270x220-20260417-152538-a9eca33f4d.mo.text-removed.e54057da59.png"
+    },
+    {
+      "workOrderId": "text-remove.95b6bd40cb",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-marketing-area-obs-홈히어로-메인배너-pc-copy-20260203-154656-fc7f11f3ea.pc.text-removed.9b5a308c14.png"
+    },
+    {
+      "workOrderId": "text-remove.11c1e9faf6",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-marketing-area-pc-20260123-180808-d5bdf741d0.pc.text-removed.08ca960537.jpg"
+    },
+    {
+      "workOrderId": "text-remove.1d540d050c",
+      "reason": "output-file-missing",
+      "outputRef": "data/raw/assets/text-removed/home-marketing-area-pc-20260306-185815-336ddad9e0.pc.text-removed.44b874692b.jpg"
+    }
+  ],
+  "failed": []
+}

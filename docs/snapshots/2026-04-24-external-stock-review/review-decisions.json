@@ -1,0 +1,1413 @@
+{
+  "version": 1,
+  "generatedAt": "2026-04-24T08:23:10.289Z",
+  "instructions": [
+    "Set decision to approved or blocked for rows you reviewed.",
+    "Leave unreviewed rows as pending.",
+    "Run: node scripts/apply-external-stock-review-decisions.js --decisions=docs/snapshots/2026-04-24-external-stock-review/review-decisions.json --apply",
+    "Approval is per viewport variant; approving pc does not approve mo."
+  ],
+  "decisions": [
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:American homes and gardens (1910) (17970996789).jpg",
+      "role": "background-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "No restrictions",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1910)_(17970996789).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__american-homes-and-gardens-1910-17970996789__8194fa73d7b3.jpg",
+      "reviewNotes": "blocked: document, floorplan, illustration, or embedded text risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.american-homes-and-gardens-1910-17970996789.8194fa73d7b3",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:American homes and gardens (1910) (17970996789).jpg",
+      "role": "background-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "No restrictions",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1910)_(17970996789).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__american-homes-and-gardens-1910-17970996789__8194fa73d7b3.jpg",
+      "reviewNotes": "blocked: document, floorplan, illustration, or embedded text risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:Chief of Mission's Residence (4857444112).jpg",
+      "role": "background-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Chief_of_Mission%27s_Residence_(4857444112).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__chief-of-mission-s-residence-4857444112__493ec8854fbe.jpg",
+      "reviewNotes": "blocked: dated, low-resolution, or weak modern appliance fit",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.chief-of-mission-s-residence-4857444112.493ec8854fbe",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:Chief of Mission's Residence (4857444112).jpg",
+      "role": "background-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Chief_of_Mission%27s_Residence_(4857444112).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__chief-of-mission-s-residence-4857444112__493ec8854fbe.jpg",
+      "reviewNotes": "blocked: dated, low-resolution, or weak modern appliance fit",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "kitchen-appliance-stage",
+      "sourceTitle": "File:Honor bilt modern homes. (1921) (14740923406).jpg",
+      "role": "background-only",
+      "semanticRole": "text-free kitchen and refrigerator stage candidate",
+      "visualTone": "clean kitchen appliance stage",
+      "pageFamilies": [
+        "home",
+        "category-refrigerators",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "product-grid"
+      ],
+      "licenseProfile": "No restrictions",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Honor_bilt_modern_homes._(1921)_(14740923406).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__honor-bilt-modern-homes-1921-14740923406__ca163823ef84.jpg",
+      "reviewNotes": "blocked: document, floorplan, illustration, or embedded text risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.kitchen-appliance-stage.honor-bilt-modern-homes-1921-14740923406.ca163823ef84",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "kitchen-appliance-stage",
+      "sourceTitle": "File:Honor bilt modern homes. (1921) (14740923406).jpg",
+      "role": "background-only",
+      "semanticRole": "text-free kitchen and refrigerator stage candidate",
+      "visualTone": "clean kitchen appliance stage",
+      "pageFamilies": [
+        "home",
+        "category-refrigerators",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "product-grid"
+      ],
+      "licenseProfile": "No restrictions",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Honor_bilt_modern_homes._(1921)_(14740923406).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__honor-bilt-modern-homes-1921-14740923406__ca163823ef84.jpg",
+      "reviewNotes": "blocked: document, floorplan, illustration, or embedded text risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "service-care-soft-stage",
+      "sourceTitle": "File:American homes and gardens (1911) (18157123091).jpg",
+      "role": "background-only",
+      "semanticRole": "support and care service background candidate",
+      "visualTone": "soft service and care stage",
+      "pageFamilies": [
+        "support",
+        "care-solutions",
+        "care-solutions-pdp"
+      ],
+      "slotFamilies": [
+        "mainService",
+        "careBanner",
+        "bestcare",
+        "banner"
+      ],
+      "licenseProfile": "No restrictions",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1911)_(18157123091).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__american-homes-and-gardens-1911-18157123091__32e78473f7d1.jpg",
+      "reviewNotes": "blocked: document, floorplan, illustration, or embedded text risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.service-care-soft-stage.american-homes-and-gardens-1911-18157123091.32e78473f7d1",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "service-care-soft-stage",
+      "sourceTitle": "File:American homes and gardens (1911) (18157123091).jpg",
+      "role": "background-only",
+      "semanticRole": "support and care service background candidate",
+      "visualTone": "soft service and care stage",
+      "pageFamilies": [
+        "support",
+        "care-solutions",
+        "care-solutions-pdp"
+      ],
+      "slotFamilies": [
+        "mainService",
+        "careBanner",
+        "bestcare",
+        "banner"
+      ],
+      "licenseProfile": "No restrictions",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:American_homes_and_gardens_(1911)_(18157123091).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__american-homes-and-gardens-1911-18157123091__32e78473f7d1.jpg",
+      "reviewNotes": "blocked: document, floorplan, illustration, or embedded text risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:The Citadel of Aleppo, Syria, panoramic.jpg",
+      "role": "background-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_Citadel_of_Aleppo,_Syria,_panoramic.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__the-citadel-of-aleppo-syria-panoramic__9894de0adc2e.jpg",
+      "reviewNotes": "blocked: exterior/location image does not match intended home appliance stage semantics",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.the-citadel-of-aleppo-syria-panoramic.9894de0adc2e",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:The Citadel of Aleppo, Syria, panoramic.jpg",
+      "role": "background-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_Citadel_of_Aleppo,_Syria,_panoramic.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__the-citadel-of-aleppo-syria-panoramic__9894de0adc2e.jpg",
+      "reviewNotes": "blocked: exterior/location image does not match intended home appliance stage semantics",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:Roomic - Flickr - uberculture.jpg",
+      "role": "background-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Roomic_-_Flickr_-_uberculture.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__roomic-flickr-uberculture__1c65364bb5cd.jpg",
+      "reviewNotes": "blocked: dated, low-resolution, or weak modern appliance fit",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.roomic-flickr-uberculture.1c65364bb5cd",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:Roomic - Flickr - uberculture.jpg",
+      "role": "background-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Roomic_-_Flickr_-_uberculture.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__roomic-flickr-uberculture__1c65364bb5cd.jpg",
+      "reviewNotes": "blocked: dated, low-resolution, or weak modern appliance fit",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.living-room-unsplash.efef9af45dbf",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "approved",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:Living room (Unsplash).jpg",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "CC0 / cc0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Living_room_(Unsplash).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__living-room-unsplash__efef9af45dbf.jpg",
+      "reviewNotes": "approved: clean modern living room, no visible embedded promotional text, useful as mobile object/editorial stage media; license CC0 recorded",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:The Living Room at 219 North Delaware Street, a Larger View (ac08866d-68b8-487b-937b-fbf1e29e9f65).jpg",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_Living_Room_at_219_North_Delaware_Street,_a_Larger_View_(ac08866d-68b8-487b-937b-fbf1e29e9f65).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-living-room-at-219-north-delaware-street-a-l__28076c7d157a.jpg",
+      "reviewNotes": "blocked: dated, low-resolution, or weak modern appliance fit",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:The sitting room is where the Lincoln family would spend their evenings together, like a modern living room or family room. (43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-sitting-room-is-where-the-lincoln-family-wou__1716534fe618.jpg",
+      "reviewNotes": "blocked: people/historical institutional context risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.1716534fe618",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:The sitting room is where the Lincoln family would spend their evenings together, like a modern living room or family room. (43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(43775bf9-a88e-4a9a-bb5f-51dcbda45aef).JPG",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-sitting-room-is-where-the-lincoln-family-wou__1716534fe618.jpg",
+      "reviewNotes": "blocked: people/historical institutional context risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:The sitting room is where the Lincoln family would spend their evenings together, like a modern living room or family room. (7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-sitting-room-is-where-the-lincoln-family-wou__5930b09022f3.jpg",
+      "reviewNotes": "blocked: people/historical institutional context risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.the-sitting-room-is-where-the-lincoln-family-wou.5930b09022f3",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:The sitting room is where the Lincoln family would spend their evenings together, like a modern living room or family room. (7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_sitting_room_is_where_the_Lincoln_family_would_spend_their_evenings_together,_like_a_modern_living_room_or_family_room._(7499b3b2-9c73-4c7e-bfbd-0c701663138c).JPG",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__the-sitting-room-is-where-the-lincoln-family-wou__5930b09022f3.jpg",
+      "reviewNotes": "blocked: people/historical institutional context risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "service-care-soft-stage",
+      "sourceTitle": "File:This bedroom belonged to the Lincoln family’s hired staff member if they needed a place to stay. The Lincolns hired and paid (8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG",
+      "role": "object-only",
+      "semanticRole": "support and care service background candidate",
+      "visualTone": "soft service and care stage",
+      "pageFamilies": [
+        "support",
+        "care-solutions",
+        "care-solutions-pdp"
+      ],
+      "slotFamilies": [
+        "mainService",
+        "careBanner",
+        "bestcare",
+        "banner"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:This_bedroom_belonged_to_the_Lincoln_family%E2%80%99s_hired_staff_member_if_they_needed_a_place_to_stay._The_Lincolns_hired_and_paid_(8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__this-bedroom-belonged-to-the-lincoln-family-s-hi__e2127dbb614d.jpg",
+      "reviewNotes": "blocked: people/historical institutional context risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.service-care-soft-stage.this-bedroom-belonged-to-the-lincoln-family-s-hi.e2127dbb614d",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "service-care-soft-stage",
+      "sourceTitle": "File:This bedroom belonged to the Lincoln family’s hired staff member if they needed a place to stay. The Lincolns hired and paid (8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG",
+      "role": "object-only",
+      "semanticRole": "support and care service background candidate",
+      "visualTone": "soft service and care stage",
+      "pageFamilies": [
+        "support",
+        "care-solutions",
+        "care-solutions-pdp"
+      ],
+      "slotFamilies": [
+        "mainService",
+        "careBanner",
+        "bestcare",
+        "banner"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:This_bedroom_belonged_to_the_Lincoln_family%E2%80%99s_hired_staff_member_if_they_needed_a_place_to_stay._The_Lincolns_hired_and_paid_(8e066c0b-b905-43c5-85b2-ec6cc8efa807).JPG",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__service-care-soft-stage__this-bedroom-belonged-to-the-lincoln-family-s-hi__e2127dbb614d.jpg",
+      "reviewNotes": "blocked: people/historical institutional context risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:Kitchen and Living Room Singlewide.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "CC BY-SA 3.0 / cc-by-sa-3.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Kitchen_and_Living_Room_Singlewide.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__kitchen-and-living-room-singlewide__b702a1222f40.jpg",
+      "reviewNotes": "blocked: dated, low-resolution, or weak modern appliance fit",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "approved",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:Modern kitchen and dining area with stylish furnishings and natural light in a contemporary home setting.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Modern_kitchen_and_dining_area_with_stylish_furnishings_and_natural_light_in_a_contemporary_home_setting.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__modern-kitchen-and-dining-area-with-stylish-furn__3dbb04d2a8d8.jpg",
+      "reviewNotes": "approved: modern kitchen/living interior, no obvious embedded promotional text or watermark, useful for home/kitchen stage; license CC BY 2.0 recorded",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.modern-kitchen-and-dining-area-with-stylish-furn.3dbb04d2a8d8",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "approved",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:Modern kitchen and dining area with stylish furnishings and natural light in a contemporary home setting.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Modern_kitchen_and_dining_area_with_stylish_furnishings_and_natural_light_in_a_contemporary_home_setting.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__modern-kitchen-and-dining-area-with-stylish-furn__3dbb04d2a8d8.jpg",
+      "reviewNotes": "approved: modern kitchen/living interior, no obvious embedded promotional text or watermark, useful for home/kitchen stage; license CC BY 2.0 recorded",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.modern-living-room-with-stylish-furniture-and-a-.0029f5526cd6",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "approved",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:Modern living room with stylish furniture and a view of the outdoors in a cozy apartment setting.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Modern_living_room_with_stylish_furniture_and_a_view_of_the_outdoors_in_a_cozy_apartment_setting.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__modern-living-room-with-stylish-furniture-and-a-__0029f5526cd6.jpg",
+      "reviewNotes": "approved: modern living room with TV/media wall, no obvious embedded promotional text, useful for mobile home living stage; license CC BY 2.0 recorded",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:House at Caulfield.JPG",
+      "role": "object-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "CC BY-SA 3.0 / cc-by-sa-3.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:House_at_Caulfield.JPG",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__house-at-caulfield__9a8a2775831d.jpg",
+      "reviewNotes": "blocked: exterior/location image does not match intended home appliance stage semantics",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-wide-interior-stage.house-at-caulfield.9a8a2775831d",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-wide-interior-stage",
+      "sourceTitle": "File:House at Caulfield.JPG",
+      "role": "object-only",
+      "semanticRole": "wide home interior background candidate",
+      "visualTone": "wide editorial home interior",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "story"
+      ],
+      "licenseProfile": "CC BY-SA 3.0 / cc-by-sa-3.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:House_at_Caulfield.JPG",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-wide-interior-stage__house-at-caulfield__9a8a2775831d.jpg",
+      "reviewNotes": "blocked: exterior/location image does not match intended home appliance stage semantics",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "approved",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "kitchen-appliance-stage",
+      "sourceTitle": "File:Sustainable Kitchen - Flickr - Jeremy Levine Design.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free kitchen and refrigerator stage candidate",
+      "visualTone": "clean kitchen appliance stage",
+      "pageFamilies": [
+        "home",
+        "category-refrigerators",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "product-grid"
+      ],
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Sustainable_Kitchen_-_Flickr_-_Jeremy_Levine_Design.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__sustainable-kitchen-flickr-jeremy-levine-design__180e854c1e79.jpg",
+      "reviewNotes": "approved: clean kitchen interior, no obvious embedded promotional text, useful for refrigerator/kitchen stage; license CC BY 2.0 recorded",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.kitchen-appliance-stage.sustainable-kitchen-flickr-jeremy-levine-design.180e854c1e79",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "approved",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "kitchen-appliance-stage",
+      "sourceTitle": "File:Sustainable Kitchen - Flickr - Jeremy Levine Design.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free kitchen and refrigerator stage candidate",
+      "visualTone": "clean kitchen appliance stage",
+      "pageFamilies": [
+        "home",
+        "category-refrigerators",
+        "pdp-refrigerator-general",
+        "pdp-refrigerator-glass",
+        "pdp-refrigerator-knockon"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "product-grid"
+      ],
+      "licenseProfile": "CC BY 2.0 / cc-by-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Sustainable_Kitchen_-_Flickr_-_Jeremy_Levine_Design.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__kitchen-appliance-stage__sustainable-kitchen-flickr-jeremy-levine-design__180e854c1e79.jpg",
+      "reviewNotes": "approved: clean kitchen interior, no obvious embedded promotional text, useful for refrigerator/kitchen stage; license CC BY 2.0 recorded",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "approved",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "laundry-utility-stage",
+      "sourceTitle": "File:Finnish laundry room from 1990.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free laundry or utility room stage candidate",
+      "visualTone": "clean utility room stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "careBanner"
+      ],
+      "licenseProfile": "CC BY 4.0 / cc-by-4.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Finnish_laundry_room_from_1990.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__finnish-laundry-room-from-1990__c242420e9389.jpg",
+      "reviewNotes": "approved: clear laundry room utility image, no obvious promotional text or watermark, useful for laundry/care utility sections; license CC BY 4.0 recorded",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.laundry-utility-stage.finnish-laundry-room-from-1990.c242420e9389",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "approved",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "laundry-utility-stage",
+      "sourceTitle": "File:Finnish laundry room from 1990.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free laundry or utility room stage candidate",
+      "visualTone": "clean utility room stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "careBanner"
+      ],
+      "licenseProfile": "CC BY 4.0 / cc-by-4.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Finnish_laundry_room_from_1990.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__finnish-laundry-room-from-1990__c242420e9389.jpg",
+      "reviewNotes": "approved: clear laundry room utility image, no obvious promotional text or watermark, useful for laundry/care utility sections; license CC BY 4.0 recorded",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "media-wall-stage",
+      "sourceTitle": "File:Christian Laube House, Buffalo, New York - 20211218.jpg",
+      "role": "object-only",
+      "semanticRole": "home theater and media wall candidate",
+      "visualTone": "dark media wall stage",
+      "pageFamilies": [
+        "home",
+        "category-tvs",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "gallery",
+        "product-grid"
+      ],
+      "licenseProfile": "CC BY-SA 4.0 / cc-by-sa-4.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Christian_Laube_House,_Buffalo,_New_York_-_20211218.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__media-wall-stage__christian-laube-house-buffalo-new-york-20211218__5542ff08e9e8.jpg",
+      "reviewNotes": "blocked: exterior/location image does not match intended home appliance stage semantics",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.media-wall-stage.christian-laube-house-buffalo-new-york-20211218.5542ff08e9e8",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "media-wall-stage",
+      "sourceTitle": "File:Christian Laube House, Buffalo, New York - 20211218.jpg",
+      "role": "object-only",
+      "semanticRole": "home theater and media wall candidate",
+      "visualTone": "dark media wall stage",
+      "pageFamilies": [
+        "home",
+        "category-tvs",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "gallery",
+        "product-grid"
+      ],
+      "licenseProfile": "CC BY-SA 4.0 / cc-by-sa-4.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Christian_Laube_House,_Buffalo,_New_York_-_20211218.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__media-wall-stage__christian-laube-house-buffalo-new-york-20211218__5542ff08e9e8.jpg",
+      "reviewNotes": "blocked: exterior/location image does not match intended home appliance stage semantics",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "tv-living-stage",
+      "sourceTitle": "File:Modern Living Room.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free TV living room stage candidate",
+      "visualTone": "premium living room media stage",
+      "pageFamilies": [
+        "home",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "gallery"
+      ],
+      "licenseProfile": "CC BY-SA 4.0 / cc-by-sa-4.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Modern_Living_Room.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__tv-living-stage__modern-living-room__9f7789fb9d22.jpg",
+      "reviewNotes": "blocked: conservative external-stock review; not strong enough for final approved asset",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.tv-living-stage.modern-living-room.9f7789fb9d22",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "tv-living-stage",
+      "sourceTitle": "File:Modern Living Room.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free TV living room stage candidate",
+      "visualTone": "premium living room media stage",
+      "pageFamilies": [
+        "home",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "gallery"
+      ],
+      "licenseProfile": "CC BY-SA 4.0 / cc-by-sa-4.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Modern_Living_Room.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__tv-living-stage__modern-living-room__9f7789fb9d22.jpg",
+      "reviewNotes": "blocked: conservative external-stock review; not strong enough for final approved asset",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "tv-living-stage",
+      "sourceTitle": "File:Turning Technology into Furniture - Stove(1886), Radiola60 in Cab.(1927-28), Predicta TV(1958-60), RCA TV(1949), Edison Phonograph(1919), Sewing Machine(1950-55,1860-65) - Fully Furnished - Historic Furniture Exhibit - Henry Ford Museum.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free TV living room stage candidate",
+      "visualTone": "premium living room media stage",
+      "pageFamilies": [
+        "home",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "gallery"
+      ],
+      "licenseProfile": "CC BY-SA 2.0 / cc-by-sa-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Turning_Technology_into_Furniture_-_Stove(1886),_Radiola60_in_Cab.(1927-28),_Predicta_TV(1958-60),_RCA_TV(1949),_Edison_Phonograph(1919),_Sewing_Machine(1950-55,1860-65)_-_Fully_Furnished_-_Historic_Furniture_Exhibit_-_Henry_Ford_Museum.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__tv-living-stage__turning-technology-into-furniture-stove-1886-rad__c6487c2a592f.jpg",
+      "reviewNotes": "blocked: museum/exhibit content and dated object semantics, not suitable for LG-style final asset",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.tv-living-stage.turning-technology-into-furniture-stove-1886-rad.c6487c2a592f",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "tv-living-stage",
+      "sourceTitle": "File:Turning Technology into Furniture - Stove(1886), Radiola60 in Cab.(1927-28), Predicta TV(1958-60), RCA TV(1949), Edison Phonograph(1919), Sewing Machine(1950-55,1860-65) - Fully Furnished - Historic Furniture Exhibit - Henry Ford Museum.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free TV living room stage candidate",
+      "visualTone": "premium living room media stage",
+      "pageFamilies": [
+        "home",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "gallery"
+      ],
+      "licenseProfile": "CC BY-SA 2.0 / cc-by-sa-2.0",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Turning_Technology_into_Furniture_-_Stove(1886),_Radiola60_in_Cab.(1927-28),_Predicta_TV(1958-60),_RCA_TV(1949),_Edison_Phonograph(1919),_Sewing_Machine(1950-55,1860-65)_-_Fully_Furnished_-_Historic_Furniture_Exhibit_-_Henry_Ford_Museum.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__tv-living-stage__turning-technology-into-furniture-stove-1886-rad__c6487c2a592f.jpg",
+      "reviewNotes": "blocked: museum/exhibit content and dated object semantics, not suitable for LG-style final asset",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "home-living-stage",
+      "sourceTitle": "File:Gene Zema house showing living room, Seattle (4669580613).jpg",
+      "role": "object-only",
+      "semanticRole": "text-free home living interior stage candidate",
+      "visualTone": "warm modern living stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area"
+      ],
+      "licenseProfile": "No restrictions",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:Gene_Zema_house_showing_living_room,_Seattle_(4669580613).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__home-living-stage__gene-zema-house-showing-living-room-seattle-4669__b956565f0972.jpg",
+      "reviewNotes": "blocked: dated, low-resolution, or weak modern appliance fit",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "laundry-utility-stage",
+      "sourceTitle": "File:StateLibQld 2 75473 Prisoners using the laundry facilities at the new female division of Boggo Road Gaol, Brisbane, 1903.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free laundry or utility room stage candidate",
+      "visualTone": "clean utility room stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "careBanner"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:StateLibQld_2_75473_Prisoners_using_the_laundry_facilities_at_the_new_female_division_of_Boggo_Road_Gaol,_Brisbane,_1903.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__statelibqld-2-75473-prisoners-using-the-laundry-__bb3007a71c4c.jpg",
+      "reviewNotes": "blocked: people/historical institutional context risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.laundry-utility-stage.statelibqld-2-75473-prisoners-using-the-laundry-.bb3007a71c4c",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "laundry-utility-stage",
+      "sourceTitle": "File:StateLibQld 2 75473 Prisoners using the laundry facilities at the new female division of Boggo Road Gaol, Brisbane, 1903.jpg",
+      "role": "object-only",
+      "semanticRole": "text-free laundry or utility room stage candidate",
+      "visualTone": "clean utility room stage",
+      "pageFamilies": [
+        "home",
+        "care-solutions"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "marketing-area",
+        "careBanner"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:StateLibQld_2_75473_Prisoners_using_the_laundry_facilities_at_the_new_female_division_of_Boggo_Road_Gaol,_Brisbane,_1903.jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__laundry-utility-stage__statelibqld-2-75473-prisoners-using-the-laundry-__bb3007a71c4c.jpg",
+      "reviewNotes": "blocked: people/historical institutional context risk",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e",
+      "viewportProfile": "mo",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "media-wall-stage",
+      "sourceTitle": "File:The Town Crier, v.15, no.50, Dec. 11, 1920 - DPLA - 37f26783bbd274eca9a46efa6e846211 (page 32).jpg",
+      "role": "reference-only",
+      "semanticRole": "home theater and media wall candidate",
+      "visualTone": "dark media wall stage",
+      "pageFamilies": [
+        "home",
+        "category-tvs",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "gallery",
+        "product-grid"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_Town_Crier,_v.15,_no.50,_Dec._11,_1920_-_DPLA_-_37f26783bbd274eca9a46efa6e846211_(page_32).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__media-wall-stage__the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26__b1ccbcb0675e.jpg",
+      "reviewNotes": "blocked: reference/document page image, not safe as final visual asset",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.media-wall-stage.the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26.b1ccbcb0675e",
+      "viewportProfile": "pc",
+      "currentStatus": "candidate",
+      "decision": "blocked",
+      "suggestedReviewFocus": [
+        "license/attribution",
+        "embedded text or watermark",
+        "trademark or property risk",
+        "PC/MO crop fit",
+        "role correctness"
+      ],
+      "sourceProfileId": "media-wall-stage",
+      "sourceTitle": "File:The Town Crier, v.15, no.50, Dec. 11, 1920 - DPLA - 37f26783bbd274eca9a46efa6e846211 (page 32).jpg",
+      "role": "reference-only",
+      "semanticRole": "home theater and media wall candidate",
+      "visualTone": "dark media wall stage",
+      "pageFamilies": [
+        "home",
+        "category-tvs",
+        "pdp-tv-general",
+        "pdp-tv-premium"
+      ],
+      "slotFamilies": [
+        "hero",
+        "banner",
+        "gallery",
+        "product-grid"
+      ],
+      "licenseProfile": "Public domain / pd",
+      "pageUrl": "https://commons.wikimedia.org/wiki/File:The_Town_Crier,_v.15,_no.50,_Dec._11,_1920_-_DPLA_-_37f26783bbd274eca9a46efa6e846211_(page_32).jpg",
+      "localSourcePath": "data/raw/assets/external-free/wikimedia-commons__media-wall-stage__the-town-crier-v-15-no-50-dec-11-1920-dpla-37f26__b1ccbcb0675e.jpg",
+      "reviewNotes": "blocked: reference/document page image, not safe as final visual asset",
+      "reviewedBy": "codex-external-stock-review"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.kitchen-and-living-room-singlewide.b702a1222f40",
+      "viewportProfile": "pc",
+      "decision": "blocked",
+      "reviewedBy": "codex-external-stock-review",
+      "reviewNotes": "blocked: previously approved PC variant re-reviewed; dated low-quality singlewide interior not strong enough for final LG-style asset",
+      "currentStatus": "approved"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.gene-zema-house-showing-living-room-seattle-4669.b956565f0972",
+      "viewportProfile": "pc",
+      "decision": "blocked",
+      "reviewedBy": "codex-external-stock-review",
+      "reviewNotes": "blocked: previously approved PC variant re-reviewed; dated black-and-white interior and weak modern appliance fit",
+      "currentStatus": "approved"
+    },
+    {
+      "assetId": "external.wikimedia-commons.home-living-stage.the-living-room-at-219-north-delaware-street-a-l.28076c7d157a",
+      "viewportProfile": "pc",
+      "decision": "blocked",
+      "reviewedBy": "codex-external-stock-review",
+      "reviewNotes": "blocked: previously approved PC variant re-reviewed; historical interior not suitable for final modern LG-style asset",
+      "currentStatus": "approved"
+    }
+  ],
+  "reviewSummary": {
+    "approved": 8,
+    "blocked": 33,
+    "pending": 0,
+    "policy": "conservative external stock visual review including re-review of prior approved PC variants",
+    "additionalApprovedVariantBlocks": 3
+  }
+}

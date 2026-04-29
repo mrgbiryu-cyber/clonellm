@@ -1,378 +1,30 @@
 {
-  "generatedAt": "2026-04-16T02:15:42.512Z",
+  "generatedAt": "2026-04-16T13:29:57.738Z",
   "baseUrl": "http://127.0.0.1:3000",
   "results": [
     {
       "pageId": "home",
       "viewportProfile": "pc",
       "sectionCount": 17,
-      "referenceMarkupCount": 15,
-      "referenceGeometryCount": 0,
-      "workingGeometryCount": 0,
-      "missingReferenceMarkupCount": 2,
-      "missingReferenceGeometryCount": 17,
-      "status": "fail",
-      "weakSections": [
-        {
-          "slotId": "header-top",
-          "label": "상단 헤더",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "header-bottom",
-          "label": "주 메뉴 헤더",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "hero",
-          "label": "히어로",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "quickmenu",
-          "label": "탐색 바로가기",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcQuickmenu_quickmenu__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "md-choice",
-          "label": "MD 추천",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListHorizontype_list_horizontype__",
-            "HomePcListHorizontypeSkeleton_skeleton__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "timedeal",
-          "label": "타임딜",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcTimedeal_timedeal__",
-            "HomePcTimedealSkeleton_timedeal__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "best-ranking",
-          "label": "인기 랭킹",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListTabstypeBestranking_list_tab_bestranking__",
-            "data-area=메인 베스트 랭킹 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "marketing-area",
-          "label": "홈스타일 탐색",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListMarketingArea_list_marketing_area__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "subscription",
-          "label": "구독 추천",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListTabsBannertype_list_tabs_bannertype__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "space-renewal",
-          "label": "공간 리뉴얼",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListBannertype_list_bannertype__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "brand-showroom",
-          "label": "브랜드 쇼룸",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListSquaretype_list_squaretype__",
-            "data-area=메인 브랜드 쇼룸 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "latest-product-news",
-          "label": "최신 제품 소식",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListSquaretypeScroll_list_squaretype_scroll__",
-            "data-area=메인 최신 제품 소식 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "smart-life",
-          "label": "스마트 라이프",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListSquaretype_list_squaretype__",
-            "data-area=메인 슬기로운 가전생활 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "summary-banner-2",
-          "label": "하단 프로모션 배너",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcBannerPromotion_banner_promotion__",
-            "data-area=메인 하단 배너 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "missed-benefits",
-          "label": "놓치면 아쉬운 혜택",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListRectangletype_list_rectangle__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "lg-best-care",
-          "label": "LG 베스트 케어",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListBannerRectangletype_list_banner_rectangle__",
-            "data-area=메인 베스트 케어 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "bestshop-guide",
-          "label": "베스트샵 가이드",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListBannerHorizontype_list_banner_horizon__",
-            "data-area=메인 베스트샵 이용안내 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        }
-      ]
+      "referenceMarkupCount": 17,
+      "referenceGeometryCount": 17,
+      "workingGeometryCount": 17,
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     },
     {
       "pageId": "home",
       "viewportProfile": "ta",
       "sectionCount": 17,
-      "referenceMarkupCount": 15,
-      "referenceGeometryCount": 0,
-      "workingGeometryCount": 0,
-      "missingReferenceMarkupCount": 2,
-      "missingReferenceGeometryCount": 17,
-      "status": "fail",
-      "weakSections": [
-        {
-          "slotId": "header-top",
-          "label": "상단 헤더",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "header-bottom",
-          "label": "주 메뉴 헤더",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "hero",
-          "label": "히어로",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "quickmenu",
-          "label": "탐색 바로가기",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcQuickmenu_quickmenu__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "md-choice",
-          "label": "MD 추천",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListHorizontype_list_horizontype__",
-            "HomePcListHorizontypeSkeleton_skeleton__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "timedeal",
-          "label": "타임딜",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcTimedeal_timedeal__",
-            "HomePcTimedealSkeleton_timedeal__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "best-ranking",
-          "label": "인기 랭킹",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListTabstypeBestranking_list_tab_bestranking__",
-            "data-area=메인 베스트 랭킹 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "marketing-area",
-          "label": "홈스타일 탐색",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListMarketingArea_list_marketing_area__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "subscription",
-          "label": "구독 추천",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListTabsBannertype_list_tabs_bannertype__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "space-renewal",
-          "label": "공간 리뉴얼",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListBannertype_list_bannertype__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "brand-showroom",
-          "label": "브랜드 쇼룸",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListSquaretype_list_squaretype__",
-            "data-area=메인 브랜드 쇼룸 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "latest-product-news",
-          "label": "최신 제품 소식",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListSquaretypeScroll_list_squaretype_scroll__",
-            "data-area=메인 최신 제품 소식 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "smart-life",
-          "label": "스마트 라이프",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListSquaretype_list_squaretype__",
-            "data-area=메인 슬기로운 가전생활 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "summary-banner-2",
-          "label": "하단 프로모션 배너",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcBannerPromotion_banner_promotion__",
-            "data-area=메인 하단 배너 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "missed-benefits",
-          "label": "놓치면 아쉬운 혜택",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListRectangletype_list_rectangle__"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "lg-best-care",
-          "label": "LG 베스트 케어",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListBannerRectangletype_list_banner_rectangle__",
-            "data-area=메인 베스트 케어 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        },
-        {
-          "slotId": "bestshop-guide",
-          "label": "베스트샵 가이드",
-          "hasReferenceMarkup": true,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "HomePcListBannerHorizontype_list_banner_horizon__",
-            "data-area=메인 베스트샵 이용안내 영역"
-          ],
-          "extractStatus": "exact-reference-section"
-        }
-      ]
+      "referenceMarkupCount": 17,
+      "referenceGeometryCount": 17,
+      "workingGeometryCount": 17,
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     },
     {
       "pageId": "support",
@@ -390,22 +42,13 @@
       "pageId": "bestshop",
       "viewportProfile": "pc",
       "sectionCount": 4,
-      "referenceMarkupCount": 3,
-      "referenceGeometryCount": 3,
-      "workingGeometryCount": 3,
-      "missingReferenceMarkupCount": 1,
-      "missingReferenceGeometryCount": 1,
-      "status": "warning",
-      "weakSections": [
-        {
-          "slotId": "brandBanner",
-          "label": "브랜드 배너",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [],
-          "extractStatus": "reference-derived-fallback"
-        }
-      ]
+      "referenceMarkupCount": 4,
+      "referenceGeometryCount": 4,
+      "workingGeometryCount": 4,
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     },
     {
       "pageId": "care-solutions",
@@ -459,560 +102,85 @@
       "pageId": "category-tvs",
       "viewportProfile": "pc",
       "sectionCount": 6,
-      "referenceMarkupCount": 1,
-      "referenceGeometryCount": 4,
-      "workingGeometryCount": 4,
-      "missingReferenceMarkupCount": 5,
-      "missingReferenceGeometryCount": 2,
-      "status": "fail",
-      "weakSections": [
-        {
-          "slotId": "filter",
-          "label": "필터",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "[class*=\"filter\"]",
-            "[id*=\"filter\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "sort",
-          "label": "정렬",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "[class*=\"sort\"]",
-            "[id*=\"sort\"]",
-            "[class*=\"orderby\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "productGrid",
-          "label": "상품 그리드",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"product-list\"]",
-            "[class*=\"productList\"]",
-            "[class*=\"list-wrap\"]",
-            "[class*=\"list_wrap\"]",
-            "[class*=\"plp-list\"]"
-          ],
-          "extractStatus": "missing-reference-section"
-        },
-        {
-          "slotId": "firstRow",
-          "label": "첫 행",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "representativeProducts",
-            "[class*=\"product-list\"]",
-            "[class*=\"productList\"]",
-            "[class*=\"list-wrap\"]",
-            "[class*=\"list_wrap\"]"
-          ],
-          "extractStatus": "missing-reference-section"
-        },
-        {
-          "slotId": "firstProduct",
-          "label": "대표 상품",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "representativeProducts[0]",
-            "li[class*=\"item\"]",
-            "[class*=\"product-item\"]",
-            "[class*=\"item-card\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        }
-      ]
+      "referenceMarkupCount": 6,
+      "referenceGeometryCount": 6,
+      "workingGeometryCount": 6,
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     },
     {
       "pageId": "category-refrigerators",
       "viewportProfile": "pc",
       "sectionCount": 6,
-      "referenceMarkupCount": 1,
-      "referenceGeometryCount": 4,
-      "workingGeometryCount": 4,
-      "missingReferenceMarkupCount": 5,
-      "missingReferenceGeometryCount": 2,
-      "status": "fail",
-      "weakSections": [
-        {
-          "slotId": "filter",
-          "label": "필터",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "[class*=\"filter\"]",
-            "[id*=\"filter\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "sort",
-          "label": "정렬",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "[class*=\"sort\"]",
-            "[id*=\"sort\"]",
-            "[class*=\"orderby\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "productGrid",
-          "label": "상품 그리드",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"product-list\"]",
-            "[class*=\"productList\"]",
-            "[class*=\"list-wrap\"]",
-            "[class*=\"list_wrap\"]",
-            "[class*=\"plp-list\"]"
-          ],
-          "extractStatus": "missing-reference-section"
-        },
-        {
-          "slotId": "firstRow",
-          "label": "첫 행",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "representativeProducts",
-            "[class*=\"product-list\"]",
-            "[class*=\"productList\"]",
-            "[class*=\"list-wrap\"]",
-            "[class*=\"list_wrap\"]"
-          ],
-          "extractStatus": "missing-reference-section"
-        },
-        {
-          "slotId": "firstProduct",
-          "label": "대표 상품",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "representativeProducts[0]",
-            "li[class*=\"item\"]",
-            "[class*=\"product-item\"]",
-            "[class*=\"item-card\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        }
-      ]
+      "referenceMarkupCount": 6,
+      "referenceGeometryCount": 6,
+      "workingGeometryCount": 6,
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     },
     {
       "pageId": "pdp-tv-general",
       "viewportProfile": "pc",
       "sectionCount": 7,
-      "referenceMarkupCount": 2,
-      "referenceGeometryCount": 6,
+      "referenceMarkupCount": 7,
+      "referenceGeometryCount": 7,
       "workingGeometryCount": 7,
-      "missingReferenceMarkupCount": 5,
-      "missingReferenceGeometryCount": 1,
-      "status": "fail",
-      "weakSections": [
-        {
-          "slotId": "price",
-          "label": "가격/혜택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"price\"]",
-            "[class*=\"price\"]",
-            "[id*=\"price\"]",
-            "[class*=\"benefit\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "option",
-          "label": "옵션 선택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"option\"]",
-            "[class*=\"option\"]",
-            "[id*=\"option\"]",
-            "[class*=\"select\"]",
-            "[class*=\"model\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "sticky",
-          "label": "고정 구매 영역",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"sticky\"]",
-            "[id*=\"sticky\"]",
-            "[class*=\"purchase\"]",
-            "[class*=\"buy\"]",
-            "[class*=\"cart\"]",
-            "[class*=\"cta\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "review",
-          "label": "리뷰",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[id*=\"review\"]",
-            "#review",
-            "[id*=\"review\"]",
-            "[class*=\"review\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "qna",
-          "label": "Q&A",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "[id*=\"qna\"]",
-            "#qna",
-            "[id*=\"qna\"]",
-            "[class*=\"qna\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        }
-      ]
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     },
     {
       "pageId": "pdp-tv-premium",
       "viewportProfile": "pc",
       "sectionCount": 7,
-      "referenceMarkupCount": 2,
-      "referenceGeometryCount": 6,
-      "workingGeometryCount": 6,
-      "missingReferenceMarkupCount": 5,
-      "missingReferenceGeometryCount": 1,
-      "status": "fail",
-      "weakSections": [
-        {
-          "slotId": "price",
-          "label": "가격/혜택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"price\"]",
-            "[class*=\"price\"]",
-            "[id*=\"price\"]",
-            "[class*=\"benefit\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "option",
-          "label": "옵션 선택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"option\"]",
-            "[class*=\"option\"]",
-            "[id*=\"option\"]",
-            "[class*=\"select\"]",
-            "[class*=\"model\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "sticky",
-          "label": "고정 구매 영역",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"sticky\"]",
-            "[id*=\"sticky\"]",
-            "[class*=\"purchase\"]",
-            "[class*=\"buy\"]",
-            "[class*=\"cart\"]",
-            "[class*=\"cta\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "review",
-          "label": "리뷰",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[id*=\"review\"]",
-            "#review",
-            "[id*=\"review\"]",
-            "[class*=\"review\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "qna",
-          "label": "Q&A",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "[id*=\"qna\"]",
-            "#qna",
-            "[id*=\"qna\"]",
-            "[class*=\"qna\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        }
-      ]
+      "referenceMarkupCount": 7,
+      "referenceGeometryCount": 7,
+      "workingGeometryCount": 7,
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     },
     {
       "pageId": "pdp-refrigerator-general",
       "viewportProfile": "pc",
       "sectionCount": 7,
-      "referenceMarkupCount": 2,
-      "referenceGeometryCount": 6,
-      "workingGeometryCount": 6,
-      "missingReferenceMarkupCount": 5,
-      "missingReferenceGeometryCount": 1,
-      "status": "fail",
-      "weakSections": [
-        {
-          "slotId": "price",
-          "label": "가격/혜택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"price\"]",
-            "[class*=\"price\"]",
-            "[id*=\"price\"]",
-            "[class*=\"benefit\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "option",
-          "label": "옵션 선택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"option\"]",
-            "[class*=\"option\"]",
-            "[id*=\"option\"]",
-            "[class*=\"select\"]",
-            "[class*=\"model\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "sticky",
-          "label": "고정 구매 영역",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"sticky\"]",
-            "[id*=\"sticky\"]",
-            "[class*=\"purchase\"]",
-            "[class*=\"buy\"]",
-            "[class*=\"cart\"]",
-            "[class*=\"cta\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "review",
-          "label": "리뷰",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[id*=\"review\"]",
-            "#review",
-            "[id*=\"review\"]",
-            "[class*=\"review\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "qna",
-          "label": "Q&A",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "[id*=\"qna\"]",
-            "#qna",
-            "[id*=\"qna\"]",
-            "[class*=\"qna\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        }
-      ]
+      "referenceMarkupCount": 7,
+      "referenceGeometryCount": 7,
+      "workingGeometryCount": 7,
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     },
     {
       "pageId": "pdp-refrigerator-knockon",
       "viewportProfile": "pc",
       "sectionCount": 7,
-      "referenceMarkupCount": 2,
-      "referenceGeometryCount": 6,
+      "referenceMarkupCount": 7,
+      "referenceGeometryCount": 7,
       "workingGeometryCount": 7,
-      "missingReferenceMarkupCount": 5,
-      "missingReferenceGeometryCount": 1,
-      "status": "fail",
-      "weakSections": [
-        {
-          "slotId": "price",
-          "label": "가격/혜택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"price\"]",
-            "[class*=\"price\"]",
-            "[id*=\"price\"]",
-            "[class*=\"benefit\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "option",
-          "label": "옵션 선택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"option\"]",
-            "[class*=\"option\"]",
-            "[id*=\"option\"]",
-            "[class*=\"select\"]",
-            "[class*=\"model\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "sticky",
-          "label": "고정 구매 영역",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"sticky\"]",
-            "[id*=\"sticky\"]",
-            "[class*=\"purchase\"]",
-            "[class*=\"buy\"]",
-            "[class*=\"cart\"]",
-            "[class*=\"cta\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "review",
-          "label": "리뷰",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[id*=\"review\"]",
-            "#review",
-            "[id*=\"review\"]",
-            "[class*=\"review\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "qna",
-          "label": "Q&A",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "[id*=\"qna\"]",
-            "#qna",
-            "[id*=\"qna\"]",
-            "[class*=\"qna\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        }
-      ]
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     },
     {
       "pageId": "pdp-refrigerator-glass",
       "viewportProfile": "pc",
       "sectionCount": 7,
-      "referenceMarkupCount": 2,
-      "referenceGeometryCount": 6,
+      "referenceMarkupCount": 7,
+      "referenceGeometryCount": 7,
       "workingGeometryCount": 7,
-      "missingReferenceMarkupCount": 5,
-      "missingReferenceGeometryCount": 1,
-      "status": "fail",
-      "weakSections": [
-        {
-          "slotId": "price",
-          "label": "가격/혜택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"price\"]",
-            "[class*=\"price\"]",
-            "[id*=\"price\"]",
-            "[class*=\"benefit\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "option",
-          "label": "옵션 선택",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"option\"]",
-            "[class*=\"option\"]",
-            "[id*=\"option\"]",
-            "[class*=\"select\"]",
-            "[class*=\"model\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "sticky",
-          "label": "고정 구매 영역",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[class*=\"sticky\"]",
-            "[id*=\"sticky\"]",
-            "[class*=\"purchase\"]",
-            "[class*=\"buy\"]",
-            "[class*=\"cart\"]",
-            "[class*=\"cta\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "review",
-          "label": "리뷰",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": true,
-          "selectorHints": [
-            "[id*=\"review\"]",
-            "#review",
-            "[id*=\"review\"]",
-            "[class*=\"review\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        },
-        {
-          "slotId": "qna",
-          "label": "Q&A",
-          "hasReferenceMarkup": false,
-          "hasReferenceMeasurement": false,
-          "selectorHints": [
-            "[id*=\"qna\"]",
-            "#qna",
-            "[id*=\"qna\"]",
-            "[class*=\"qna\"]"
-          ],
-          "extractStatus": "reference-derived-fallback"
-        }
-      ]
+      "missingReferenceMarkupCount": 0,
+      "missingReferenceGeometryCount": 0,
+      "status": "pass",
+      "weakSections": []
     }
   ]
 }

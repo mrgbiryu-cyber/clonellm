@@ -1,0 +1,143 @@
+{
+  "generatedAt": "2026-04-20T00:00:00.000Z",
+  "version": 1,
+  "global": {
+    "principles": [
+      "Do not invent a blank page. Start from a prepared family skeleton and fill only the intended content, tone, hierarchy, and asset treatment.",
+      "Treat the skeleton as the executable base structure for Tailwind replacement blocks.",
+      "When a family skeleton exists, keep the structural slots and vary only emphasis, density, copy distribution, and asset choice."
+    ],
+    "rendererPolicy": [
+      "Replacement blocks must be self-contained and safe to swap into the baseline clone without higher-layer shell reassembly.",
+      "Customer-facing output must not leak helper labels, author notes, or internal guidance strings."
+    ]
+  },
+  "families": [
+    {
+      "familyId": "hero-carousel-composition",
+      "label": "Hero Skeleton",
+      "supportedPages": ["home", "bestshop", "care-solutions"],
+      "replacementTargets": ["hero"],
+      "structureSlots": ["badge", "headline", "support", "primaryAction", "visual", "secondaryRail"],
+      "tailwindSkeleton": {
+        "component": "hero-split-stage",
+        "layout": "lead copy + lead visual + optional support rail",
+        "required": ["headline", "primaryAction", "visual"],
+        "optional": ["badge", "support", "secondaryRail"],
+        "rules": ["headline dominates", "visual supports headline", "secondary rail stays subordinate"]
+      }
+    },
+    {
+      "familyId": "icon-link-grid-composition",
+      "label": "Icon Grid Skeleton",
+      "supportedPages": ["home", "support", "bestshop", "care-solutions", "homestyle-home"],
+      "replacementTargets": ["quickmenu", "quickMenu", "tabs", "shortcut"],
+      "structureSlots": ["title", "subtitle", "leadItem", "supportItems", "cta"],
+      "tailwindSkeleton": {
+        "component": "scan-grid",
+        "layout": "compact head + optional lead card + support grid",
+        "required": ["title", "supportItems"],
+        "optional": ["subtitle", "leadItem", "cta"],
+        "rules": ["prefer lead/support rhythm", "icon shells stay consistent", "avoid equal-weight dense dump"]
+      }
+    },
+    {
+      "familyId": "ranking-list-composition",
+      "label": "Ranking Skeleton",
+      "supportedPages": ["home", "care-solutions"],
+      "replacementTargets": ["best-ranking", "ranking"],
+      "structureSlots": ["title", "subtitle", "rankedItems"],
+      "tailwindSkeleton": {
+        "component": "ranking-stack",
+        "layout": "compact head + vertical ranked cards",
+        "required": ["title", "rankedItems"],
+        "optional": ["subtitle"],
+        "rules": ["rank remains obvious", "thumb/body alignment stays clean"]
+      }
+    },
+    {
+      "familyId": "image-banner-strip-composition",
+      "label": "Banner Skeleton",
+      "supportedPages": ["home", "support", "bestshop", "care-solutions", "homestyle-home", "category-tvs", "category-refrigerators"],
+      "replacementTargets": ["summary-banner-2", "tipsBanner", "brandBanner", "careBanner", "labelBanner", "banner"],
+      "structureSlots": ["eyebrow", "title", "subtitle", "cta", "visual"],
+      "tailwindSkeleton": {
+        "component": "wide-banner",
+        "layout": "copy block + companion visual",
+        "required": ["title", "visual"],
+        "optional": ["eyebrow", "subtitle", "cta"],
+        "rules": ["banner reads as decisive band", "visual does not overpower message"]
+      }
+    },
+    {
+      "familyId": "service-benefit-hub-composition",
+      "label": "Benefit Hub Skeleton",
+      "supportedPages": ["support", "care-solutions"],
+      "replacementTargets": ["mainService", "bestcare", "benefit"],
+      "structureSlots": ["title", "subtitle", "benefitCards", "cta"],
+      "tailwindSkeleton": {
+        "component": "benefit-grid",
+        "layout": "compact head + practical cards",
+        "required": ["title", "benefitCards"],
+        "optional": ["subtitle", "cta"],
+        "rules": ["practical before decorative", "trust/support tone stays concise"]
+      }
+    },
+    {
+      "familyId": "editorial-visual-story-composition",
+      "label": "Editorial Story Skeleton",
+      "supportedPages": ["care-solutions-pdp", "homestyle-home"],
+      "replacementTargets": ["visual", "brandStory"],
+      "structureSlots": ["title", "subtitle", "storyCards"],
+      "tailwindSkeleton": {
+        "component": "story-grid",
+        "layout": "compact head + visual story cards",
+        "required": ["title", "storyCards"],
+        "optional": ["subtitle"],
+        "rules": ["story stays concise", "cards preserve readable browse rhythm"]
+      }
+    },
+    {
+      "familyId": "commerce-card-grid-composition",
+      "label": "Commerce Grid Skeleton",
+      "supportedPages": ["home", "homestyle-pdp"],
+      "replacementTargets": ["md-choice", "timedeal", "subscription", "space-renewal", "latest-product-news", "brand-showroom", "marketing-area", "bestProduct"],
+      "structureSlots": ["title", "subtitle", "leadCard", "productCards"],
+      "tailwindSkeleton": {
+        "component": "commerce-grid",
+        "layout": "head + optional lead card + product grid",
+        "required": ["title", "productCards"],
+        "optional": ["subtitle", "leadCard"],
+        "rules": ["shopping clarity first", "cards remain scannable and shoppable"]
+      }
+    },
+    {
+      "familyId": "pdp-summary-stack-composition",
+      "label": "PDP Summary Skeleton",
+      "supportedPages": ["pdp-tv-general", "pdp-tv-premium", "pdp-refrigerator-general", "pdp-refrigerator-knockon", "pdp-refrigerator-glass"],
+      "replacementTargets": ["summary"],
+      "structureSlots": ["badge", "title", "subtitle", "highlights", "primaryAction", "secondaryAction", "visual"],
+      "tailwindSkeleton": {
+        "component": "pdp-summary-stage",
+        "layout": "summary copy + highlights + companion visual",
+        "required": ["title", "highlights", "primaryAction"],
+        "optional": ["badge", "subtitle", "secondaryAction", "visual"],
+        "rules": ["decision summary first", "highlights compress complexity"]
+      }
+    },
+    {
+      "familyId": "pdp-sticky-buybox-composition",
+      "label": "PDP Sticky Buybox Skeleton",
+      "supportedPages": ["pdp-tv-general", "pdp-tv-premium", "pdp-refrigerator-general", "pdp-refrigerator-knockon", "pdp-refrigerator-glass"],
+      "replacementTargets": ["sticky"],
+      "structureSlots": ["title", "subtitle", "price", "primaryAction", "secondaryAction"],
+      "tailwindSkeleton": {
+        "component": "sticky-buybox",
+        "layout": "compact decision row",
+        "required": ["price", "primaryAction"],
+        "optional": ["title", "subtitle", "secondaryAction"],
+        "rules": ["price and buy CTA stay obvious", "compact and decisive"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,239 @@
+{
+  "generatedAt": "2026-04-24T09:28:40.153Z",
+  "baseUrl": "http://127.0.0.1:3000",
+  "authenticatedAs": "mrgbiryu",
+  "results": [
+    {
+      "pageId": "home",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777022586659",
+      "previewPath": "/runtime-draft/runtime-draft-1777022586659",
+      "status": 200,
+      "bodyLength": 88214
+    },
+    {
+      "pageId": "home",
+      "viewportProfile": "ta",
+      "draftBuildId": "runtime-draft-1777022720514",
+      "previewPath": "/runtime-draft/runtime-draft-1777022720514",
+      "status": 200,
+      "bodyLength": 88227
+    },
+    {
+      "pageId": "home",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777022779734",
+      "previewPath": "/runtime-draft/runtime-draft-1777022779734",
+      "status": 200,
+      "bodyLength": 153095
+    },
+    {
+      "pageId": "support",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777020335463",
+      "previewPath": "/runtime-draft/runtime-draft-1777020335463",
+      "status": 200,
+      "bodyLength": 515206
+    },
+    {
+      "pageId": "support",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777020382343",
+      "previewPath": "/runtime-draft/runtime-draft-1777020382343",
+      "status": 200,
+      "bodyLength": 515587
+    },
+    {
+      "pageId": "bestshop",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777022560580",
+      "previewPath": "/runtime-draft/runtime-draft-1777022560580",
+      "status": 200,
+      "bodyLength": 456896
+    },
+    {
+      "pageId": "bestshop",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777022686353",
+      "previewPath": "/runtime-draft/runtime-draft-1777022686353",
+      "status": 200,
+      "bodyLength": 280922
+    },
+    {
+      "pageId": "care-solutions",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777022607772",
+      "previewPath": "/runtime-draft/runtime-draft-1777022607772",
+      "status": 200,
+      "bodyLength": 776198
+    },
+    {
+      "pageId": "care-solutions",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777020517129",
+      "previewPath": "/runtime-draft/runtime-draft-1777020517129",
+      "status": 200,
+      "bodyLength": 775416
+    },
+    {
+      "pageId": "care-solutions-pdp",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777020557635",
+      "previewPath": "/runtime-draft/runtime-draft-1777020557635",
+      "status": 200,
+      "bodyLength": 1097804
+    },
+    {
+      "pageId": "care-solutions-pdp",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777020599119",
+      "previewPath": "/runtime-draft/runtime-draft-1777020599119",
+      "status": 200,
+      "bodyLength": 1038006
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777020640405",
+      "previewPath": "/runtime-draft/runtime-draft-1777020640405",
+      "status": 200,
+      "bodyLength": 808377
+    },
+    {
+      "pageId": "homestyle-home",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777020684067",
+      "previewPath": "/runtime-draft/runtime-draft-1777020684067",
+      "status": 200,
+      "bodyLength": 14389
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777020726532",
+      "previewPath": "/runtime-draft/runtime-draft-1777020726532",
+      "status": 200,
+      "bodyLength": 293888
+    },
+    {
+      "pageId": "homestyle-pdp",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777020769245",
+      "previewPath": "/runtime-draft/runtime-draft-1777020769245",
+      "status": 200,
+      "bodyLength": 22319
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777020814232",
+      "previewPath": "/runtime-draft/runtime-draft-1777020814232",
+      "status": 200,
+      "bodyLength": 165262
+    },
+    {
+      "pageId": "category-tvs",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777020857129",
+      "previewPath": "/runtime-draft/runtime-draft-1777020857129",
+      "status": 200,
+      "bodyLength": 215509
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777020899566",
+      "previewPath": "/runtime-draft/runtime-draft-1777020899566",
+      "status": 200,
+      "bodyLength": 175608
+    },
+    {
+      "pageId": "category-refrigerators",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777020943034",
+      "previewPath": "/runtime-draft/runtime-draft-1777020943034",
+      "status": 200,
+      "bodyLength": 229318
+    },
+    {
+      "pageId": "pdp-tv-general",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777020994776",
+      "previewPath": "/runtime-draft/runtime-draft-1777020994776",
+      "status": 200,
+      "bodyLength": 772276
+    },
+    {
+      "pageId": "pdp-tv-general",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777021039878",
+      "previewPath": "/runtime-draft/runtime-draft-1777021039878",
+      "status": 200,
+      "bodyLength": 548261
+    },
+    {
+      "pageId": "pdp-tv-premium",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777021085349",
+      "previewPath": "/runtime-draft/runtime-draft-1777021085349",
+      "status": 200,
+      "bodyLength": 733304
+    },
+    {
+      "pageId": "pdp-tv-premium",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777021131338",
+      "previewPath": "/runtime-draft/runtime-draft-1777021131338",
+      "status": 200,
+      "bodyLength": 708241
+    },
+    {
+      "pageId": "pdp-refrigerator-general",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777021178220",
+      "previewPath": "/runtime-draft/runtime-draft-1777021178220",
+      "status": 200,
+      "bodyLength": 733476
+    },
+    {
+      "pageId": "pdp-refrigerator-general",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777021226735",
+      "previewPath": "/runtime-draft/runtime-draft-1777021226735",
+      "status": 200,
+      "bodyLength": 690722
+    },
+    {
+      "pageId": "pdp-refrigerator-knockon",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777021275295",
+      "previewPath": "/runtime-draft/runtime-draft-1777021275295",
+      "status": 200,
+      "bodyLength": 687238
+    },
+    {
+      "pageId": "pdp-refrigerator-knockon",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777021324780",
+      "previewPath": "/runtime-draft/runtime-draft-1777021324780",
+      "status": 200,
+      "bodyLength": 698762
+    },
+    {
+      "pageId": "pdp-refrigerator-glass",
+      "viewportProfile": "pc",
+      "draftBuildId": "runtime-draft-1777021379225",
+      "previewPath": "/runtime-draft/runtime-draft-1777021379225",
+      "status": 200,
+      "bodyLength": 757924
+    },
+    {
+      "pageId": "pdp-refrigerator-glass",
+      "viewportProfile": "mo",
+      "draftBuildId": "runtime-draft-1777021435418",
+      "previewPath": "/runtime-draft/runtime-draft-1777021435418",
+      "status": 200,
+      "bodyLength": 707881
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "policies": [
+    {
+      "policyId": "stage-hero",
+      "label": "Stage Hero Asset Policy",
+      "targetSlots": ["hero", "service-intro", "visual"],
+      "imageUsageMode": "full-bleed-background",
+      "allowedBackgroundRoles": ["background-only"],
+      "allowedAccentRoles": ["object-only", "icon-only"],
+      "disallowPromoReoverlay": true,
+      "notes": [
+        "Full-bleed stage images must use background-only assets.",
+        "Object-only assets may appear as badges, logos, or secondary product accents only."
+      ]
+    },
+    {
+      "policyId": "quickmenu-icon-family",
+      "label": "Quickmenu Icon Family Policy",
+      "targetSlots": ["quickmenu", "quickMenu", "tabs", "shortcut"],
+      "imageUsageMode": "icon-family",
+      "allowedPrimaryRoles": ["icon-only"],
+      "disallowPromoReoverlay": true,
+      "notes": [
+        "Quickmenu and tab-entry surfaces must use one consistent icon family.",
+        "Promo-complete thumbnails must not be reused as icon shells."
+      ]
+    },
+    {
+      "policyId": "banner-stage",
+      "label": "Banner Asset Policy",
+      "targetSlots": ["summary-banner-2", "tipsBanner", "brandBanner", "careBanner", "labelBanner", "banner", "noticeBanner"],
+      "imageUsageMode": "full-bleed-background",
+      "allowedBackgroundRoles": ["background-only"],
+      "allowedAccentRoles": ["object-only"],
+      "disallowPromoReoverlay": true,
+      "notes": [
+        "Banner backgrounds should be text-free or image-only surfaces.",
+        "Promo-complete banner art must not receive a second text overlay."
+      ]
+    },
+    {
+      "policyId": "commerce-grid",
+      "label": "Commerce Grid Asset Policy",
+      "targetSlots": ["md-choice", "timedeal", "subscription", "space-renewal", "latest-product-news", "brand-showroom", "marketing-area", "bestProduct", "best-ranking", "ranking"],
+      "imageUsageMode": "card-media",
+      "allowedCardMediaRoles": ["background-only", "object-only", "reference-only"],
+      "disallowPromoReoverlay": false,
+      "notes": [
+        "Commerce sections may use product/object imagery directly.",
+        "Use promo-complete assets only when they are the complete card content, not a re-overlaid background."
+      ]
+    },
+    {
+      "policyId": "benefit-hub",
+      "label": "Benefit Hub Asset Policy",
+      "targetSlots": ["benefit", "benefit-highlight", "mainService", "bestcare", "service-benefit"],
+      "imageUsageMode": "icon-or-object",
+      "allowedPrimaryRoles": ["icon-only", "object-only"],
+      "disallowPromoReoverlay": true,
+      "notes": [
+        "Benefit hubs should use icons or simple object visuals, not full promo banners."
+      ]
+    },
+    {
+      "policyId": "pdp-summary-stage",
+      "label": "PDP Summary Stage Asset Policy",
+      "targetSlots": ["summary"],
+      "imageUsageMode": "full-bleed-background",
+      "allowedBackgroundRoles": ["background-only"],
+      "allowedAccentRoles": ["object-only"],
+      "disallowPromoReoverlay": true,
+      "notes": [
+        "PDP summary hero surfaces should use product/background imagery without embedded promo text."
+      ]
+    },
+    {
+      "policyId": "pdp-sticky-buybox",
+      "label": "PDP Sticky Buybox Asset Policy",
+      "targetSlots": ["sticky"],
+      "imageUsageMode": "no-required-image",
+      "disallowPromoReoverlay": false,
+      "notes": [
+        "Sticky buybox should avoid decorative media unless explicitly requested."
+      ]
+    }
+  ]
+}
