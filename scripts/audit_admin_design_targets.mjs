@@ -101,6 +101,25 @@ async function fetchJson(baseUrl, token, route, options = {}) {
   return { ok: response.ok, status: response.status, text, json };
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function pollWorkspaceBuildLocalDraftJob(baseUrl, token, pollUrl, { timeoutMs = 1_200_000 } = {}) {
+  const normalizedPollUrl = String(pollUrl || "").trim();
+  if (!normalizedPollUrl) throw new Error("workspace_build_local_draft_poll_url_missing");
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const job = await fetchJson(baseUrl, token, normalizedPollUrl, { timeoutMs: 60_000 });
+    if (job.json?.status === "done" || job.json?.status === "failed") {
+      return { ...job, ok: job.ok && job.json?.status === "done" };
+    }
+    const elapsedMs = Date.now() - startedAt;
+    await sleep(elapsedMs < 15_000 ? 2_000 : elapsedMs < 60_000 ? 5_000 : 10_000);
+  }
+  throw new Error("workspace_build_local_draft_timeout");
+}
+
 function clonePath(pageId, viewportProfile) {
   return `/clone/${encodeURIComponent(pageId)}?viewportProfile=${encodeURIComponent(viewportProfile)}&baseline=origin`;
 }
@@ -250,7 +269,7 @@ async function auditTarget({ baseUrl, token, pageId, viewportProfile, label, bui
   };
   if (build) {
     const approvedPlan = buildSyntheticApprovedPlan({ pageId, viewportProfile, label, components });
-    const buildResponse = await fetchJson(baseUrl, token, "/api/workspace/build-local-draft", {
+    const submittedBuildResponse = await fetchJson(baseUrl, token, "/api/workspace/build-local-draft", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -274,6 +293,9 @@ async function auditTarget({ baseUrl, token, pageId, viewportProfile, label, bui
       }),
       timeoutMs: 120_000,
     });
+    const buildResponse = submittedBuildResponse.json?.status === "queued" && submittedBuildResponse.json?.pollUrl
+      ? await pollWorkspaceBuildLocalDraftJob(baseUrl, token, submittedBuildResponse.json.pollUrl)
+      : submittedBuildResponse;
     const item = buildResponse.json?.item || {};
     const authoredSections = Array.isArray(item?.report?.authoredSections)
       ? item.report.authoredSections

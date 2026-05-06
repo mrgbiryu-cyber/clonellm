@@ -13,6 +13,15 @@ import {
   writeJson,
 } from "./openwebui-export-utils.mjs";
 
+const KNOWLEDGE_SEED_PATH = "data/normalized/openwebui-knowledge-seed-v1.json";
+const ALLOWED_COLLECTIONS = new Set([
+  "lge-policy",
+  "lge-component-spec",
+  "lge-design-history",
+  "lge-requirements",
+  "lge-idea-archive",
+]);
+
 function describeSource(sourcePath, data) {
   if (sourcePath.includes("asset-role-policies")) {
     const policies = Array.isArray(data.policies) ? data.policies : [];
@@ -198,7 +207,9 @@ function describeSource(sourcePath, data) {
 
 export function buildKnowledgeProjections() {
   const inventory = loadInventory();
-  return DRY_RUN_SOURCE_PATHS.map((sourcePath) => {
+  const sourceProjections = DRY_RUN_SOURCE_PATHS
+    .filter((sourcePath) => sourcePath !== KNOWLEDGE_SEED_PATH)
+    .map((sourcePath) => {
     const record = getSourceRecord(inventory, sourcePath);
     const data = readJson(sourcePath);
     const description = describeSource(sourcePath, data);
@@ -215,6 +226,43 @@ export function buildKnowledgeProjections() {
       summary: description.summary,
       markdown: description.markdown,
       metadata: description.metadata,
+    };
+  });
+  return [
+    ...sourceProjections,
+    ...buildSeedKnowledgeProjections(inventory),
+  ];
+}
+
+function buildSeedKnowledgeProjections(inventory) {
+  let record;
+  try {
+    record = getSourceRecord(inventory, KNOWLEDGE_SEED_PATH);
+  } catch {
+    return [];
+  }
+  const seed = readJson(KNOWLEDGE_SEED_PATH);
+  const documents = Array.isArray(seed.documents) ? seed.documents : [];
+  return documents.map((document) => {
+    const collection = ALLOWED_COLLECTIONS.has(document.collection) ? document.collection : "lge-requirements";
+    const truthLevel = document.truthLevel || record.truthLevel || "historical";
+    return {
+      projectionVersion: "knowledge-projection-v1",
+      documentId: `knowledge.${slugify(document.documentId || document.title || collection)}`,
+      collection,
+      truthLevel,
+      freshness: document.freshness || freshnessForTruthLevel(truthLevel),
+      sourcePath: KNOWLEDGE_SEED_PATH,
+      sourceHash: record.sourceHash,
+      generatedAt: new Date().toISOString(),
+      title: String(document.title || document.documentId || collection).trim(),
+      summary: String(document.summary || "").trim(),
+      markdown: String(document.markdown || "").trim(),
+      metadata: {
+        ...(document.metadata && typeof document.metadata === "object" ? document.metadata : {}),
+        sourceDocumentPaths: Array.isArray(document.sourceDocumentPaths) ? document.sourceDocumentPaths : [],
+        seedVersion: seed.seedVersion || "openwebui-knowledge-seed-v1",
+      },
     };
   });
 }

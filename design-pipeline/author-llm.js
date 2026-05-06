@@ -5,6 +5,7 @@ const { buildLocalAuthoredSectionHtmlPackage } = require("./author-output");
 const { resolveDesignStageModel } = require("./model-profile");
 const {
   buildSectionSequencePlan,
+  buildSectionClusterPlan,
   summarizeAuthoredSectionsForContext,
 } = require("./section-sequence");
 const {
@@ -21,6 +22,113 @@ function toStringArray(value, limit = 24) {
     return value.split(/\r?\n/).map((item) => item.trim()).filter(Boolean).slice(0, limit);
   }
   return [];
+}
+
+function resolveDesignAuthorConcurrency(sequencePlan = []) {
+  const configured = Number(process.env.DESIGN_AUTHOR_CONCURRENCY || process.env.DESIGN_AUTHOR_MAX_CONCURRENCY || 3);
+  const count = Array.isArray(sequencePlan) ? sequencePlan.length : 0;
+  if (count <= 2) return 1;
+  return Math.max(1, Math.min(6, Number.isFinite(configured) ? configured : 3));
+}
+
+function resolveDesignAuthorSectionMaxTokens(section = {}, options = {}) {
+  const slotId = String(section?.slotId || "").trim().toLowerCase();
+  const stage = String(options?.stage || "").trim().toLowerCase();
+  const isAnchor = stage === "anchor" || slotId === "hero" || slotId === "summary";
+  const isComplexSupport = slotId === "quickmenu" || slotId === "sticky";
+  const configured = Number(
+    process.env.DESIGN_AUTHOR_SECTION_MAX_TOKENS ||
+      process.env.DESIGN_AUTHOR_MAX_TOKENS ||
+      process.env.BUILDER_MAX_TOKENS ||
+      ""
+  );
+  if (Number.isFinite(configured) && configured > 0) return Math.max(4000, configured);
+  const roleConfigured = Number(
+    isAnchor
+      ? process.env.DESIGN_AUTHOR_ANCHOR_MAX_TOKENS
+      : isComplexSupport
+        ? process.env.DESIGN_AUTHOR_COMPLEX_SUPPORT_MAX_TOKENS
+        : process.env.DESIGN_AUTHOR_SUPPORT_MAX_TOKENS
+  );
+  if (Number.isFinite(roleConfigured) && roleConfigured > 0) return Math.max(4000, roleConfigured);
+  if (isAnchor) return 32000;
+  if (isComplexSupport) return 24000;
+  return 16000;
+}
+
+function resolveDesignAuthorBatchingEnabled() {
+  return String(process.env.DESIGN_AUTHOR_BATCHING_ENABLED || "1").trim() !== "0";
+}
+
+function resolveDesignAuthorClusterMaxSections() {
+  const configured = Number(process.env.DESIGN_AUTHOR_CLUSTER_MAX_SECTIONS || 4);
+  return Math.max(2, Math.min(6, Number.isFinite(configured) ? configured : 4));
+}
+
+function resolveDesignAuthorClusterMaxTokens(sections = []) {
+  const configured = Number(process.env.DESIGN_AUTHOR_CLUSTER_MAX_TOKENS || "");
+  if (Number.isFinite(configured) && configured > 0) return Math.max(8000, configured);
+  const requested = (Array.isArray(sections) ? sections : []).reduce((sum, section) => {
+    return sum + resolveDesignAuthorSectionMaxTokens(section, { stage: section?.stage || "support" });
+  }, 0);
+  return Math.min(64000, Math.max(12000, Math.ceil(requested * 1.15)));
+}
+
+function isLeadingSequenceStep(step = {}) {
+  const priority = Number(step?.priority);
+  return Number.isFinite(priority) && priority <= 0;
+}
+
+function buildTruncatedSectionError(sectionRequest = {}, responseMeta = null) {
+  const slotId = String(sectionRequest?.slotId || "").trim();
+  const error = new Error(`design_author_output_truncated:${slotId || "unknown"}`);
+  error.code = "design_author_output_truncated";
+  error.responseMeta = responseMeta;
+  error.diagnostics = {
+    reason: "finish_reason_length",
+    slotId,
+    finishReason: String(responseMeta?.finishReason || "").trim(),
+    usage: responseMeta?.usage || null,
+  };
+  return error;
+}
+
+function buildTruncatedClusterError(sectionRequests = [], responseMeta = null) {
+  const slotIds = (Array.isArray(sectionRequests) ? sectionRequests : [])
+    .map((section) => String(section?.slotId || "").trim())
+    .filter(Boolean);
+  const error = new Error(`design_author_cluster_output_truncated:${slotIds.join(",") || "unknown"}`);
+  error.code = "design_author_cluster_output_truncated";
+  error.responseMeta = responseMeta;
+  error.diagnostics = {
+    reason: "finish_reason_length",
+    slotIds,
+    finishReason: String(responseMeta?.finishReason || "").trim(),
+    usage: responseMeta?.usage || null,
+  };
+  return error;
+}
+
+function mergePartialAuthoredSections(fallbackPackage = {}, partialSections = []) {
+  const fallbackSections = Array.isArray(fallbackPackage?.sections) ? fallbackPackage.sections : [];
+  const partialBySlot = new Map(
+    (Array.isArray(partialSections) ? partialSections : [])
+      .map((section) => [String(section?.slotId || "").trim(), section])
+      .filter(([slotId, section]) => slotId && section)
+  );
+  const mergedSections = fallbackSections.map((section) => {
+    const slotId = String(section?.slotId || "").trim();
+    return partialBySlot.get(slotId) || section;
+  });
+  for (const [slotId, section] of partialBySlot.entries()) {
+    if (!mergedSections.some((item) => String(item?.slotId || "").trim() === slotId)) {
+      mergedSections.push(section);
+    }
+  }
+  return {
+    ...fallbackPackage,
+    sections: mergedSections,
+  };
 }
 
 function buildSectionRequests(authorInput = {}) {
@@ -376,6 +484,8 @@ function buildSectionAuthorUserPrompt(authorInput = {}, sectionRequest = {}, opt
     "The document must contain exactly one `## Section:` block, for the requested slot only.",
     "Inside `### Delivery`, repeat the same SectionKey as the requested slot.",
     "Do not write any other sections.",
+    "Use sequenceContext.upstreamSections as real implementation context: match its visible rhythm, color surface, spacing scale, typography scale, and CTA treatment unless the current section has a strong reason to differ.",
+    "When upstreamSections include htmlExcerpt or styleSignature.classTokens, treat them as the page's already-authored visual language, not as copy to duplicate verbatim.",
     "Use the Korean language for visible copy unless the reference clearly requires English.",
     `Viewport contract: ${String(payload.page?.viewportProfile || "pc")} / ${String(payload.page?.viewportMode || "desktop")}`,
     `Asset variant policy: ${String(payload.execution?.assetVariantPolicy || "use-current-viewport-variants-only")}`,
@@ -387,6 +497,63 @@ function buildSectionAuthorUserPrompt(authorInput = {}, sectionRequest = {}, opt
     "- Do not rename, reinterpret, or invent placeholder ids such as semantic aliases.",
     "Authoring rules:",
     ...buildSectionAuthoringRules(currentSection).map((rule, index) => `${index + 1}. ${rule}`),
+    "",
+    JSON.stringify(payload, null, 2),
+  ].join("\n");
+}
+
+function buildClusterAuthorUserPrompt(authorInput = {}, sectionRequests = [], options = {}) {
+  const source = authorInput && typeof authorInput === "object" ? authorInput : {};
+  const context = options && typeof options === "object" ? options : {};
+  const packet = source.designAuthorPacket && typeof source.designAuthorPacket === "object"
+    ? source.designAuthorPacket
+    : {};
+  const sections = (Array.isArray(sectionRequests) ? sectionRequests : []).filter(Boolean);
+  const expectedSlotIds = sections.map((section) => String(section?.slotId || "").trim()).filter(Boolean);
+  const payload = {
+    page: packet.page || {},
+    concept: packet.concept || {},
+    execution: {
+      ...(packet.execution || {}),
+      targetGroup: packet.execution?.targetGroup || {},
+    },
+    sequenceContext: {
+      sequenceIndex: Number(context.sequenceIndex || 0),
+      totalSections: Number(context.totalSections || 1),
+      stage: "cluster-support",
+      anchorSectionSlotId: String(context.anchorSectionSlotId || "").trim(),
+      upstreamSections: Array.isArray(context.upstreamSections) ? context.upstreamSections : [],
+    },
+    cluster: {
+      clusterId: String(context.clusterId || "").trim(),
+      goal: String(context.goal || "").trim(),
+      rules: toStringArray(context.rules, 8),
+      expectedSlotIds,
+    },
+    sections,
+    reference: packet.reference || {},
+  };
+  const sectionRuleBlocks = sections.flatMap((section) => [
+    `Section ${String(section?.slotId || "").trim()} rules:`,
+    ...buildSectionAuthoringRules(section).map((rule, index) => `${index + 1}. ${rule}`),
+  ]);
+  return [
+    "Create one Authored Section Markdown document for a section cluster.",
+    "The document must contain one `## Section:` block for each requested slot in cluster.expectedSlotIds, and no other sections.",
+    "Inside each `### Delivery`, repeat the same SectionKey as that section slot.",
+    "Keep each section independent with one root <section>, but make the cluster read as one visual system.",
+    "Use sequenceContext.upstreamSections as the already-authored page language; match rhythm, color surface, spacing scale, typography scale, and CTA treatment without copying text verbatim.",
+    "Use the Korean language for visible copy unless the reference clearly requires English.",
+    `Viewport contract: ${String(payload.page?.viewportProfile || "pc")} / ${String(payload.page?.viewportMode || "desktop")}`,
+    `Asset variant policy: ${String(payload.execution?.assetVariantPolicy || "use-current-viewport-variants-only")}`,
+    "- Use only assetRegistry image variants matching the current viewportProfile unless a fallback is explicitly marked.",
+    "- PC-approved assets do not imply Mobile approval; Mobile-approved assets do not imply PC approval.",
+    `Requested change profile: ${String(payload.execution?.changeProfile?.profileId || payload.execution?.requestedChangeLevel || "stable")}`,
+    "Asset usage rules:",
+    "- Use only exact asset ids provided in each section's currentAssets or availableAssetFamilies.",
+    "- Do not rename, reinterpret, or invent placeholder ids such as semantic aliases.",
+    "Cluster authoring rules:",
+    ...sectionRuleBlocks,
     "",
     JSON.stringify(payload, null, 2),
   ].join("\n");
@@ -464,6 +631,32 @@ function buildSingleSectionProjectionError(expectedSlotId = "", rawDocument = ""
   return error;
 }
 
+function buildClusterProjectionError(expectedSlotIds = [], rawDocument = "", document = "") {
+  const normalizedExpectedSlotIds = toStringArray(expectedSlotIds, 12);
+  const rawText = String(rawDocument || "").trim();
+  const projectedDiagnostics = analyzeAuthoredMarkdownProjection(document || rawText);
+  const projectedKeys = Array.isArray(projectedDiagnostics.projectedSectionKeys)
+    ? projectedDiagnostics.projectedSectionKeys
+    : [];
+  const missing = normalizedExpectedSlotIds.filter((slotId) => !projectedKeys.includes(slotId));
+  const reason = [
+    "design_author_cluster_missing_section_identifiers",
+    `expected=${normalizedExpectedSlotIds.join(",") || "none"}`,
+    `projectedKeys=${projectedKeys.join(",") || "none"}`,
+    `missing=${missing.join(",") || "none"}`,
+  ].join(" ");
+  const error = new Error(reason);
+  error.diagnostics = {
+    ...projectedDiagnostics,
+    expectedSectionKeys: normalizedExpectedSlotIds,
+    missingSectionKeys: missing,
+  };
+  error.rawDocument = rawText;
+  error.document = String(document || "").trim();
+  error.rawDocumentPreview = rawText.slice(0, 1200);
+  return error;
+}
+
 async function authorSingleSection(input = {}, options = {}) {
   const source = input && typeof input === "object" ? input : {};
   const opts = options && typeof options === "object" ? options : {};
@@ -478,7 +671,7 @@ async function authorSingleSection(input = {}, options = {}) {
     model,
     temperature: 0.2,
     timeoutMs: Number(process.env.DESIGN_AUTHOR_TIMEOUT_MS || 180000),
-    maxTokens: Number(process.env.DESIGN_AUTHOR_SECTION_MAX_TOKENS || process.env.DESIGN_AUTHOR_MAX_TOKENS || 50000),
+    maxTokens: resolveDesignAuthorSectionMaxTokens(sectionRequest, { stage: opts.stage }),
     maxAttempts: Number(process.env.DESIGN_AUTHOR_MAX_ATTEMPTS || 1),
     returnMeta: true,
     messages: [
@@ -503,6 +696,12 @@ async function authorSingleSection(input = {}, options = {}) {
     response && typeof response === "object" && !Array.isArray(response) && response.meta && typeof response.meta === "object"
       ? response.meta
       : null;
+  if (String(responseMeta?.finishReason || "").trim() === "length") {
+    const error = buildTruncatedSectionError(sectionRequest, responseMeta);
+    error.rawDocument = rawDocument;
+    error.rawDocumentPreview = rawDocument.slice(0, 1200);
+    throw error;
+  }
   const document = extractMarkdownDocument(rawDocument);
   const normalized = projectAuthoredMarkdownToHtmlPackage(document);
   const projectedSections = Array.isArray(normalized.sections) ? normalized.sections : [];
@@ -526,6 +725,265 @@ async function authorSingleSection(input = {}, options = {}) {
   };
 }
 
+async function authorClusterSections(input = {}, options = {}) {
+  const source = input && typeof input === "object" ? input : {};
+  const opts = options && typeof options === "object" ? options : {};
+  const authorInput = source.authorInput && typeof source.authorInput === "object" ? source.authorInput : {};
+  const sectionRequests = (Array.isArray(source.sectionRequests) ? source.sectionRequests : []).filter(Boolean);
+  const expectedSlotIds = sectionRequests.map((section) => String(section?.slotId || "").trim()).filter(Boolean);
+  const model = resolveDesignStageModel(
+    "designAuthor",
+    opts.model || process.env.DESIGN_AUTHOR_MODEL || resolveOpenRouterModel("BUILDER_MODEL", "OPENROUTER_MODEL")
+  );
+  const response = await callOpenRouterText({
+    model,
+    temperature: 0.2,
+    timeoutMs: Number(process.env.DESIGN_AUTHOR_TIMEOUT_MS || 180000),
+    maxTokens: resolveDesignAuthorClusterMaxTokens(sectionRequests),
+    maxAttempts: Number(process.env.DESIGN_AUTHOR_MAX_ATTEMPTS || 1),
+    returnMeta: true,
+    messages: [
+      { role: "system", content: buildDesignAuthorSystemPrompt() },
+      {
+        role: "user",
+        content: buildClusterAuthorUserPrompt(authorInput, sectionRequests, {
+          sequenceIndex: opts.sequenceIndex,
+          totalSections: opts.totalSections,
+          anchorSectionSlotId: opts.anchorSectionSlotId,
+          upstreamSections: opts.upstreamSections,
+          clusterId: opts.clusterId,
+          goal: opts.goal,
+          rules: opts.rules,
+        }),
+      },
+    ],
+  });
+  const rawDocument =
+    response && typeof response === "object" && !Array.isArray(response)
+      ? String(response.text || "").trim()
+      : String(response || "").trim();
+  const responseMeta =
+    response && typeof response === "object" && !Array.isArray(response) && response.meta && typeof response.meta === "object"
+      ? response.meta
+      : null;
+  if (String(responseMeta?.finishReason || "").trim() === "length") {
+    const error = buildTruncatedClusterError(sectionRequests, responseMeta);
+    error.rawDocument = rawDocument;
+    error.rawDocumentPreview = rawDocument.slice(0, 1200);
+    throw error;
+  }
+  const document = extractMarkdownDocument(rawDocument);
+  const normalized = projectAuthoredMarkdownToHtmlPackage(document);
+  const projectedSections = Array.isArray(normalized.sections) ? normalized.sections : [];
+  const sectionsBySlot = new Map(projectedSections.map((section) => [String(section?.slotId || "").trim(), section]));
+  const matchedSections = expectedSlotIds.map((slotId) => sectionsBySlot.get(slotId)).filter(Boolean);
+  if (matchedSections.length !== expectedSlotIds.length) {
+    const error = buildClusterProjectionError(expectedSlotIds, rawDocument, document);
+    error.responseMeta = responseMeta;
+    throw error;
+  }
+  return {
+    document,
+    package: {
+      pageId: normalized.pageId,
+      viewportProfile: normalized.viewportProfile,
+      targetGroup: normalized.targetGroup,
+      advisory: normalized.advisory,
+      sections: matchedSections,
+    },
+    diagnostics: analyzeAuthoredMarkdownProjection(document),
+    responseMeta,
+  };
+}
+
+async function authorSequenceStep({ authorInput, step, sequencePlan, accumulatedSections, model }) {
+  const sectionRequest =
+    Array.isArray(authorInput.designAuthorPacket?.sections)
+      ? authorInput.designAuthorPacket.sections.find((section) => String(section?.slotId || "").trim() === step.slotId) || null
+      : null;
+  if (!sectionRequest) {
+    throw new Error(`design_author_section_request_missing:${step.slotId}`);
+  }
+  const upstreamSections = summarizeAuthoredSectionsForContext(accumulatedSections);
+  const sectionResult = await authorSingleSection(
+    {
+      authorInput,
+      sectionRequest,
+    },
+    {
+      model,
+      sequenceIndex: step.sequenceIndex,
+      totalSections: sequencePlan.length,
+      stage: step.stage,
+      anchorSectionSlotId: sequencePlan[0]?.slotId || "",
+      upstreamSections,
+    }
+  );
+  const authoredSection = Array.isArray(sectionResult?.package?.sections) ? sectionResult.package.sections[0] : null;
+  if (!authoredSection) {
+    throw buildProjectionError(sectionResult?.document || "", sectionResult?.document || "");
+  }
+  return {
+    authoredSection,
+    sectionSummary: {
+      slotId: step.slotId,
+      stage: step.stage,
+      callType: "section",
+      diagnostics: sectionResult.diagnostics,
+      responseMeta: sectionResult.responseMeta,
+    },
+  };
+}
+
+async function authorClusterStep({ authorInput, group, sequencePlan, accumulatedSections, model }) {
+  const packetSections = Array.isArray(authorInput.designAuthorPacket?.sections)
+    ? authorInput.designAuthorPacket.sections
+    : [];
+  const sectionRequests = (Array.isArray(group?.steps) ? group.steps : [])
+    .map((step) => packetSections.find((section) => String(section?.slotId || "").trim() === step.slotId) || null)
+    .filter(Boolean);
+  if (sectionRequests.length < 2) {
+    throw new Error(`design_author_cluster_request_too_small:${String(group?.clusterId || "cluster").trim()}`);
+  }
+  const upstreamSections = summarizeAuthoredSectionsForContext(accumulatedSections);
+  const clusterResult = await authorClusterSections(
+    {
+      authorInput,
+      sectionRequests,
+    },
+    {
+      model,
+      sequenceIndex: group.firstSequenceIndex,
+      totalSections: sequencePlan.length,
+      anchorSectionSlotId: sequencePlan[0]?.slotId || "",
+      upstreamSections,
+      clusterId: group.clusterId,
+      goal: group.goal,
+      rules: group.rules,
+    }
+  );
+  const authoredSections = Array.isArray(clusterResult?.package?.sections) ? clusterResult.package.sections : [];
+  if (authoredSections.length !== sectionRequests.length) {
+    throw buildClusterProjectionError(sectionRequests.map((section) => section.slotId), clusterResult?.document || "", clusterResult?.document || "");
+  }
+  return {
+    authoredSections,
+    sectionSummaries: authoredSections.map((section) => ({
+      slotId: String(section?.slotId || "").trim(),
+      stage: "support",
+      callType: "cluster",
+      clusterId: String(group?.clusterId || "").trim(),
+      diagnostics: clusterResult.diagnostics,
+      responseMeta: clusterResult.responseMeta,
+    })),
+  };
+}
+
+async function authorSupportStepsConcurrently({ authorInput, supportSteps, sequencePlan, accumulatedSections, model, concurrency }) {
+  const sectionResults = [];
+  const authoredSections = [];
+  for (let index = 0; index < supportSteps.length; index += concurrency) {
+    const batch = supportSteps.slice(index, index + concurrency);
+    const upstreamSnapshot = accumulatedSections.slice();
+    const settled = await Promise.allSettled(
+      batch.map((step) => authorSequenceStep({
+        authorInput,
+        step,
+        sequencePlan,
+        accumulatedSections: upstreamSnapshot,
+        model,
+      }))
+    );
+    const batchAuthoredSections = [];
+    const batchSectionResults = [];
+    settled.forEach((item) => {
+      if (item.status !== "fulfilled" || !item.value) return;
+      batchAuthoredSections.push(item.value.authoredSection);
+      batchSectionResults.push(item.value.sectionSummary);
+    });
+    authoredSections.push(...batchAuthoredSections);
+    sectionResults.push(...batchSectionResults);
+    accumulatedSections.push(...batchAuthoredSections);
+    const rejected = settled.find((item) => item.status === "rejected");
+    if (rejected) {
+      const error = rejected.reason instanceof Error ? rejected.reason : new Error(String(rejected.reason || "design_author_parallel_section_failed"));
+      error.sectionResults = sectionResults.slice();
+      error.partialAuthoredSections = accumulatedSections.slice();
+      throw error;
+    }
+  }
+  return { authoredSections, sectionResults };
+}
+
+async function authorSupportStepsWithClusters({ authorInput, supportSteps, sequencePlan, accumulatedSections, model }) {
+  const sectionResults = [];
+  const authoredSections = [];
+  const maxClusterSections = resolveDesignAuthorClusterMaxSections();
+  const clusterPlan = buildSectionClusterPlan(authorInput, sequencePlan, supportSteps).flatMap((group) => {
+    if (group.type !== "cluster" || group.steps.length <= maxClusterSections) return [group];
+    const chunks = [];
+    for (let index = 0; index < group.steps.length; index += maxClusterSections) {
+      const steps = group.steps.slice(index, index + maxClusterSections);
+      chunks.push({
+        ...group,
+        clusterId: `${group.clusterId}.${chunks.length + 1}`,
+        slotIds: steps.map((step) => step.slotId),
+        steps,
+        firstSequenceIndex: steps[0]?.sequenceIndex || group.firstSequenceIndex,
+      });
+    }
+    return chunks;
+  });
+  let clusterCallCount = 0;
+  let sectionCallCount = 0;
+  let clusterFallbackSectionCount = 0;
+  for (const group of clusterPlan) {
+    if (group.type === "cluster" && group.steps.length >= 2) {
+      try {
+        clusterCallCount += 1;
+        const result = await authorClusterStep({ authorInput, group, sequencePlan, accumulatedSections, model });
+        authoredSections.push(...result.authoredSections);
+        sectionResults.push(...result.sectionSummaries);
+        accumulatedSections.push(...result.authoredSections);
+        continue;
+      } catch (clusterError) {
+        const fallbackSummaries = [];
+        const fallbackSections = [];
+        for (const step of group.steps) {
+          sectionCallCount += 1;
+          clusterFallbackSectionCount += 1;
+          const result = await authorSequenceStep({ authorInput, step, sequencePlan, accumulatedSections, model });
+          fallbackSections.push(result.authoredSection);
+          fallbackSummaries.push({
+            ...result.sectionSummary,
+            clusterFallbackFrom: group.clusterId,
+            clusterError: String(clusterError?.message || clusterError || ""),
+          });
+          accumulatedSections.push(result.authoredSection);
+        }
+        authoredSections.push(...fallbackSections);
+        sectionResults.push(...fallbackSummaries);
+        continue;
+      }
+    }
+    const step = group.steps[0];
+    if (!step) continue;
+    sectionCallCount += 1;
+    const result = await authorSequenceStep({ authorInput, step, sequencePlan, accumulatedSections, model });
+    authoredSections.push(result.authoredSection);
+    sectionResults.push(result.sectionSummary);
+    accumulatedSections.push(result.authoredSection);
+  }
+  return {
+    authoredSections,
+    sectionResults,
+    clusterPlan,
+    clusterCallCount,
+    sectionCallCount,
+    clusterFallbackSectionCount,
+  };
+}
+
 async function buildLlmAuthoredSectionHtmlPackage(input = {}, options = {}) {
   const source = input && typeof input === "object" ? input : {};
   const opts = options && typeof options === "object" ? options : {};
@@ -543,57 +1001,89 @@ async function buildLlmAuthoredSectionHtmlPackage(input = {}, options = {}) {
     }
     const accumulatedSections = [];
     const sectionResults = [];
-    for (const step of sequencePlan) {
-      const sectionRequest =
-        Array.isArray(authorInput.designAuthorPacket?.sections)
-          ? authorInput.designAuthorPacket.sections.find((section) => String(section?.slotId || "").trim() === step.slotId) || null
-          : null;
-      if (!sectionRequest) {
-        throw new Error(`design_author_section_request_missing:${step.slotId}`);
-      }
-      const upstreamSections = summarizeAuthoredSectionsForContext(accumulatedSections);
-      let sectionResult;
+    let modelCallCount = 0;
+    let clusterMeta = null;
+    const leadingSteps = sequencePlan.filter(isLeadingSequenceStep);
+    const supportSteps = sequencePlan.filter((step) => !isLeadingSequenceStep(step));
+    for (const step of leadingSteps) {
       try {
-        sectionResult = await authorSingleSection(
-          {
-            authorInput,
-            sectionRequest,
-          },
-          {
-            model,
-            sequenceIndex: step.sequenceIndex,
-            totalSections: sequencePlan.length,
-            stage: step.stage,
-            anchorSectionSlotId: sequencePlan[0]?.slotId || "",
-            upstreamSections,
-          }
-        );
+        modelCallCount += 1;
+        const result = await authorSequenceStep({ authorInput, step, sequencePlan, accumulatedSections, model });
+        accumulatedSections.push(result.authoredSection);
+        sectionResults.push(result.sectionSummary);
       } catch (error) {
         error.sectionResults = sectionResults.slice();
+        error.partialAuthoredSections = accumulatedSections.slice();
         throw error;
       }
-      const authoredSection = Array.isArray(sectionResult?.package?.sections) ? sectionResult.package.sections[0] : null;
-      if (!authoredSection) {
-        throw buildProjectionError(sectionResult?.document || "", sectionResult?.document || "");
+    }
+    if (supportSteps.length) {
+      const concurrency = resolveDesignAuthorConcurrency(sequencePlan);
+      const clusterEnabled = resolveDesignAuthorBatchingEnabled();
+      const clusterPlan = clusterEnabled ? buildSectionClusterPlan(authorInput, sequencePlan, supportSteps) : [];
+      const hasCluster = clusterPlan.some((group) => group.type === "cluster" && group.steps.length >= 2);
+      if (hasCluster) {
+        let clusterResult;
+        try {
+          clusterResult = await authorSupportStepsWithClusters({
+            authorInput,
+            supportSteps,
+            sequencePlan,
+            accumulatedSections,
+            model,
+          });
+        } catch (error) {
+          error.sectionResults = sectionResults.slice();
+          error.partialAuthoredSections = accumulatedSections.slice();
+          throw error;
+        }
+        modelCallCount += clusterResult.clusterCallCount + clusterResult.sectionCallCount;
+        clusterMeta = {
+          clusterCount: clusterResult.clusterPlan.filter((group) => group.type === "cluster").length,
+          singleCount: clusterResult.clusterPlan.filter((group) => group.type === "single").length,
+          clusterCallCount: clusterResult.clusterCallCount,
+          sectionCallCount: clusterResult.sectionCallCount,
+          clusterFallbackSectionCount: clusterResult.clusterFallbackSectionCount,
+          clusterPlan: clusterResult.clusterPlan.map((group) => ({
+            type: group.type,
+            clusterId: group.clusterId,
+            slotIds: group.slotIds,
+          })),
+        };
+        sectionResults.push(...clusterResult.sectionResults);
+      } else {
+        modelCallCount += supportSteps.length;
+        const concurrentResult = await authorSupportStepsConcurrently({
+          authorInput,
+          supportSteps,
+          sequencePlan,
+          accumulatedSections,
+          model,
+          concurrency,
+        });
+        sectionResults.push(...concurrentResult.sectionResults);
       }
-      accumulatedSections.push(authoredSection);
-      sectionResults.push({
-        slotId: step.slotId,
-        stage: step.stage,
-        diagnostics: sectionResult.diagnostics,
-        responseMeta: sectionResult.responseMeta,
-      });
     }
     const targetGroup = authorInput.authoringRequest?.targetGroup && typeof authorInput.authoringRequest.targetGroup === "object"
       ? authorInput.authoringRequest.targetGroup
       : (authorInput.conceptPackage?.executionBrief?.targetGroup && typeof authorInput.conceptPackage.executionBrief.targetGroup === "object"
         ? authorInput.conceptPackage.executionBrief.targetGroup
         : {});
+    const sectionOrder = new Map(sequencePlan.map((step, index) => [String(step?.slotId || "").trim(), index]));
+    const orderedSections = accumulatedSections.slice().sort((left, right) => {
+      const leftOrder = sectionOrder.has(String(left?.slotId || "").trim())
+        ? sectionOrder.get(String(left?.slotId || "").trim())
+        : Number.MAX_SAFE_INTEGER;
+      const rightOrder = sectionOrder.has(String(right?.slotId || "").trim())
+        ? sectionOrder.get(String(right?.slotId || "").trim())
+        : Number.MAX_SAFE_INTEGER;
+      return leftOrder - rightOrder;
+    });
     const document = buildAuthoredSectionMarkdownDocument({
       pageId: authorInput.designAuthorPacket?.page?.pageId || source.pageId || "",
       viewportProfile: authorInput.designAuthorPacket?.page?.viewportProfile || source.viewportProfile || "pc",
       targetGroup,
-      sections: accumulatedSections,
+      sections: orderedSections,
     });
     const normalized = projectAuthoredMarkdownToHtmlPackage(document);
     return {
@@ -603,6 +1093,12 @@ async function buildLlmAuthoredSectionHtmlPackage(input = {}, options = {}) {
         provider: "openrouter",
         model,
         usedDemoFallback: false,
+        authorExecutionMode: clusterMeta
+          ? "anchor-then-cluster-support"
+          : sequencePlan.length > 2 ? "anchor-then-parallel-support" : "sequential",
+        concurrency: resolveDesignAuthorConcurrency(sequencePlan),
+        modelCallCount,
+        clusterMeta,
         sectionResults,
       },
     };
@@ -611,13 +1107,16 @@ async function buildLlmAuthoredSectionHtmlPackage(input = {}, options = {}) {
       error.sectionResults = null;
     }
     const fallbackPackage = fallback();
+    const partialSections = Array.isArray(error?.partialAuthoredSections) ? error.partialAuthoredSections : [];
+    const mergedPackage = partialSections.length ? mergePartialAuthoredSections(fallbackPackage, partialSections) : fallbackPackage;
     return {
-      package: fallbackPackage,
-      document: buildAuthoredSectionMarkdownDocument(fallbackPackage),
+      package: mergedPackage,
+      document: buildAuthoredSectionMarkdownDocument(mergedPackage),
       providerMeta: {
         provider: "local-fallback",
         model,
         usedDemoFallback: true,
+        partialAuthoredSectionCount: partialSections.length,
         error: String(error?.message || error || ""),
         diagnostics: error?.diagnostics && typeof error.diagnostics === "object" ? error.diagnostics : null,
         sectionResults: Array.isArray(error?.sectionResults) ? error.sectionResults : null,
@@ -636,4 +1135,5 @@ module.exports = {
   buildDesignAuthorSystemPrompt,
   buildDesignAuthorUserPrompt,
   buildLlmAuthoredSectionHtmlPackage,
+  resolveDesignAuthorBatchingEnabled,
 };

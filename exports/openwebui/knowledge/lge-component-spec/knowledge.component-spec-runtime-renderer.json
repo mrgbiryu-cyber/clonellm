@@ -1,0 +1,28 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.component-spec-runtime-renderer",
+  "collection": "lge-component-spec",
+  "truthLevel": "policy",
+  "freshness": "current",
+  "sourcePath": "data/normalized/openwebui-knowledge-seed-v1.json",
+  "sourceHash": "sha256:797a77597bfe704dae202ebd041b8ca4859b6c929201c52601903d7962383c45",
+  "generatedAt": "2026-04-30T00:11:42.398Z",
+  "title": "Runtime Renderer and Component Spec",
+  "summary": "Component and renderer boundaries for authored sections, Tailwind runtime, and final render projections.",
+  "markdown": "# Runtime Renderer and Component Spec\n\nSources: `docs/admin-runtime-renderer-contract-2026-04-21.md`, `docs/admin-component-rebuild-schema-families-2026-04-17.md`\n\nThe builder/runtime handoff should treat authored section packages as the source for renderable changes and preserve canonical slot/component identity. Component families define expected layout blocks, required fields, and asset needs. Runtime delivery should project the authored result into the page shell without inventing new planning meaning.\n\nImportant component signals:\n\n- `home.hero` is governed by hero/stage composition rules and background asset policy.\n- `home.quickmenu` is governed by icon-family consistency and compact shortcut rules.\n- Section family contracts and component rebuild schema catalogs are policy inputs, not optional style notes.",
+  "metadata": {
+    "tags": [
+      "#component",
+      "#renderer",
+      "#builder-contract",
+      "#home.hero",
+      "#home.quickmenu"
+    ],
+    "sourceDocumentPaths": [
+      "docs/admin-runtime-renderer-contract-2026-04-21.md",
+      "docs/admin-component-rebuild-schema-families-2026-04-17.md",
+      "data/normalized/component-rebuild-schema-catalog.json"
+    ],
+    "seedVersion": "openwebui-knowledge-seed-v1"
+  }
+}

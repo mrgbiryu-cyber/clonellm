@@ -1,27 +1,27 @@
 {
   "projectionVersion": "openwebui-source-inventory-v1",
-  "generatedAt": "2026-04-29T04:31:22.139Z",
+  "generatedAt": "2026-04-30T00:11:37.145Z",
   "sourceRoot": "data/normalized",
   "outputPath": "data/normalized/openwebui-source-inventory.json",
   "summary": {
-    "totalSources": 80,
-    "parsedSources": 80,
+    "totalSources": 81,
+    "parsedSources": 81,
     "parseErrors": 0,
     "dryRunTargetsPresent": 5,
     "dryRunTargetsExpected": 5,
     "byTruthLevel": {
       "historical": 37,
-      "candidate": 27,
+      "candidate": 28,
       "policy": 10,
       "runtime-truth": 6
     },
     "byImportPolicy": {
       "knowledge": 37,
-      "candidate": 27,
+      "candidate": 28,
       "project": 16
     },
     "byProjection": {
-      "knowledge": 80,
+      "knowledge": 81,
       "ontology": 25,
       "builder-contract": 8
     }
@@ -89,7 +89,7 @@
       "exists": true,
       "sourceHash": "sha256:a646fd828ec4890d73a2e5b2b5b22810fbb12ba31ce97c90b0c82afc4b341e6d",
       "byteSize": 2452,
-      "modifiedAt": "2026-04-29T03:55:03.923Z",
+      "modifiedAt": "2026-04-24T09:24:56.104Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -152,7 +152,7 @@
       "exists": true,
       "sourceHash": "sha256:844f235837664a2528990d97be612c3b25ca2be21129e7cfc73d36e0d037b224",
       "byteSize": 459,
-      "modifiedAt": "2026-04-29T03:55:03.929Z",
+      "modifiedAt": "2026-04-24T09:24:56.105Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -177,7 +177,7 @@
       "exists": true,
       "sourceHash": "sha256:7d7194f487296a7331bc4f49f954e017a75b38dd516be29de0c938ffa61b1446",
       "byteSize": 8066,
-      "modifiedAt": "2026-04-29T03:55:03.934Z",
+      "modifiedAt": "2026-04-24T09:19:34.676Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -240,7 +240,7 @@
       "exists": true,
       "sourceHash": "sha256:468cfd636288f7b41fa4f8d0216dc35a0819d3857699dedf74747b54972c9387",
       "byteSize": 738,
-      "modifiedAt": "2026-04-29T03:55:03.939Z",
+      "modifiedAt": "2026-04-24T09:19:34.677Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -265,7 +265,7 @@
       "exists": true,
       "sourceHash": "sha256:f1c2dc04d4827bc6f32d52307d584e6c12c7b0bfabd5072e9e0e5ca5f1cb4b0d",
       "byteSize": 8066,
-      "modifiedAt": "2026-04-29T03:55:03.943Z",
+      "modifiedAt": "2026-04-24T09:08:46.035Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -328,7 +328,7 @@
       "exists": true,
       "sourceHash": "sha256:d03f31bac4d84c764951d8c68a04122a70ee797c9ac38bad81fbb186c83bd229",
       "byteSize": 738,
-      "modifiedAt": "2026-04-29T03:55:03.947Z",
+      "modifiedAt": "2026-04-24T09:08:46.035Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -353,7 +353,7 @@
       "exists": true,
       "sourceHash": "sha256:33ac0ad11ac9fb96c228054dd447f994836354fbdd80a8bdab46e832d21f0d2a",
       "byteSize": 1301,
-      "modifiedAt": "2026-04-29T03:55:03.953Z",
+      "modifiedAt": "2026-04-24T09:23:37.918Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -416,7 +416,7 @@
       "exists": true,
       "sourceHash": "sha256:74dc82ea34312746dca354027e569f40e5c4640ebc97b0df87d4750ee29475db",
       "byteSize": 408,
-      "modifiedAt": "2026-04-29T03:55:03.958Z",
+      "modifiedAt": "2026-04-24T09:23:37.919Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -441,7 +441,7 @@
       "exists": true,
       "sourceHash": "sha256:0f6acbc49014b157704a440df938a5e53f3268a4fab2ba62f557d4c5afe998dc",
       "byteSize": 5545,
-      "modifiedAt": "2026-04-29T03:55:03.963Z",
+      "modifiedAt": "2026-04-24T09:17:15.616Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -504,7 +504,7 @@
       "exists": true,
       "sourceHash": "sha256:fd7f61fa0286454d1476b35d10e9b2586559c10238d755124824b0c9b1e797e6",
       "byteSize": 560,
-      "modifiedAt": "2026-04-29T03:55:03.967Z",
+      "modifiedAt": "2026-04-24T09:17:15.616Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -529,7 +529,7 @@
       "exists": true,
       "sourceHash": "sha256:a15ada810aacf1f6417448a6c7802c171b839872901fd2e27bcf2442a380440e",
       "byteSize": 5545,
-      "modifiedAt": "2026-04-29T03:55:03.971Z",
+      "modifiedAt": "2026-04-24T09:07:31.329Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -592,7 +592,7 @@
       "exists": true,
       "sourceHash": "sha256:0834165feb941729a7d16358f4ae552995a0e11be736fda555d0a9f64a2c5c4f",
       "byteSize": 560,
-      "modifiedAt": "2026-04-29T03:55:03.976Z",
+      "modifiedAt": "2026-04-24T09:07:31.329Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -617,7 +617,7 @@
       "exists": true,
       "sourceHash": "sha256:36f4183d5c49e3ea35f490172e35f8ff349ebf9e9fffcd15f448b28eb32e46ba",
       "byteSize": 36380,
-      "modifiedAt": "2026-04-29T03:55:03.981Z",
+      "modifiedAt": "2026-04-24T09:27:26.855Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -689,7 +689,7 @@
       "exists": true,
       "sourceHash": "sha256:cb1cec4d86baf2b3387b04448e8f3ff84143bf101739768d743c783f952d2868",
       "byteSize": 3201,
-      "modifiedAt": "2026-04-29T03:55:03.985Z",
+      "modifiedAt": "2026-04-24T09:27:26.856Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -714,7 +714,7 @@
       "exists": true,
       "sourceHash": "sha256:dfb63b29a8b661feb07118ba3405b6cb1e79850fec59d2bac8878dae3ed094ce",
       "byteSize": 5761,
-      "modifiedAt": "2026-04-29T03:55:03.990Z",
+      "modifiedAt": "2026-04-24T09:26:36.927Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -777,7 +777,7 @@
       "exists": true,
       "sourceHash": "sha256:9178c20cf8d0de19c4be271eb67b1d1204b9e9722e5c323b99a33ee0bb597045",
       "byteSize": 520,
-      "modifiedAt": "2026-04-29T03:55:03.994Z",
+      "modifiedAt": "2026-04-24T09:26:36.927Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -802,7 +802,7 @@
       "exists": true,
       "sourceHash": "sha256:8e790e0fc41ac0773f59e82de18e0a05959e9dc7bb8d569566de414236db0939",
       "byteSize": 33026,
-      "modifiedAt": "2026-04-29T03:55:04.001Z",
+      "modifiedAt": "2026-04-24T09:20:20.657Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -865,7 +865,7 @@
       "exists": true,
       "sourceHash": "sha256:ddaf905bd7aa190d007da79a82e19aa512716f41fdf20ee329df6d403f10e134",
       "byteSize": 1839,
-      "modifiedAt": "2026-04-29T03:55:04.005Z",
+      "modifiedAt": "2026-04-24T09:20:20.658Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -890,7 +890,7 @@
       "exists": true,
       "sourceHash": "sha256:e63151789b681854b7639c5809a6948146b4be62a4127245f0ec69312d131b24",
       "byteSize": 37776,
-      "modifiedAt": "2026-04-29T03:55:04.010Z",
+      "modifiedAt": "2026-04-24T09:14:12.750Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -953,7 +953,7 @@
       "exists": true,
       "sourceHash": "sha256:7ff695ce0530cdf32939dcb1aef31c10d7856966d6dd81d7f842edb07d3cba43",
       "byteSize": 2093,
-      "modifiedAt": "2026-04-29T03:55:04.016Z",
+      "modifiedAt": "2026-04-24T09:14:12.750Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -978,7 +978,7 @@
       "exists": true,
       "sourceHash": "sha256:82877e7efdacb2e853fa64671a2762d77eec956c0e2d1801af5f2521a11bbb71",
       "byteSize": 1319,
-      "modifiedAt": "2026-04-29T03:55:04.020Z",
+      "modifiedAt": "2026-04-27T01:03:58.105Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1042,7 +1042,7 @@
       "exists": true,
       "sourceHash": "sha256:57319674f75ef394113d18ca5ec4ac7c982410723a9c782600d375ac48304657",
       "byteSize": 401,
-      "modifiedAt": "2026-04-29T03:55:04.025Z",
+      "modifiedAt": "2026-04-27T01:03:58.106Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -1068,7 +1068,7 @@
       "exists": true,
       "sourceHash": "sha256:a3bdff740af5ea1e24958bb9c30e809df809b657416d797059e71fbeef9b4701",
       "byteSize": 35433,
-      "modifiedAt": "2026-04-29T03:55:04.029Z",
+      "modifiedAt": "2026-04-24T09:04:05.229Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1131,7 +1131,7 @@
       "exists": true,
       "sourceHash": "sha256:82276822bd9026fb597a8d7afc68546db854c6340a762a105f03fdab54eccc49",
       "byteSize": 3999,
-      "modifiedAt": "2026-04-29T03:55:04.034Z",
+      "modifiedAt": "2026-04-24T09:04:05.229Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -1156,7 +1156,7 @@
       "exists": true,
       "sourceHash": "sha256:b8b3b92c267654d4955fc61e00668d4099b45ddd2d1c9d7cd92a53493c76339c",
       "byteSize": 7288,
-      "modifiedAt": "2026-04-29T03:55:04.039Z",
+      "modifiedAt": "2026-04-24T09:28:40.153Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1209,7 +1209,7 @@
       "exists": true,
       "sourceHash": "sha256:20cf1748018a0ad146e2dda05d123a2e4ccb40b23b46bfa5fb150c83c21a2908",
       "byteSize": 2178,
-      "modifiedAt": "2026-04-29T03:55:04.046Z",
+      "modifiedAt": "2026-04-24T09:28:40.153Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -1233,7 +1233,7 @@
       "exists": true,
       "sourceHash": "sha256:4cd17ce6797cd36dbbe1952a4ad4984252a2e69de7990ea145623bfc64785531",
       "byteSize": 5142,
-      "modifiedAt": "2026-04-29T03:55:04.051Z",
+      "modifiedAt": "2026-04-16T13:29:57.739Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1281,7 +1281,7 @@
       "exists": true,
       "sourceHash": "sha256:87b2c1c2b1ba5c27611a87dc55b4557141e06c4d71b5be26f65f2ce21c93b4f4",
       "byteSize": 934,
-      "modifiedAt": "2026-04-29T03:55:04.056Z",
+      "modifiedAt": "2026-04-16T13:29:57.740Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -1305,7 +1305,7 @@
       "exists": true,
       "sourceHash": "sha256:5fd691aae79b540ecb6bda69122bb23976ef518d2ad7f74b34b0e271b0f3c9a0",
       "byteSize": 109313,
-      "modifiedAt": "2026-04-29T03:55:04.063Z",
+      "modifiedAt": "2026-04-27T04:28:54.262Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1390,7 +1390,7 @@
       "exists": true,
       "sourceHash": "sha256:cdc010cca365a8a029aea1be2211b89d678b291e47b48e46c04efa3048ce5e94",
       "byteSize": 1933,
-      "modifiedAt": "2026-04-29T03:55:04.067Z",
+      "modifiedAt": "2026-04-27T04:28:54.263Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -1419,7 +1419,7 @@
       "exists": true,
       "sourceHash": "sha256:1b5291b77cf13d2a3db5daad784dc47acb10a3129db75e8377c7eed192912279",
       "byteSize": 3042,
-      "modifiedAt": "2026-04-29T03:55:04.072Z",
+      "modifiedAt": "2026-04-27T03:54:40.053Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1468,7 +1468,7 @@
       "exists": true,
       "sourceHash": "sha256:91bf8e4cff0437d13948af62783830e1d3f911886d7bed94d6d8fdc726a78129",
       "byteSize": 28804,
-      "modifiedAt": "2026-04-29T03:55:04.077Z",
+      "modifiedAt": "2026-04-27T00:56:26.889Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1530,7 +1530,7 @@
       "exists": true,
       "sourceHash": "sha256:6cbe3e74db449f5046d2fba259601139cce95462a94269cf26ea4001504bad09",
       "byteSize": 8455,
-      "modifiedAt": "2026-04-29T03:55:04.081Z",
+      "modifiedAt": "2026-04-27T00:56:26.891Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -1557,7 +1557,7 @@
       "exists": true,
       "sourceHash": "sha256:595fede5e24d9d200c52c666c82e587dbd8e9733b26abfc8e6de328f877080af",
       "byteSize": 35904,
-      "modifiedAt": "2026-04-29T03:55:04.088Z",
+      "modifiedAt": "2026-04-24T07:28:04.319Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1716,7 +1716,7 @@
       "exists": true,
       "sourceHash": "sha256:14f89e0ff0ee94db097232b55d88c93ba5ff78ec958f1d9f507bd5bbc40eed92",
       "byteSize": 3472,
-      "modifiedAt": "2026-04-29T03:55:04.094Z",
+      "modifiedAt": "2026-04-22T16:37:23.991Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1761,7 +1761,7 @@
       "exists": true,
       "sourceHash": "sha256:cade51fd81b93664d36156e5c3c48086d0a37ae05c04da33fd852736225e4ada",
       "byteSize": 300,
-      "modifiedAt": "2026-04-29T03:55:04.099Z",
+      "modifiedAt": "2026-04-12T01:19:53.053Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "array",
@@ -1792,7 +1792,7 @@
       "exists": true,
       "sourceHash": "sha256:6357414a62e133d7c5b5d99f17f0ff36e471aaf2dee0823629062c19bbba022b",
       "byteSize": 8212,
-      "modifiedAt": "2026-04-29T03:55:04.104Z",
+      "modifiedAt": "2026-04-17T04:46:19.987Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1846,7 +1846,7 @@
       "exists": true,
       "sourceHash": "sha256:1cda2229f5a0d4c7f5e6b90edd59bfd2962ea6cea6268c00bf704c9d74b2a27c",
       "byteSize": 7622,
-      "modifiedAt": "2026-04-29T03:55:04.109Z",
+      "modifiedAt": "2026-04-24T07:09:35.147Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1904,7 +1904,7 @@
       "exists": true,
       "sourceHash": "sha256:ff5b6c6b322245404c6d83f66ca755131ff1ddd71af24e96e35b082b87b23848",
       "byteSize": 17374,
-      "modifiedAt": "2026-04-29T03:55:04.114Z",
+      "modifiedAt": "2026-04-24T07:20:20.955Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -1962,7 +1962,7 @@
       "exists": true,
       "sourceHash": "sha256:2d74fd00f885b6a1ca8b4e4ef25f163d6e8d6308aee7a3663b64b16dee7c696d",
       "byteSize": 10042,
-      "modifiedAt": "2026-04-29T03:55:04.119Z",
+      "modifiedAt": "2026-04-15T08:58:12.434Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2005,7 +2005,7 @@
       "exists": true,
       "sourceHash": "sha256:aceef0baa894ad8062006a3c5fde27115d400e9386cfd569cb10f7e6875aac57",
       "byteSize": 4653,
-      "modifiedAt": "2026-04-29T03:55:04.124Z",
+      "modifiedAt": "2026-04-17T08:46:23.868Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2048,7 +2048,7 @@
       "exists": true,
       "sourceHash": "sha256:ad183c5e746a63ca7f72709628362831cf80269f3427b87afeb597aefe37bd11",
       "byteSize": 2060,
-      "modifiedAt": "2026-04-29T03:55:04.128Z",
+      "modifiedAt": "2026-04-12T01:19:53.053Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2091,7 +2091,7 @@
       "exists": true,
       "sourceHash": "sha256:a8f8221537c2dbc8b25596fb00ec9299a88ac556df73cba244d9e4a3e2e33c53",
       "byteSize": 18236,
-      "modifiedAt": "2026-04-29T03:55:04.135Z",
+      "modifiedAt": "2026-04-24T07:42:41.372Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2189,7 +2189,7 @@
       "exists": true,
       "sourceHash": "sha256:7226ffdf98c73224f21570d0304b6717c0496539f6539b34f679d935f9f43e3c",
       "byteSize": 5559,
-      "modifiedAt": "2026-04-29T03:55:04.141Z",
+      "modifiedAt": "2026-04-24T07:35:26.579Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2247,7 +2247,7 @@
       "exists": true,
       "sourceHash": "sha256:9658ee506b9d596f40ea7e6f7383cc8f085eefa2996c04846a7b6e41b275573d",
       "byteSize": 25461,
-      "modifiedAt": "2026-04-29T03:55:04.147Z",
+      "modifiedAt": "2026-04-20T01:37:17.743Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2299,7 +2299,7 @@
       "exists": true,
       "sourceHash": "sha256:c389c814998de7fe0cb046f697c1b9de04c1e5d27482db1713a28a1b37d83bbf",
       "byteSize": 67521,
-      "modifiedAt": "2026-04-29T03:55:04.153Z",
+      "modifiedAt": "2026-04-24T07:28:04.320Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2354,7 +2354,7 @@
       "exists": true,
       "sourceHash": "sha256:f170c1cd5184af0f3f32363cfe59de2378d0b79eddec45904dff9e01d4a03a27",
       "byteSize": 2113,
-      "modifiedAt": "2026-04-29T03:55:04.157Z",
+      "modifiedAt": "2026-04-22T15:57:21.748Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2432,7 +2432,7 @@
       "exists": true,
       "sourceHash": "sha256:f971717261ec161c80b014d52c4eef410c7b08a47ab68e75f69fb5bc56fa8400",
       "byteSize": 17291,
-      "modifiedAt": "2026-04-29T03:55:04.162Z",
+      "modifiedAt": "2026-04-21T00:17:04.832Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2496,7 +2496,7 @@
       "exists": true,
       "sourceHash": "sha256:77e4a73550b0426703df618feb5314e3f1287481c001855b1f4deccfbb4de0ce",
       "byteSize": 42844,
-      "modifiedAt": "2026-04-29T03:55:04.167Z",
+      "modifiedAt": "2026-04-27T03:53:58.270Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2558,7 +2558,7 @@
       "exists": true,
       "sourceHash": "sha256:f73230b972ed2ff0474fb06af523117a9683a09471eec8d7f16d3cde74ba470a",
       "byteSize": 936295,
-      "modifiedAt": "2026-04-29T03:55:04.187Z",
+      "modifiedAt": "2026-04-24T08:23:10.591Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2652,7 +2652,7 @@
       "exists": true,
       "sourceHash": "sha256:2f8d74da4a4bfc6408f063c279eb33d9c6f73ced66ecaf98d7f99da973e2c70a",
       "byteSize": 19944,
-      "modifiedAt": "2026-04-29T03:55:04.192Z",
+      "modifiedAt": "2026-04-24T07:28:04.321Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2725,7 +2725,7 @@
       "exists": true,
       "sourceHash": "sha256:477cbfe18c5ccee898b55402ced75a520a4eb98c4ab7ed841c2a7baab3d281cf",
       "byteSize": 13718,
-      "modifiedAt": "2026-04-29T03:55:04.201Z",
+      "modifiedAt": "2026-04-12T01:19:53.053Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2793,7 +2793,7 @@
       "exists": true,
       "sourceHash": "sha256:ead8ee48d2d5f89dbec3c167f6acfac6eef02658704cf179b3713520e0cba1f6",
       "byteSize": 3295,
-      "modifiedAt": "2026-04-29T03:55:04.205Z",
+      "modifiedAt": "2026-04-27T05:43:23.332Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2831,7 +2831,7 @@
       "exists": true,
       "sourceHash": "sha256:4bc93d4c9212d0357b63cec9d41f5c4a6e56ca93d59ab1f231198c3b51513fa2",
       "byteSize": 22634,
-      "modifiedAt": "2026-04-29T03:55:04.210Z",
+      "modifiedAt": "2026-04-24T05:51:10.786Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -2911,7 +2911,7 @@
       "exists": true,
       "sourceHash": "sha256:ce1e8ac8691b7e83cb7d9126cb6f875b6b2b5935f35eb952ac0565559ef84901",
       "byteSize": 143071,
-      "modifiedAt": "2026-04-29T03:55:04.217Z",
+      "modifiedAt": "2026-04-24T05:51:21.920Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3016,7 +3016,7 @@
       "exists": true,
       "sourceHash": "sha256:32f85786d69bc693666e15193bb968cab8862d636c676f636cf7b4b76a57140f",
       "byteSize": 421177,
-      "modifiedAt": "2026-04-29T03:55:04.227Z",
+      "modifiedAt": "2026-04-24T05:47:57.272Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3124,7 +3124,7 @@
       "exists": true,
       "sourceHash": "sha256:613c3a452791c5c20a1767c8fd8320965af1916d1b67f98375ee9cd67ab7b996",
       "byteSize": 81277,
-      "modifiedAt": "2026-04-29T03:55:04.233Z",
+      "modifiedAt": "2026-04-24T06:15:24.215Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3237,7 +3237,7 @@
       "exists": true,
       "sourceHash": "sha256:fd7d036a50c2a414d119e05899bdf59ae4185ea5e9c66d0e239314d3cee62e6f",
       "byteSize": 4973,
-      "modifiedAt": "2026-04-29T03:55:04.242Z",
+      "modifiedAt": "2026-04-24T06:15:26.002Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3307,11 +3307,68 @@
       "dryRunTarget": false
     },
     {
+      "sourcePath": "data/normalized/openwebui-knowledge-seed-v1.json",
+      "exists": true,
+      "sourceHash": "sha256:797a77597bfe704dae202ebd041b8ca4859b6c929201c52601903d7962383c45",
+      "byteSize": 11511,
+      "modifiedAt": "2026-04-30T00:11:11.922Z",
+      "fileType": "json",
+      "schemaFingerprint": {
+        "rootKind": "object",
+        "topLevelKeys": [
+          "seedVersion",
+          "generatedFor",
+          "collections",
+          "documents"
+        ],
+        "arrayFields": [
+          "collections",
+          "documents"
+        ],
+        "objectFields": [],
+        "primitiveFields": [
+          "seedVersion",
+          "generatedFor"
+        ],
+        "nestedKeySample": {
+          "seedVersion": {
+            "kind": "string"
+          },
+          "generatedFor": {
+            "kind": "string"
+          },
+          "collections": {
+            "kind": "array",
+            "length": 5,
+            "itemKinds": [
+              "string"
+            ]
+          },
+          "documents": {
+            "kind": "array",
+            "length": 9,
+            "itemKinds": [
+              "object"
+            ]
+          }
+        }
+      },
+      "parseStatus": "parsed",
+      "owner": "clonellm",
+      "importPolicy": "candidate",
+      "truthLevel": "candidate",
+      "freshnessPolicy": "required",
+      "targetProjections": [
+        "knowledge"
+      ],
+      "dryRunTarget": false
+    },
+    {
       "sourcePath": "data/normalized/openwebui-projection-schema-v1.json",
       "exists": true,
       "sourceHash": "sha256:ee876153adbb7354b5f94c60033c43073eebf19882b17f59bffe21cee7771ebe",
       "byteSize": 24952,
-      "modifiedAt": "2026-04-29T04:10:26.592Z",
+      "modifiedAt": "2026-04-29T08:17:39.780Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3400,7 +3457,7 @@
       "exists": true,
       "sourceHash": "sha256:ab42ddefbf776e513242cb8f4cd6f008d6fbfd2fcfcff6c8625b63cc59bfadd5",
       "byteSize": 29037,
-      "modifiedAt": "2026-04-29T03:55:04.247Z",
+      "modifiedAt": "2026-04-21T00:16:47.054Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3460,7 +3517,7 @@
       "exists": true,
       "sourceHash": "sha256:c680c848e3ea0cab196248443135a2eaeac26df0ca66672ad624f39cac60eb0d",
       "byteSize": 34733,
-      "modifiedAt": "2026-04-29T03:55:04.251Z",
+      "modifiedAt": "2026-04-27T04:29:26.490Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3542,7 +3599,7 @@
       "exists": true,
       "sourceHash": "sha256:dc3ea942321df57171d995f5dcb90671487a8aef02860eb5f48370694231bb98",
       "byteSize": 4771,
-      "modifiedAt": "2026-04-29T03:55:04.256Z",
+      "modifiedAt": "2026-04-27T04:29:26.491Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -3569,7 +3626,7 @@
       "exists": true,
       "sourceHash": "sha256:17b8b5af941001ab415b3388f4bc0930ee38f6a63295f02658d2afa0339c4fbd",
       "byteSize": 76736,
-      "modifiedAt": "2026-04-29T03:55:04.268Z",
+      "modifiedAt": "2026-04-12T01:19:53.054Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3624,7 +3681,7 @@
       "exists": true,
       "sourceHash": "sha256:0e0f1842bf425b9bba443e4a0d46094bdf70545273e7ec92a44390cefce27d39",
       "byteSize": 20999,
-      "modifiedAt": "2026-04-29T03:55:04.279Z",
+      "modifiedAt": "2026-04-12T01:19:53.054Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3679,7 +3736,7 @@
       "exists": true,
       "sourceHash": "sha256:9d0c77aade12fdd321bc846b52f1006f98543378fab2007e7fb3355f17accc18",
       "byteSize": 7446,
-      "modifiedAt": "2026-04-29T03:55:04.284Z",
+      "modifiedAt": "2026-04-19T14:39:46.978Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3753,7 +3810,7 @@
       "exists": true,
       "sourceHash": "sha256:a28f8f6a495d0c5d78c5f61c2205a3bd17c785441f48874cf9724b8e5f40f172",
       "byteSize": 28788,
-      "modifiedAt": "2026-04-29T03:55:04.288Z",
+      "modifiedAt": "2026-04-16T13:53:22.344Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3811,7 +3868,7 @@
       "exists": true,
       "sourceHash": "sha256:b31430937f086c79157b423eeff58766e08830628abc70ea56312205a510f930",
       "byteSize": 1393,
-      "modifiedAt": "2026-04-29T03:55:04.294Z",
+      "modifiedAt": "2026-04-16T13:53:22.345Z",
       "fileType": "md",
       "schemaFingerprint": {
         "rootKind": "text",
@@ -3838,7 +3895,7 @@
       "exists": true,
       "sourceHash": "sha256:63a66f328b7c64a3e5e9408fae9385c6153fa49ee62eb872fbca8069dc3d6320",
       "byteSize": 15044,
-      "modifiedAt": "2026-04-29T03:55:04.303Z",
+      "modifiedAt": "2026-04-12T01:19:53.054Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -3905,7 +3962,7 @@
       "exists": true,
       "sourceHash": "sha256:a3e6461ff552ba79d822c3de3bb4e5cecd2d8af29e0b92242e072a7384fa3602",
       "byteSize": 34420,
-      "modifiedAt": "2026-04-29T03:55:04.314Z",
+      "modifiedAt": "2026-04-12T01:19:53.054Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4008,7 +4065,7 @@
       "exists": true,
       "sourceHash": "sha256:0ba727ec1b6d4b148a83f29dba9255e4d37650cb991c6ac1f4779c992aaae6fe",
       "byteSize": 81204,
-      "modifiedAt": "2026-04-29T03:55:04.325Z",
+      "modifiedAt": "2026-04-12T01:19:53.055Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4113,7 +4170,7 @@
       "exists": true,
       "sourceHash": "sha256:be0b3f5155646c20fd08872e3d41695d83d36191646c99a9d0cbdd2c58fd1a39",
       "byteSize": 75405,
-      "modifiedAt": "2026-04-29T03:55:04.332Z",
+      "modifiedAt": "2026-04-12T01:19:53.055Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4218,7 +4275,7 @@
       "exists": true,
       "sourceHash": "sha256:9c5bf11a1ac34b7647ca34baa7c0575d203e672c91c11da28ce5a319bbfe97b9",
       "byteSize": 75701,
-      "modifiedAt": "2026-04-29T03:55:04.338Z",
+      "modifiedAt": "2026-04-12T01:19:53.055Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4323,7 +4380,7 @@
       "exists": true,
       "sourceHash": "sha256:89ba4618e37d4c8feb84fbce173a988a5b606690ab0658c40cea8a8337d9b015",
       "byteSize": 1511,
-      "modifiedAt": "2026-04-29T04:31:02.849Z",
+      "modifiedAt": "2026-04-29T08:17:39.782Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4409,7 +4466,7 @@
       "exists": true,
       "sourceHash": "sha256:96573ee597c17b194edb2deed80fc2dc42bbed52b5f460fafadca48a4f933b29",
       "byteSize": 18554,
-      "modifiedAt": "2026-04-29T03:55:04.343Z",
+      "modifiedAt": "2026-04-21T00:16:13.143Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4488,7 +4545,7 @@
       "exists": true,
       "sourceHash": "sha256:b6a30566520d2ebcd5d45bdb8bc497d6411a1e005951e17506d278cc25dbb509",
       "byteSize": 37288,
-      "modifiedAt": "2026-04-29T03:55:04.354Z",
+      "modifiedAt": "2026-04-15T11:00:39.830Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4543,7 +4600,7 @@
       "exists": true,
       "sourceHash": "sha256:1fe2f45a9627ac7cab7b7965ebf953b6539f8be432243d40b8c62998d75fabb6",
       "byteSize": 11993,
-      "modifiedAt": "2026-04-29T03:55:04.359Z",
+      "modifiedAt": "2026-04-12T01:19:53.055Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4637,7 +4694,7 @@
       "exists": true,
       "sourceHash": "sha256:ea746ce31d5e1560dbd36c1b1951b57bc325f23607ea264bf8ebdc8e6a3b2736",
       "byteSize": 122815,
-      "modifiedAt": "2026-04-29T03:55:04.371Z",
+      "modifiedAt": "2026-04-13T16:04:30.435Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4734,7 +4791,7 @@
       "exists": true,
       "sourceHash": "sha256:ffc9e60730fff307a5e2db9b793111c3e8be22edc0aad21e4a815fecc9f754e2",
       "byteSize": 9759,
-      "modifiedAt": "2026-04-29T03:55:04.375Z",
+      "modifiedAt": "2026-04-21T00:17:20.085Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4782,7 +4839,7 @@
       "exists": true,
       "sourceHash": "sha256:d788e968d20705f14a2d8c7a83039a75e622e1613066273eb4f79ff5efc11302",
       "byteSize": 6756,
-      "modifiedAt": "2026-04-29T03:55:04.379Z",
+      "modifiedAt": "2026-04-20T14:26:26.091Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",
@@ -4840,7 +4897,7 @@
       "exists": true,
       "sourceHash": "sha256:14aed42707cd37392282806b4beb3b61c6ce349ea5327fc69e8823cc56e4834a",
       "byteSize": 17890,
-      "modifiedAt": "2026-04-29T03:55:04.391Z",
+      "modifiedAt": "2026-04-12T01:19:53.056Z",
       "fileType": "json",
       "schemaFingerprint": {
         "rootKind": "object",

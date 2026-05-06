@@ -120,6 +120,21 @@ async function apiFetch(token, pathname, payload = null, method = "GET") {
   throw lastError || new Error("fetch_failed");
 }
 
+async function pollWorkspaceBuildLocalDraftJob(token, pollUrl, { timeoutMs = 1_200_000 } = {}) {
+  const normalizedPollUrl = String(pollUrl || "").trim();
+  if (!normalizedPollUrl) throw new Error("workspace_build_local_draft_poll_url_missing");
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const job = await apiFetch(token, normalizedPollUrl, null, "GET");
+    if (job.json?.status === "done" || job.json?.status === "failed") {
+      return { ...job, ok: job.ok && job.json?.status === "done" };
+    }
+    const elapsedMs = Date.now() - startedAt;
+    await sleep(elapsedMs < 15_000 ? 2_000 : elapsedMs < 60_000 ? 5_000 : 10_000);
+  }
+  throw new Error("workspace_build_local_draft_timeout");
+}
+
 async function waitForServerReady() {
   for (let attempt = 1; attempt <= 20; attempt += 1) {
     try {
@@ -437,15 +452,18 @@ async function main() {
           planId: plan.json.item.id,
           approvedPlan,
         }, "POST");
+        const buildResult = build.json?.status === "queued" && build.json?.pollUrl
+          ? await pollWorkspaceBuildLocalDraftJob(token, build.json.pollUrl)
+          : build;
         item.build = {
-          status: build.status,
-          ok: build.ok,
-          draftBuildId: build.json?.item?.id || build.json?.draftBuildId || null,
-          error: build.ok ? null : (build.json?.error || build.json?.detail || null),
-          json: build.json,
+          status: buildResult.status,
+          ok: buildResult.ok,
+          draftBuildId: buildResult.json?.item?.id || buildResult.json?.draftBuildId || null,
+          error: buildResult.ok ? null : (buildResult.json?.error || buildResult.json?.detail || null),
+          json: buildResult.json,
         };
-        if (build.json?.item?.id || build.json?.draftBuildId) {
-          const draftBuildId = build.json?.item?.id || build.json?.draftBuildId;
+        if (buildResult.json?.item?.id || buildResult.json?.draftBuildId) {
+          const draftBuildId = buildResult.json?.item?.id || buildResult.json?.draftBuildId;
           const draftResp = await apiFetch(
             token,
             `/api/workspace/draft-builds?pageId=${encodeURIComponent(scenario.pageId)}&viewportProfile=${encodeURIComponent(scenario.viewportProfile)}&limit=10`,

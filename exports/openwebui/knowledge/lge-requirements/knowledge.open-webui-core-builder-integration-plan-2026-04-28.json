@@ -1,0 +1,25 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.open-webui-core-builder-integration-plan-2026-04-28",
+  "collection": "lge-requirements",
+  "truthLevel": "historical",
+  "freshness": "historical",
+  "sourcePath": "data/normalized/openwebui-knowledge-seed-v1.json",
+  "sourceHash": "sha256:797a77597bfe704dae202ebd041b8ca4859b6c929201c52601903d7962383c45",
+  "generatedAt": "2026-04-30T00:11:42.398Z",
+  "title": "Open WebUI Core Builder Integration Plan",
+  "summary": "Core plan for Open WebUI ownership of planning, knowledge, artifacts, concept threads, and builder handoff.",
+  "markdown": "# Open WebUI Core Builder Integration Plan\n\nSource: `docs/open-webui-core-builder-integration-plan-2026-04-28.md`\n\nCNS Atlas / Open WebUI owns planning, knowledge, decisions, and canonical artifacts. `clonellm` remains the LGE builder/runtime source for renderable drafts. The integration path includes Open WebUI knowledge exports, ontology projections, builder contract projections, concept document handoff, job polling, artifact persistence, and later approval/handoff packaging.\n\nUse this document as the main requirements reference for integration scope and ownership boundaries.",
+  "metadata": {
+    "tags": [
+      "#requirements",
+      "#openwebui",
+      "#builder",
+      "#ownership"
+    ],
+    "sourceDocumentPaths": [
+      "docs/open-webui-core-builder-integration-plan-2026-04-28.md"
+    ],
+    "seedVersion": "openwebui-knowledge-seed-v1"
+  }
+}

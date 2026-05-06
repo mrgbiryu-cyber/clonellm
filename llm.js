@@ -1863,8 +1863,17 @@ async function callOpenRouterJson({
         throw new Error(`OpenRouter request failed [${resolvedModel}]: ${response.status} ${text}`);
       }
       const payload = await response.json();
-      const content = payload?.choices?.[0]?.message?.content;
-      return parseJsonResponseContent(content);
+      const choice = payload?.choices?.[0] || {};
+      const finishReason = String(choice?.finish_reason || "").trim();
+      const content = choice?.message?.content;
+      try {
+        return parseJsonResponseContent(content);
+      } catch (parseError) {
+        if (finishReason === "length") {
+          throw new Error(`OpenRouter JSON output was truncated [${resolvedModel}] at max_tokens=${currentMaxTokens || "default"}`);
+        }
+        throw parseError;
+      }
     } catch (error) {
       clearTimeout(timer);
       lastError = error;
@@ -2688,8 +2697,10 @@ function buildRequirementPlanMarkdownDocs(requirementPlan = {}, plannerInput = {
   ].join("\n").trim();
 
   const designSpecMarkdown = buildDesignSpecMarkdown(requirementPlan, plannerInput, sectionBlueprints);
+  const conceptDisplayMarkdown = String(requirementPlan?.conceptDisplayMarkdown || "").trim() || builderMarkdown;
 
   return {
+    conceptDisplayMarkdown,
     builderMarkdown,
     layoutMockupMarkdown,
     designSpecMarkdown,
@@ -2957,14 +2968,13 @@ function buildPlannerSystemPrompt(plannerInput = {}) {
       "Interpret designChangeLevel as the allowed exploration width for visual change while still prioritizing the brand baseline.",
     ])),
     formatPromptSection("Output Rules", formatPromptNumberedList([
-      "Return JSON only.",
-      "Required top-level keys: summary, requirementPlan.",
-      "Required requirementPlan keys: title, designChangeLevel, interventionLayer, patchDepth, targetGroupId, targetGroupLabel, targetComponents, requestSummary, planningDirection, designDirection, priority, guardrails, referenceNotes, builderBrief, builderMarkdown, layoutMockupMarkdown, designSpecMarkdown, sectionBlueprints.",
-      "builderBrief must include objective, mustKeep, mustChange, suggestedFocusSlots.",
-      "builderMarkdown must read like customer-facing proposal material with a clear beginning-middle-end structure.",
-      "layoutMockupMarkdown must include fenced text blocks and a detailed wireframe section for every proposed screen or section.",
-      "designSpecMarkdown must translate the proposal into a builder-facing execution spec with global rules, must-keep / must-change, guardrails, and section blueprints.",
-      "sectionBlueprints must be an array of section-level execution specs including order, slotId when known, label, archetype, objective, problemStatement, visualDirection, mustKeep, mustChange, hierarchy, and actionCue.",
+    "Return JSON only.",
+    "Required top-level keys: summary, requirementPlan.",
+    "Required requirementPlan keys: title, designChangeLevel, interventionLayer, patchDepth, targetGroupId, targetGroupLabel, targetComponents, requestSummary, planningDirection, designDirection, priority, guardrails, referenceNotes, builderBrief, conceptDisplayMarkdown.",
+    "builderBrief must include objective, mustKeep, mustChange, suggestedFocusSlots.",
+    "conceptDisplayMarkdown is the polished customer-facing concept document. Write it as natural Markdown prose with headings and bullets where useful. Do not expose internal ids, raw schema names, debug data, code fences, or implementation JSON in conceptDisplayMarkdown.",
+    "In conceptDisplayMarkdown, preserve Markdown line breaks explicitly. Put every heading, paragraph, horizontal rule, and bullet on its own line using escaped newline characters. Never place multiple headings and paragraphs on one line.",
+    "Do not include builderMarkdown, layoutMockupMarkdown, designSpecMarkdown, sectionBlueprints, or code fences in the JSON. The server will generate those build-facing documents from your structured plan.",
       "Preserve facts about products, prices, and specs.",
     ])),
     formatPromptSection("Budget Rules", formatPromptNumberedList([
@@ -3183,8 +3193,9 @@ function buildPlannerUserPrompt(plannerInput) {
     "Spend more detail on why the design should change, what customer problem it solves, and what visual direction should be approved before build.",
     "Write in a customer-facing proposal tone. The customer should be able to read each section and understand the rationale behind priority, what must remain, what must change, and what goal the proposal is trying to achieve.",
     "In planningDirection and designDirection, explicitly explain the reasons behind priority, mustKeep, mustChange, and objective. These sections should read like the narrative explanation of the plan, not separate disconnected bullets.",
-    "Also create a builder-friendly markdown brief inspired by DESIGN.md-style design docs so the next model can interpret structure, hierarchy, and intent more reliably.",
-    "Also create a markdown mockup/wireframe that sketches the page in section order for the current viewport. This mockup should help the builder visualize placement and rhythm without inventing unsupported structure.",
+    "Return only the structured JSON plan. The server will turn that plan into builder-friendly markdown, a wireframe, a design spec, and section blueprints.",
+    "Also include requirementPlan.conceptDisplayMarkdown as the full customer-facing concept document the user should review before build. This is not a summary; it should preserve the quality and nuance of your proposal while avoiding internal ids and implementation debug details.",
+    "The conceptDisplayMarkdown value must be valid Markdown after JSON parsing, with real line breaks between headings, paragraphs, dividers, and bullet lists.",
     "Follow this scope-specific output budget.",
     JSON.stringify(budget, null, 2),
     JSON.stringify(compactPlannerInput, null, 2),
@@ -3260,6 +3271,24 @@ function buildDemoPlannerResult(plannerInput = {}) {
       suggestedFocusSlots: focusSlots.slice(0, budget.focusSlotsMax),
     },
   };
+  requirementPlan.conceptDisplayMarkdown = [
+    `# ${requirementPlan.title}`,
+    "",
+    "## 제안 개요",
+    ...toMarkdownBulletLines(requirementPlan.requestSummary),
+    "",
+    "## 기획 방향",
+    ...toMarkdownBulletLines(requirementPlan.planningDirection),
+    "",
+    "## 디자인 방향",
+    ...toMarkdownBulletLines(requirementPlan.designDirection),
+    "",
+    "## 유지할 기준",
+    ...toMarkdownBulletLines(requirementPlan.builderBrief.mustKeep),
+    "",
+    "## 바꿀 방향",
+    ...toMarkdownBulletLines(requirementPlan.builderBrief.mustChange),
+  ].join("\n").trim();
   return {
     summary: `${pageLabel} 요구사항 정리 완료`,
     requirementPlan: {
@@ -3320,6 +3349,7 @@ function normalizePlannerResult(result, plannerInput = {}) {
       requirementPlan.guardrails,
       toStringArray(plannerInput?.guardrailBundle?.rules, ["사실 기반 가격/스펙/상품 정보는 임의 변경 금지"])
     ).map((line) => truncateText(line, budget.guardrails.maxChars)).slice(0, budget.guardrails.max),
+    conceptDisplayMarkdown: truncateText(String(requirementPlan.conceptDisplayMarkdown || "").trim(), 40000),
     referenceNotes: normalizePlannerReferenceNotes(requirementPlan.referenceNotes, fallbackRefNotes).slice(0, budget.referenceNotesMax),
     builderBrief: {
       objective: truncateText(String(
@@ -3352,12 +3382,13 @@ async function handleLlmPlan(plannerInput) {
   const primaryModel = resolveOpenRouterModel("PLANNER_MODEL", "OPENROUTER_MODEL");
   const configuredFallbackModels = resolveOpenRouterModelCandidates("PLANNER_FALLBACK_MODEL");
   const builderModel = resolveOpenRouterModel("BUILDER_MODEL", "BUILDER_FALLBACK_MODEL", "OPENROUTER_MODEL");
+  const allowPlannerDemoFallback = process.env.PLANNER_DEMO_FALLBACK === "1" || isDemoLlmEnabled();
   const fallbackModels = [
     ...configuredFallbackModels,
     ...(builderModel && builderModel !== primaryModel ? [builderModel] : []),
   ].filter((model, index, array) => model && model !== primaryModel && array.indexOf(model) === index);
   const plannerTimeoutMs = Math.max(90_000, Number(process.env.PLANNER_REQUEST_TIMEOUT_MS || process.env.LLM_REQUEST_TIMEOUT_MS || 180_000));
-  const plannerMaxTokens = resolveOpenRouterMaxTokens(process.env.PLANNER_MAX_TOKENS, 2048);
+  const plannerMaxTokens = resolveOpenRouterMaxTokens(process.env.PLANNER_MAX_TOKENS, 8192);
   const requestMessages = [
     { role: "system", content: buildPlannerSystemPrompt(plannerInput) },
     {
@@ -3384,7 +3415,7 @@ async function handleLlmPlan(plannerInput) {
       callOpenRouterJson({
         model: primaryModel,
         temperature: 0.2,
-        demoFallback: () => buildDemoPlannerResult(plannerInput),
+        demoFallback: allowPlannerDemoFallback ? () => buildDemoPlannerResult(plannerInput) : null,
         messages: requestMessages,
         timeoutMs: plannerTimeoutMs,
         maxTokens: plannerMaxTokens,
@@ -3404,7 +3435,7 @@ async function handleLlmPlan(plannerInput) {
             callOpenRouterJson({
               model: fallbackModel,
               temperature: 0.2,
-              demoFallback: () => buildDemoPlannerResult(plannerInput),
+              demoFallback: allowPlannerDemoFallback ? () => buildDemoPlannerResult(plannerInput) : null,
               messages: requestMessages,
               timeoutMs: plannerTimeoutMs,
               maxTokens: plannerMaxTokens,
@@ -3422,10 +3453,12 @@ async function handleLlmPlan(plannerInput) {
       }
       if (!recovered) {
         if (!isRetryableOpenRouterFailure(fallbackError)) throw fallbackError;
+        if (!allowPlannerDemoFallback) throw fallbackError;
         console.warn(`[planner] recovery-fallback reason=${String(fallbackError?.message || fallbackError)}`);
         result = buildDemoPlannerResult(plannerInput);
       }
     } else if (isRetryableOpenRouterFailure(error)) {
+      if (!allowPlannerDemoFallback) throw error;
       console.warn(`[planner] recovery-fallback reason=${String(error?.message || error)}`);
       result = buildDemoPlannerResult(plannerInput);
     } else {

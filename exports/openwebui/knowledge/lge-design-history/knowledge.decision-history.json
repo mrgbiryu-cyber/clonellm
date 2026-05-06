@@ -1,0 +1,24 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.decision-history",
+  "collection": "lge-design-history",
+  "truthLevel": "historical",
+  "freshness": "historical",
+  "sourcePath": "data/normalized/openwebui-knowledge-seed-v1.json",
+  "sourceHash": "sha256:797a77597bfe704dae202ebd041b8ca4859b6c929201c52601903d7962383c45",
+  "generatedAt": "2026-04-30T00:11:42.398Z",
+  "title": "Design Decision History",
+  "summary": "Decision and review history used as provenance for later Open WebUI discussions.",
+  "markdown": "# Design Decision History\n\nSource: `docs/decision-history.md`\n\nOpen WebUI should keep accepted, rejected, and revised design decisions as historical context. This seed reserves the `lge-design-history` collection for runtime checkpoints, audit results, human decisions, critic results, and approval/revision rationale.\n\nImport this collection before Idea Bench work so candidate concepts can reference prior decisions rather than restarting from scratch.",
+  "metadata": {
+    "tags": [
+      "#history",
+      "#decision",
+      "#review"
+    ],
+    "sourceDocumentPaths": [
+      "docs/decision-history.md"
+    ],
+    "seedVersion": "openwebui-knowledge-seed-v1"
+  }
+}

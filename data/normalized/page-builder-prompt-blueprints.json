@@ -42,6 +42,7 @@
         {
           "clusterId": "top-stage",
           "targetGroupId": "top",
+          "slotIds": ["hero", "quickmenu"],
           "goal": "Stage hero and quickmenu as one coordinated top-entry system.",
           "rules": ["hero first", "quickmenu as companion band", "no peer split between hero and quickmenu"]
         }
@@ -74,6 +75,7 @@
         {
           "clusterId": "top-stage-mo",
           "targetGroupId": "top",
+          "slotIds": ["hero", "quickmenu"],
           "goal": "Hero and quickmenu adapt to mobile without losing the top-stage coordination.",
           "rules": ["hero takes dominant first-screen height", "quickmenu collapses to 2-row grid or horizontal-scroll band", "no peer-level competition between hero and quickmenu at mobile scale"]
         }
@@ -114,6 +116,7 @@
         {
           "clusterId": "top-stage",
           "targetGroupId": "top",
+          "slotIds": ["hero", "quickmenu"],
           "goal": "Adapt the top-stage system for tablet without losing the hero-led reading order.",
           "rules": ["hero still leads", "support navigation remains secondary", "touch-target rhythm stays calm"]
         }

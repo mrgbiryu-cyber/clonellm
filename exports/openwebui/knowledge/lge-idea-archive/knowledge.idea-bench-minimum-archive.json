@@ -1,0 +1,26 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.idea-bench-minimum-archive",
+  "collection": "lge-idea-archive",
+  "truthLevel": "historical",
+  "freshness": "historical",
+  "sourcePath": "data/normalized/openwebui-knowledge-seed-v1.json",
+  "sourceHash": "sha256:797a77597bfe704dae202ebd041b8ca4859b6c929201c52601903d7962383c45",
+  "generatedAt": "2026-04-30T00:11:42.398Z",
+  "title": "Idea Bench Minimum Archive",
+  "summary": "Seed archive for candidate concepts, concept groups, selection reasons, and future handoff decisions.",
+  "markdown": "# Idea Bench Minimum Archive\n\nSources: `docs/open-webui-remaining-integration-sequence-2026-04-29.md`, `docs/snapshots/2026-04-24-external-stock-review/review-decisions.template.json`\n\nIdea Bench starts as multiple chat Action runs grouped by the same concept group. Each candidate should preserve preview/compare URLs, selected concept rationale, rejected alternatives, and follow-up handoff notes. This collection stores candidate ideas and decision rationale separately from hard policy.",
+  "metadata": {
+    "tags": [
+      "#idea-archive",
+      "#concept-group",
+      "#decision",
+      "#handoff"
+    ],
+    "sourceDocumentPaths": [
+      "docs/open-webui-remaining-integration-sequence-2026-04-29.md",
+      "docs/snapshots/2026-04-24-external-stock-review/review-decisions.template.json"
+    ],
+    "seedVersion": "openwebui-knowledge-seed-v1"
+  }
+}

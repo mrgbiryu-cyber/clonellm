@@ -15,8 +15,10 @@ const ACTIVITY_PATH = path.join(RUNTIME_DIR, "activity-log.json");
 const COOKIE_NAME = "lge_workspace_session";
 let workspaceStoreCache = null;
 let workspaceStoreCacheStat = null;
+let legacyWorkspaceOversizeWarningShown = false;
 const workspaceShardCache = new Map();
 const WORKSPACE_SHARD_CACHE_MAX = 20;
+const LEGACY_WORKSPACES_MAX_READ_BYTES = Math.max(1024 * 1024, Number(process.env.LEGACY_WORKSPACES_MAX_READ_BYTES || 32 * 1024 * 1024));
 const WORKSPACE_LOCK_STALE_MS = 2 * 60 * 1000;
 const WORKSPACE_LOCK_TIMEOUT_MS = 30 * 1000;
 const MAX_SESSIONS_PER_USER = 8;
@@ -33,10 +35,11 @@ function readJson(filePath, fallback) {
   }
 }
 
-function writeJson(filePath, payload) {
+function writeJson(filePath, payload, options = {}) {
   ensureDir(path.dirname(filePath));
   const tmpPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
-  fs.writeFileSync(tmpPath, `${JSON.stringify(payload, null, 2)}\n`, "utf-8");
+  const pretty = options?.pretty !== false;
+  fs.writeFileSync(tmpPath, `${JSON.stringify(payload, null, pretty ? 2 : 0)}\n`, "utf-8");
   fs.renameSync(tmpPath, filePath);
 }
 
@@ -455,7 +458,7 @@ function writeWorkspaceCollectionItem(userId = "", collectionName = "", item = {
     itemId,
     updatedAt: nowIso(),
     item: normalizedItem,
-  });
+  }, { pretty: collectionName !== "draftBuilds" });
   try {
     fs.rmSync(`${filePath}.gz`, { force: true });
   } catch {}
@@ -547,6 +550,21 @@ function writeWorkspaceCollection(userId = "", collectionName = "", items = []) 
 function readWorkspaces() {
   try {
     const stat = fs.statSync(WORKSPACES_PATH);
+    if (
+      Number(stat.size || 0) > LEGACY_WORKSPACES_MAX_READ_BYTES &&
+      String(process.env.LEGACY_WORKSPACES_FULL_READ_ENABLED || "").trim() !== "1"
+    ) {
+      if (!legacyWorkspaceOversizeWarningShown) {
+        console.warn(
+          `[workspace] legacy workspaces.json too large (${stat.size} bytes > ${LEGACY_WORKSPACES_MAX_READ_BYTES}); skipping full legacy read. ` +
+            "Set LEGACY_WORKSPACES_FULL_READ_ENABLED=1 to override."
+        );
+        legacyWorkspaceOversizeWarningShown = true;
+      }
+      workspaceStoreCache = { workspaces: [] };
+      workspaceStoreCacheStat = `${Number(stat.mtimeMs || 0)}:${Number(stat.size || 0)}:skipped`;
+      return workspaceStoreCache;
+    }
     const signature = `${Number(stat.mtimeMs || 0)}:${Number(stat.size || 0)}`;
     if (workspaceStoreCache && workspaceStoreCacheStat === signature) {
       return workspaceStoreCache;
@@ -578,7 +596,9 @@ function readActivityLog() {
 }
 
 function writeActivityLog(payload) {
-  writeJson(ACTIVITY_PATH, payload);
+  writeJson(ACTIVITY_PATH, {
+    events: toPlainArray(payload?.events).slice(-5000),
+  }, { pretty: false });
 }
 
 function readUserActivity(userId, limit = 50) {
@@ -1154,25 +1174,77 @@ function findDraftBuildById(userId, draftBuildId = "") {
   return readWorkspaceCollection(userId, "draftBuilds").find((item) => String(item?.id || "").trim() === normalizedDraftBuildId) || null;
 }
 
+function findDraftBuildWithOwnerById(draftBuildId = "") {
+  const normalizedDraftBuildId = String(draftBuildId || "").trim();
+  if (!normalizedDraftBuildId) return null;
+  const users = readUsers().users || [];
+  for (const user of users) {
+    const userId = String(user?.userId || "").trim();
+    if (!userId) continue;
+    const draftBuild = readWorkspaceCollectionItem(userId, "draftBuilds", normalizedDraftBuildId);
+    if (draftBuild) {
+      return {
+        userId,
+        user: sanitizeUser(user),
+        draftBuild,
+      };
+    }
+  }
+  const safeItemId = /^[a-zA-Z0-9._-]+$/.test(normalizedDraftBuildId)
+    ? normalizedDraftBuildId
+    : crypto.createHash("sha1").update(normalizedDraftBuildId).digest("hex");
+  try {
+    const suffix = `.draftBuilds.${safeItemId}.json`;
+    const fileName = fs.readdirSync(WORKSPACE_SHARDS_DIR).find((name) => String(name || "").endsWith(suffix));
+    if (fileName) {
+      const filePath = path.join(WORKSPACE_SHARDS_DIR, fileName);
+      const payload = readJson(filePath, null);
+      const draftBuild = payload?.item && typeof payload.item === "object" ? normalizeDraftBuild(payload.item) : null;
+      const ownerUserId = String(payload?.userId || fileName.slice(0, -suffix.length) || "").trim();
+      if (draftBuild) {
+        return {
+          userId: ownerUserId,
+          user: { userId: ownerUserId, loginId: "draft-owner", displayName: "Draft Owner" },
+          draftBuild,
+        };
+      }
+    }
+  } catch {}
+  return null;
+}
+
 function saveDraftBuild(userId, buildInput = {}) {
   const normalizedInput = normalizeDraftBuild(buildInput);
   let savedBuild = null;
   updateWorkspaceMeta(
     userId,
     (draft) => {
-      const items = readWorkspaceCollection(userId, "draftBuilds");
-      const existingIndex = items.findIndex((item) => item.id === normalizedInput.id);
-      const existing = existingIndex >= 0 ? items[existingIndex] : null;
+      const indexItems = readWorkspaceCollectionIndex(userId, "draftBuilds");
+      const existingSummary = indexItems.find((item) => item.id === normalizedInput.id) || null;
+      const existing = existingSummary ? readWorkspaceCollectionItem(userId, "draftBuilds", normalizedInput.id) : null;
       const nextBuild = normalizeDraftBuild({
         ...(existing || {}),
         ...normalizedInput,
         createdAt: existing?.createdAt || normalizedInput.createdAt || nowIso(),
         updatedAt: nowIso(),
       });
-      if (existingIndex >= 0) items.splice(existingIndex, 1);
-      items.unshift(nextBuild);
-      const nextItems = writeWorkspaceCollection(userId, "draftBuilds", items.slice(0, 200));
-      draft.draftBuilds = nextItems.map(summarizeDraftBuildRecord);
+      writeWorkspaceCollectionItem(userId, "draftBuilds", nextBuild);
+      const summaryItems = writeWorkspaceCollectionIndex(
+        userId,
+        "draftBuilds",
+        [nextBuild, ...indexItems.filter((item) => item.id !== nextBuild.id)].slice(0, 200)
+      );
+      const collectionPath = getWorkspaceCollectionPath(userId, "draftBuilds");
+      if (collectionPath) {
+        writeJson(collectionPath, {
+          userId: String(userId || "").trim(),
+          collection: "draftBuilds",
+          updatedAt: nowIso(),
+          storageMode: "item-files",
+          items: summaryItems,
+        });
+      }
+      draft.draftBuilds = summaryItems;
       savedBuild = nextBuild;
       return nextBuild;
     },
@@ -1501,6 +1573,7 @@ module.exports = {
   saveRequirementPlan,
   listDraftBuilds,
   findDraftBuildById,
+  findDraftBuildWithOwnerById,
   saveDraftBuild,
   updateDraftBuildById,
   attachDraftReplayCheck,

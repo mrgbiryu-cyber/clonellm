@@ -1,0 +1,27 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.runtime-checkpoint-2026-04-22",
+  "collection": "lge-design-history",
+  "truthLevel": "historical",
+  "freshness": "historical",
+  "sourcePath": "data/normalized/openwebui-knowledge-seed-v1.json",
+  "sourceHash": "sha256:797a77597bfe704dae202ebd041b8ca4859b6c929201c52601903d7962383c45",
+  "generatedAt": "2026-04-30T00:11:42.398Z",
+  "title": "Runtime Checkpoint 2026-04-22",
+  "summary": "Historical checkpoint for the current design-runtime-v1 path, verified runtime draft, screenshots, and rollback material.",
+  "markdown": "# Runtime Checkpoint 2026-04-22\n\nSource: `docs/admin-runtime-checkpoint-2026-04-22.md`\n\nThis checkpoint records that `design-runtime-v1` is the main path, after/section preview/compare render in Tailwind runtime, hero asset role policy has been applied, quickmenu is moving toward icon family structure, and `designChangeLevel=medium` is the stable baseline. It also records stable and latest verified build identifiers, screenshot references, and rollback material.\n\nUse this collection as historical context when deciding whether a new concept or draft regresses verified runtime behavior.",
+  "metadata": {
+    "tags": [
+      "#history",
+      "#checkpoint",
+      "#runtime",
+      "#tailwind"
+    ],
+    "sourceDocumentPaths": [
+      "docs/admin-runtime-checkpoint-2026-04-22.md",
+      "docs/snapshots/2026-04-22-design-runtime-checkpoint/checkpoint-git-status.txt",
+      "docs/snapshots/2026-04-22-design-runtime-checkpoint/checkpoint-git-diff-stat.txt"
+    ],
+    "seedVersion": "openwebui-knowledge-seed-v1"
+  }
+}

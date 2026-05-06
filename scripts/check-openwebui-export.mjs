@@ -21,6 +21,14 @@ const REQUIRED_KNOWLEDGE_FIELDS = [
   "markdown",
 ];
 
+const REQUIRED_KNOWLEDGE_COLLECTIONS = [
+  "lge-policy",
+  "lge-component-spec",
+  "lge-design-history",
+  "lge-requirements",
+  "lge-idea-archive",
+];
+
 function fail(message) {
   throw new Error(message);
 }
@@ -62,6 +70,13 @@ function checkManifest(inventory) {
 function checkKnowledge(manifest) {
   const knowledgeEntries = manifest.files.filter((item) => item.projectionType === "knowledge");
   assert(knowledgeEntries.length >= 5, "Expected at least 5 knowledge projections");
+  const collectionCounts = knowledgeEntries.reduce((acc, entry) => {
+    acc[entry.collection] = (acc[entry.collection] || 0) + 1;
+    return acc;
+  }, {});
+  for (const collection of REQUIRED_KNOWLEDGE_COLLECTIONS) {
+    assert(collectionCounts[collection] > 0, `Missing required knowledge collection: ${collection}`);
+  }
   for (const entry of knowledgeEntries) {
     const projection = readProjection(entry.projection);
     for (const field of REQUIRED_KNOWLEDGE_FIELDS) {

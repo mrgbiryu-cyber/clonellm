@@ -1,0 +1,28 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.asset-role-policy-rollout-2026-04-22",
+  "collection": "lge-policy",
+  "truthLevel": "policy",
+  "freshness": "current",
+  "sourcePath": "data/normalized/openwebui-knowledge-seed-v1.json",
+  "sourceHash": "sha256:797a77597bfe704dae202ebd041b8ca4859b6c929201c52601903d7962383c45",
+  "generatedAt": "2026-04-30T00:11:42.398Z",
+  "title": "Asset Role Policy Rollout",
+  "summary": "Asset role rules for hero, quickmenu, promo, commerce, benefit, and PDP summary usage.",
+  "markdown": "# Asset Role Policy Rollout\n\nSource: `docs/admin-asset-role-policy-rollout-2026-04-22.md`\n\nUse role-first asset selection. A visual asset is not interchangeable just because it is visually attractive. Stage hero and first-screen background use must be constrained to `background-only` assets. Quickmenu, shortcut, tab, and compact navigation surfaces should use `icon-only` families. `promo-complete` is an already-composed banner role and must not be re-overlaid as a hero background or compressed into an icon slot.\n\nOpen WebUI knowledge users should treat these rules as hard policy when evaluating concepts, drafts, or generated artifacts.",
+  "metadata": {
+    "tags": [
+      "#policy",
+      "#asset-role",
+      "#background-only",
+      "#promo-complete",
+      "#icon-only"
+    ],
+    "sourceDocumentPaths": [
+      "docs/admin-asset-role-policy-rollout-2026-04-22.md",
+      "data/normalized/asset-role-policies.json",
+      "data/normalized/section-family-contracts.json"
+    ],
+    "seedVersion": "openwebui-knowledge-seed-v1"
+  }
+}

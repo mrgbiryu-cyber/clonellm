@@ -115,6 +115,21 @@ async function apiFetch({ baseUrl, token, pathname, payload = null, method = "GE
   return { status: response.status, ok: response.ok, json };
 }
 
+async function pollWorkspaceBuildLocalDraftJob({ baseUrl, token, pollUrl, timeoutMs = 1_200_000 }) {
+  const normalizedPollUrl = String(pollUrl || "").trim();
+  if (!normalizedPollUrl) throw new Error("workspace_build_local_draft_poll_url_missing");
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeoutMs) {
+    const job = await apiFetch({ baseUrl, token, pathname: normalizedPollUrl, method: "GET" });
+    if (job.json?.status === "done" || job.json?.status === "failed") {
+      return { ...job, ok: job.ok && job.json?.status === "done" };
+    }
+    const elapsedMs = Date.now() - startedAt;
+    await sleep(elapsedMs < 15_000 ? 2_000 : elapsedMs < 60_000 ? 5_000 : 10_000);
+  }
+  throw new Error("workspace_build_local_draft_timeout");
+}
+
 async function waitForServerReady(baseUrl) {
   for (let attempt = 1; attempt <= 20; attempt += 1) {
     try {
@@ -424,27 +439,30 @@ async function buildVariant({ baseUrl, token, scenario, planId, approvedPlan, va
     payload: buildDraftPayload({ scenario, planId, approvedPlan, variant }),
     method: "POST",
   });
-  if (!build.ok) {
+  const buildResult = build.json?.status === "queued" && build.json?.pollUrl
+    ? await pollWorkspaceBuildLocalDraftJob({ baseUrl, token, pollUrl: build.json.pollUrl })
+    : build;
+  if (!buildResult.ok) {
     return {
       ...variant,
       validation: {
         ok: false,
-        checks: [{ name: "build_http_ok", ok: false, detail: { status: build.status, error: build.json?.error, detail: build.json?.detail } }],
+        checks: [{ name: "build_http_ok", ok: false, detail: { status: buildResult.status, error: buildResult.json?.error, detail: buildResult.json?.detail } }],
         providerMeta: {},
         metrics: {},
       },
       urls: {},
-      rawError: build.json,
+      rawError: buildResult.json,
     };
   }
-  const previewPath = String(build.json?.previewPath || "").trim();
-  const comparePath = String(build.json?.comparePath || "").trim();
+  const previewPath = String(buildResult.json?.previewPath || "").trim();
+  const comparePath = String(buildResult.json?.comparePath || "").trim();
   const rendered = await apiFetch({ baseUrl, token, pathname: previewPath, expectJson: false });
   const compared = await apiFetch({ baseUrl, token, pathname: comparePath, expectJson: false });
   const validation = validateVariant({
     scenario,
     approvedPlan,
-    buildJson: build.json,
+    buildJson: buildResult.json,
     renderedHtml: rendered.text,
     compareHtml: compared.text,
   });

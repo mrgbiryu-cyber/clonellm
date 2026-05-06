@@ -1,6 +1,6 @@
 {
   "builderContractVersion": "builder-contract-v1",
-  "generatedAt": "2026-04-29T05:04:13.410Z",
+  "generatedAt": "2026-05-04T06:30:59.285Z",
   "sourceManifest": [
     {
       "sourcePath": "data/normalized/section-family-contracts.json",
@@ -337,7 +337,9 @@
       "componentIds": [
         "home.bestshop-guide"
       ],
-      "assetRolePolicyIds": [],
+      "assetRolePolicyIds": [
+        "css-composition-section"
+      ],
       "viewportProfiles": [
         "pc",
         "mo"
@@ -391,7 +393,9 @@
       "componentIds": [
         "home.lg-best-care"
       ],
-      "assetRolePolicyIds": [],
+      "assetRolePolicyIds": [
+        "css-composition-section"
+      ],
       "viewportProfiles": [
         "pc",
         "mo"
@@ -431,7 +435,9 @@
       "componentIds": [
         "home.missed-benefits"
       ],
-      "assetRolePolicyIds": [],
+      "assetRolePolicyIds": [
+        "css-composition-section"
+      ],
       "viewportProfiles": [
         "pc",
         "mo"
@@ -457,7 +463,9 @@
       "componentIds": [
         "home.smart-life"
       ],
-      "assetRolePolicyIds": [],
+      "assetRolePolicyIds": [
+        "css-composition-section"
+      ],
       "viewportProfiles": [
         "pc",
         "mo"
@@ -1161,6 +1169,21 @@
         "bestProduct",
         "best-ranking",
         "ranking"
+      ],
+      "allowedRoles": [
+        "background-only",
+        "object-only",
+        "reference-only"
+      ],
+      "forbiddenRoles": []
+    },
+    {
+      "policyId": "css-composition-section",
+      "slotIds": [
+        "smart-life",
+        "missed-benefits",
+        "lg-best-care",
+        "bestshop-guide"
       ],
       "allowedRoles": [
         "background-only",

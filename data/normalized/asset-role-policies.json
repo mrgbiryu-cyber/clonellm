@@ -52,6 +52,18 @@
       ]
     },
     {
+      "policyId": "css-composition-section",
+      "label": "CSS Composition Section Policy",
+      "targetSlots": ["smart-life", "missed-benefits", "lg-best-care", "bestshop-guide"],
+      "imageUsageMode": "css-composition-or-card-media",
+      "allowedCardMediaRoles": ["background-only", "object-only", "reference-only"],
+      "disallowPromoReoverlay": false,
+      "notes": [
+        "Home lower sections are primarily CSS composition/replay sections and should not require new full-bleed imagery.",
+        "If card media is used, prefer background-only, object-only, or reference-only assets instead of re-overlaying promo-complete artwork."
+      ]
+    },
+    {
       "policyId": "benefit-hub",
       "label": "Benefit Hub Asset Policy",
       "targetSlots": ["benefit", "benefit-highlight", "mainService", "bestcare", "service-benefit"],

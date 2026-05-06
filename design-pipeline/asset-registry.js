@@ -7,6 +7,9 @@ const ROOT = path.join(__dirname, "..");
 const IMAGE_ASSET_REGISTRY_PATH = path.join(ROOT, "data", "normalized", "image-asset-registry.json");
 const ICON_FAMILY_REGISTRY_PATH = path.join(ROOT, "data", "normalized", "icon-family-registry.json");
 const INTERACTION_COMPONENT_REGISTRY_PATH = path.join(ROOT, "data", "normalized", "interaction-component-registry.json");
+const REGISTRY_CACHE_TTL_MS = Math.max(1000, Number(process.env.ASSET_REGISTRY_CACHE_TTL_MS || 30000));
+const REGISTRY_CACHE_MAX_ENTRIES = Math.max(3, Number(process.env.ASSET_REGISTRY_CACHE_MAX_ENTRIES || 16));
+const REGISTRY_FILE_CACHE = new Map();
 
 function readJsonFile(filePath, fallback = {}) {
   try {
@@ -18,6 +21,41 @@ function readJsonFile(filePath, fallback = {}) {
 
 function writeJsonFile(filePath, payload = {}) {
   fs.writeFileSync(filePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  invalidateRegistryFileCache(filePath);
+}
+
+function readFileSignature(filePath) {
+  try {
+    const stat = fs.statSync(filePath);
+    return `${stat.mtimeMs}:${stat.size}`;
+  } catch {
+    return "missing";
+  }
+}
+
+function invalidateRegistryFileCache(filePath) {
+  REGISTRY_FILE_CACHE.delete(filePath);
+}
+
+function readCachedJsonFile(filePath, fallback = {}) {
+  const now = Date.now();
+  const cached = REGISTRY_FILE_CACHE.get(filePath);
+  if (cached && now - cached.checkedAt <= REGISTRY_CACHE_TTL_MS) {
+    return cached.value;
+  }
+  const signature = readFileSignature(filePath);
+  if (cached && cached.signature === signature) {
+    cached.checkedAt = now;
+    REGISTRY_FILE_CACHE.delete(filePath);
+    REGISTRY_FILE_CACHE.set(filePath, cached);
+    return cached.value;
+  }
+  const value = readJsonFile(filePath, fallback);
+  REGISTRY_FILE_CACHE.set(filePath, { checkedAt: now, signature, value });
+  while (REGISTRY_FILE_CACHE.size > REGISTRY_CACHE_MAX_ENTRIES) {
+    REGISTRY_FILE_CACHE.delete(REGISTRY_FILE_CACHE.keys().next().value);
+  }
+  return value;
 }
 
 function normalizeRegistryStatus(value = "") {
@@ -187,15 +225,36 @@ function compactInteractionComponentCard(component = {}) {
 }
 
 function readImageAssetRegistry() {
-  return readJsonFile(IMAGE_ASSET_REGISTRY_PATH, { assets: [] });
+  return readCachedJsonFile(IMAGE_ASSET_REGISTRY_PATH, { assets: [] });
 }
 
 function readIconFamilyRegistry() {
-  return readJsonFile(ICON_FAMILY_REGISTRY_PATH, { families: [] });
+  return readCachedJsonFile(ICON_FAMILY_REGISTRY_PATH, { families: [] });
 }
 
 function readInteractionComponentRegistry() {
-  return readJsonFile(INTERACTION_COMPONENT_REGISTRY_PATH, { components: [] });
+  return readCachedJsonFile(INTERACTION_COMPONENT_REGISTRY_PATH, { components: [] });
+}
+
+function readAssetRegistryBundle() {
+  return {
+    imageRegistry: readImageAssetRegistry(),
+    iconFamilyRegistry: readIconFamilyRegistry(),
+    interactionComponentRegistry: readInteractionComponentRegistry(),
+  };
+}
+
+function normalizeAssetRegistryBundle(bundle = {}) {
+  if (bundle && typeof bundle === "object") {
+    return {
+      imageRegistry: bundle.imageRegistry && typeof bundle.imageRegistry === "object" ? bundle.imageRegistry : readImageAssetRegistry(),
+      iconFamilyRegistry: bundle.iconFamilyRegistry && typeof bundle.iconFamilyRegistry === "object" ? bundle.iconFamilyRegistry : readIconFamilyRegistry(),
+      interactionComponentRegistry: bundle.interactionComponentRegistry && typeof bundle.interactionComponentRegistry === "object"
+        ? bundle.interactionComponentRegistry
+        : readInteractionComponentRegistry(),
+    };
+  }
+  return readAssetRegistryBundle();
 }
 
 function updateImageAssetVariantStatus(input = {}) {
@@ -317,11 +376,14 @@ function countByField(items = [], fieldName = "status") {
   }, {});
 }
 
-function summarizeFullAssetRegistryInventory() {
-  const imageAssets = Array.isArray(readImageAssetRegistry().assets) ? readImageAssetRegistry().assets : [];
+function summarizeFullAssetRegistryInventory(input = {}) {
+  const registryBundle = normalizeAssetRegistryBundle(input.registryBundle);
+  const imageAssets = Array.isArray(registryBundle.imageRegistry.assets) ? registryBundle.imageRegistry.assets : [];
   const imageVariants = imageAssets.flatMap((asset) => Object.values(asset?.variants || {}));
-  const iconFamilies = Array.isArray(readIconFamilyRegistry().families) ? readIconFamilyRegistry().families : [];
-  const interactionComponents = Array.isArray(readInteractionComponentRegistry().components) ? readInteractionComponentRegistry().components : [];
+  const iconFamilies = Array.isArray(registryBundle.iconFamilyRegistry.families) ? registryBundle.iconFamilyRegistry.families : [];
+  const interactionComponents = Array.isArray(registryBundle.interactionComponentRegistry.components)
+    ? registryBundle.interactionComponentRegistry.components
+    : [];
   return {
     imageAssetCount: imageAssets.length,
     imageVariantCount: imageVariants.length,
@@ -342,23 +404,24 @@ function summarizeFullAssetRegistryInventory() {
 
 function resolveAssetRegistryCardsForSection(input = {}) {
   const source = input && typeof input === "object" ? input : {};
+  const registryBundle = normalizeAssetRegistryBundle(source.registryBundle);
   const scope = {
     pageId: String(source.pageId || "").trim(),
     slotId: String(source.slotId || "").trim(),
     componentId: String(source.componentId || "").trim(),
     viewportProfile: String(source.viewportProfile || "pc").trim() || "pc",
   };
-  const imageMatches = (readImageAssetRegistry().assets || [])
+  const imageMatches = (registryBundle.imageRegistry.assets || [])
     .filter((asset) => matchesScope(asset, scope))
     .map((asset) => compactImageAssetCard(asset, scope.viewportProfile))
     .filter((asset) => asset.assetId)
     .sort(compareRegistryCards);
-  const iconFamilyMatches = (readIconFamilyRegistry().families || [])
+  const iconFamilyMatches = (registryBundle.iconFamilyRegistry.families || [])
     .filter((family) => matchesScope(family, scope))
     .map(compactIconFamilyCard)
     .filter((family) => family.familyId)
     .sort(compareRegistryCards);
-  const interactionMatches = (readInteractionComponentRegistry().components || [])
+  const interactionMatches = (registryBundle.interactionComponentRegistry.components || [])
     .filter((component) => matchesScope(component, scope))
     .map(compactInteractionComponentCard)
     .filter((component) => component.interactionId)
@@ -402,6 +465,7 @@ function buildAssetRegistryCatalogForPage(input = {}) {
   const pageId = String(source.pageId || "").trim();
   const viewportProfile = String(source.viewportProfile || "pc").trim() || "pc";
   const components = Array.isArray(source.components) ? source.components : [];
+  const registryBundle = readAssetRegistryBundle();
   const sectionCards = components
     .map((component) => {
       const componentId = String(component?.componentId || "").trim();
@@ -412,6 +476,7 @@ function buildAssetRegistryCatalogForPage(input = {}) {
         slotId,
         componentId,
         viewportProfile,
+        registryBundle,
       });
       const summary = summarizeAssetRegistryCards(cards);
       const total =
@@ -464,7 +529,7 @@ function buildAssetRegistryCatalogForPage(input = {}) {
     pageId,
     viewportProfile,
     generatedAt: new Date().toISOString(),
-    inventoryTotals: summarizeFullAssetRegistryInventory(),
+    inventoryTotals: summarizeFullAssetRegistryInventory({ registryBundle }),
     totals,
     sections: sectionCards,
   };
@@ -474,6 +539,7 @@ module.exports = {
   readImageAssetRegistry,
   readIconFamilyRegistry,
   readInteractionComponentRegistry,
+  readAssetRegistryBundle,
   summarizeFullAssetRegistryInventory,
   resolveAssetRegistryCardsForSection,
   buildAssetRegistryCatalogForPage,

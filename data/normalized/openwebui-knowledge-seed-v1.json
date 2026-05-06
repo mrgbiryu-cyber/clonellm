@@ -1,0 +1,148 @@
+{
+  "seedVersion": "openwebui-knowledge-seed-v1",
+  "generatedFor": "CNS Atlas / Open WebUI initial LGE knowledge import",
+  "collections": [
+    "lge-policy",
+    "lge-component-spec",
+    "lge-design-history",
+    "lge-requirements",
+    "lge-idea-archive"
+  ],
+  "documents": [
+    {
+      "documentId": "runtime-guardrails-2026-04-22",
+      "collection": "lge-policy",
+      "truthLevel": "policy",
+      "title": "Design Runtime Guardrails",
+      "summary": "Mandatory guardrails for Tailwind runtime parity, source preservation, asset roles, legacy URL isolation, and same-session validation.",
+      "sourceDocumentPaths": [
+        "docs/admin-design-runtime-guardrails-2026-04-22.md"
+      ],
+      "markdown": "# Design Runtime Guardrails\n\nSource: `docs/admin-design-runtime-guardrails-2026-04-22.md`\n\nOpen WebUI planning must preserve the source concept text, section identifiers, target scope, and asset role intent before sending work to the builder. Tailwind-authored after/preview/compare surfaces must render in the same Tailwind-enabled runtime shell. Section preview should come from the final rendered afterHtml path rather than a second raw-authored render path.\n\nRequired policy signals:\n\n- Preserve Markdown and concept source truth instead of re-summarizing it in intermediate layers.\n- Keep `request -> saved plan -> concept package -> author input` identifiers intact.\n- Hero and stage imagery must use `background-only` assets.\n- Quickmenu and shortcut icons must use `icon-only` families.\n- `promo-complete` assets must not be reused as hero backgrounds or icon substitutes.\n- Main user-facing routes should use runtime draft/compare paths, not legacy clone URLs.\n",
+      "metadata": {
+        "tags": ["#policy", "#runtime", "#guardrail", "#tailwind", "#asset-role"]
+      }
+    },
+    {
+      "documentId": "asset-role-policy-rollout-2026-04-22",
+      "collection": "lge-policy",
+      "truthLevel": "policy",
+      "title": "Asset Role Policy Rollout",
+      "summary": "Asset role rules for hero, quickmenu, promo, commerce, benefit, and PDP summary usage.",
+      "sourceDocumentPaths": [
+        "docs/admin-asset-role-policy-rollout-2026-04-22.md",
+        "data/normalized/asset-role-policies.json",
+        "data/normalized/section-family-contracts.json"
+      ],
+      "markdown": "# Asset Role Policy Rollout\n\nSource: `docs/admin-asset-role-policy-rollout-2026-04-22.md`\n\nUse role-first asset selection. A visual asset is not interchangeable just because it is visually attractive. Stage hero and first-screen background use must be constrained to `background-only` assets. Quickmenu, shortcut, tab, and compact navigation surfaces should use `icon-only` families. `promo-complete` is an already-composed banner role and must not be re-overlaid as a hero background or compressed into an icon slot.\n\nOpen WebUI knowledge users should treat these rules as hard policy when evaluating concepts, drafts, or generated artifacts.\n",
+      "metadata": {
+        "tags": ["#policy", "#asset-role", "#background-only", "#promo-complete", "#icon-only"]
+      }
+    },
+    {
+      "documentId": "component-spec-runtime-renderer",
+      "collection": "lge-component-spec",
+      "truthLevel": "policy",
+      "title": "Runtime Renderer and Component Spec",
+      "summary": "Component and renderer boundaries for authored sections, Tailwind runtime, and final render projections.",
+      "sourceDocumentPaths": [
+        "docs/admin-runtime-renderer-contract-2026-04-21.md",
+        "docs/admin-component-rebuild-schema-families-2026-04-17.md",
+        "data/normalized/component-rebuild-schema-catalog.json"
+      ],
+      "markdown": "# Runtime Renderer and Component Spec\n\nSources: `docs/admin-runtime-renderer-contract-2026-04-21.md`, `docs/admin-component-rebuild-schema-families-2026-04-17.md`\n\nThe builder/runtime handoff should treat authored section packages as the source for renderable changes and preserve canonical slot/component identity. Component families define expected layout blocks, required fields, and asset needs. Runtime delivery should project the authored result into the page shell without inventing new planning meaning.\n\nImportant component signals:\n\n- `home.hero` is governed by hero/stage composition rules and background asset policy.\n- `home.quickmenu` is governed by icon-family consistency and compact shortcut rules.\n- Section family contracts and component rebuild schema catalogs are policy inputs, not optional style notes.\n",
+      "metadata": {
+        "tags": ["#component", "#renderer", "#builder-contract", "#home.hero", "#home.quickmenu"]
+      }
+    },
+    {
+      "documentId": "runtime-checkpoint-2026-04-22",
+      "collection": "lge-design-history",
+      "truthLevel": "historical",
+      "title": "Runtime Checkpoint 2026-04-22",
+      "summary": "Historical checkpoint for the current design-runtime-v1 path, verified runtime draft, screenshots, and rollback material.",
+      "sourceDocumentPaths": [
+        "docs/admin-runtime-checkpoint-2026-04-22.md",
+        "docs/snapshots/2026-04-22-design-runtime-checkpoint/checkpoint-git-status.txt",
+        "docs/snapshots/2026-04-22-design-runtime-checkpoint/checkpoint-git-diff-stat.txt"
+      ],
+      "markdown": "# Runtime Checkpoint 2026-04-22\n\nSource: `docs/admin-runtime-checkpoint-2026-04-22.md`\n\nThis checkpoint records that `design-runtime-v1` is the main path, after/section preview/compare render in Tailwind runtime, hero asset role policy has been applied, quickmenu is moving toward icon family structure, and `designChangeLevel=medium` is the stable baseline. It also records stable and latest verified build identifiers, screenshot references, and rollback material.\n\nUse this collection as historical context when deciding whether a new concept or draft regresses verified runtime behavior.\n",
+      "metadata": {
+        "tags": ["#history", "#checkpoint", "#runtime", "#tailwind"]
+      }
+    },
+    {
+      "documentId": "decision-history",
+      "collection": "lge-design-history",
+      "truthLevel": "historical",
+      "title": "Design Decision History",
+      "summary": "Decision and review history used as provenance for later Open WebUI discussions.",
+      "sourceDocumentPaths": [
+        "docs/decision-history.md"
+      ],
+      "markdown": "# Design Decision History\n\nSource: `docs/decision-history.md`\n\nOpen WebUI should keep accepted, rejected, and revised design decisions as historical context. This seed reserves the `lge-design-history` collection for runtime checkpoints, audit results, human decisions, critic results, and approval/revision rationale.\n\nImport this collection before Idea Bench work so candidate concepts can reference prior decisions rather than restarting from scratch.\n",
+      "metadata": {
+        "tags": ["#history", "#decision", "#review"]
+      }
+    },
+    {
+      "documentId": "open-webui-core-builder-integration-plan-2026-04-28",
+      "collection": "lge-requirements",
+      "truthLevel": "historical",
+      "title": "Open WebUI Core Builder Integration Plan",
+      "summary": "Core plan for Open WebUI ownership of planning, knowledge, artifacts, concept threads, and builder handoff.",
+      "sourceDocumentPaths": [
+        "docs/open-webui-core-builder-integration-plan-2026-04-28.md"
+      ],
+      "markdown": "# Open WebUI Core Builder Integration Plan\n\nSource: `docs/open-webui-core-builder-integration-plan-2026-04-28.md`\n\nCNS Atlas / Open WebUI owns planning, knowledge, decisions, and canonical artifacts. `clonellm` remains the LGE builder/runtime source for renderable drafts. The integration path includes Open WebUI knowledge exports, ontology projections, builder contract projections, concept document handoff, job polling, artifact persistence, and later approval/handoff packaging.\n\nUse this document as the main requirements reference for integration scope and ownership boundaries.\n",
+      "metadata": {
+        "tags": ["#requirements", "#openwebui", "#builder", "#ownership"]
+      }
+    },
+    {
+      "documentId": "open-webui-remaining-sequence-2026-04-29",
+      "collection": "lge-requirements",
+      "truthLevel": "historical",
+      "title": "Open WebUI Remaining Integration Sequence",
+      "summary": "Operational remaining sequence for CNS Atlas chat, LGE Builder Action, artifact metadata, concept document input, knowledge import, Idea Bench, and handoff.",
+      "sourceDocumentPaths": [
+        "docs/open-webui-remaining-integration-sequence-2026-04-29.md"
+      ],
+      "markdown": "# Open WebUI Remaining Integration Sequence\n\nSource: `docs/open-webui-remaining-integration-sequence-2026-04-29.md`\n\nThe current sequence is: verify normal CNS Atlas chat, verify LGE Builder Action links, persist artifact metadata, fix YAML frontmatter + Markdown conceptDocument input, load initial LGE Knowledge collections, then defer Idea Bench and approval handoff. Initial knowledge collections are `lge-policy`, `lge-component-spec`, `lge-design-history`, `lge-requirements`, and `lge-idea-archive`.\n",
+      "metadata": {
+        "tags": ["#requirements", "#openwebui", "#sequence", "#knowledge"]
+      }
+    },
+    {
+      "documentId": "requirement-scope-and-quality",
+      "collection": "lge-requirements",
+      "truthLevel": "historical",
+      "title": "Requirement Scope and Design Quality",
+      "summary": "Scope and quality requirements used to judge concept and build readiness.",
+      "sourceDocumentPaths": [
+        "docs/admin-requirement-scope-schema-2026-04-17.md",
+        "docs/admin-claude-level-design-quality-requirements-2026-04-19.md",
+        "docs/requirements-prd-identity-focus-2026-04-16.md"
+      ],
+      "markdown": "# Requirement Scope and Design Quality\n\nSources: `docs/admin-requirement-scope-schema-2026-04-17.md`, `docs/admin-claude-level-design-quality-requirements-2026-04-19.md`, `docs/requirements-prd-identity-focus-2026-04-16.md`\n\nRequirements should define target page, section scope, intended design change level, preserved identity, and quality bar before builder execution. Open WebUI concepts should identify the exact target components and guardrails so the builder does not infer missing scope from vague prompts.\n",
+      "metadata": {
+        "tags": ["#requirements", "#quality", "#scope", "#identity"]
+      }
+    },
+    {
+      "documentId": "idea-bench-minimum-archive",
+      "collection": "lge-idea-archive",
+      "truthLevel": "historical",
+      "title": "Idea Bench Minimum Archive",
+      "summary": "Seed archive for candidate concepts, concept groups, selection reasons, and future handoff decisions.",
+      "sourceDocumentPaths": [
+        "docs/open-webui-remaining-integration-sequence-2026-04-29.md",
+        "docs/snapshots/2026-04-24-external-stock-review/review-decisions.template.json"
+      ],
+      "markdown": "# Idea Bench Minimum Archive\n\nSources: `docs/open-webui-remaining-integration-sequence-2026-04-29.md`, `docs/snapshots/2026-04-24-external-stock-review/review-decisions.template.json`\n\nIdea Bench starts as multiple chat Action runs grouped by the same concept group. Each candidate should preserve preview/compare URLs, selected concept rationale, rejected alternatives, and follow-up handoff notes. This collection stores candidate ideas and decision rationale separately from hard policy.\n",
+      "metadata": {
+        "tags": ["#idea-archive", "#concept-group", "#decision", "#handoff"]
+      }
+    }
+  ]
+}

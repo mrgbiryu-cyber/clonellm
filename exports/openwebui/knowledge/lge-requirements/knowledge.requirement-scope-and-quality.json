@@ -1,0 +1,27 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.requirement-scope-and-quality",
+  "collection": "lge-requirements",
+  "truthLevel": "historical",
+  "freshness": "historical",
+  "sourcePath": "data/normalized/openwebui-knowledge-seed-v1.json",
+  "sourceHash": "sha256:797a77597bfe704dae202ebd041b8ca4859b6c929201c52601903d7962383c45",
+  "generatedAt": "2026-04-30T00:11:42.398Z",
+  "title": "Requirement Scope and Design Quality",
+  "summary": "Scope and quality requirements used to judge concept and build readiness.",
+  "markdown": "# Requirement Scope and Design Quality\n\nSources: `docs/admin-requirement-scope-schema-2026-04-17.md`, `docs/admin-claude-level-design-quality-requirements-2026-04-19.md`, `docs/requirements-prd-identity-focus-2026-04-16.md`\n\nRequirements should define target page, section scope, intended design change level, preserved identity, and quality bar before builder execution. Open WebUI concepts should identify the exact target components and guardrails so the builder does not infer missing scope from vague prompts.",
+  "metadata": {
+    "tags": [
+      "#requirements",
+      "#quality",
+      "#scope",
+      "#identity"
+    ],
+    "sourceDocumentPaths": [
+      "docs/admin-requirement-scope-schema-2026-04-17.md",
+      "docs/admin-claude-level-design-quality-requirements-2026-04-19.md",
+      "docs/requirements-prd-identity-focus-2026-04-16.md"
+    ],
+    "seedVersion": "openwebui-knowledge-seed-v1"
+  }
+}

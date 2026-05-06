@@ -13,6 +13,7 @@ export const DRY_RUN_SOURCE_PATHS = [
   "data/normalized/asset-role-policies.json",
   "data/normalized/component-rebuild-schema-catalog.json",
   "data/normalized/image-asset-registry.json",
+  "data/normalized/openwebui-knowledge-seed-v1.json",
   "data/normalized/page-runtime-status.json",
   "data/normalized/section-family-contracts.json",
 ];
@@ -122,6 +123,9 @@ export function parseComponentId(componentId) {
 }
 
 export function collectionForSource(sourcePath) {
+  if (sourcePath.includes("openwebui-knowledge-seed")) {
+    return "lge-requirements";
+  }
   if (sourcePath.includes("asset-role") || sourcePath.includes("section-family") || sourcePath.includes("component-rebuild")) {
     return "lge-policy";
   }

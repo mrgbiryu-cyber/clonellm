@@ -1,0 +1,26 @@
+{
+  "projectionVersion": "knowledge-projection-v1",
+  "documentId": "knowledge.runtime-guardrails-2026-04-22",
+  "collection": "lge-policy",
+  "truthLevel": "policy",
+  "freshness": "current",
+  "sourcePath": "data/normalized/openwebui-knowledge-seed-v1.json",
+  "sourceHash": "sha256:797a77597bfe704dae202ebd041b8ca4859b6c929201c52601903d7962383c45",
+  "generatedAt": "2026-04-30T00:11:42.398Z",
+  "title": "Design Runtime Guardrails",
+  "summary": "Mandatory guardrails for Tailwind runtime parity, source preservation, asset roles, legacy URL isolation, and same-session validation.",
+  "markdown": "# Design Runtime Guardrails\n\nSource: `docs/admin-design-runtime-guardrails-2026-04-22.md`\n\nOpen WebUI planning must preserve the source concept text, section identifiers, target scope, and asset role intent before sending work to the builder. Tailwind-authored after/preview/compare surfaces must render in the same Tailwind-enabled runtime shell. Section preview should come from the final rendered afterHtml path rather than a second raw-authored render path.\n\nRequired policy signals:\n\n- Preserve Markdown and concept source truth instead of re-summarizing it in intermediate layers.\n- Keep `request -> saved plan -> concept package -> author input` identifiers intact.\n- Hero and stage imagery must use `background-only` assets.\n- Quickmenu and shortcut icons must use `icon-only` families.\n- `promo-complete` assets must not be reused as hero backgrounds or icon substitutes.\n- Main user-facing routes should use runtime draft/compare paths, not legacy clone URLs.",
+  "metadata": {
+    "tags": [
+      "#policy",
+      "#runtime",
+      "#guardrail",
+      "#tailwind",
+      "#asset-role"
+    ],
+    "sourceDocumentPaths": [
+      "docs/admin-design-runtime-guardrails-2026-04-22.md"
+    ],
+    "seedVersion": "openwebui-knowledge-seed-v1"
+  }
+}

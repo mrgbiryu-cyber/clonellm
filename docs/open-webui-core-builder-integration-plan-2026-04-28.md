@@ -1,5 +1,7 @@
 # Open WebUI Core / clonellm Builder Integration Plan (2026-04-28)
 
+> 실행/배포 연결점 정리는 [`open-webui-server-handoff-runbook-2026-04-29.md`](./open-webui-server-handoff-runbook-2026-04-29.md)를 기준으로 본다.
+
 ## 목적
 
 이 문서는 현재 `clonellm` 프로젝트를 Open WebUI 안으로 흡수하는 방향을 정리한 논의용 계획서다.

@@ -2,7 +2,7 @@
 
 const { resolveAvailableAssetFamilies } = require("./asset-family");
 const { resolveAssetFallbackPolicy } = require("./asset-fallback-policy");
-const { resolveAssetRegistryCardsForSection } = require("./asset-registry");
+const { readAssetRegistryBundle, resolveAssetRegistryCardsForSection } = require("./asset-registry");
 const { resolveAssetUsagePolicy } = require("./asset-role-policy");
 const { resolveDesignDiversityProfiles } = require("./design-diversity");
 
@@ -75,6 +75,26 @@ function truncateText(value = "", maxLength = 1200) {
   if (!text) return "";
   if (!Number.isFinite(maxLength) || maxLength <= 0) return text;
   return text.length > maxLength ? `${text.slice(0, maxLength).trim()}...` : text;
+}
+
+function stripMarkdownFrontmatter(value = "") {
+  const text = String(value || "").trim();
+  if (!text.startsWith("---")) return text;
+  const lines = text.split(/\r?\n/);
+  for (let index = 1; index < lines.length; index += 1) {
+    if (lines[index].trim() === "---" || lines[index].trim() === "...") {
+      return lines.slice(index + 1).join("\n").trim();
+    }
+  }
+  return text;
+}
+
+function compactConceptDocumentForAuthor(value = "", maxLength = 2400) {
+  const text = stripMarkdownFrontmatter(value)
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  if (!text) return "";
+  return truncateText(text, maxLength);
 }
 
 function compactHtmlForModel(html = "", maxLength = 3500) {
@@ -304,6 +324,22 @@ function filterReusableAssetsForSlot(slotId = "", items = []) {
   return source;
 }
 
+function resolveComponentIdForSlot({ pageId = "", slotId = "", componentIds = [], index = 0 } = {}) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedSlotId = String(slotId || "").trim();
+  const candidates = Array.isArray(componentIds)
+    ? componentIds.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  if (!normalizedSlotId) return String(candidates[index] || "").trim();
+  const exactSlotMatch = candidates.find((componentId) => componentId.split(".").pop() === normalizedSlotId);
+  if (exactSlotMatch) return exactSlotMatch;
+  const pageSlotId = normalizedPageId ? `${normalizedPageId}.${normalizedSlotId}` : "";
+  if (pageSlotId && candidates.includes(pageSlotId)) return pageSlotId;
+  const indexed = String(candidates[index] || "").trim();
+  if (indexed && indexed.split(".").pop() === normalizedSlotId) return indexed;
+  return pageSlotId || indexed;
+}
+
 function inferAuthoringMode(source = {}) {
   const explicit = String(source.authoringMode || "").trim();
   if (explicit) return explicit;
@@ -406,6 +442,7 @@ function buildConceptPackageFromRequirementPlan(requirementPlan = {}, options = 
           : "선택된 target group 범위 안에서만 authored sections를 교체한다.",
       },
       sectionBlueprints: Array.isArray(plan.sectionBlueprints) ? plan.sectionBlueprints.slice(0, 24) : [],
+      authoringClusters: Array.isArray(plan.authoringClusters) ? plan.authoringClusters.slice(0, 12) : [],
       userFixedContent: toStringArray(source.userFixedContent || plan.userFixedContent, 12),
       userDirectEdits: Array.isArray(source.userDirectEdits || plan.userDirectEdits)
         ? (source.userDirectEdits || plan.userDirectEdits).slice(0, 24)
@@ -466,6 +503,9 @@ function buildDesignAuthorInput(input = {}) {
   const sectionBlueprints = Array.isArray(conceptPackage.executionBrief?.sectionBlueprints)
     ? conceptPackage.executionBrief.sectionBlueprints
     : [];
+  const authoringClusters = Array.isArray(conceptPackage.executionBrief?.authoringClusters)
+    ? conceptPackage.executionBrief.authoringClusters.slice(0, 12)
+    : [];
   const journeyFlow = conceptPackage.executionBrief?.journeyFlow && typeof conceptPackage.executionBrief.journeyFlow === "object"
     ? JSON.parse(JSON.stringify(conceptPackage.executionBrief.journeyFlow))
     : null;
@@ -480,17 +520,24 @@ function buildDesignAuthorInput(input = {}) {
     source.currentSectionContext?.currentSectionAssetMap && typeof source.currentSectionContext.currentSectionAssetMap === "object"
       ? normalizeCurrentSectionAssetMap(source.currentSectionContext.currentSectionAssetMap)
       : buildCurrentSectionAssetMap(currentPageAssetMap, slotIds);
+  const assetRegistryBundle = readAssetRegistryBundle();
   const sectionPackets = slotIds.map((slotId, index) => {
     const blueprint = sectionBlueprints.find((item) => String(item?.slotId || "").trim() === String(slotId || "").trim()) || {};
     const currentHtml = String(currentSectionHtmlMap[slotId] || "").trim();
     const availableAssetFamilies = buildSectionAssetFamilies(source.pageId, slotId);
     const assetUsagePolicy = resolveAssetUsagePolicy(source.pageId, slotId);
-    const componentId = String(targetGroup.componentIds?.[index] || "").trim();
+    const componentId = resolveComponentIdForSlot({
+      pageId: source.pageId,
+      slotId,
+      componentIds: targetGroup.componentIds,
+      index,
+    });
     const assetRegistry = resolveAssetRegistryCardsForSection({
       pageId: source.pageId,
       slotId,
       componentId,
       viewportProfile: viewportMeta.viewportProfile,
+      registryBundle: assetRegistryBundle,
     });
     const assetFallbackPolicy = resolveAssetFallbackPolicy({
       pageId: source.pageId,
@@ -564,6 +611,7 @@ function buildDesignAuthorInput(input = {}) {
       typography: truncateText(selectedConcept.typography?.headline || "", 120),
       colorSystem: truncateText(selectedConcept.colorSystem?.baseSurface || "", 120),
       promotionTonePolicy: truncateText(selectedConcept.promotionTonePolicy || "", 180),
+      sourceDocumentExcerpt: compactConceptDocumentForAuthor(conceptPackage.conceptDocument || "", 2400),
     },
     execution: {
       authoringMode: String(
@@ -618,6 +666,7 @@ function buildDesignAuthorInput(input = {}) {
         groupLabel: String(targetGroup.groupLabel || "").trim(),
         boundaryIntent: truncateText(targetGroup.boundaryIntent || "", 220),
       },
+      authoringClusters,
       guardrails: uniqueList([
         `현재 viewportProfile=${viewportMeta.viewportProfile}, mode=${viewportMeta.viewportMode} 기준으로 작성한다.`,
         `자산 variant 정책은 ${assetVariantPolicy} 이다.`,
@@ -743,4 +792,5 @@ module.exports = {
   buildConceptPackageFromRequirementPlan,
   buildDesignAuthorInput,
   buildDesignAuthorInputSnapshot,
+  resolveComponentIdForSlot,
 };

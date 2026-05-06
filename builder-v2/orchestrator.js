@@ -53,6 +53,51 @@ function ensureReferenceLibraryContainer(builderInput = {}) {
   return builderInput.systemContext.designReferenceLibrary;
 }
 
+function cloneSerializable(value, fallback) {
+  if (typeof value === "undefined") return fallback;
+  try {
+    return typeof structuredClone === "function"
+      ? structuredClone(value)
+      : JSON.parse(JSON.stringify(value));
+  } catch {
+    return fallback;
+  }
+}
+
+function buildArtifactSidecarRegistrySnapshot(registry = {}) {
+  const source = registry && typeof registry === "object" ? registry : {};
+  return {
+    pageId: String(source.pageId || "").trim(),
+    viewportProfile: String(source.viewportProfile || "").trim(),
+    generatedAt: String(source.generatedAt || "").trim(),
+    sections: Array.isArray(source.sections)
+      ? source.sections.slice(0, 120).map((section) => ({
+          componentId: String(section?.componentId || "").trim(),
+          slotId: String(section?.slotId || "").trim(),
+          label: String(section?.label || section?.title || "").trim(),
+          geometry: cloneSerializable(section?.geometry || {}, {}),
+          sourceFidelity: cloneSerializable(section?.sourceFidelity || {}, {}),
+        }))
+      : [],
+  };
+}
+
+function buildWholePageContextInputSnapshot(builderInput = {}) {
+  const source = builderInput && typeof builderInput === "object" ? builderInput : {};
+  const systemContext = source.systemContext && typeof source.systemContext === "object" ? source.systemContext : {};
+  return {
+    pageContext: cloneSerializable(source.pageContext || {}, {}),
+    userInput: cloneSerializable(source.userInput || {}, {}),
+    generationOptions: cloneSerializable(source.generationOptions || {}, {}),
+    pageSummary: cloneSerializable(source.pageSummary || {}, {}),
+    approvedPlan: cloneSerializable(source.approvedPlan || {}, {}),
+    systemContext: {
+      targeting: cloneSerializable(systemContext.targeting || {}, {}),
+      artifactSidecarRegistry: buildArtifactSidecarRegistrySnapshot(systemContext.artifactSidecarRegistry || {}),
+    },
+  };
+}
+
 async function runBuilderV2({
   user,
   payload,
@@ -134,6 +179,14 @@ async function runBuilderV2({
     `[builder-v2] input-context user=${user.userId} page=${pageId} editableComponents=${Array.isArray(builderInput?.systemContext?.editableComponents) ? builderInput.systemContext.editableComponents.length : 0} sidecarSections=${Array.isArray(builderInput?.systemContext?.artifactSidecarRegistry?.sections) ? builderInput.systemContext.artifactSidecarRegistry.sections.length : 0}`
   );
 
+  const wholePageContextInput = buildWholePageContextInputSnapshot(builderInput);
+  const wholePageContextAssetsPromise = materializeWholePageContextVisualAssets(wholePageContextInput, {
+    userId: user.userId,
+    pageId,
+    viewportProfile,
+    editableData: data,
+  }).catch((error) => ({ __error: error }));
+
   let referenceVisualAssets = sanitizeVisualAssetList(
     await materializeReferenceVisualAssets(builderInput),
     log,
@@ -167,16 +220,9 @@ async function runBuilderV2({
     }
   }
 
-  const wholePageContextAssets = sanitizeVisualAssetList(
-    await materializeWholePageContextVisualAssets(builderInput, {
-      userId: user.userId,
-      pageId,
-      viewportProfile,
-      editableData: data,
-    }),
-    log,
-    "whole-page-context-assets"
-  );
+  const wholePageContextAssetsResult = await wholePageContextAssetsPromise;
+  if (wholePageContextAssetsResult?.__error) throw wholePageContextAssetsResult.__error;
+  const wholePageContextAssets = sanitizeVisualAssetList(wholePageContextAssetsResult, log, "whole-page-context-assets");
   if (wholePageContextAssets.length) {
     ensureReferenceLibraryContainer(builderInput).wholePageContextAssets = wholePageContextAssets;
     log?.(

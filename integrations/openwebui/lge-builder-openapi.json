@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3100"
+      "url": "http://127.0.0.1:3000"
     }
   ],
   "security": [
@@ -15,6 +15,92 @@
     }
   ],
   "paths": {
+    "/api/builder/lge/v1/preflight": {
+      "post": {
+        "operationId": "preflight_lge_builder_draft",
+        "summary": "Check whether an LGE builder draft request is currently buildable",
+        "description": "Validates the current builder contract, operational viewport support, asset role policy, and source snapshot availability without queuing or creating a draft build.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BuilderDraftRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preflight result. ok=false responses should be routed to feasibility handling by the Open WebUI Action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuilderPreflightResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/builder/lge/v1/concept-preview": {
+      "post": {
+        "operationId": "create_lge_builder_concept_preview",
+        "summary": "Queue an Atlas conceptDocument generation job",
+        "description": "Accepts the admin-compatible requirementDraft shape over the Open WebUI service-token channel. This endpoint creates a conceptDocument only; it does not create a draft build, preview, compare page, or artifact record.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConceptPreviewRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Concept generation job queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptPreviewQueuedResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/builder/lge/v1/concept-jobs/{jobId}": {
+      "get": {
+        "operationId": "get_lge_builder_concept_job",
+        "summary": "Poll an Atlas conceptDocument generation job",
+        "parameters": [
+          {
+            "name": "jobId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Concept job status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConceptJobResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/builder/lge/v1/draft": {
       "post": {
         "operationId": "create_lge_builder_draft",
@@ -31,7 +117,14 @@
         },
         "responses": {
           "202": {
-            "description": "Job queued"
+            "description": "Job queued",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuilderDraftQueuedResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -52,7 +145,14 @@
         ],
         "responses": {
           "200": {
-            "description": "Job status"
+            "description": "Job status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BuilderJobResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -87,6 +187,266 @@
       }
     },
     "schemas": {
+      "RequirementDraft": {
+        "type": "object",
+        "description": "Admin requirement form canonical shape. Open WebUI should fill this first, then let backend generate the conceptDocument.",
+        "properties": {
+          "mode": {
+            "type": "string"
+          },
+          "changeLevel": {
+            "type": "string",
+            "enum": ["low", "medium", "high"]
+          },
+          "interventionLayer": {
+            "type": "string"
+          },
+          "patchDepth": {
+            "type": "string"
+          },
+          "rendererSurface": {
+            "type": "string"
+          },
+          "builderProvider": {
+            "type": "string",
+            "enum": ["local", "openrouter"]
+          },
+          "journeyMode": {
+            "type": "string"
+          },
+          "journeyId": {
+            "type": "string"
+          },
+          "journeyDiscoveryMode": {
+            "type": "string"
+          },
+          "scopePreset": {
+            "type": "string"
+          },
+          "targetScope": {
+            "type": "string"
+          },
+          "targetComponents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "targetGroupId": {
+            "type": "string"
+          },
+          "targetGroupLabel": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "background": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string"
+          },
+          "tone": {
+            "type": "string"
+          },
+          "avoid": {
+            "type": "string"
+          },
+          "refs": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "pageId": {
+            "type": "string"
+          },
+          "viewportProfile": {
+            "type": "string",
+            "enum": ["pc", "mo", "ta"]
+          }
+        },
+        "additionalProperties": true
+      },
+      "ConceptPreviewRequest": {
+        "type": "object",
+        "properties": {
+          "requirementDraft": {
+            "$ref": "#/components/schemas/RequirementDraft"
+          },
+          "pageId": {
+            "type": "string"
+          },
+          "viewportProfile": {
+            "type": "string",
+            "enum": ["pc", "mo", "ta"]
+          },
+          "requestText": {
+            "type": "string"
+          },
+          "keyMessage": {
+            "type": "string"
+          },
+          "preferredDirection": {
+            "type": "string"
+          },
+          "toneAndMood": {
+            "type": "string"
+          },
+          "avoidDirection": {
+            "type": "string"
+          },
+          "referenceUrls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "designChangeLevel": {
+            "type": "string"
+          },
+          "interventionLayer": {
+            "type": "string"
+          },
+          "patchDepth": {
+            "type": "string"
+          },
+          "rendererSurface": {
+            "type": "string"
+          },
+          "builderProvider": {
+            "type": "string",
+            "enum": ["local", "openrouter"]
+          },
+          "targetScope": {
+            "type": "string"
+          },
+          "targetComponents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "targetGroupId": {
+            "type": "string"
+          },
+          "targetGroupLabel": {
+            "type": "string"
+          },
+          "scopePreset": {
+            "type": "string"
+          },
+          "journeyMode": {
+            "type": "string"
+          },
+          "journeyId": {
+            "type": "string"
+          },
+          "journeyDiscoveryMode": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
+      "ConceptPreviewQueuedResponse": {
+        "type": "object",
+        "required": ["ok", "jobId", "status", "pollUrl"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "jobId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "const": "queued"
+          },
+          "pollUrl": {
+            "type": "string"
+          },
+          "queuedAt": {
+            "type": "string"
+          },
+          "externalOwner": {
+            "type": "object"
+          }
+        }
+      },
+      "ConceptJobResponse": {
+        "type": "object",
+        "required": ["ok", "jobId", "status"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "jobId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["queued", "running", "done", "failed", "not_found"]
+          },
+          "stage": {
+            "type": "string",
+            "enum": ["queued", "resolving_target", "analyzing_references", "generating_concept", "formatting_concept_document", "done", "failed"]
+          },
+          "message": {
+            "type": "string"
+          },
+          "percent": {
+            "type": "number"
+          },
+          "requirementDraft": {
+            "$ref": "#/components/schemas/RequirementDraft"
+          },
+          "requirementPlan": {
+            "type": "object"
+          },
+          "conceptDisplayMarkdown": {
+            "type": "string",
+            "description": "Customer-facing concept document produced by the planner. Display this in Open WebUI; do not use a summary as the build source."
+          },
+          "builderMarkdown": {
+            "type": "string"
+          },
+          "designSpecMarkdown": {
+            "type": "string"
+          },
+          "conceptDocument": {
+            "type": "string"
+          },
+          "conceptTrace": {
+            "type": "object",
+            "description": "Debug trace paths and hashes for requirementDraft, planner output, display markdown, builder markdown, design spec, and final conceptDocument."
+          },
+          "plannerProvider": {
+            "type": "string",
+            "enum": ["local", "openrouter"]
+          },
+          "completedAt": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": true
+      },
       "BuilderDraftRequest": {
         "type": "object",
         "required": [
@@ -108,7 +468,17 @@
           "externalProjectId": {
             "type": "string"
           },
+          "externalRequirementId": {
+            "type": "string"
+          },
+          "requirementId": {
+            "type": "string",
+            "description": "Alias accepted by Open WebUI Action; copied into externalRequirementId when externalRequirementId is absent."
+          },
           "externalConceptId": {
+            "type": "string"
+          },
+          "conceptGroupId": {
             "type": "string"
           },
           "conceptThreadId": {
@@ -128,7 +498,546 @@
             "type": "object"
           },
           "builderOptions": {
+            "type": "object",
+            "properties": {
+              "rendererSurface": {
+                "type": "string",
+                "enum": ["tailwind"]
+              },
+              "designChangeLevel": {
+                "type": "string",
+                "enum": ["low", "medium", "high"]
+              },
+              "patchDepth": {
+                "type": "string",
+                "enum": ["low", "medium", "high", "light", "strong", "full"]
+              },
+              "interventionLayer": {
+                "type": "string"
+              },
+              "targetScope": {
+                "type": "string",
+                "enum": ["components", "page"]
+              },
+              "authorProvider": {
+                "type": "string",
+                "enum": ["local", "openrouter"]
+              },
+              "authorModel": {
+                "type": "string",
+                "description": "OpenRouter author model. Open WebUI production flow uses anthropic/claude-sonnet-4.6."
+              },
+              "designAuthorModel": {
+                "type": "string",
+                "description": "Alias for authorModel. Explicit values bypass the runtime design-model profile."
+              },
+              "bypassDesignModelProfile": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "BuilderPreflightReasonCode": {
+        "type": "string",
+        "enum": [
+          "unsupported_page",
+          "unsupported_section",
+          "unsupported_viewport",
+          "unsupported_component",
+          "missing_asset_policy",
+          "asset_policy_violation",
+          "missing_source_snapshot",
+          "concept_too_vague",
+          "ok"
+        ]
+      },
+      "BuilderPreflightScope": {
+        "type": "object",
+        "required": ["pageId", "viewportProfile", "slots", "componentIds"],
+        "properties": {
+          "pageId": {
+            "type": "string"
+          },
+          "viewportProfile": {
+            "type": "string",
+            "enum": ["pc", "mo"]
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "componentIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "BuilderPreflightIssue": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "value": {},
+          "slotId": {
+            "type": "string"
+          },
+          "supported": {},
+          "forbidden": {},
+          "minimumLength": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": true
+      },
+      "BuilderPreflightResponse": {
+        "type": "object",
+        "required": ["ok", "route", "reasonCode", "message", "buildable", "missing", "unsupported"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "route": {
+            "type": "string",
+            "enum": ["build", "feasibility"]
+          },
+          "reasonCode": {
+            "$ref": "#/components/schemas/BuilderPreflightReasonCode"
+          },
+          "message": {
+            "type": "string"
+          },
+          "buildable": {
+            "$ref": "#/components/schemas/BuilderPreflightScope"
+          },
+          "missing": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuilderPreflightIssue"
+            }
+          },
+          "unsupported": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuilderPreflightIssue"
+            }
+          },
+          "supported": {
+            "type": "object",
+            "properties": {
+              "pageIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "viewportProfiles": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": ["pc", "mo"]
+                }
+              },
+              "slots": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "componentIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "reasonCodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BuilderPreflightReasonCode"
+            }
+          },
+          "externalOwner": {
             "type": "object"
+          }
+        }
+      },
+      "BuilderDraftQueuedResponse": {
+        "type": "object",
+        "required": ["ok", "jobId", "status", "pollUrl"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "jobId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "const": "queued"
+          },
+          "pollUrl": {
+            "type": "string"
+          },
+          "queuedAt": {
+            "type": "string"
+          },
+          "externalOwner": {
+            "type": "object"
+          }
+        }
+      },
+      "BuilderJobResponse": {
+        "type": "object",
+        "required": ["ok", "jobId", "status"],
+        "properties": {
+          "ok": {
+            "type": "boolean"
+          },
+          "jobId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["queued", "running", "done", "failed", "not_found"]
+          },
+          "builderRunId": {
+            "type": "string",
+            "description": "The clonellm draftBuildId when status is done."
+          },
+          "previewPath": {
+            "type": "string"
+          },
+          "comparePath": {
+            "type": "string"
+          },
+          "artifactRecord": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderArtifactRecord"
+          },
+          "artifact": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderArtifact"
+          },
+          "completedAt": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      },
+      "OpenWebUIBuilderArtifact": {
+        "type": "object",
+        "required": ["schemaVersion", "artifactType", "metadata", "links", "storage", "sourceTrace", "artifactRecord"],
+        "properties": {
+          "schemaVersion": {
+            "type": "string",
+            "const": "openwebui-builder-artifact-v1"
+          },
+          "artifactType": {
+            "type": "string",
+            "const": "lge-builder-draft"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderArtifactMetadata"
+          },
+          "links": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderArtifactLinks"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderArtifactStorage"
+          },
+          "sourceTrace": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderSourceTrace"
+          },
+          "artifactRecord": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderArtifactRecord"
+          },
+          "authoredSectionHtmlPackage": {
+            "type": "object"
+          },
+          "snapshotData": {
+            "type": "object"
+          },
+          "report": {
+            "type": "object"
+          },
+          "validation": {
+            "type": ["object", "null"]
+          }
+        }
+      },
+      "OpenWebUIBuilderArtifactMetadata": {
+        "type": "object",
+        "required": ["artifactId", "artifactType", "builderJobId", "draftBuildId", "pageId", "viewportProfile"],
+        "properties": {
+          "schemaVersion": {
+            "type": "string"
+          },
+          "artifactId": {
+            "type": "string"
+          },
+          "artifactType": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "externalProjectId": {
+            "type": "string"
+          },
+          "externalRequirementId": {
+            "type": "string"
+          },
+          "requirementId": {
+            "type": "string"
+          },
+          "externalConceptId": {
+            "type": "string"
+          },
+          "conceptGroupId": {
+            "type": "string"
+          },
+          "conceptThreadId": {
+            "type": "string"
+          },
+          "builderJobId": {
+            "type": "string"
+          },
+          "builderRunId": {
+            "type": "string"
+          },
+          "draftBuildId": {
+            "type": "string"
+          },
+          "pageId": {
+            "type": "string"
+          },
+          "viewportProfile": {
+            "type": "string",
+            "enum": ["pc", "mo", "ta"]
+          },
+          "targetGroupId": {
+            "type": "string"
+          }
+        }
+      },
+      "OpenWebUIBuilderArtifactLinks": {
+        "type": "object",
+        "required": ["previewPath", "comparePath"],
+        "properties": {
+          "previewPath": {
+            "type": "string"
+          },
+          "comparePath": {
+            "type": "string"
+          },
+          "runtimeDraftPath": {
+            "type": "string"
+          },
+          "runtimeComparePath": {
+            "type": "string"
+          }
+        }
+      },
+      "OpenWebUIBuilderArtifactStorage": {
+        "type": "object",
+        "required": ["owner", "recommendedRecordKey", "canonicalPreviewFields", "payloadFields"],
+        "properties": {
+          "owner": {
+            "type": "string",
+            "const": "open-webui"
+          },
+          "recommendedRecordKey": {
+            "type": "string"
+          },
+          "canonicalPreviewFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "payloadFields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "OpenWebUIBuilderArtifactRecord": {
+        "type": "object",
+        "required": [
+          "schemaVersion",
+          "artifactId",
+          "artifactType",
+          "source",
+          "status",
+          "builderJobId",
+          "draftBuildId",
+          "pageId",
+          "viewportProfile",
+          "sourceTrace",
+          "links",
+          "storage"
+        ],
+        "properties": {
+          "schemaVersion": {
+            "type": "string",
+            "const": "openwebui-builder-artifact-v1"
+          },
+          "artifactId": {
+            "type": "string"
+          },
+          "artifactType": {
+            "type": "string",
+            "const": "lge-builder-draft"
+          },
+          "source": {
+            "type": "string",
+            "const": "clonellm-builder-api-v1"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "completedAt": {
+            "type": "string"
+          },
+          "externalProjectId": {
+            "type": "string"
+          },
+          "externalRequirementId": {
+            "type": "string"
+          },
+          "externalConceptId": {
+            "type": "string"
+          },
+          "conceptGroupId": {
+            "type": "string"
+          },
+          "conceptThreadId": {
+            "type": "string"
+          },
+          "builderJobId": {
+            "type": "string"
+          },
+          "builderRunId": {
+            "type": "string"
+          },
+          "draftBuildId": {
+            "type": "string"
+          },
+          "pageId": {
+            "type": "string"
+          },
+          "viewportProfile": {
+            "type": "string",
+            "enum": ["pc", "mo", "ta"]
+          },
+          "targetGroupId": {
+            "type": "string"
+          },
+          "targetGroup": {
+            "type": ["object", "null"]
+          },
+          "sourceTrace": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderSourceTrace"
+          },
+          "builder": {
+            "type": "object"
+          },
+          "links": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderArtifactLinks"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/OpenWebUIBuilderArtifactStorage"
+          },
+          "report": {
+            "type": "object"
+          },
+          "validation": {
+            "type": ["object", "null"]
+          },
+          "runtimeAdvisory": {
+            "type": "array"
+          },
+          "authoredSectionHtmlPackage": {
+            "type": ["object", "null"]
+          },
+          "snapshotSummary": {
+            "type": "object"
+          },
+          "externalOwner": {
+            "type": ["object", "null"]
+          }
+        }
+      },
+      "OpenWebUIBuilderSourceTrace": {
+        "type": "object",
+        "required": [
+          "source",
+          "conceptDocumentPreserved",
+          "externalProjectId",
+          "externalRequirementId",
+          "externalConceptId",
+          "conceptGroupId",
+          "conceptThreadId",
+          "builderJobId",
+          "draftBuildId",
+          "snapshotTracePath"
+        ],
+        "properties": {
+          "source": {
+            "type": "string",
+            "const": "clonellm-builder-api-v1"
+          },
+          "conceptDocumentPreserved": {
+            "type": "boolean",
+            "const": true
+          },
+          "conceptDocumentSha256": {
+            "type": "string",
+            "description": "SHA-256 of the exact conceptDocument submitted to the draft build endpoint."
+          },
+          "conceptDocumentBytes": {
+            "type": "number",
+            "description": "Byte length of the exact conceptDocument submitted to the draft build endpoint."
+          },
+          "externalProjectId": {
+            "type": "string"
+          },
+          "externalRequirementId": {
+            "type": "string"
+          },
+          "externalConceptId": {
+            "type": "string"
+          },
+          "conceptGroupId": {
+            "type": "string"
+          },
+          "conceptThreadId": {
+            "type": "string"
+          },
+          "builderJobId": {
+            "type": "string"
+          },
+          "draftBuildId": {
+            "type": "string"
+          },
+          "snapshotTracePath": {
+            "type": "string",
+            "const": "artifact.snapshotData.authoringStageTrace"
           }
         }
       }

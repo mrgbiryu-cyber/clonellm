@@ -32,12 +32,9 @@ function loadEnvOverrides(envPath) {
 
 loadEnvOverrides(ENV_PATH);
 
-// TEST MODEL PROFILE (2026-04-29)
-// 디버깅 중 /api/llm/status도 저가 모델 기본값을 보여주도록 맞춘다.
-// flow 검증 완료 후 production/high-quality target은 anthropic/claude-sonnet-4.6 으로 복구한다.
-const DEFAULT_OPENROUTER_TEXT_MODEL = "anthropic/claude-haiku-4.5";
+const DEFAULT_OPENROUTER_TEXT_MODEL = "anthropic/claude-sonnet-4.6";
 
-const { buildDemoPlannerResult, handleLlmChange, handleLlmChangeOnData, handleLlmPlan, handleLlmBuildOnData, handleLlmFix, handleLlmVisualCritic, callOpenRouterImageGeneration, applyOperations, enforceBuilderOperations, normalizeEditableData, readEditableData, writeEditableData } = require("./llm");
+const { buildDemoPlannerResult, handleLlmChange, handleLlmChangeOnData, handleLlmPlan, handleLlmBuildOnData, handleLlmFix, handleLlmVisualCritic, callOpenRouterText, callOpenRouterImageGeneration, applyOperations, enforceBuilderOperations, normalizeEditableData, readEditableData, writeEditableData } = require("./llm");
 const { runBuilderV2 } = require("./builder-v2/orchestrator");
 const { resolveBuilderVersion } = require("./builder-v2/contracts");
 const { runV2Engine } = require("./builder-v2/engine-v2");
@@ -105,6 +102,7 @@ const {
   saveRequirementPlan,
   listDraftBuilds,
   findDraftBuildById,
+  findDraftBuildWithOwnerById,
   saveDraftBuild,
   updateDraftBuildById,
   attachDraftReplayCheck,
@@ -116,7 +114,7 @@ const {
   savePageIdentityOverride,
 } = require("./auth");
 
-const HOST = "0.0.0.0";
+const HOST = String(process.env.HOST || "0.0.0.0");
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = __dirname;
 const STATIC_DIR = path.join(ROOT, "web");
@@ -159,6 +157,10 @@ const RUNTIME_DIR = path.join(ROOT, "data", "runtime");
 const ROUTE_TRACE_PATH = path.join(RUNTIME_DIR, "route-trace.jsonl");
 const SHARE_LINKS_PATH = path.join(RUNTIME_DIR, "share-links.json");
 const CONCEPT_PACKAGES_PATH = path.join(RUNTIME_DIR, "concept-packages.json");
+const OPENWEBUI_JOB_STORE_DIR = path.join(RUNTIME_DIR, "openwebui-jobs");
+const OPENWEBUI_JOB_SQLITE_PATH = path.join(RUNTIME_DIR, "jobs.db");
+const OPENWEBUI_CONCEPT_DETAILS_DIR = path.join(RUNTIME_DIR, "openwebui-concept-details");
+const OPENWEBUI_PREBUILD_CANDIDATES_DIR = path.join(RUNTIME_DIR, "prebuild-candidates");
 const JOURNEY_FLOWS_PATH = path.join(RUNTIME_DIR, "journey-flows.json");
 const JOURNEY_BUILDS_PATH = path.join(RUNTIME_DIR, "journey-builds.json");
 const JOURNEY_DEFINITIONS_PATH = path.join(ROOT, "data", "normalized", "journey-definitions.json");
@@ -175,7 +177,41 @@ const OPENWEBUI_BUILDER_SERVICE_TOKEN = String(process.env.OPENWEBUI_BUILDER_SER
 const OPENWEBUI_PREVIEW_TOKEN_SECRET = String(process.env.OPENWEBUI_PREVIEW_TOKEN_SECRET || OPENWEBUI_BUILDER_SERVICE_TOKEN || "dev-openwebui-preview-secret").trim();
 const OPENWEBUI_BUILDER_USER_ID = String(process.env.OPENWEBUI_BUILDER_USER_ID || "openwebui-builder-service").trim();
 const OPENWEBUI_BUILDER_JOB_RETENTION_MS = Math.max(5 * 60 * 1000, Number(process.env.OPENWEBUI_BUILDER_JOB_RETENTION_MS || 24 * 60 * 60 * 1000));
+const OPENWEBUI_PREBUILD_CANDIDATE_RETENTION_MS = Math.max(5 * 60 * 1000, Number(process.env.OPENWEBUI_PREBUILD_CANDIDATE_RETENTION_MS || 4 * 60 * 60 * 1000));
+const OPENWEBUI_CONCEPT_PREBUILD_CONCURRENCY = Math.max(
+  1,
+  Math.min(4, Number(process.env.OPENWEBUI_CONCEPT_PREBUILD_CONCURRENCY || 1))
+);
+const OPENWEBUI_CONCEPT_PREBUILD_QUEUE_MAX = Math.max(
+  1,
+  Math.min(50, Number(process.env.OPENWEBUI_CONCEPT_PREBUILD_QUEUE_MAX || 8))
+);
+const WORKSPACE_DRAFT_JOB_RETENTION_MS = Math.max(5 * 60 * 1000, Number(process.env.WORKSPACE_DRAFT_JOB_RETENTION_MS || 30 * 60 * 1000));
+const OPENWEBUI_BUILDER_JOB_TIMEOUT_MS = Math.max(
+  10 * 60 * 1000,
+  Number(
+    process.env.OPENWEBUI_BUILDER_JOB_TIMEOUT_MS ||
+      process.env.BUILDER_JOB_TIMEOUT_MS ||
+      Math.max(20 * 60 * 1000, Number(process.env.PLANNER_REQUEST_TIMEOUT_MS || process.env.LLM_REQUEST_TIMEOUT_MS || 270000) * 4)
+  )
+);
+const OPENWEBUI_PREBUILD_WAIT_MAX_MS = Math.max(
+  0,
+  Number(process.env.OPENWEBUI_PREBUILD_WAIT_MAX_MS || Math.min(15 * 60 * 1000, Math.max(0, OPENWEBUI_BUILDER_JOB_TIMEOUT_MS - 60 * 1000)))
+);
+const OPENWEBUI_PREBUILD_WAIT_POLL_MS = Math.max(500, Number(process.env.OPENWEBUI_PREBUILD_WAIT_POLL_MS || 2000));
 const OPENWEBUI_BUILDER_JOBS = new Map();
+const OPENWEBUI_BUILDER_CONCEPT_JOBS = new Map();
+const OPENWEBUI_PREBUILD_CANDIDATES = new Map();
+const OPENWEBUI_CONCEPT_PREBUILD_QUEUE = [];
+const WORKSPACE_BUILD_LOCAL_DRAFT_JOBS = new Map();
+const OPENWEBUI_DURABLE_JOB_STORE = createOpenwebuiDurableJobStore();
+let lastOpenwebuiBuilderJobPruneAt = 0;
+let lastOpenwebuiBuilderConceptJobPruneAt = 0;
+let lastOpenwebuiPrebuildCandidatePruneAt = 0;
+let lastWorkspaceBuildLocalDraftJobPruneAt = 0;
+let openwebuiConceptPrebuildActiveCount = 0;
+const JOB_PRUNE_INTERVAL_MS = Math.max(1000, Number(process.env.JOB_PRUNE_INTERVAL_MS || 60000));
 const WORKING_COMPONENT_INVENTORY_CACHE = new Map();
 const WORKING_EDITABILITY_CACHE = new Map();
 const WORKING_SHARE_SECTION_REGISTRY_CACHE = new Map();
@@ -191,6 +227,11 @@ const SECTION_FAMILY_CONTRACTS_CACHE = new Map();
 const PAGE_BUILDER_PROMPT_BLUEPRINTS_CACHE = new Map();
 const FAMILY_RECIPE_PLAN_CACHE = new Map();
 const FAMILY_TOP_RECIPE_BLUEPRINTS_CACHE = new Map();
+const OPENWEBUI_BUILDER_CONTRACT_CACHE = new Map();
+const REFERENCE_SHELL_SIGNATURE_CACHE = new Map();
+const RUNTIME_REFERENCE_SHELL_CACHE = new Map();
+const RUNTIME_REFERENCE_EXTRACTION_CACHE = new Map();
+const RUNTIME_CACHE_PRUNE_STATE = new WeakMap();
 const IMAGE_GENERATION_RUNTIME_STATE = {
   unavailableUntil: 0,
   lastReason: "",
@@ -505,8 +546,40 @@ function readCachedValue(cache, key, compute, ttlMs = PAGE_COMPUTE_CACHE_TTL_MS)
   }
   const value = compute();
   cache.set(key, { at: now, value });
-  pruneRuntimeCache(cache, { now, ttlMs });
+  const pruneState = RUNTIME_CACHE_PRUNE_STATE.get(cache) || { at: 0 };
+  if (cache.size >= Math.floor(PAGE_COMPUTE_CACHE_MAX_ENTRIES * 0.9) || now - pruneState.at > JOB_PRUNE_INTERVAL_MS) {
+    pruneRuntimeCache(cache, { now, ttlMs });
+    RUNTIME_CACHE_PRUNE_STATE.set(cache, { at: now });
+  }
   return value;
+}
+
+function readFileSignatureForCache(filePath) {
+  try {
+    const stat = fs.statSync(filePath);
+    return `${Number(stat.mtimeMs || 0)}:${Number(stat.size || 0)}`;
+  } catch {
+    return "missing";
+  }
+}
+
+function createStageTimingRecorder() {
+  const startedAtMs = Date.now();
+  const stages = {};
+  return {
+    mark(stageName, stageStartedAtMs) {
+      const name = String(stageName || "").trim();
+      if (!name) return;
+      const start = Number(stageStartedAtMs || startedAtMs);
+      stages[name] = Math.max(0, Date.now() - start);
+    },
+    finish() {
+      return {
+        totalMs: Math.max(0, Date.now() - startedAtMs),
+        stages,
+      };
+    },
+  };
 }
 
 function buildWorkspacePageCacheKey(editableData, pageId, scope = "", viewportProfile = "") {
@@ -530,6 +603,15 @@ function sendJson(res, status, payload) {
   res.end(body);
 }
 
+function parseJsonBodyOr400(body, res) {
+  try {
+    return { ok: true, payload: body ? JSON.parse(body) : {} };
+  } catch (error) {
+    sendJson(res, 400, { error: "invalid_json", detail: String(error?.message || error) });
+    return { ok: false, payload: null };
+  }
+}
+
 function base64urlEncodeJson(value) {
   return Buffer.from(JSON.stringify(value)).toString("base64url");
 }
@@ -538,6 +620,14 @@ function signPreviewPayload(payload) {
   const encodedPayload = base64urlEncodeJson(payload);
   const signature = crypto.createHmac("sha256", OPENWEBUI_PREVIEW_TOKEN_SECRET).update(encodedPayload).digest("base64url");
   return `${encodedPayload}.${signature}`;
+}
+
+function isAuthorizedDebugRequest(req, requestUrl) {
+  const criticKey = String(requestUrl?.searchParams?.get("criticKey") || "").trim();
+  if (criticKey && criticKey === INTERNAL_VISUAL_CRITIC_KEY) return true;
+  const authHeader = String(req.headers.authorization || "").trim();
+  const bearer = authHeader.match(/^Bearer\s+(.+)$/i)?.[1]?.trim() || "";
+  return Boolean(bearer && bearer === OPENWEBUI_BUILDER_SERVICE_TOKEN);
 }
 
 function verifyPreviewToken(token = "") {
@@ -614,22 +704,822 @@ function requireOpenWebuiBuilderRequest(req, res) {
   };
 }
 
-function pruneOpenwebuiBuilderJobs() {
-  const now = Date.now();
-  for (const [jobId, job] of OPENWEBUI_BUILDER_JOBS.entries()) {
-    const completedAt = Date.parse(job.completedAt || job.failedAt || job.acknowledgedAt || job.startedAt || job.queuedAt || "");
-    if (Number.isFinite(completedAt) && now - completedAt > OPENWEBUI_BUILDER_JOB_RETENTION_MS) {
-      OPENWEBUI_BUILDER_JOBS.delete(jobId);
-    }
+function sanitizeJobStoreId(value = "") {
+  return String(value || "")
+    .trim()
+    .replace(/[^A-Za-z0-9_.-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function createFileBackedOpenwebuiJobStore() {
+  const typeDir = (type = "") => path.join(OPENWEBUI_JOB_STORE_DIR, sanitizeJobStoreId(type || "job"));
+  const itemPath = (type = "", jobId = "") => {
+    const safeJobId = sanitizeJobStoreId(jobId);
+    if (!safeJobId) return "";
+    return path.join(typeDir(type), `${safeJobId}.json`);
+  };
+  return {
+    backend: "file",
+    get(type = "", jobId = "") {
+      const filePath = itemPath(type, jobId);
+      if (!filePath || !fs.existsSync(filePath)) return null;
+      try {
+        const payload = JSON.parse(fs.readFileSync(filePath, "utf8"));
+        return payload?.payload && typeof payload.payload === "object" ? payload.payload : null;
+      } catch {
+        return null;
+      }
+    },
+    set(type = "", jobId = "", payload = {}) {
+      const filePath = itemPath(type, jobId);
+      if (!filePath) return;
+      try {
+        ensureParentDir(filePath);
+        const tmpPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+        fs.writeFileSync(tmpPath, `${JSON.stringify({
+          schemaVersion: "openwebui-job-store-file-v1",
+          type,
+          jobId,
+          updatedAt: new Date().toISOString(),
+          payload,
+        })}\n`, "utf8");
+        fs.renameSync(tmpPath, filePath);
+      } catch (error) {
+        console.warn(`[openwebui-job-store] file write failed: ${error.message}`);
+      }
+    },
+    delete(type = "", jobId = "") {
+      const filePath = itemPath(type, jobId);
+      if (!filePath) return;
+      try {
+        fs.rmSync(filePath, { force: true });
+      } catch {}
+    },
+    list(type = "") {
+      const dir = typeDir(type);
+      try {
+        return fs.readdirSync(dir)
+          .filter((name) => name.endsWith(".json"))
+          .map((name) => this.get(type, name.slice(0, -".json".length)))
+          .filter(Boolean);
+      } catch {
+        return [];
+      }
+    },
+    listExpired(type = "", beforeMs = 0) {
+      return this.list(type).filter((job) => getOpenwebuiJobRetentionAnchorMs(job) < beforeMs);
+    },
+  };
+}
+
+function createSqliteOpenwebuiJobStore() {
+  let BetterSqlite3 = null;
+  try {
+    BetterSqlite3 = require("better-sqlite3");
+  } catch {
+    return null;
+  }
+  try {
+    ensureParentDir(OPENWEBUI_JOB_SQLITE_PATH);
+    const db = new BetterSqlite3(OPENWEBUI_JOB_SQLITE_PATH);
+    db.pragma("journal_mode = WAL");
+    db.pragma("synchronous = NORMAL");
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS jobs (
+        jobId TEXT PRIMARY KEY,
+        type TEXT NOT NULL,
+        status TEXT,
+        userId TEXT,
+        projectId TEXT,
+        pageId TEXT,
+        queuedAt INTEGER,
+        startedAt INTEGER,
+        completedAt INTEGER,
+        failedAt INTEGER,
+        draftBuildId TEXT,
+        previewPath TEXT,
+        comparePath TEXT,
+        prebuildStatus TEXT,
+        candidateKey TEXT,
+        updatedAt INTEGER NOT NULL,
+        payload TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_jobs_type_status_updated ON jobs(type, status, updatedAt);
+      CREATE INDEX IF NOT EXISTS idx_jobs_owner ON jobs(userId, projectId, updatedAt);
+    `);
+    const upsert = db.prepare(`
+      INSERT INTO jobs (
+        jobId, type, status, userId, projectId, pageId, queuedAt, startedAt, completedAt, failedAt,
+        draftBuildId, previewPath, comparePath, prebuildStatus, candidateKey, updatedAt, payload
+      ) VALUES (
+        @jobId, @type, @status, @userId, @projectId, @pageId, @queuedAt, @startedAt, @completedAt, @failedAt,
+        @draftBuildId, @previewPath, @comparePath, @prebuildStatus, @candidateKey, @updatedAt, @payload
+      )
+      ON CONFLICT(jobId) DO UPDATE SET
+        type=excluded.type,
+        status=excluded.status,
+        userId=excluded.userId,
+        projectId=excluded.projectId,
+        pageId=excluded.pageId,
+        queuedAt=excluded.queuedAt,
+        startedAt=excluded.startedAt,
+        completedAt=excluded.completedAt,
+        failedAt=excluded.failedAt,
+        draftBuildId=excluded.draftBuildId,
+        previewPath=excluded.previewPath,
+        comparePath=excluded.comparePath,
+        prebuildStatus=excluded.prebuildStatus,
+        candidateKey=excluded.candidateKey,
+        updatedAt=excluded.updatedAt,
+        payload=excluded.payload
+    `);
+    const select = db.prepare("SELECT payload FROM jobs WHERE jobId = ? AND type = ?");
+    const remove = db.prepare("DELETE FROM jobs WHERE jobId = ? AND type = ?");
+    const list = db.prepare("SELECT payload FROM jobs WHERE type = ? ORDER BY updatedAt DESC LIMIT 1000");
+    const listExpired = db.prepare(`
+      SELECT payload FROM jobs
+      WHERE type = ?
+        AND COALESCE(completedAt, failedAt, startedAt, queuedAt, updatedAt) < ?
+      ORDER BY updatedAt ASC
+      LIMIT 1000
+    `);
+    return {
+      backend: "sqlite",
+      get(type = "", jobId = "") {
+        const row = select.get(String(jobId || "").trim(), String(type || "").trim());
+        if (!row?.payload) return null;
+        try {
+          return JSON.parse(row.payload);
+        } catch {
+          return null;
+        }
+      },
+      set(type = "", jobId = "", payload = {}) {
+        const externalOwner = payload?.externalOwner && typeof payload.externalOwner === "object" ? payload.externalOwner : {};
+        const prebuild = payload?.prebuild && typeof payload.prebuild === "object" ? payload.prebuild : {};
+        upsert.run({
+          jobId: String(jobId || "").trim(),
+          type: String(type || "").trim(),
+          status: String(payload?.status || "").trim(),
+          userId: String(payload?.userId || externalOwner.userId || "").trim(),
+          projectId: String(payload?.projectId || externalOwner.projectId || payload?.externalProjectId || "").trim(),
+          pageId: String(payload?.pageId || payload?.artifactRecord?.pageId || payload?.artifact?.metadata?.pageId || "").trim(),
+          queuedAt: Date.parse(payload?.queuedAt || "") || null,
+          startedAt: Date.parse(payload?.startedAt || "") || null,
+          completedAt: Date.parse(payload?.completedAt || "") || null,
+          failedAt: Date.parse(payload?.failedAt || "") || null,
+          draftBuildId: String(payload?.draftBuildId || payload?.builderRunId || payload?.artifactRecord?.draftBuildId || "").trim(),
+          previewPath: String(payload?.previewPath || payload?.artifactRecord?.links?.previewPath || "").trim(),
+          comparePath: String(payload?.comparePath || payload?.artifactRecord?.links?.comparePath || "").trim(),
+          prebuildStatus: String(prebuild.status || "").trim(),
+          candidateKey: String(prebuild.candidateKey || payload?.candidateKey || "").trim(),
+          updatedAt: Date.now(),
+          payload: JSON.stringify(payload || {}),
+        });
+      },
+      delete(type = "", jobId = "") {
+        remove.run(String(jobId || "").trim(), String(type || "").trim());
+      },
+      list(type = "") {
+        return list.all(String(type || "").trim()).map((row) => {
+          try {
+            return JSON.parse(row.payload);
+          } catch {
+            return null;
+          }
+        }).filter(Boolean);
+      },
+      listExpired(type = "", beforeMs = 0) {
+        return listExpired.all(String(type || "").trim(), Number(beforeMs || 0)).map((row) => {
+          try {
+            return JSON.parse(row.payload);
+          } catch {
+            return null;
+          }
+        }).filter(Boolean);
+      },
+    };
+  } catch (error) {
+    console.warn(`[openwebui-job-store] sqlite unavailable: ${error.message}`);
+    return null;
   }
 }
 
+function createOpenwebuiDurableJobStore() {
+  if (String(process.env.OPENWEBUI_JOB_STORE_DISABLED || "").trim() === "1") {
+    return {
+      backend: "disabled",
+      get() { return null; },
+      set() {},
+      delete() {},
+      list() { return []; },
+      listExpired() { return []; },
+    };
+  }
+  return createSqliteOpenwebuiJobStore() || createFileBackedOpenwebuiJobStore();
+}
+
+function persistOpenwebuiJob(type = "", jobId = "", payload = {}) {
+  try {
+    const durablePayload = String(type || "").trim() === "concept"
+      ? buildOpenwebuiConceptJobDurablePayload(jobId, payload)
+      : payload;
+    OPENWEBUI_DURABLE_JOB_STORE.set(type, jobId, durablePayload);
+  } catch (error) {
+    console.warn(`[openwebui-job-store] persist failed: ${error.message}`);
+  }
+}
+
+function readOpenwebuiDurableJob(type = "", jobId = "") {
+  try {
+    const payload = OPENWEBUI_DURABLE_JOB_STORE.get(type, jobId);
+    return String(type || "").trim() === "concept" ? hydrateOpenwebuiConceptJob(payload) : payload;
+  } catch {
+    return null;
+  }
+}
+
+function deleteOpenwebuiDurableJob(type = "", jobId = "") {
+  try {
+    OPENWEBUI_DURABLE_JOB_STORE.delete(type, jobId);
+    if (String(type || "").trim() === "concept") deleteOpenwebuiConceptJobDetail(jobId);
+  } catch {}
+}
+
+function getOpenwebuiJobRetentionAnchorMs(job = {}) {
+  const parsed = Date.parse(
+    job?.completedAt ||
+      job?.failedAt ||
+      job?.acknowledgedAt ||
+      job?.startedAt ||
+      job?.queuedAt ||
+      job?.updatedAt ||
+      ""
+  );
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function pruneOpenwebuiDurableJobs(type = "", retentionMs = OPENWEBUI_BUILDER_JOB_RETENTION_MS) {
+  const normalizedType = String(type || "").trim();
+  if (!normalizedType || !OPENWEBUI_DURABLE_JOB_STORE?.listExpired) return;
+  const beforeMs = Date.now() - Math.max(0, Number(retentionMs || 0));
+  const expiredJobs = OPENWEBUI_DURABLE_JOB_STORE.listExpired(normalizedType, beforeMs);
+  expiredJobs.forEach((job) => {
+    const jobId = String(job?.jobId || "").trim();
+    if (!jobId) return;
+    if (normalizedType === "concept") {
+      const candidateKey = String(job?.prebuild?.candidateKey || job?.candidateKey || "").trim();
+      if (candidateKey) {
+        OPENWEBUI_PREBUILD_CANDIDATES.delete(candidateKey);
+        deleteOpenwebuiPrebuildCandidateRecord(candidateKey);
+      }
+    }
+    deleteOpenwebuiDurableJob(normalizedType, jobId);
+  });
+}
+
+function getOpenwebuiBuilderJob(jobId = "") {
+  const normalizedJobId = String(jobId || "").trim();
+  if (!normalizedJobId) return null;
+  const inMemory = OPENWEBUI_BUILDER_JOBS.get(normalizedJobId);
+  if (inMemory) return inMemory;
+  const durable = readOpenwebuiDurableJob("builder", normalizedJobId);
+  if (durable) OPENWEBUI_BUILDER_JOBS.set(normalizedJobId, durable);
+  return durable || null;
+}
+
+function getOpenwebuiBuilderConceptJob(jobId = "") {
+  const normalizedJobId = String(jobId || "").trim();
+  if (!normalizedJobId) return null;
+  const inMemory = OPENWEBUI_BUILDER_CONCEPT_JOBS.get(normalizedJobId);
+  if (inMemory) return inMemory;
+  const durable = readOpenwebuiDurableJob("concept", normalizedJobId);
+  if (durable) OPENWEBUI_BUILDER_CONCEPT_JOBS.set(normalizedJobId, durable);
+  return durable || null;
+}
+
+function getWorkspaceBuildLocalDraftJob(jobId = "") {
+  const normalizedJobId = String(jobId || "").trim();
+  if (!normalizedJobId) return null;
+  const inMemory = WORKSPACE_BUILD_LOCAL_DRAFT_JOBS.get(normalizedJobId);
+  if (inMemory) return inMemory;
+  const durable = readOpenwebuiDurableJob("workspace-draft", normalizedJobId);
+  if (durable) WORKSPACE_BUILD_LOCAL_DRAFT_JOBS.set(normalizedJobId, durable);
+  return durable || null;
+}
+
+const OPENWEBUI_CONCEPT_JOB_DETAIL_FIELDS = [
+  "requirementDraft",
+  "requirementPlan",
+  "providerResult",
+  "planningPreview",
+  "conceptDisplayMarkdown",
+  "builderMarkdown",
+  "designSpecMarkdown",
+  "conceptDocument",
+  "authoringPlan",
+  "conceptTrace",
+];
+
+function getOpenwebuiConceptJobDetailPath(jobId = "") {
+  const safeJobId = sanitizeJobStoreId(jobId);
+  if (!safeJobId) return "";
+  return path.join(OPENWEBUI_CONCEPT_DETAILS_DIR, `${safeJobId}.json`);
+}
+
+function writeOpenwebuiConceptJobDetail(jobId = "", job = {}) {
+  const filePath = getOpenwebuiConceptJobDetailPath(jobId);
+  if (!filePath || !job || typeof job !== "object") return null;
+  const detail = {};
+  for (const field of OPENWEBUI_CONCEPT_JOB_DETAIL_FIELDS) {
+    if (job[field] !== undefined) detail[field] = job[field];
+  }
+  if (!Object.keys(detail).length) return null;
+  try {
+    ensureParentDir(filePath);
+    const tmpPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+    fs.writeFileSync(tmpPath, `${JSON.stringify({
+      schemaVersion: "openwebui-concept-job-detail-v1",
+      jobId: String(jobId || "").trim(),
+      updatedAt: new Date().toISOString(),
+      detail,
+    })}\n`, "utf8");
+    fs.renameSync(tmpPath, filePath);
+    return {
+      storage: "file",
+      path: path.relative(ROOT, filePath),
+      fields: Object.keys(detail),
+    };
+  } catch (error) {
+    console.warn(`[openwebui-concept-detail] write failed: ${error.message}`);
+    return null;
+  }
+}
+
+function readOpenwebuiConceptJobDetail(jobId = "") {
+  const filePath = getOpenwebuiConceptJobDetailPath(jobId);
+  if (!filePath || !fs.existsSync(filePath)) return null;
+  try {
+    const payload = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    return payload?.detail && typeof payload.detail === "object" ? payload.detail : null;
+  } catch {
+    return null;
+  }
+}
+
+function deleteOpenwebuiConceptJobDetail(jobId = "") {
+  const filePath = getOpenwebuiConceptJobDetailPath(jobId);
+  if (!filePath) return;
+  try {
+    fs.rmSync(filePath, { force: true });
+  } catch {}
+}
+
+function buildOpenwebuiConceptJobDurablePayload(jobId = "", job = {}) {
+  if (!job || typeof job !== "object") return job;
+  const detailRef = writeOpenwebuiConceptJobDetail(jobId, job);
+  if (!detailRef && !job.conceptDetailRef) return job;
+  const slim = { ...job, conceptDetailRef: detailRef || job.conceptDetailRef };
+  for (const field of OPENWEBUI_CONCEPT_JOB_DETAIL_FIELDS) {
+    delete slim[field];
+  }
+  return slim;
+}
+
+function hydrateOpenwebuiConceptJob(job = null) {
+  if (!job || typeof job !== "object") return job;
+  const hasInlineDetail = OPENWEBUI_CONCEPT_JOB_DETAIL_FIELDS.some((field) => job[field] !== undefined);
+  if (hasInlineDetail) return job;
+  const detail = readOpenwebuiConceptJobDetail(job.jobId);
+  return detail ? { ...job, ...detail } : job;
+}
+
+function pruneOpenwebuiBuilderJobs() {
+  const now = Date.now();
+  for (const [jobId, job] of OPENWEBUI_BUILDER_JOBS.entries()) {
+    const anchorMs = getOpenwebuiJobRetentionAnchorMs(job);
+    if (anchorMs && now - anchorMs > OPENWEBUI_BUILDER_JOB_RETENTION_MS) {
+      OPENWEBUI_BUILDER_JOBS.delete(jobId);
+      deleteOpenwebuiDurableJob("builder", jobId);
+    }
+  }
+  pruneOpenwebuiDurableJobs("builder", OPENWEBUI_BUILDER_JOB_RETENTION_MS);
+}
+
 function setOpenwebuiBuilderJob(jobId, patch = {}) {
-  pruneOpenwebuiBuilderJobs();
+  const now = Date.now();
+  if (now - lastOpenwebuiBuilderJobPruneAt > JOB_PRUNE_INTERVAL_MS) {
+    pruneOpenwebuiBuilderJobs();
+    lastOpenwebuiBuilderJobPruneAt = now;
+  }
   const current = OPENWEBUI_BUILDER_JOBS.get(jobId) || {};
   const next = { ...current, ...patch, jobId };
   OPENWEBUI_BUILDER_JOBS.set(jobId, next);
+  persistOpenwebuiJob("builder", jobId, next);
   return next;
+}
+
+class BuilderJobTimeoutError extends Error {
+  constructor(message, jobId = "") {
+    super(message);
+    this.name = "BuilderJobTimeoutError";
+    this.code = "builder_job_timeout";
+    this.error = "builder_job_timeout";
+    this.jobId = jobId;
+    this.detail = message;
+  }
+}
+
+function withOpenwebuiBuilderJobTimeout(promise, jobId = "") {
+  let timer = null;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => {
+      reject(new BuilderJobTimeoutError(`Open WebUI builder job timed out after ${OPENWEBUI_BUILDER_JOB_TIMEOUT_MS}ms`, jobId));
+    }, OPENWEBUI_BUILDER_JOB_TIMEOUT_MS);
+  });
+  return Promise.race([promise, timeout]).finally(() => {
+    if (timer) clearTimeout(timer);
+  }).catch((error) => {
+    if (error?.code === "builder_job_timeout") {
+      error.error = "builder_job_timeout";
+      error.detail = String(error.message || error);
+      error.jobId = jobId;
+    }
+    throw error;
+  });
+}
+
+function markOpenwebuiBuilderJobTimedOutIfStale(jobId, job = {}) {
+  const status = String(job?.status || "").trim().toLowerCase();
+  if (status !== "queued" && status !== "running") return job;
+  const startedAtMs = Date.parse(job.startedAt || job.queuedAt || "");
+  if (!Number.isFinite(startedAtMs)) return job;
+  const elapsedMs = Date.now() - startedAtMs;
+  if (elapsedMs <= OPENWEBUI_BUILDER_JOB_TIMEOUT_MS) return job;
+  return setOpenwebuiBuilderJob(jobId, {
+    ok: false,
+    status: "failed",
+    error: "builder_job_timeout",
+    detail: `Open WebUI builder job exceeded ${OPENWEBUI_BUILDER_JOB_TIMEOUT_MS}ms without completion.`,
+    failedAt: new Date().toISOString(),
+  });
+}
+
+function pruneOpenwebuiBuilderConceptJobs() {
+  const now = Date.now();
+  for (const [jobId, job] of OPENWEBUI_BUILDER_CONCEPT_JOBS.entries()) {
+    const anchorMs = getOpenwebuiJobRetentionAnchorMs(job);
+    if (anchorMs && now - anchorMs > OPENWEBUI_BUILDER_JOB_RETENTION_MS) {
+      const candidateKey = String(job?.prebuild?.candidateKey || job?.candidateKey || "").trim();
+      if (candidateKey) deleteOpenwebuiPrebuildCandidateRecord(candidateKey);
+      OPENWEBUI_BUILDER_CONCEPT_JOBS.delete(jobId);
+      deleteOpenwebuiDurableJob("concept", jobId);
+    }
+  }
+  pruneOpenwebuiDurableJobs("concept", OPENWEBUI_BUILDER_JOB_RETENTION_MS);
+}
+
+function setOpenwebuiBuilderConceptJob(jobId, patch = {}) {
+  const now = Date.now();
+  if (now - lastOpenwebuiBuilderConceptJobPruneAt > JOB_PRUNE_INTERVAL_MS) {
+    pruneOpenwebuiBuilderConceptJobs();
+    lastOpenwebuiBuilderConceptJobPruneAt = now;
+  }
+  const current = OPENWEBUI_BUILDER_CONCEPT_JOBS.get(jobId) || {};
+  const next = { ...current, ...patch, jobId };
+  OPENWEBUI_BUILDER_CONCEPT_JOBS.set(jobId, next);
+  persistOpenwebuiJob("concept", jobId, next);
+  return next;
+}
+
+function pruneOpenwebuiPrebuildCandidates() {
+  const now = Date.now();
+  for (const [candidateKey, record] of OPENWEBUI_PREBUILD_CANDIDATES.entries()) {
+    const createdAt = Date.parse(record?.createdAt || record?.completedAt || "");
+    if (Number.isFinite(createdAt) && now - createdAt > OPENWEBUI_PREBUILD_CANDIDATE_RETENTION_MS) {
+      deleteOpenwebuiPrebuildCandidateRecord(candidateKey);
+    }
+  }
+  try {
+    const names = fs.readdirSync(OPENWEBUI_PREBUILD_CANDIDATES_DIR);
+    names
+      .filter((name) => name.endsWith(".json"))
+      .forEach((name) => {
+        const filePath = path.join(OPENWEBUI_PREBUILD_CANDIDATES_DIR, name);
+        try {
+          const payload = JSON.parse(fs.readFileSync(filePath, "utf8"));
+          const record = payload?.record && typeof payload.record === "object" ? payload.record : {};
+          const createdAt = Date.parse(record.createdAt || record.completedAt || payload.updatedAt || "");
+          if (!Number.isFinite(createdAt) || now - createdAt <= OPENWEBUI_PREBUILD_CANDIDATE_RETENTION_MS) return;
+          const candidateKey = String(record.candidateKey || payload.candidateKey || name.slice(0, -".json".length)).trim();
+          if (candidateKey) deleteOpenwebuiPrebuildCandidateRecord(candidateKey);
+          else fs.rmSync(filePath, { force: true });
+        } catch {
+          // Keep unreadable candidate files for manual inspection instead of deleting possibly useful evidence.
+        }
+      });
+  } catch {}
+}
+
+function buildOpenwebuiPrebuildCandidateKey(jobId = "", conceptHash = "") {
+  return [
+    "prebuild",
+    String(jobId || "").trim(),
+    String(conceptHash || "").trim().slice(0, 16),
+  ]
+    .join("-")
+    .replace(/[^A-Za-z0-9_.-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function getOpenwebuiPrebuildCandidatePath(candidateKey = "") {
+  const normalizedKey = sanitizeJobStoreId(candidateKey);
+  if (!normalizedKey) return "";
+  return path.join(OPENWEBUI_PREBUILD_CANDIDATES_DIR, `${normalizedKey}.json`);
+}
+
+function writeOpenwebuiPrebuildCandidateRecord(candidateKey = "", record = {}) {
+  const filePath = getOpenwebuiPrebuildCandidatePath(candidateKey);
+  if (!filePath) return;
+  try {
+    ensureParentDir(filePath);
+    const tmpPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
+    fs.writeFileSync(tmpPath, `${JSON.stringify({
+      schemaVersion: "openwebui-prebuild-candidate-file-v1",
+      candidateKey,
+      updatedAt: new Date().toISOString(),
+      record,
+    })}\n`, "utf8");
+    fs.renameSync(tmpPath, filePath);
+  } catch (error) {
+    console.warn(`[openwebui-prebuild] candidate write failed: ${error.message}`);
+  }
+}
+
+function readOpenwebuiPrebuildCandidateRecord(candidateKey = "") {
+  const normalizedKey = String(candidateKey || "").trim();
+  if (!normalizedKey) return null;
+  const inMemory = OPENWEBUI_PREBUILD_CANDIDATES.get(normalizedKey);
+  if (inMemory) return inMemory;
+  const filePath = getOpenwebuiPrebuildCandidatePath(normalizedKey);
+  if (!filePath || !fs.existsSync(filePath)) return null;
+  try {
+    const payload = JSON.parse(fs.readFileSync(filePath, "utf8"));
+    const record = payload?.record && typeof payload.record === "object" ? payload.record : null;
+    if (record) OPENWEBUI_PREBUILD_CANDIDATES.set(normalizedKey, record);
+    return record;
+  } catch {
+    return null;
+  }
+}
+
+function warmOpenwebuiPrebuildCandidateCache({ limit = 64 } = {}) {
+  const normalizedLimit = Math.max(0, Math.min(500, Number(limit || 64)));
+  if (!normalizedLimit) return { loaded: 0, pruned: 0 };
+  let loaded = 0;
+  let pruned = 0;
+  try {
+    const entries = fs.readdirSync(OPENWEBUI_PREBUILD_CANDIDATES_DIR)
+      .filter((name) => name.endsWith(".json"))
+      .map((name) => {
+        const filePath = path.join(OPENWEBUI_PREBUILD_CANDIDATES_DIR, name);
+        try {
+          return { name, filePath, mtimeMs: fs.statSync(filePath).mtimeMs || 0 };
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.mtimeMs - a.mtimeMs)
+      .slice(0, normalizedLimit);
+    const now = Date.now();
+    entries.forEach((entry) => {
+      const candidateKey = entry.name.slice(0, -".json".length);
+      const record = readOpenwebuiPrebuildCandidateRecord(candidateKey);
+      const createdAt = Date.parse(record?.createdAt || record?.completedAt || "");
+      if (Number.isFinite(createdAt) && now - createdAt > OPENWEBUI_PREBUILD_CANDIDATE_RETENTION_MS) {
+        deleteOpenwebuiPrebuildCandidateRecord(candidateKey);
+        pruned += 1;
+      } else if (record) {
+        loaded += 1;
+      }
+    });
+  } catch {}
+  return { loaded, pruned };
+}
+
+function deleteOpenwebuiPrebuildCandidateRecord(candidateKey = "") {
+  const normalizedKey = String(candidateKey || "").trim();
+  if (normalizedKey) OPENWEBUI_PREBUILD_CANDIDATES.delete(normalizedKey);
+  const filePath = getOpenwebuiPrebuildCandidatePath(candidateKey);
+  if (!filePath) return;
+  try {
+    fs.rmSync(filePath, { force: true });
+  } catch {}
+}
+
+function setOpenwebuiPrebuildCandidate(candidateKey = "", record = {}) {
+  const normalizedKey = String(candidateKey || "").trim();
+  if (!normalizedKey) return null;
+  const now = Date.now();
+  if (now - lastOpenwebuiPrebuildCandidatePruneAt > JOB_PRUNE_INTERVAL_MS) {
+    pruneOpenwebuiPrebuildCandidates();
+    lastOpenwebuiPrebuildCandidatePruneAt = now;
+  }
+  const next = {
+    ...record,
+    candidateKey: normalizedKey,
+    createdAt: record.createdAt || new Date().toISOString(),
+  };
+  OPENWEBUI_PREBUILD_CANDIDATES.set(normalizedKey, next);
+  writeOpenwebuiPrebuildCandidateRecord(normalizedKey, next);
+  return next;
+}
+
+warmOpenwebuiPrebuildCandidateCache();
+
+function drainOpenwebuiConceptPrebuildQueue() {
+  while (
+    openwebuiConceptPrebuildActiveCount < OPENWEBUI_CONCEPT_PREBUILD_CONCURRENCY &&
+    OPENWEBUI_CONCEPT_PREBUILD_QUEUE.length
+  ) {
+    const entry = OPENWEBUI_CONCEPT_PREBUILD_QUEUE.shift();
+    const task = typeof entry === "function" ? entry : entry?.task;
+    if (typeof task !== "function") continue;
+    openwebuiConceptPrebuildActiveCount += 1;
+    setImmediate(async () => {
+      try {
+        await task();
+      } finally {
+        openwebuiConceptPrebuildActiveCount = Math.max(0, openwebuiConceptPrebuildActiveCount - 1);
+        drainOpenwebuiConceptPrebuildQueue();
+      }
+    });
+  }
+}
+
+function enqueueOpenwebuiConceptPrebuild(task, options = {}) {
+  if (typeof task !== "function") return;
+  if (OPENWEBUI_CONCEPT_PREBUILD_QUEUE.length >= OPENWEBUI_CONCEPT_PREBUILD_QUEUE_MAX) {
+    const dropped = OPENWEBUI_CONCEPT_PREBUILD_QUEUE.shift();
+    const droppedJobId = String(dropped?.jobId || "").trim();
+    if (droppedJobId) {
+      setOpenwebuiBuilderConceptJob(droppedJobId, {
+        prebuild: {
+          status: "skipped",
+          reason: "prebuild_queue_overflow",
+          skippedAt: new Date().toISOString(),
+        },
+        prebuiltCandidateAvailable: false,
+      });
+    }
+  }
+  OPENWEBUI_CONCEPT_PREBUILD_QUEUE.push({
+    task,
+    jobId: String(options?.jobId || "").trim(),
+    queuedAt: new Date().toISOString(),
+  });
+  drainOpenwebuiConceptPrebuildQueue();
+}
+
+function pruneWorkspaceBuildLocalDraftJobs() {
+  const now = Date.now();
+  for (const [jobId, job] of WORKSPACE_BUILD_LOCAL_DRAFT_JOBS.entries()) {
+    const anchorMs = getOpenwebuiJobRetentionAnchorMs(job);
+    if (anchorMs && now - anchorMs > WORKSPACE_DRAFT_JOB_RETENTION_MS) {
+      WORKSPACE_BUILD_LOCAL_DRAFT_JOBS.delete(jobId);
+      deleteOpenwebuiDurableJob("workspace-draft", jobId);
+    }
+  }
+  pruneOpenwebuiDurableJobs("workspace-draft", WORKSPACE_DRAFT_JOB_RETENTION_MS);
+}
+
+function setWorkspaceBuildLocalDraftJob(jobId, patch = {}) {
+  const now = Date.now();
+  if (now - lastWorkspaceBuildLocalDraftJobPruneAt > JOB_PRUNE_INTERVAL_MS) {
+    pruneWorkspaceBuildLocalDraftJobs();
+    lastWorkspaceBuildLocalDraftJobPruneAt = now;
+  }
+  const current = WORKSPACE_BUILD_LOCAL_DRAFT_JOBS.get(jobId) || {};
+  const next = { ...current, ...patch, jobId };
+  WORKSPACE_BUILD_LOCAL_DRAFT_JOBS.set(jobId, next);
+  persistOpenwebuiJob("workspace-draft", jobId, next);
+  return next;
+}
+
+function markWorkspaceBuildLocalDraftJobTimedOutIfStale(jobId, job = {}) {
+  const status = String(job?.status || "").trim().toLowerCase();
+  if (status !== "queued" && status !== "running") return job;
+  const startedAtMs = Date.parse(job.startedAt || job.queuedAt || "");
+  if (!Number.isFinite(startedAtMs)) return job;
+  const elapsedMs = Date.now() - startedAtMs;
+  if (elapsedMs <= OPENWEBUI_BUILDER_JOB_TIMEOUT_MS) return job;
+  return setWorkspaceBuildLocalDraftJob(jobId, {
+    ok: false,
+    status: "failed",
+    error: "workspace_build_local_draft_timeout",
+    userMessage: "디자인 생성 시간이 초과되었습니다. 같은 컨셉서로 다시 실행해 주세요.",
+    detail: `Workspace build-local-draft job exceeded ${OPENWEBUI_BUILDER_JOB_TIMEOUT_MS}ms without completion.`,
+    failedAt: new Date().toISOString(),
+  });
+}
+
+function buildDraftJobProviderSummary(providerResult = null) {
+  const meta = providerResult?.authorProviderMeta && typeof providerResult.authorProviderMeta === "object"
+    ? providerResult.authorProviderMeta
+    : {};
+  const validation = providerResult?.authorOutputValidation && typeof providerResult.authorOutputValidation === "object"
+    ? providerResult.authorOutputValidation
+    : null;
+  return {
+    provider: String(meta.provider || meta.modelProvider || "").trim(),
+    model: String(meta.model || meta.modelId || "").trim(),
+    usedDemoFallback: meta.usedDemoFallback === true,
+    authorExecutionMode: String(meta.authorExecutionMode || meta.executionMode || "").trim(),
+    deliveryReady: validation?.deliveryReadiness?.readyForRuntime === true,
+  };
+}
+
+function buildWorkspaceBuildLocalDraftJobDonePatch(result = {}) {
+  const saved = result?.saved && typeof result.saved === "object" ? result.saved : {};
+  const artifact = result?.artifact && typeof result.artifact === "object" ? result.artifact : {};
+  const draftBuildId = String(saved.id || artifact.draftBuildId || "").trim();
+  return {
+    ok: true,
+    status: "done",
+    stage: "done",
+    message: "Runtime draft is ready.",
+    percent: 100,
+    draftBuildId,
+    item: {
+      id: draftBuildId,
+      pageId: String(saved.pageId || artifact.pageId || "").trim(),
+      viewportProfile: String(saved.viewportProfile || artifact.viewportProfile || "").trim(),
+      summary: String(saved.summary || "").trim(),
+      builderProvider: String(saved.builderProvider || "").trim(),
+      report: saved.report && typeof saved.report === "object" ? saved.report : {},
+    },
+    previewPath: result.previewPath,
+    comparePath: result.comparePath,
+    providerSummary: buildDraftJobProviderSummary(result.providerResult),
+    artifactSummary: {
+      schemaVersion: String(artifact.schemaVersion || "").trim(),
+      artifactType: String(artifact.artifactType || "").trim(),
+      pageId: String(artifact.pageId || "").trim(),
+      viewportProfile: String(artifact.viewportProfile || "").trim(),
+      draftBuildId,
+      builderRunId: String(artifact.builderRunId || draftBuildId).trim(),
+      previewPath: result.previewPath,
+      comparePath: result.comparePath,
+    },
+    stageTiming: result.stageTiming && typeof result.stageTiming === "object" ? result.stageTiming : null,
+    completedAt: new Date().toISOString(),
+  };
+}
+
+function summarizeValidationIssue(value, depth = 0) {
+  if (value == null || depth > 2) return "";
+  if (typeof value === "string") return value.slice(0, 240);
+  if (Array.isArray(value)) {
+    return value.map((item) => summarizeValidationIssue(item, depth + 1)).filter(Boolean).slice(0, 4).join("; ");
+  }
+  if (typeof value === "object") {
+    const direct = ["message", "reason", "error", "detail", "code", "slotId", "selector"].map((key) => value[key]).filter(Boolean);
+    if (direct.length) return direct.map((item) => String(item || "").slice(0, 160)).join(" ");
+    return Object.values(value).map((item) => summarizeValidationIssue(item, depth + 1)).filter(Boolean).slice(0, 4).join("; ");
+  }
+  return String(value || "").slice(0, 160);
+}
+
+function normalizeBuilderJobFailure(error, fallbackError = "workspace_build_local_draft_failed") {
+  const code = String(error?.error || error?.code || fallbackError).trim() || fallbackError;
+  const rawDetail = String(error?.detail || error?.message || error || "").trim();
+  let validationSummary = null;
+  let userMessage = error?.userMessage ? String(error.userMessage).trim() : "";
+  if (rawDetail && /^[\[{]/.test(rawDetail)) {
+    try {
+      const parsed = JSON.parse(rawDetail);
+      validationSummary = summarizeValidationIssue(parsed);
+    } catch {}
+  }
+  if (!userMessage) {
+    if (code === "design_author_output_not_ready") {
+      userMessage = "Design Author 결과가 런타임 적용 조건을 충족하지 못했습니다. 컨셉서 범위나 모델 출력을 다시 확인해 주세요.";
+    } else if (code === "builder_job_timeout" || code === "workspace_build_local_draft_timeout") {
+      userMessage = "디자인 생성 시간이 초과되었습니다. 같은 컨셉서로 다시 실행해 주세요.";
+    } else {
+      userMessage = "디자인 생성에 실패했습니다. 세부 원인은 서버 로그와 job detail에서 확인할 수 있습니다.";
+    }
+  }
+  return {
+    ok: false,
+    status: "failed",
+    error: code,
+    userMessage,
+    detail: validationSummary || rawDetail,
+    validationSummary,
+    failedAt: new Date().toISOString(),
+  };
 }
 
 function sendHtml(res, status, fileName) {
@@ -2492,6 +3382,112 @@ function writeRouteTrace(entry) {
   }
 }
 
+function writeBuildStageTimingTrace({ payload = null, externalOwner = null, stageTiming = null, providerMeta = null, draftBuildId = "" } = {}) {
+  if (!stageTiming || typeof stageTiming !== "object") return;
+  writeRouteTrace({
+    id: crypto.randomUUID(),
+    type: "build_stage_timing",
+    recordedAt: new Date().toISOString(),
+    ts: Date.now(),
+    pageId: String(payload?.pageId || "").trim(),
+    viewportProfile: String(payload?.viewportProfile || "pc").trim() || "pc",
+    userId: String(externalOwner?.userId || payload?.userId || "").trim(),
+    projectId: String(externalOwner?.projectId || payload?.externalProjectId || "").trim(),
+    externalConceptId: String(payload?.externalConceptId || payload?.planId || "").trim(),
+    conceptJobId: String(payload?.conceptJobId || "").trim(),
+    draftBuildId: String(draftBuildId || "").trim(),
+    provider: String(providerMeta?.provider || providerMeta?.modelProvider || payload?.authorProvider || payload?.builderProvider || "").trim(),
+    model: String(providerMeta?.model || providerMeta?.modelId || payload?.designAuthorModel || payload?.authorModel || "").trim(),
+    modelCallSkipped: providerMeta?.modelCallSkipped === true,
+    stageTiming,
+  });
+}
+
+function readTailTextLines(filePath, maxLines = 200, maxBytes = 1024 * 1024) {
+  const normalizedMaxLines = Math.max(1, Math.min(5000, Number(maxLines || 200)));
+  const normalizedMaxBytes = Math.max(4096, Math.min(10 * 1024 * 1024, Number(maxBytes || 1024 * 1024)));
+  let fd = null;
+  try {
+    const stat = fs.statSync(filePath);
+    const bytesToRead = Math.min(stat.size, normalizedMaxBytes);
+    const start = Math.max(0, stat.size - bytesToRead);
+    const buffer = Buffer.alloc(bytesToRead);
+    fd = fs.openSync(filePath, "r");
+    fs.readSync(fd, buffer, 0, bytesToRead, start);
+    const lines = buffer.toString("utf8").split(/\r?\n/).filter(Boolean);
+    return lines.slice(-normalizedMaxLines);
+  } catch {
+    return [];
+  } finally {
+    if (fd !== null) {
+      try {
+        fs.closeSync(fd);
+      } catch {
+        // Ignore close failures for debug reporting.
+      }
+    }
+  }
+}
+
+function percentileValue(values = [], percentile = 0.5) {
+  const sorted = values.map((value) => Number(value)).filter(Number.isFinite).sort((a, b) => a - b);
+  if (!sorted.length) return null;
+  const index = Math.min(sorted.length - 1, Math.max(0, Math.ceil(sorted.length * percentile) - 1));
+  return sorted[index];
+}
+
+function buildStageTimingReport({ limit = 200 } = {}) {
+  const lines = readTailTextLines(ROUTE_TRACE_PATH, limit, 2 * 1024 * 1024);
+  const entries = lines
+    .map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter((entry) => entry?.type === "build_stage_timing" && entry.stageTiming && typeof entry.stageTiming === "object")
+    .slice(-Math.max(1, Math.min(1000, Number(limit || 200))));
+  const totals = entries.map((entry) => Number(entry.stageTiming.totalMs)).filter(Number.isFinite);
+  const stageNames = new Set();
+  entries.forEach((entry) => {
+    Object.keys(entry.stageTiming.stages || {}).forEach((name) => stageNames.add(name));
+  });
+  const stages = {};
+  for (const stageName of stageNames) {
+    const values = entries.map((entry) => Number(entry.stageTiming.stages?.[stageName])).filter(Number.isFinite);
+    stages[stageName] = {
+      count: values.length,
+      p50Ms: percentileValue(values, 0.5),
+      p95Ms: percentileValue(values, 0.95),
+      maxMs: values.length ? Math.max(...values) : null,
+    };
+  }
+  return {
+    ok: true,
+    source: ROUTE_TRACE_PATH,
+    count: entries.length,
+    total: {
+      p50Ms: percentileValue(totals, 0.5),
+      p95Ms: percentileValue(totals, 0.95),
+      maxMs: totals.length ? Math.max(...totals) : null,
+    },
+    stages,
+    recent: entries.slice(-10).map((entry) => ({
+      recordedAt: entry.recordedAt,
+      pageId: entry.pageId,
+      viewportProfile: entry.viewportProfile,
+      projectId: entry.projectId,
+      conceptJobId: entry.conceptJobId,
+      draftBuildId: entry.draftBuildId,
+      provider: entry.provider,
+      modelCallSkipped: entry.modelCallSkipped === true,
+      totalMs: entry.stageTiming.totalMs,
+      stages: entry.stageTiming.stages || {},
+    })),
+  };
+}
+
 function traceRouteRequest(req, requestUrl) {
   const descriptor = buildRouteTraceDescriptor(req, requestUrl);
   if (!descriptor) return;
@@ -2516,6 +3512,25 @@ function buildTailwindRuntimeCollisionCss() {
   .contents {
     display: block !important;
   }`;
+}
+
+function stripRuntimeInternalGuardrailLeaks(html = "") {
+  const source = String(html || "");
+  if (!source) return "";
+  const internalPhrases = [
+    "Preserve Tailwind runtime parity",
+    "Preserve LGE asset role guardrails",
+  ];
+  const phrasePattern = internalPhrases
+    .map((phrase) => phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join("|");
+  const listItemPattern = new RegExp(`<li\\b[^>]*>[\\s\\S]*?(?:${phrasePattern})[\\s\\S]*?<\\/li>`, "gi");
+  const paragraphPattern = new RegExp(`<p\\b[^>]*>[\\s\\S]*?(?:${phrasePattern})[\\s\\S]*?<\\/p>`, "gi");
+  const barePhrasePattern = new RegExp(`\\s*(?:${phrasePattern})(?:\\s*;\\s*)?`, "gi");
+  return source
+    .replace(listItemPattern, "")
+    .replace(paragraphPattern, "")
+    .replace(barePhrasePattern, "");
 }
 
 function injectTailwindRuntimeIntoHtml(html = "") {
@@ -2676,7 +3691,7 @@ function buildLightweightRuntimePreviewHtml(draftBuild = {}, snapshotState = "af
     .map((value) => String(value || "").trim())
     .filter(Boolean);
   if (snapshotState !== "after") return "";
-  const renderedAfterHtml = String(renderedHtmlReference.afterHtml || "").trim();
+  const renderedAfterHtml = stripRuntimeInternalGuardrailLeaks(String(renderedHtmlReference.afterHtml || "").trim());
   if (renderedAfterHtml) {
     const previewHtml = requestedSlotIds.length
       ? buildLightweightSectionPreviewHtml(renderedAfterHtml, sectionPreviewSlot)
@@ -2689,7 +3704,7 @@ function buildLightweightRuntimePreviewHtml(draftBuild = {}, snapshotState = "af
     : sections;
   if (!previewSections.length) return "";
   const mainHtml = previewSections
-    .map((section) => String(section?.html || "").trim())
+    .map((section) => stripRuntimeInternalGuardrailLeaks(String(section?.html || "").trim()))
     .filter(Boolean)
     .join("\n");
   if (!mainHtml) return "";
@@ -2810,15 +3825,47 @@ function validateOpenWebuiBuilderPayload(payload = {}) {
     errors.push({ code: "viewport_profile", detail: "viewportProfile must be pc, mo, or ta" });
   }
   const targetGroup = payload.conceptPackage?.targetGroup || {};
+  const builderOptions = payload.builderOptions && typeof payload.builderOptions === "object" ? payload.builderOptions : {};
+  const explicitTargetScope = String(builderOptions.targetScope || "").trim().toLowerCase();
+  if (explicitTargetScope && explicitTargetScope !== "components" && explicitTargetScope !== "page") {
+    errors.push({ code: "target_scope", detail: "builderOptions.targetScope must be components or page" });
+  }
+  const pageTarget = explicitTargetScope === "page" || (!explicitTargetScope && String(builderOptions.interventionLayer || "").trim().toLowerCase() === "page");
   if (!Array.isArray(targetGroup.slotIds) || !targetGroup.slotIds.length) errors.push({ code: "target_slots_required" });
-  if (!Array.isArray(targetGroup.componentIds) || !targetGroup.componentIds.length) errors.push({ code: "target_components_required" });
+  if (!pageTarget && (!Array.isArray(targetGroup.componentIds) || !targetGroup.componentIds.length)) errors.push({ code: "target_components_required" });
   return { ok: errors.length === 0, errors };
 }
 
-function validateOpenWebuiConceptAgainstBuilderContract(payload = {}) {
+const OPENWEBUI_BUILDER_OPERATIONAL_VIEWPORTS = ["pc", "mo"];
+const OPENWEBUI_BUILDER_PREFLIGHT_REASON_CODES = [
+  "unsupported_page",
+  "unsupported_section",
+  "unsupported_viewport",
+  "unsupported_component",
+  "missing_asset_policy",
+  "asset_policy_violation",
+  "missing_source_snapshot",
+  "concept_too_vague",
+  "ok",
+];
+
+function readOpenWebuiBuilderContract() {
   const contractPath = path.join(ROOT, "exports", "openwebui", "builder-contract", "builder-contract-v1.json");
-  if (!fs.existsSync(contractPath)) return { ok: true, skipped: true, reason: "builder_contract_export_missing" };
+  if (!fs.existsSync(contractPath)) return null;
+  const signature = readFileSignatureForCache(contractPath);
+  const cached = OPENWEBUI_BUILDER_CONTRACT_CACHE.get(contractPath);
+  if (cached && cached.signature === signature) return cached.contract;
   const contract = readJsonFile(contractPath);
+  OPENWEBUI_BUILDER_CONTRACT_CACHE.set(contractPath, {
+    signature,
+    contract: contract && typeof contract === "object" ? contract : null,
+  });
+  return contract && typeof contract === "object" ? contract : null;
+}
+
+function validateOpenWebuiConceptAgainstBuilderContract(payload = {}) {
+  const contract = readOpenWebuiBuilderContract();
+  if (!contract) return { ok: true, skipped: true, reason: "builder_contract_export_missing" };
   const pageId = String(payload.pageId || "").trim();
   const viewportProfile = String(payload.viewportProfile || "").trim();
   const targetGroup = payload.conceptPackage?.targetGroup || {};
@@ -2838,6 +3885,253 @@ function validateOpenWebuiConceptAgainstBuilderContract(payload = {}) {
   return { ok: errors.length === 0, errors };
 }
 
+function getOpenWebuiBuilderTargetScope(payload = {}) {
+  const conceptPackage = payload.conceptPackage && typeof payload.conceptPackage === "object" ? payload.conceptPackage : {};
+  const targetGroup = conceptPackage.targetGroup && typeof conceptPackage.targetGroup === "object" ? conceptPackage.targetGroup : {};
+  const slotSource = Array.isArray(targetGroup.slotIds)
+    ? targetGroup.slotIds
+    : Array.isArray(payload.slots)
+      ? payload.slots
+      : Array.isArray(payload.slotIds)
+        ? payload.slotIds
+        : [];
+  const componentSource = Array.isArray(targetGroup.componentIds)
+    ? targetGroup.componentIds
+    : Array.isArray(payload.componentIds)
+      ? payload.componentIds
+      : [];
+  return {
+    slotIds: slotSource.map((item) => String(item || "").trim()).filter(Boolean),
+    componentIds: componentSource.map((item) => String(item || "").trim()).filter(Boolean),
+    targetGroup,
+  };
+}
+
+function findOpenWebuiBuilderComponentForSlot(contract = {}, pageId = "", slotId = "") {
+  return (Array.isArray(contract.components) ? contract.components : []).find((component) => {
+    const componentId = String(component?.componentId || "").trim();
+    const slotIds = Array.isArray(component?.slotIds) ? component.slotIds.map((item) => String(item || "").trim()) : [];
+    return componentId.startsWith(`${pageId}.`) && slotIds.includes(slotId);
+  }) || null;
+}
+
+function getOpenWebuiBuilderPolicyForSlot(contract = {}, slotId = "") {
+  return (Array.isArray(contract.assetRolePolicies) ? contract.assetRolePolicies : []).find((policy) => {
+    const slotIds = Array.isArray(policy?.slotIds) ? policy.slotIds.map((item) => String(item || "").trim()) : [];
+    return slotIds.includes(slotId);
+  }) || null;
+}
+
+function getOpenWebuiPageBuildableSlotIds(contract = {}, pageId = "", viewportProfile = "") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewport = String(viewportProfile || "").trim();
+  const candidateSlots = (Array.isArray(contract?.slots) ? contract.slots : [])
+    .filter((slot) => String(slot?.pageId || "").trim() === normalizedPageId)
+    .map((slot) => String(slot?.slotId || "").trim())
+    .filter(Boolean);
+  const referenceArtifacts = normalizedPageId && normalizedViewport && candidateSlots.length
+    ? buildRuntimeReferenceArtifacts(normalizedPageId, normalizedViewport, candidateSlots)
+    : null;
+  return candidateSlots
+    .filter((slotId) => {
+      if (!slotId || !getOpenWebuiBuilderPolicyForSlot(contract || {}, slotId)) return false;
+      const slot = (Array.isArray(contract?.slots) ? contract.slots : []).find((item) =>
+        String(item?.pageId || "").trim() === normalizedPageId && String(item?.slotId || "").trim() === slotId
+      );
+      const viewports = Array.isArray(slot?.viewportProfiles) ? slot.viewportProfiles.map((item) => String(item || "").trim()) : [];
+      if (normalizedViewport && viewports.length && !viewports.includes(normalizedViewport)) return false;
+      if (referenceArtifacts?.currentSectionHtmlMap && !referenceArtifacts.currentSectionHtmlMap[slotId]) return false;
+      return true;
+    });
+}
+
+function listOpenWebuiBuilderAssetRoleRequests(payload = {}) {
+  const conceptPackage = payload.conceptPackage && typeof payload.conceptPackage === "object" ? payload.conceptPackage : {};
+  const builderOptions = payload.builderOptions && typeof payload.builderOptions === "object" ? payload.builderOptions : {};
+  return [
+    ...safeObjectArray(payload.assetRoleRequests, 40),
+    ...safeObjectArray(payload.assetRequests, 40),
+    ...safeObjectArray(payload.assets, 40),
+    ...safeObjectArray(conceptPackage.assetRoleRequests, 40),
+    ...safeObjectArray(conceptPackage.assetRequests, 40),
+    ...safeObjectArray(conceptPackage.assets, 40),
+    ...safeObjectArray(builderOptions.assetRoleRequests, 40),
+  ]
+    .map((item) => ({
+      slotId: String(item.slotId || item.slot || item.targetSlotId || "").trim(),
+      role: String(item.role || item.assetRole || item.policyRole || item.assetType || "").trim(),
+      raw: item,
+    }))
+    .filter((item) => item.slotId || item.role);
+}
+
+function buildOpenWebuiBuilderPreflightResponse(payload = {}) {
+  const contract = readOpenWebuiBuilderContract();
+  const pageId = String(payload.pageId || "").trim();
+  const requestedViewportProfile = String(payload.viewportProfile || "").trim();
+  const targetScope = getOpenWebuiBuilderTargetScope(payload);
+  let requestedSlotIds = Array.from(new Set(targetScope.slotIds));
+  const requestedComponentIds = Array.from(new Set(targetScope.componentIds));
+  const missing = [];
+  const unsupported = [];
+  const supportedPages = Array.isArray(contract?.pages) ? contract.pages.map((page) => String(page?.pageId || "").trim()).filter(Boolean) : [];
+  const page = (Array.isArray(contract?.pages) ? contract.pages : []).find((item) => String(item?.pageId || "").trim() === pageId) || null;
+  const pageSlots = (Array.isArray(contract?.slots) ? contract.slots : []).filter((slot) => String(slot?.pageId || "").trim() === pageId);
+  const supportedSlotIds = pageSlots.map((slot) => String(slot?.slotId || "").trim()).filter(Boolean);
+  const builderOptions = payload.builderOptions && typeof payload.builderOptions === "object" ? payload.builderOptions : {};
+  const explicitTargetScope = String(builderOptions.targetScope || payload.targetScope || "").trim().toLowerCase();
+  const targetGroupId = String(targetScope.targetGroup?.groupId || payload.targetGroupId || "").trim().toLowerCase();
+  if (!requestedSlotIds.length && (explicitTargetScope === "page" || /(?:^|-)all$/.test(targetGroupId))) {
+    requestedSlotIds = getOpenWebuiPageBuildableSlotIds(contract || {}, pageId, requestedViewportProfile);
+  }
+  const requestedSupportedSlotIds = requestedSlotIds.filter((slotId) => supportedSlotIds.includes(slotId));
+  const resolvedComponentIds = requestedSupportedSlotIds
+    .map((slotId) => findOpenWebuiBuilderComponentForSlot(contract || {}, pageId, slotId)?.componentId || `${pageId}.${slotId}`)
+    .filter(Boolean);
+  const buildableViewportProfile = OPENWEBUI_BUILDER_OPERATIONAL_VIEWPORTS.includes(requestedViewportProfile)
+    ? requestedViewportProfile
+    : "pc";
+  const buildable = {
+    pageId,
+    viewportProfile: buildableViewportProfile,
+    slots: requestedSupportedSlotIds,
+    componentIds: resolvedComponentIds,
+  };
+
+  const fail = (reasonCode, message) => ({
+    ok: false,
+    route: "feasibility",
+    reasonCode,
+    message,
+    buildable,
+    missing,
+    unsupported,
+    supported: {
+      pageIds: supportedPages,
+      viewportProfiles: OPENWEBUI_BUILDER_OPERATIONAL_VIEWPORTS,
+      slots: supportedSlotIds,
+      componentIds: resolvedComponentIds,
+    },
+  });
+
+  if (!contract) {
+    missing.push({ field: "builderContract", value: "exports/openwebui/builder-contract/builder-contract-v1.json" });
+    return fail("missing_source_snapshot", "Builder contract export is not available; run the builder contract export before preflight.");
+  }
+  if (!pageId) missing.push({ field: "pageId" });
+  if (!requestedViewportProfile) missing.push({ field: "viewportProfile" });
+  if (!requestedSlotIds.length) missing.push({ field: "conceptPackage.targetGroup.slotIds" });
+  if (!pageId || !requestedViewportProfile || !requestedSlotIds.length) {
+    return fail("concept_too_vague", "Preflight needs pageId, viewportProfile, and at least one target slot.");
+  }
+  if (!page) {
+    unsupported.push({ field: "pageId", value: pageId, supported: supportedPages });
+    return fail("unsupported_page", `${pageId} is not in the current builder contract.`);
+  }
+  if (!OPENWEBUI_BUILDER_OPERATIONAL_VIEWPORTS.includes(requestedViewportProfile)) {
+    unsupported.push({ field: "viewportProfile", value: requestedViewportProfile, supported: OPENWEBUI_BUILDER_OPERATIONAL_VIEWPORTS });
+    const message = requestedViewportProfile === "ta"
+      ? "ta viewport is reserved. Use pc or mo."
+      : `${requestedViewportProfile} viewport is not supported. Use pc or mo.`;
+    return fail("unsupported_viewport", message);
+  }
+  const unsupportedSlotIds = requestedSlotIds.filter((slotId) => !supportedSlotIds.includes(slotId));
+  if (unsupportedSlotIds.length) {
+    unsupportedSlotIds.forEach((slotId) => unsupported.push({ field: "slots", value: slotId, supported: supportedSlotIds }));
+    return fail("unsupported_section", `Unsupported slot for ${pageId}: ${unsupportedSlotIds.join(", ")}`);
+  }
+  const viewportUnsupportedSlots = requestedSlotIds.filter((slotId) => {
+    const slot = pageSlots.find((item) => String(item?.slotId || "").trim() === slotId);
+    const viewportProfiles = Array.isArray(slot?.viewportProfiles) ? slot.viewportProfiles.map((item) => String(item || "").trim()) : [];
+    return !viewportProfiles.includes(requestedViewportProfile);
+  });
+  if (viewportUnsupportedSlots.length) {
+    viewportUnsupportedSlots.forEach((slotId) => {
+      const slot = pageSlots.find((item) => String(item?.slotId || "").trim() === slotId);
+      unsupported.push({
+        field: "viewportProfile",
+        slotId,
+        value: requestedViewportProfile,
+        supported: (Array.isArray(slot?.viewportProfiles) ? slot.viewportProfiles : []).filter((item) => OPENWEBUI_BUILDER_OPERATIONAL_VIEWPORTS.includes(String(item || "").trim())),
+      });
+    });
+    return fail("unsupported_viewport", `${requestedViewportProfile} viewport is not supported for slot: ${viewportUnsupportedSlots.join(", ")}`);
+  }
+  const effectiveComponentIds = requestedComponentIds.length ? requestedComponentIds : resolvedComponentIds;
+  const unsupportedComponentIds = effectiveComponentIds.filter((componentId) => {
+    const component = (Array.isArray(contract.components) ? contract.components : []).find((item) => String(item?.componentId || "").trim() === componentId);
+    if (!component || !componentId.startsWith(`${pageId}.`)) return true;
+    const componentSlotIds = Array.isArray(component?.slotIds) ? component.slotIds.map((item) => String(item || "").trim()) : [];
+    return !componentSlotIds.some((slotId) => requestedSlotIds.includes(slotId));
+  });
+  if (unsupportedComponentIds.length) {
+    unsupportedComponentIds.forEach((componentId) => unsupported.push({ field: "componentIds", value: componentId, supported: resolvedComponentIds }));
+    return fail("unsupported_component", `Unsupported component for ${pageId}: ${unsupportedComponentIds.join(", ")}`);
+  }
+  buildable.componentIds = effectiveComponentIds;
+
+  const slotsWithoutPolicy = requestedSlotIds.filter((slotId) => !getOpenWebuiBuilderPolicyForSlot(contract, slotId));
+  if (slotsWithoutPolicy.length) {
+    slotsWithoutPolicy.forEach((slotId) => unsupported.push({ field: "assetRolePolicy", value: slotId, supported: "assetRolePolicies.slotIds" }));
+    return fail("missing_asset_policy", `Missing asset role policy for slot: ${slotsWithoutPolicy.join(", ")}`);
+  }
+  const assetRoleRequests = listOpenWebuiBuilderAssetRoleRequests(payload);
+  for (const request of assetRoleRequests) {
+    const policy = request.slotId ? getOpenWebuiBuilderPolicyForSlot(contract, request.slotId) : null;
+    const allowedRoles = Array.isArray(policy?.allowedRoles) ? policy.allowedRoles.map((item) => String(item || "").trim()).filter(Boolean) : [];
+    const forbiddenRoles = Array.isArray(policy?.forbiddenRoles) ? policy.forbiddenRoles.map((item) => String(item || "").trim()).filter(Boolean) : [];
+    if (request.slotId && !policy) {
+      unsupported.push({ field: "assetRolePolicy", value: request.slotId, supported: "assetRolePolicies.slotIds" });
+      return fail("missing_asset_policy", `Missing asset role policy for slot: ${request.slotId}`);
+    }
+    if (request.role && policy && !allowedRoles.length && !forbiddenRoles.length) {
+      unsupported.push({ field: "assetRole", slotId: request.slotId, value: request.role, supported: allowedRoles });
+      return fail("missing_asset_policy", `No asset role policy is defined for slot: ${request.slotId}`);
+    }
+    if (request.role && forbiddenRoles.includes(request.role)) {
+      unsupported.push({ field: "assetRole", slotId: request.slotId, value: request.role, forbidden: forbiddenRoles, supported: allowedRoles });
+      return fail("asset_policy_violation", `${request.role} is forbidden for slot: ${request.slotId}`);
+    }
+    if (request.role && allowedRoles.length && !allowedRoles.includes(request.role)) {
+      unsupported.push({ field: "assetRole", slotId: request.slotId, value: request.role, supported: allowedRoles });
+      return fail("asset_policy_violation", `${request.role} is not supported for slot: ${request.slotId}`);
+    }
+  }
+
+  const referenceArtifacts = buildRuntimeReferenceArtifacts(pageId, requestedViewportProfile, requestedSlotIds);
+  if (!referenceArtifacts?.rawShellHtml) {
+    unsupported.push({ field: "sourceSnapshot", value: { pageId, viewportProfile: requestedViewportProfile } });
+    return fail("missing_source_snapshot", `Source snapshot is not available for ${pageId}/${requestedViewportProfile}.`);
+  }
+  const missingSourceSlots = requestedSlotIds.filter((slotId) => !referenceArtifacts.currentSectionHtmlMap?.[slotId]);
+  if (missingSourceSlots.length) {
+    missingSourceSlots.forEach((slotId) => unsupported.push({ field: "sourceSnapshot.slots", value: slotId }));
+    return fail("missing_source_snapshot", `Source snapshot is missing section markup for slot: ${missingSourceSlots.join(", ")}`);
+  }
+
+  const conceptDocument = String(payload.conceptDocument || "").trim();
+  if (conceptDocument.length < 40) {
+    missing.push({ field: "conceptDocument", minimumLength: 40 });
+    return fail("concept_too_vague", "conceptDocument is too short for a builder-ready Atlas concept.");
+  }
+
+  return {
+    ok: true,
+    route: "build",
+    reasonCode: "ok",
+    message: "Builder request is buildable.",
+    buildable,
+    missing,
+    unsupported,
+    supported: {
+      pageIds: supportedPages,
+      viewportProfiles: OPENWEBUI_BUILDER_OPERATIONAL_VIEWPORTS,
+      slots: supportedSlotIds,
+      componentIds: buildable.componentIds,
+    },
+  };
+}
+
 function buildApprovedPlanFromOpenWebuiPayload(payload = {}) {
   const conceptPackage = payload.conceptPackage && typeof payload.conceptPackage === "object" ? payload.conceptPackage : {};
   const targetGroup = conceptPackage.targetGroup && typeof conceptPackage.targetGroup === "object" ? conceptPackage.targetGroup : {};
@@ -2845,6 +4139,7 @@ function buildApprovedPlanFromOpenWebuiPayload(payload = {}) {
   const slotIds = Array.isArray(targetGroup.slotIds) ? targetGroup.slotIds.map((item) => String(item || "").trim()).filter(Boolean) : [];
   const componentIds = Array.isArray(targetGroup.componentIds) ? targetGroup.componentIds.map((item) => String(item || "").trim()).filter(Boolean) : [];
   const title = String(conceptPackage.title || payload.externalConceptId || "Open WebUI Builder Concept").trim();
+  const conceptSections = buildOpenWebuiConceptDocumentSections(payload.conceptDocument || "");
   return {
     id: String(payload.externalConceptId || "").trim(),
     title,
@@ -2852,8 +4147,22 @@ function buildApprovedPlanFromOpenWebuiPayload(payload = {}) {
     targetGroupId: String(targetGroup.groupId || "openwebui-target").trim() || "openwebui-target",
     targetGroupLabel: String(targetGroup.groupLabel || targetGroup.groupId || "Open WebUI Target").trim(),
     targetComponents: componentIds,
-    planningDirection: [title, String(payload.conceptDocument || "").slice(0, 1600)].filter(Boolean),
-    designDirection: [String(payload.conceptDocument || "").slice(0, 1600)].filter(Boolean),
+    targetScope: normalizeOpenWebuiTargetScope(payload.builderOptions || {}, componentIds),
+    planningDirection: [
+      title,
+      conceptSections.overview,
+      conceptSections.conceptDisplayMarkdown ? `Concept Display Markdown:\n${conceptSections.conceptDisplayMarkdown}` : "",
+      conceptSections.builderMarkdown ? `Builder Markdown:\n${conceptSections.builderMarkdown}` : "",
+    ].filter(Boolean),
+    designDirection: [
+      conceptSections.conceptDisplayMarkdown ? `Concept Display Markdown:\n${conceptSections.conceptDisplayMarkdown}` : "",
+      conceptSections.designSpecMarkdown ? `Design Spec Markdown:\n${conceptSections.designSpecMarkdown}` : "",
+      conceptSections.builderMarkdown ? `Builder Markdown:\n${conceptSections.builderMarkdown}` : "",
+      conceptSections.overview,
+    ].filter(Boolean),
+    builderMarkdown: conceptSections.builderMarkdown,
+    conceptDisplayMarkdown: conceptSections.conceptDisplayMarkdown,
+    designSpecMarkdown: conceptSections.designSpecMarkdown,
     guardrails: [
       ...safeArray(designPolicy.guardrails, 20),
       "Preserve conceptDocument source text without builder-side re-summarization.",
@@ -2889,38 +4198,315 @@ function buildApprovedPlanFromOpenWebuiPayload(payload = {}) {
         mustKeep: safeArray(designPolicy.mustKeep, 20),
         mustChange: safeArray(designPolicy.mustChange, 20),
         guardrails: safeArray(designPolicy.guardrails, 20),
-        problemStatement: [title],
+        problemStatement: [title, conceptSections.overview].filter(Boolean),
+        hierarchyGoals: [
+          conceptSections.conceptDisplayMarkdown ? `Concept Display Markdown:\n${conceptSections.conceptDisplayMarkdown}` : "",
+          conceptSections.builderMarkdown ? `Builder Markdown:\n${conceptSections.builderMarkdown}` : "",
+          conceptSections.designSpecMarkdown ? `Design Spec Markdown:\n${conceptSections.designSpecMarkdown}` : "",
+        ].filter(Boolean),
       },
     },
     conceptDocument: String(payload.conceptDocument || ""),
-    conceptPackage,
   };
+}
+
+function stripOpenWebuiConceptFrontmatter(value = "") {
+  const text = String(value || "").trim();
+  if (!text.startsWith("---")) return text;
+  const lines = text.split(/\r?\n/);
+  for (let index = 1; index < lines.length; index += 1) {
+    if (lines[index].trim() === "---" || lines[index].trim() === "...") {
+      return lines.slice(index + 1).join("\n").trim();
+    }
+  }
+  return text;
+}
+
+function extractOpenWebuiMarkdownSection(markdown = "", headingNames = []) {
+  const names = safeArray(headingNames, 20).map((item) => item.toLowerCase());
+  if (!names.length) return "";
+  const lines = String(markdown || "").split(/\r?\n/);
+  let startIndex = -1;
+  let startLevel = 0;
+  for (let index = 0; index < lines.length; index += 1) {
+    const match = /^(#{1,6})\s+(.+?)\s*$/.exec(lines[index].trim());
+    if (!match) continue;
+    const heading = match[2].replace(/#+$/, "").trim().toLowerCase();
+    if (names.includes(heading)) {
+      startIndex = index + 1;
+      startLevel = match[1].length;
+      break;
+    }
+  }
+  if (startIndex < 0) return "";
+  const body = [];
+  for (let index = startIndex; index < lines.length; index += 1) {
+    const match = /^(#{1,6})\s+/.exec(lines[index].trim());
+    if (match && match[1].length <= startLevel) break;
+    body.push(lines[index]);
+  }
+  return body.join("\n").trim();
+}
+
+function compactOpenWebuiConceptText(value = "", maxLength = 2400) {
+  const text = String(value || "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  if (text.length <= maxLength) return text;
+  const headLength = Math.max(600, Math.floor(maxLength * 0.6));
+  const tailLength = Math.max(400, maxLength - headLength - 40);
+  return `${text.slice(0, headLength).trim()}\n\n...\n\n${text.slice(-tailLength).trim()}`;
+}
+
+function buildOpenWebuiConceptDocumentSections(conceptDocument = "") {
+  const body = stripOpenWebuiConceptFrontmatter(conceptDocument);
+  const conceptDisplayMarkdown = compactOpenWebuiConceptText(
+    extractOpenWebuiMarkdownSection(body, ["Concept Display Markdown", "Concept Markdown", "User Concept"]),
+    20000
+  );
+  const builderMarkdown = compactOpenWebuiConceptText(
+    extractOpenWebuiMarkdownSection(body, ["Builder Markdown", "Builder Brief", "Builder Instructions"]),
+    20000
+  );
+  const designSpecMarkdown = compactOpenWebuiConceptText(
+    extractOpenWebuiMarkdownSection(body, ["Design Spec Markdown", "Design Spec", "Viewport Contract"]),
+    20000
+  );
+  const firstInternalSectionIndex = body.search(/^#{1,6}\s+(Concept Display Markdown|Concept Markdown|User Concept|Builder Markdown|Builder Brief|Builder Instructions|Design Spec Markdown|Design Spec|Viewport Contract|Section Blueprints|Requirement Draft|Reference URLs)\b/im);
+  const overviewSource = firstInternalSectionIndex >= 0 ? body.slice(0, firstInternalSectionIndex) : body;
+  const overview = compactOpenWebuiConceptText(overviewSource || body, 1800);
+  return {
+    overview,
+    conceptDisplayMarkdown,
+    builderMarkdown,
+    designSpecMarkdown,
+  };
+}
+
+function normalizeOpenWebuiTargetScope(builderOptions = {}, componentIds = []) {
+  const normalizedComponents = safeArray(componentIds || [], 50);
+  if (normalizedComponents.length) return "components";
+  const explicit = String(builderOptions?.targetScope || "").trim().toLowerCase();
+  if (explicit === "components" || explicit === "page") return explicit;
+  const interventionLayer = String(builderOptions?.interventionLayer || "").trim().toLowerCase();
+  if (interventionLayer === "page") return "page";
+  return "page";
 }
 
 function adaptOpenWebuiBuilderPayload(payload = {}) {
   const conceptPackage = payload.conceptPackage && typeof payload.conceptPackage === "object" ? payload.conceptPackage : {};
   const targetGroup = conceptPackage.targetGroup && typeof conceptPackage.targetGroup === "object" ? conceptPackage.targetGroup : {};
   const builderOptions = payload.builderOptions && typeof payload.builderOptions === "object" ? payload.builderOptions : {};
+  const targetComponents = safeArray(targetGroup.componentIds, 50);
+  const explicitDesignAuthorModel = String(builderOptions.designAuthorModel || builderOptions.authorModel || builderOptions.model || "").trim();
   return {
     pageId: String(payload.pageId || "").trim(),
     viewportProfile: String(payload.viewportProfile || "pc").trim() || "pc",
     planId: String(payload.externalConceptId || "").trim(),
     approvedPlan: buildApprovedPlanFromOpenWebuiPayload(payload),
-    targetComponents: safeArray(targetGroup.componentIds, 50),
+    targetComponents,
     targetGroupId: String(targetGroup.groupId || "openwebui-target").trim() || "openwebui-target",
     targetGroupLabel: String(targetGroup.groupLabel || targetGroup.groupId || "Open WebUI Target").trim(),
-    targetScope: String(builderOptions.interventionLayer || "section-group").trim() || "section-group",
+    targetScope: normalizeOpenWebuiTargetScope(builderOptions, targetComponents),
     patchDepth: String(builderOptions.patchDepth || "medium").trim() || "medium",
     designChangeLevel: String(builderOptions.designChangeLevel || "medium").trim() || "medium",
     interventionLayer: String(builderOptions.interventionLayer || "section-group").trim() || "section-group",
     rendererSurface: String(builderOptions.rendererSurface || "tailwind").trim() || "tailwind",
     builderProvider: String(builderOptions.authorProvider || "local").trim() || "local",
     authorProvider: String(builderOptions.authorProvider || "local").trim() || "local",
+    designAuthorModel: explicitDesignAuthorModel,
+    authorModel: String(builderOptions.authorModel || explicitDesignAuthorModel).trim(),
+    model: String(builderOptions.model || explicitDesignAuthorModel).trim(),
+    bypassDesignModelProfile:
+      builderOptions.bypassDesignModelProfile === true ||
+      String(builderOptions.bypassDesignModelProfile || "").trim() === "1" ||
+      Boolean(explicitDesignAuthorModel),
     externalProjectId: String(payload.externalProjectId || "").trim(),
+    externalRequirementId: String(payload.externalRequirementId || payload.requirementId || "").trim(),
+    requirementId: String(payload.requirementId || payload.externalRequirementId || "").trim(),
     externalConceptId: String(payload.externalConceptId || "").trim(),
+    conceptGroupId: String(payload.conceptGroupId || "").trim(),
     conceptThreadId: String(payload.conceptThreadId || "").trim(),
     conceptDocument: String(payload.conceptDocument || ""),
+    conceptJobId: String(payload.conceptJobId || builderOptions.conceptJobId || "").trim(),
+    authoringPlan: payload.authoringPlan && typeof payload.authoringPlan === "object" ? payload.authoringPlan : null,
+    authoredSectionHtmlPackageCandidate:
+      payload.authoredSectionHtmlPackageCandidate && typeof payload.authoredSectionHtmlPackageCandidate === "object"
+        ? payload.authoredSectionHtmlPackageCandidate
+        : null,
     conceptPackage,
+  };
+}
+
+function buildOpenWebuiBuilderSourceTrace({ jobId = "", draftBuildId = "", payload = null } = {}) {
+  const conceptDocument = String(payload?.conceptDocument || "");
+  return {
+    source: "clonellm-builder-api-v1",
+    conceptDocumentPreserved: true,
+    conceptDocumentSha256: sha256ConceptDocument(conceptDocument),
+    conceptDocumentBytes: Buffer.byteLength(conceptDocument),
+    externalProjectId: String(payload?.externalProjectId || "").trim(),
+    externalRequirementId: String(payload?.externalRequirementId || payload?.requirementId || "").trim(),
+    externalConceptId: String(payload?.externalConceptId || payload?.planId || "").trim(),
+    conceptGroupId: String(payload?.conceptGroupId || "").trim(),
+    conceptThreadId: String(payload?.conceptThreadId || "").trim(),
+    builderJobId: String(jobId || "").trim(),
+    draftBuildId: String(draftBuildId || "").trim(),
+    snapshotTracePath: "artifact.snapshotData.authoringStageTrace",
+  };
+}
+
+function buildOpenWebuiBuilderArtifactRecord({
+  jobId = "",
+  status = "ready",
+  completedAt = "",
+  result = null,
+  artifact = null,
+  payload = null,
+  externalOwner = null,
+} = {}) {
+  const draftBuildId = String(result?.saved?.id || "").trim();
+  const pageId = String(artifact?.pageId || payload?.pageId || "").trim();
+  const viewportProfile = String(artifact?.viewportProfile || payload?.viewportProfile || "pc").trim() || "pc";
+  const targetGroup = artifact?.targetGroup && typeof artifact.targetGroup === "object" ? artifact.targetGroup : null;
+  const targetGroupId = String(targetGroup?.groupId || payload?.targetGroupId || "").trim();
+  const externalProjectId = String(payload?.externalProjectId || externalOwner?.projectId || "").trim();
+  const externalRequirementId = String(payload?.externalRequirementId || "").trim();
+  const externalConceptId = String(payload?.externalConceptId || payload?.planId || "").trim();
+  const conceptGroupId = String(payload?.conceptGroupId || "").trim();
+  const conceptThreadId = String(payload?.conceptThreadId || "").trim();
+  const previewPath = String(result?.previewPath || "").trim();
+  const comparePath = String(result?.comparePath || "").trim();
+  const sourceTrace = buildOpenWebuiBuilderSourceTrace({ jobId, draftBuildId, payload });
+  const artifactId = [
+    "openwebui-artifact",
+    externalProjectId || "project",
+    externalConceptId || "concept",
+    draftBuildId || jobId || crypto.randomUUID(),
+  ]
+    .map((part) => String(part || "").trim().replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, ""))
+    .filter(Boolean)
+    .join("-");
+
+  return {
+    schemaVersion: "openwebui-builder-artifact-v1",
+    artifactId,
+    artifactType: "lge-builder-draft",
+    source: "clonellm-builder-api-v1",
+    status,
+    createdAt: String(result?.saved?.createdAt || result?.saved?.updatedAt || completedAt || new Date().toISOString()),
+    completedAt: String(completedAt || ""),
+    externalProjectId,
+    externalRequirementId,
+    externalConceptId,
+    conceptGroupId,
+    conceptThreadId,
+    sourceTrace,
+    builderJobId: String(jobId || "").trim(),
+    builderRunId: draftBuildId,
+    draftBuildId,
+    pageId,
+    viewportProfile,
+    targetGroupId,
+    targetGroup,
+    builder: {
+      builderApiVersion: "v1",
+      builderContractVersion: "builder-contract-v1",
+      builderVersion: "design-runtime-v1",
+      rendererSurface: "tailwind",
+      authorProvider: String(payload?.authorProvider || payload?.builderProvider || "local").trim() || "local",
+      designChangeLevel: String(payload?.designChangeLevel || "medium").trim() || "medium",
+      patchDepth: String(payload?.patchDepth || "medium").trim() || "medium",
+      interventionLayer: String(payload?.interventionLayer || "section-group").trim() || "section-group",
+    },
+    links: {
+      previewPath,
+      comparePath,
+      runtimeDraftPath: previewPath,
+      runtimeComparePath: comparePath,
+    },
+    storage: {
+      owner: "open-webui",
+      recommendedRecordKey: artifactId,
+      canonicalPreviewFields: ["links.previewPath", "links.comparePath", "draftBuildId", "pageId", "viewportProfile"],
+      payloadFields: ["report", "validation", "runtimeAdvisory", "authoredSectionHtmlPackage", "snapshotSummary"],
+    },
+    stageTiming: result?.stageTiming && typeof result.stageTiming === "object" ? result.stageTiming : null,
+    snapshotSummary: {
+      source: String(artifact?.snapshotData?.source || "openwebui-builder-api-v1"),
+      pageId,
+      viewportProfile,
+      builderApiVersion: String(artifact?.snapshotData?.builderApiVersion || "v1"),
+      builderContractVersion: String(artifact?.snapshotData?.builderContractVersion || "builder-contract-v1"),
+      executionMode: String(artifact?.snapshotData?.executionMode || "authored-section-html"),
+      targetGroupId: String(artifact?.snapshotData?.targetGroupId || targetGroupId),
+    },
+    externalOwner: externalOwner || artifact?.externalOwner || null,
+  };
+}
+
+function buildOpenWebuiBuilderArtifactMetadata(artifactRecord = {}) {
+  return {
+    schemaVersion: artifactRecord.schemaVersion,
+    artifactId: artifactRecord.artifactId,
+    artifactType: artifactRecord.artifactType,
+    status: artifactRecord.status,
+    externalProjectId: artifactRecord.externalProjectId,
+    externalRequirementId: artifactRecord.externalRequirementId,
+    externalConceptId: artifactRecord.externalConceptId,
+    conceptGroupId: artifactRecord.conceptGroupId,
+    conceptThreadId: artifactRecord.conceptThreadId,
+    builderJobId: artifactRecord.builderJobId,
+    builderRunId: artifactRecord.builderRunId,
+    draftBuildId: artifactRecord.draftBuildId,
+    pageId: artifactRecord.pageId,
+    viewportProfile: artifactRecord.viewportProfile,
+    targetGroupId: artifactRecord.targetGroupId,
+  };
+}
+
+function buildOpenWebuiSlimBuilderArtifact({ artifactRecord = {}, result = null } = {}) {
+  return {
+    schemaVersion: artifactRecord.schemaVersion || "openwebui-builder-artifact-v1",
+    artifactType: artifactRecord.artifactType || "lge-builder-draft",
+    artifactId: artifactRecord.artifactId,
+    status: artifactRecord.status || "ready",
+    pageId: artifactRecord.pageId,
+    viewportProfile: artifactRecord.viewportProfile,
+    draftBuildId: artifactRecord.draftBuildId,
+    builderRunId: artifactRecord.builderRunId || artifactRecord.draftBuildId,
+    previewPath: artifactRecord.links?.previewPath || result?.previewPath || "",
+    comparePath: artifactRecord.links?.comparePath || result?.comparePath || "",
+    artifactRecord,
+    metadata: buildOpenWebuiBuilderArtifactMetadata(artifactRecord),
+    links: artifactRecord.links || {},
+    storage: artifactRecord.storage || {},
+    sourceTrace: artifactRecord.sourceTrace || {},
+    snapshotSummary: artifactRecord.snapshotSummary || {},
+    detailPath: `/api/builder/lge/v1/jobs/${encodeURIComponent(String(artifactRecord.builderJobId || ""))}/artifact`,
+  };
+}
+
+function hydrateOpenWebuiBuilderArtifactDetail(job = {}, authContext = null) {
+  const draftBuildId = String(job?.builderRunId || job?.draftBuildId || job?.artifactRecord?.draftBuildId || "").trim();
+  if (!draftBuildId) return null;
+  const authUserId = String(authContext?.user?.userId || "").trim();
+  let draftBuild = authUserId ? findDraftBuildById(authUserId, draftBuildId) : null;
+  if (!draftBuild) {
+    const fallback = findDraftBuildWithOwnerById(draftBuildId);
+    draftBuild = fallback?.draftBuild || null;
+  }
+  if (!draftBuild) return null;
+  const artifactRecord = job.artifactRecord && typeof job.artifactRecord === "object" ? job.artifactRecord : {};
+  const slimArtifact = job.artifact && typeof job.artifact === "object" ? job.artifact : buildOpenWebuiSlimBuilderArtifact({ artifactRecord });
+  return {
+    ...slimArtifact,
+    report: draftBuild.report || {},
+    validation: draftBuild.snapshotData?.designAuthorOutputValidation || slimArtifact.validation || null,
+    runtimeAdvisory: Array.isArray(draftBuild.snapshotData?.runtimeAdvisory) ? draftBuild.snapshotData.runtimeAdvisory : [],
+    authoredSectionMarkdownDocument: draftBuild.snapshotData?.authoredSectionMarkdownDocument || "",
+    authoredSectionHtmlPackage: draftBuild.snapshotData?.authoredSectionHtmlPackage || null,
+    snapshotData: draftBuild.snapshotData || {},
   };
 }
 
@@ -2932,13 +4518,93 @@ function httpError(status, error, detail = "") {
   return next;
 }
 
-async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner = null } = {}) {
+function alignConceptPackageTargetGroupWithBuildInput(conceptPackage = {}, buildInput = {}) {
+  const packageSource = conceptPackage && typeof conceptPackage === "object" ? conceptPackage : {};
+  const buildTargetGroup = buildInput?.targetGroup && typeof buildInput.targetGroup === "object"
+    ? buildInput.targetGroup
+    : {};
+  const buildComponentIds = Array.isArray(buildTargetGroup.componentIds)
+    ? buildTargetGroup.componentIds.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  const buildSlotIds = Array.isArray(buildTargetGroup.slotIds)
+    ? buildTargetGroup.slotIds.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  if (!buildComponentIds.length && !buildSlotIds.length) return packageSource;
+  const executionBrief = packageSource.executionBrief && typeof packageSource.executionBrief === "object"
+    ? { ...packageSource.executionBrief }
+    : {};
+  const targetGroup = executionBrief.targetGroup && typeof executionBrief.targetGroup === "object"
+    ? { ...executionBrief.targetGroup }
+    : {};
+  const existingComponentIds = Array.isArray(targetGroup.componentIds)
+    ? targetGroup.componentIds.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  const existingSlotIds = Array.isArray(targetGroup.slotIds)
+    ? targetGroup.slotIds.map((item) => String(item || "").trim()).filter(Boolean)
+    : [];
+  const effectiveSlotIds = existingSlotIds.length ? existingSlotIds : buildSlotIds;
+  const componentIdsBySlot = new Map();
+  buildComponentIds.forEach((componentId) => {
+    const slotId = String(componentId || "").trim().split(".").pop();
+    if (slotId && !componentIdsBySlot.has(slotId)) componentIdsBySlot.set(slotId, componentId);
+  });
+  const alignedComponentIds = effectiveSlotIds.length
+    ? effectiveSlotIds.map((slotId) => componentIdsBySlot.get(slotId)).filter(Boolean)
+    : buildComponentIds;
+  targetGroup.componentIds = existingComponentIds.length ? existingComponentIds : alignedComponentIds;
+  targetGroup.slotIds = effectiveSlotIds;
+  executionBrief.targetGroup = targetGroup;
+  return {
+    ...packageSource,
+    executionBrief,
+  };
+}
+
+function buildAuthoredSectionHtmlPackageCandidate({
+  payload = {},
+  conceptPackage = {},
+  externalOwner = null,
+  authoredSectionHtmlPackage = null,
+  authoredSectionMarkdownDocument = "",
+  authorProviderMeta = {},
+  authorOutputValidation = null,
+  stageTiming = null,
+} = {}) {
+  const conceptHash = sha256ConceptDocument(String(payload.conceptDocument || conceptPackage.conceptDocument || ""));
+  return {
+    schemaVersion: "authored-section-html-package-candidate-v1",
+    status: "ready",
+    sourceTrace: {
+      conceptHash,
+      builderProvider: normalizeDesignAuthorProvider(payload.builderProvider || payload.authorProvider || "local"),
+      model: String(payload.designAuthorModel || payload.authorModel || payload.model || "").trim(),
+      pageId: String(payload.pageId || "").trim(),
+      viewportProfile: String(payload.viewportProfile || "pc").trim() || "pc",
+      userId: String(externalOwner?.userId || payload.userId || "").trim(),
+      projectId: String(externalOwner?.projectId || payload.externalProjectId || "").trim(),
+      conceptJobId: String(payload.conceptJobId || "").trim(),
+      conceptThreadId: String(payload.conceptThreadId || "").trim(),
+      generatedAt: new Date().toISOString(),
+    },
+    authoredSectionHtmlPackage,
+    authoredSectionMarkdownDocument: String(authoredSectionMarkdownDocument || ""),
+    providerMeta: authorProviderMeta && typeof authorProviderMeta === "object" ? authorProviderMeta : {},
+    validation: authorOutputValidation && typeof authorOutputValidation === "object" ? authorOutputValidation : null,
+    stageTiming: stageTiming && typeof stageTiming === "object" ? stageTiming : null,
+  };
+}
+
+async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner = null, authorCandidateOnly = false } = {}) {
+  const stageTimingRecorder = createStageTimingRecorder();
+  let stageStartedAt = Date.now();
   const pageId = String(payload.pageId || "").trim();
   if (!pageId) throw httpError(400, "page_id_required");
   const approvedPlan = payload.approvedPlan && typeof payload.approvedPlan === "object" ? payload.approvedPlan : null;
   if (!approvedPlan) throw httpError(400, "approved_plan_required");
 
   const editableData = readWorkspaceData(user.userId);
+  stageTimingRecorder.mark("workspaceRead", stageStartedAt);
+  stageStartedAt = Date.now();
   const page = findPage(editableData, pageId);
   const editablePayload = buildLlmEditableList(pageId, {
     editableData,
@@ -2963,11 +4629,15 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
   const slotIds = Array.isArray(foundation?.request?.targetGroup?.slotIds)
     ? foundation.request.targetGroup.slotIds
     : [];
+  stageTimingRecorder.mark("buildInput", stageStartedAt);
+  stageStartedAt = Date.now();
   const referenceArtifacts = buildRuntimeReferenceArtifacts(pageId, payload.viewportProfile, slotIds);
   if (!referenceArtifacts?.rawShellHtml) {
     throw httpError(404, "reference_page_shell_not_found", `${pageId}:${payload.viewportProfile || "pc"}`);
   }
-  const conceptPackage = buildConceptPackageFromRequirementPlan(approvedPlan, {
+  stageTimingRecorder.mark("referenceArtifacts", stageStartedAt);
+  stageStartedAt = Date.now();
+  let conceptPackage = buildConceptPackageFromRequirementPlan(approvedPlan, {
     viewportProfile: referenceArtifacts.viewportProfile || payload.viewportProfile,
     pageIdentity: effectiveIdentity,
     targetGroupId: payload.targetGroupId,
@@ -2976,9 +4646,16 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
     patchDepth: payload.patchDepth,
     designChangeLevel: payload.designChangeLevel,
   });
+  conceptPackage = alignConceptPackageTargetGroupWithBuildInput(conceptPackage, buildInput);
   if (payload.conceptDocument) conceptPackage.conceptDocument = String(payload.conceptDocument || "");
   if (payload.conceptPackage && typeof payload.conceptPackage === "object") {
     conceptPackage.externalConceptPackage = JSON.parse(JSON.stringify(payload.conceptPackage));
+  }
+  if (Array.isArray(payload.authoringPlan?.clusters) && payload.authoringPlan.clusters.length) {
+    conceptPackage.executionBrief = {
+      ...(conceptPackage.executionBrief || {}),
+      authoringClusters: payload.authoringPlan.clusters.slice(0, 12),
+    };
   }
   const authorInput = buildDesignAuthorInput({
     pageId,
@@ -3005,42 +4682,86 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
     },
   });
   const authorSequencePlan = buildSectionSequencePlan(authorInput);
+  stageTimingRecorder.mark("authorInput", stageStartedAt);
+  stageStartedAt = Date.now();
   const designAuthorProvider = normalizeDesignAuthorProvider(payload.builderProvider || payload.authorProvider || "local");
-  if (designAuthorProvider !== "local") {
-    throw httpError(400, "builder_provider_not_supported_for_phase1", "Phase 1 builder-only API currently supports authorProvider=local.");
-  }
-  let authoredSectionHtmlPackage = buildLocalAuthoredSectionHtmlPackage({
-    pageId,
-    viewportProfile: referenceArtifacts.viewportProfile,
-    authorInput,
-    cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
-    referenceContext: {
-      currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-      currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-    },
-  });
-  authoredSectionHtmlPackage = enrichAuthoredSectionHtmlPackageWithAuthorInput({
-    authoredSectionHtmlPackage,
-    authorInput,
-    cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
-  });
+  const designAuthorModel = String(payload.designAuthorModel || payload.authorModel || payload.model || resolveOpenWebuiDesignAuthorModel()).trim();
+  const bypassDesignModelProfile =
+    designAuthorProvider === "openrouter" &&
+    designAuthorModel &&
+    (payload.bypassDesignModelProfile === true || String(payload.bypassDesignModelProfile || "").trim() === "1");
+  const prebuiltAuthorCandidate = resolveAuthoredSectionHtmlPackageCandidate(payload, conceptPackage);
+  const resolvedAuthorResult = prebuiltAuthorCandidate || (designAuthorProvider === "openrouter"
+    ? await withTemporaryEnv(
+        bypassDesignModelProfile ? { DESIGN_MODEL_PROFILE_BYPASS: "1" } : {},
+        () => buildLlmAuthoredSectionHtmlPackage({
+          pageId,
+          viewportProfile: referenceArtifacts.viewportProfile,
+          authorInput,
+          cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+          referenceContext: {
+            currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+            currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+          },
+        }, designAuthorModel ? { model: designAuthorModel } : {})
+      )
+    : {
+        package: buildLocalAuthoredSectionHtmlPackage({
+          pageId,
+          viewportProfile: referenceArtifacts.viewportProfile,
+          authorInput,
+          cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+          referenceContext: {
+            currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+            currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+          },
+        }),
+        providerMeta: {
+          provider: "local",
+          usedDemoFallback: false,
+        },
+      });
+  stageTimingRecorder.mark("authorPackage", stageStartedAt);
+  stageStartedAt = Date.now();
+  let authoredSectionHtmlPackage =
+    resolvedAuthorResult?.package && typeof resolvedAuthorResult.package === "object"
+      ? enrichAuthoredSectionHtmlPackageWithAuthorInput({
+          authoredSectionHtmlPackage: resolvedAuthorResult.package,
+          authorInput,
+          cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+        })
+      : buildLocalAuthoredSectionHtmlPackage({
+          pageId,
+          viewportProfile: referenceArtifacts.viewportProfile,
+          authorInput,
+          cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+          referenceContext: {
+            currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+            currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+          },
+        });
   const authorInputSnapshot = buildDesignAuthorInputSnapshot(authorInput);
   const normalizedAssetUsage = normalizeAuthoredAssetUsage({
     authoredSectionHtmlPackage,
     authorInputSnapshot,
   });
   authoredSectionHtmlPackage = normalizedAssetUsage?.package || authoredSectionHtmlPackage;
-  const authoredSectionMarkdownDocument = buildLocalAuthoredSectionMarkdownDocument({
-    pageId,
-    viewportProfile: referenceArtifacts.viewportProfile,
-    authorInput,
-    cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
-    referenceContext: {
-      currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-      currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-    },
-  });
-  const authorProviderMeta = { provider: "local", usedDemoFallback: false };
+  const authoredSectionMarkdownDocument =
+    String(resolvedAuthorResult?.document || "").trim() ||
+    buildLocalAuthoredSectionMarkdownDocument({
+      pageId,
+      viewportProfile: referenceArtifacts.viewportProfile,
+      authorInput,
+      cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
+      referenceContext: {
+        currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
+        currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
+      },
+    });
+  const authorProviderMeta =
+    resolvedAuthorResult?.providerMeta && typeof resolvedAuthorResult.providerMeta === "object"
+      ? resolvedAuthorResult.providerMeta
+      : { provider: designAuthorProvider };
   const authoringStageTrace = buildAuthoringStageTrace({
     payload,
     approvedPlan,
@@ -3053,6 +4774,8 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
     sequencePlan: authorSequencePlan,
     authorProviderMeta,
   });
+  stageTimingRecorder.mark("outputNormalization", stageStartedAt);
+  stageStartedAt = Date.now();
   const authorOutputValidation = validateDesignAuthorOutput({
     authoredSectionMarkdownDocument,
     authoredSectionHtmlPackage,
@@ -3080,6 +4803,26 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
   if (!authorOutputValidation?.deliveryReadiness?.readyForRuntime) {
     throw httpError(422, "design_author_output_not_ready", JSON.stringify(authorOutputValidation));
   }
+  stageTimingRecorder.mark("validation", stageStartedAt);
+  stageStartedAt = Date.now();
+  if (authorCandidateOnly) {
+    const stageTiming = stageTimingRecorder.finish();
+    return {
+      ok: true,
+      authorCandidateOnly: true,
+      authoredSectionHtmlPackageCandidate: buildAuthoredSectionHtmlPackageCandidate({
+        payload,
+        conceptPackage,
+        externalOwner,
+        authoredSectionHtmlPackage,
+        authoredSectionMarkdownDocument,
+        authorProviderMeta,
+        authorOutputValidation,
+        stageTiming,
+      }),
+      stageTiming,
+    };
+  }
   const runtimeResult = renderRuntimeDraft({
     authoredSectionMarkdownDocument,
     authoredSectionHtmlPackage,
@@ -3095,11 +4838,14 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
       },
     },
   });
+  stageTimingRecorder.mark("render", stageStartedAt);
+  stageStartedAt = Date.now();
   const runtimeDraft = runtimeResult?.draftBuild && typeof runtimeResult.draftBuild === "object" ? runtimeResult.draftBuild : {};
   const storedConceptPackage = sanitizeAuthoringSnapshotForStorage(conceptPackage);
   const storedAuthorInputSnapshot = sanitizeAuthoringSnapshotForStorage(authorInputSnapshot);
   const storedAuthoringStageTrace = sanitizeAuthoringSnapshotForStorage(authoringStageTrace);
   const storedFoundation = sanitizeAuthoringSnapshotForStorage(foundation);
+  const preSaveStageTiming = stageTimingRecorder.finish();
   const draftItem = sanitizeAuthoringSnapshotForStorage({
     ...runtimeDraft,
     id: String(runtimeDraft.id || "").trim() || `runtime-draft-${Date.now()}`,
@@ -3113,7 +4859,10 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
     targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
     externalOwner,
     externalProjectId: String(payload.externalProjectId || "").trim(),
+    externalRequirementId: String(payload.externalRequirementId || payload.requirementId || "").trim(),
+    requirementId: String(payload.requirementId || payload.externalRequirementId || "").trim(),
     externalConceptId: String(payload.externalConceptId || "").trim(),
+    conceptGroupId: String(payload.conceptGroupId || "").trim(),
     conceptThreadId: String(payload.conceptThreadId || "").trim(),
     executionStrategy: {
       builderProvider: designAuthorProvider,
@@ -3138,6 +4887,12 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
       patchDepth: String(payload.patchDepth || "medium").trim() || "medium",
       interventionLayer: String(payload.interventionLayer || "section-group").trim() || "section-group",
       targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
+      externalProjectId: String(payload.externalProjectId || "").trim(),
+      externalRequirementId: String(payload.externalRequirementId || payload.requirementId || "").trim(),
+      requirementId: String(payload.requirementId || payload.externalRequirementId || "").trim(),
+      externalConceptId: String(payload.externalConceptId || "").trim(),
+      conceptGroupId: String(payload.conceptGroupId || "").trim(),
+      conceptThreadId: String(payload.conceptThreadId || "").trim(),
       executionMode: "authored-section-html",
       cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
       conceptDocument: String(payload.conceptDocument || ""),
@@ -3148,6 +4903,7 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
       authoredSectionMarkdownDocument,
       authoredSectionHtmlPackage,
       authoringStageTrace: storedAuthoringStageTrace,
+      builderStageTiming: preSaveStageTiming,
       externalOwner,
       referencePageShell: {
         pageId,
@@ -3164,6 +4920,15 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
     },
   });
   const saved = saveDraftBuild(user.userId, draftItem);
+  stageTimingRecorder.mark("save", stageStartedAt);
+  const stageTiming = stageTimingRecorder.finish();
+  writeBuildStageTimingTrace({
+    payload,
+    externalOwner,
+    stageTiming,
+    providerMeta: authorProviderMeta,
+    draftBuildId: String(saved?.id || "").trim(),
+  });
   const previewToken = createPreviewToken({
     draftBuildId: String(saved?.id || "").trim(),
     userId: user.userId,
@@ -3177,8 +4942,20 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
     previewPath,
     comparePath,
     artifact: {
+      schemaVersion: "openwebui-builder-artifact-v1",
+      artifactType: "lge-builder-draft",
       pageId,
       viewportProfile: referenceArtifacts.viewportProfile,
+      externalProjectId: String(payload.externalProjectId || "").trim(),
+      externalRequirementId: String(payload.externalRequirementId || payload.requirementId || "").trim(),
+      requirementId: String(payload.requirementId || payload.externalRequirementId || "").trim(),
+      externalConceptId: String(payload.externalConceptId || "").trim(),
+      conceptGroupId: String(payload.conceptGroupId || "").trim(),
+      conceptThreadId: String(payload.conceptThreadId || "").trim(),
+      draftBuildId: String(saved?.id || "").trim(),
+      builderRunId: String(saved?.id || "").trim(),
+      previewPath,
+      comparePath,
       targetGroup: payload.conceptPackage?.targetGroup || null,
       authoredSectionMarkdownDocument,
       authoredSectionHtmlPackage,
@@ -3186,6 +4963,7 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
       report: saved?.report || {},
       validation: authorOutputValidation,
       runtimeAdvisory: runtimeResult?.advisory || [],
+      stageTiming,
       externalOwner,
     },
     providerResult: {
@@ -3198,7 +4976,9 @@ async function buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner
       authoredSectionMarkdownDocument,
       authoredSectionHtmlPackage,
       runtimeAdvisory: runtimeResult?.advisory || [],
+      stageTiming,
     },
+    stageTiming,
   };
 }
 
@@ -3720,7 +5500,78 @@ ${sections}
 </html>`;
 }
 
-function buildRuntimeReferenceArtifacts(pageId, viewportProfile = "pc", slotIds = []) {
+function firstExistingFileSignature(filePaths = []) {
+  for (const filePath of filePaths) {
+    const normalizedPath = String(filePath || "").trim();
+    if (!normalizedPath) continue;
+    try {
+      const stat = fs.statSync(normalizedPath);
+      if (stat.isFile()) return `${normalizedPath}:${Number(stat.mtimeMs || 0)}:${Number(stat.size || 0)}`;
+    } catch {}
+  }
+  return "missing";
+}
+
+function computeRuntimeReferenceShellSourceSignature(pageId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(viewportProfile, "pc")
+      : normalizeViewportProfile(viewportProfile, "pc");
+  if (buildReferenceBasedJourneyPageSpec(normalizedPageId, normalizedViewportProfile)) {
+    return `reference-based:${normalizedPageId}:${normalizedViewportProfile}:v1`;
+  }
+  const suffix = viewportProfileToReferenceLiveSuffix(normalizedViewportProfile);
+  const candidates = [];
+  if (normalizedPageId === "home") {
+    if (normalizedViewportProfile === "mo") {
+      candidates.push(path.join(REFERENCE_LIVE_DIR, "home.mobile.html"), path.join(REFERENCE_LIVE_FALLBACK_DIR, "home.mobile.html"));
+    } else if (normalizedViewportProfile === "ta") {
+      candidates.push(
+        path.join(REFERENCE_LIVE_DIR, "home.tablet.html"),
+        path.join(REFERENCE_LIVE_FALLBACK_DIR, "home.tablet.html"),
+        path.join(REFERENCE_LIVE_DIR, "home.desktop.html")
+      );
+    } else {
+      candidates.push(path.join(REFERENCE_LIVE_DIR, "home.desktop.html"));
+    }
+  } else {
+    candidates.push(
+      path.join(REFERENCE_LIVE_DIR, `${normalizedPageId}.${suffix}.html`),
+      path.join(REFERENCE_LIVE_DIR, `${normalizedPageId}.${String(normalizedViewportProfile || "pc").trim().toLowerCase()}.html`)
+    );
+    if (String(normalizedPageId || "").startsWith("category-")) {
+      const profile = normalizedViewportProfile === "mo" ? "mo" : "pc";
+      candidates.push(path.join(ROOT, "data", "visual", "plp", normalizedPageId, profile, "reference.html"));
+    }
+  }
+  const archive = getArchiveRowByPageId(normalizedPageId);
+  if (archive) candidates.push(path.join(ARCHIVE_PAGES_DIR, `${archiveSlugFromUrl(archive.url)}.html`));
+  try {
+    fs.readdirSync(ARCHIVE_PAGES_DIR)
+      .filter((name) => name.startsWith(`${normalizedPageId}__`) && name.endsWith(".html"))
+      .slice(0, 3)
+      .forEach((name) => candidates.push(path.join(ARCHIVE_PAGES_DIR, name)));
+  } catch {}
+  return firstExistingFileSignature(candidates);
+}
+
+function getCachedRuntimeReferenceShellSourceSignature(pageId, viewportProfile = "pc") {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(viewportProfile, "pc")
+      : normalizeViewportProfile(viewportProfile, "pc");
+  const cacheKey = [normalizedPageId, normalizedViewportProfile].join("::");
+  return readCachedValue(
+    REFERENCE_SHELL_SIGNATURE_CACHE,
+    cacheKey,
+    () => computeRuntimeReferenceShellSourceSignature(normalizedPageId, normalizedViewportProfile),
+    Math.max(1000, Number(process.env.REFERENCE_SHELL_SIGNATURE_CACHE_TTL_MS || 30000))
+  );
+}
+
+function buildRuntimeReferenceShellArtifact(pageId, viewportProfile = "pc") {
   const normalizedPageId = String(pageId || "").trim();
   const normalizedViewportProfile =
     normalizedPageId === "home"
@@ -3735,8 +5586,20 @@ function buildRuntimeReferenceArtifacts(pageId, viewportProfile = "pc", slotIds 
     ? rawHtml
     : rewriteReferenceHtml(rawHtml, normalizedPageId, normalizedViewportProfile);
   if (!referenceHtml) return null;
+  return {
+    pageId: normalizedPageId,
+    viewportProfile: normalizedViewportProfile,
+    sourceType: referenceBasedSpec ? "reference-based" : "live-clone",
+    referenceBasedSlots: (referenceBasedSpec?.slots || []).map((slot) => String(slot?.slotId || "").trim()).filter(Boolean),
+    rawShellHtml: referenceHtml,
+  };
+}
+
+function extractRuntimeReferenceSectionsFromShell(shellArtifact = null, requestedSlotIds = []) {
+  if (!shellArtifact?.rawShellHtml) return null;
+  const referenceHtml = String(shellArtifact.rawShellHtml || "");
   const normalizedSlotIds = Array.from(new Set(
-    (Array.isArray(slotIds) && slotIds.length ? slotIds : (referenceBasedSpec?.slots || []).map((slot) => slot.slotId))
+    (requestedSlotIds.length ? requestedSlotIds : shellArtifact.referenceBasedSlots || [])
       .map((slotId) => String(slotId || "").trim())
       .filter(Boolean)
   ));
@@ -3747,17 +5610,14 @@ function buildRuntimeReferenceArtifacts(pageId, viewportProfile = "pc", slotIds 
   normalizedSlotIds.forEach((slotId) => {
     const selectorCandidates = Array.from(new Set([
       `[data-codex-slot="${slotId}"]`,
-      ...buildReplacementSelectorCandidates(normalizedPageId, slotId, "", normalizedViewportProfile),
+      ...buildReplacementSelectorCandidates(shellArtifact.pageId, slotId, "", shellArtifact.viewportProfile),
     ].filter(Boolean)));
     const sectionHtml =
       extractFirstAvailableSelectorBlock(referenceHtml, selectorCandidates) ||
-      extractArtifactSectionMarkup(normalizedPageId, slotId, normalizedViewportProfile);
+      extractArtifactSectionMarkup(shellArtifact.pageId, slotId, shellArtifact.viewportProfile);
     if (!sectionHtml) return;
     currentSectionHtmlMap[slotId] = sectionHtml;
-    sectionBoundaryMap[slotId] = {
-      currentHtml: sectionHtml,
-      selectorCandidates,
-    };
+    sectionBoundaryMap[slotId] = { currentHtml: sectionHtml, selectorCandidates };
     const imageEntries = Array.from(sectionHtml.matchAll(/<img\b([^>]+)>/gi))
       .map((match) => {
         const attrs = String(match?.[1] || "");
@@ -3770,37 +5630,59 @@ function buildRuntimeReferenceArtifacts(pageId, viewportProfile = "pc", slotIds 
       .filter(Boolean);
     const normalizedAssets = [];
     if (imageEntries[0]) {
-      const mainAsset = {
-        assetSlotId: `${slotId}-main`,
-        source: imageEntries[0].source,
-        altText: imageEntries[0].altText,
-      };
+      const mainAsset = { assetSlotId: `${slotId}-main`, source: imageEntries[0].source, altText: imageEntries[0].altText };
       currentPageAssetMap[mainAsset.assetSlotId] = mainAsset.source;
       normalizedAssets.push(mainAsset);
     }
     imageEntries.slice(1, 6).forEach((entry, index) => {
-      const asset = {
-        assetSlotId: `${slotId}-image-${index + 1}`,
-        source: entry.source,
-        altText: entry.altText,
-      };
+      const asset = { assetSlotId: `${slotId}-image-${index + 1}`, source: entry.source, altText: entry.altText };
       currentPageAssetMap[asset.assetSlotId] = asset.source;
       normalizedAssets.push(asset);
     });
-    if (normalizedAssets.length) {
-      currentSectionAssetMap[slotId] = normalizedAssets;
-    }
+    if (normalizedAssets.length) currentSectionAssetMap[slotId] = normalizedAssets;
   });
   return {
-    pageId: normalizedPageId,
-    viewportProfile: normalizedViewportProfile,
-    sourceType: referenceBasedSpec ? "reference-based" : "live-clone",
+    pageId: shellArtifact.pageId,
+    viewportProfile: shellArtifact.viewportProfile,
+    sourceType: shellArtifact.sourceType,
     rawShellHtml: referenceHtml,
     currentSectionHtmlMap,
     currentSectionAssetMap,
     sectionBoundaryMap,
     currentPageAssetMap,
   };
+}
+
+function buildRuntimeReferenceArtifacts(pageId, viewportProfile = "pc", slotIds = []) {
+  const normalizedPageId = String(pageId || "").trim();
+  const normalizedViewportProfile =
+    normalizedPageId === "home"
+      ? normalizeHomeViewportProfile(viewportProfile, "pc")
+      : normalizeViewportProfile(viewportProfile, "pc");
+  const requestedSlotIds = Array.from(new Set(
+    (Array.isArray(slotIds) ? slotIds : [])
+      .map((slotId) => String(slotId || "").trim())
+      .filter(Boolean)
+  ));
+  const shellSignature = getCachedRuntimeReferenceShellSourceSignature(normalizedPageId, normalizedViewportProfile);
+  const shellCacheKey = [normalizedPageId, normalizedViewportProfile, shellSignature].join("::");
+  const shellArtifact = readCachedValue(
+    RUNTIME_REFERENCE_SHELL_CACHE,
+    shellCacheKey,
+    () => buildRuntimeReferenceShellArtifact(normalizedPageId, normalizedViewportProfile),
+    Math.max(1000, Number(process.env.RUNTIME_REFERENCE_SHELL_CACHE_TTL_MS || 120000))
+  );
+  if (!shellArtifact?.rawShellHtml) return null;
+  const extractionCacheKey = [
+    shellCacheKey,
+    requestedSlotIds.length ? requestedSlotIds.slice().sort().join(",") : "*",
+  ].join("::");
+  return readCachedValue(
+    RUNTIME_REFERENCE_EXTRACTION_CACHE,
+    extractionCacheKey,
+    () => extractRuntimeReferenceSectionsFromShell(shellArtifact, requestedSlotIds),
+    Math.max(1000, Number(process.env.RUNTIME_REFERENCE_ARTIFACTS_CACHE_TTL_MS || 60000))
+  );
 }
 
 function buildSectionPreviewImageDiffMeta({
@@ -4105,7 +5987,11 @@ function buildLightweightSectionPreviewHtml(html, slotId = "") {
 }
 
 function readWorkspaceData(userId) {
-  return normalizeEditableData(JSON.parse(JSON.stringify(getWorkspace(userId).data || readEditableData())));
+  const source = getWorkspace(userId).data || readEditableData();
+  const cloned = typeof structuredClone === "function"
+    ? structuredClone(source)
+    : JSON.parse(JSON.stringify(source));
+  return normalizeEditableData(cloned);
 }
 
 function saveDataForUser(user, data, summary) {
@@ -5204,13 +7090,39 @@ function readPageBuilderPromptBlueprints() {
   });
 }
 
+function targetGroupMatchesBlueprintCluster(requestedTargetGroupId = "", clusterTargetGroupId = "") {
+  const requested = String(requestedTargetGroupId || "").trim().toLowerCase();
+  const cluster = String(clusterTargetGroupId || "").trim().toLowerCase();
+  if (!requested || !cluster) return true;
+  if (requested === cluster) return true;
+  const aliases = {
+    top: ["home-top", "openwebui-target"],
+    "home-top": ["top", "openwebui-target"],
+    "home-all": ["top", "openwebui-target"],
+    page: ["top", "openwebui-target"],
+    "openwebui-target": ["top", "home-top", "home-all", "page"],
+  };
+  return Array.isArray(aliases[requested]) && aliases[requested].includes(cluster);
+}
+
+function resolveBlueprintClusterSlotIds(cluster = {}, activeBlueprint = {}) {
+  const explicit = safeArray(cluster?.slotIds, 12);
+  if (explicit.length) return explicit;
+  const rendererTargets = safeArray(activeBlueprint?.rendererStrategy?.replacementTargets, 12);
+  if (rendererTargets.length) return rendererTargets;
+  return (Array.isArray(activeBlueprint?.sectionPrompts) ? activeBlueprint.sectionPrompts : [])
+    .map((item) => String(item?.familyId || "").trim())
+    .filter(Boolean)
+    .slice(0, 12);
+}
+
 function buildPagePromptBlueprintContext(pageId = "", options = {}) {
   const payload = readPageBuilderPromptBlueprints();
   const normalizedPageId = String(pageId || "").trim();
   const normalizedViewportProfile = String(options.viewportProfile || "").trim().toLowerCase();
   const normalizedTargetGroupId = String(options.targetGroupId || "").trim();
   const normalizedTargetKind = String(options.targetKind || "").trim();
-  const blueprints = safeArray(payload?.pageBlueprints, 32).map((item) => (item && typeof item === "object" ? item : {}));
+  const blueprints = safeObjectArray(payload?.pageBlueprints, 32).map((item) => (item && typeof item === "object" ? item : {}));
   const exactMatch = blueprints.find((item) =>
     String(item?.pageId || "").trim() === normalizedPageId &&
     String(item?.viewportProfile || "").trim().toLowerCase() === normalizedViewportProfile
@@ -5240,19 +7152,19 @@ function buildPagePromptBlueprintContext(pageId = "", options = {}) {
           label: String(activeBlueprint?.label || normalizedPageId).trim(),
           implementationStatus: String(activeBlueprint?.implementationStatus || "blueprint-only").trim(),
           pagePrompt: activeBlueprint?.pagePrompt && typeof activeBlueprint.pagePrompt === "object" ? activeBlueprint.pagePrompt : {},
-          clusters: safeArray(activeBlueprint?.clusters, 8)
+          clusters: safeObjectArray(activeBlueprint?.clusters, 8)
             .filter((item) => {
               const targetGroupId = String(item?.targetGroupId || "").trim();
-              if (!normalizedTargetGroupId || !targetGroupId) return true;
-              return targetGroupId === normalizedTargetGroupId;
+              return targetGroupMatchesBlueprintCluster(normalizedTargetGroupId, targetGroupId);
             })
             .map((item) => ({
               clusterId: String(item?.clusterId || "").trim(),
               targetGroupId: String(item?.targetGroupId || "").trim(),
+              slotIds: resolveBlueprintClusterSlotIds(item, activeBlueprint),
               goal: String(item?.goal || "").trim(),
               rules: safeArray(item?.rules, 6),
             })),
-          sectionPrompts: safeArray(activeBlueprint?.sectionPrompts, 12).map((item) => ({
+          sectionPrompts: safeObjectArray(activeBlueprint?.sectionPrompts, 12).map((item) => ({
             familyId: String(item?.familyId || "").trim(),
             role: String(item?.role || "").trim(),
             rules: safeArray(item?.rules, 6),
@@ -8367,6 +10279,1330 @@ function buildOpenRouterPlanningPreviewPlan(plannerResult = {}, payload = {}) {
   };
 }
 
+function normalizeOpenWebuiConceptReferenceUrls(value) {
+  if (Array.isArray(value)) return safeArray(value, 10);
+  return String(value || "")
+    .split(/\r?\n|,/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 10);
+}
+
+function inferOpenWebuiConceptTargetComponents(pageId = "", source = {}) {
+  const normalizedPageId = String(pageId || "").trim() || "home";
+  const explicitComponents = safeArray(
+    source.targetComponents || source.componentIds || source.components || source.conceptPackage?.targetGroup?.componentIds || [],
+    50
+  );
+  if (explicitComponents.length) return explicitComponents;
+  const slotIds = safeArray(source.slots || source.slotIds || source.conceptPackage?.targetGroup?.slotIds || [], 24);
+  if (slotIds.length) return slotIds.map((slotId) => `${normalizedPageId}.${slotId}`);
+  const targetHint = [
+    source.targetGroupId,
+    source.scopePreset,
+    source.targetGroupLabel,
+    source.targetScope,
+  ].map((item) => String(item || "").trim().toLowerCase()).filter(Boolean).join(" ");
+  if (normalizedPageId === "home" && (/home-top|first|top|hero|quick/.test(targetHint) || !targetHint)) {
+    return ["home.hero", "home.quickmenu"];
+  }
+  return [];
+}
+
+function inferOpenWebuiConceptTargetSlots(pageId = "", source = {}) {
+  const normalizedPageId = String(pageId || "").trim() || "home";
+  const explicitSlots = safeArray(
+    source.targetSlots || source.slots || source.slotIds || source.conceptPackage?.targetGroup?.slotIds || [],
+    50
+  );
+  if (explicitSlots.length) return explicitSlots;
+  const componentSlots = safeArray(
+    source.targetComponents || source.componentIds || source.components || source.conceptPackage?.targetGroup?.componentIds || [],
+    50
+  ).map((componentId) => inferSlotIdFromComponentId(componentId)).filter(Boolean);
+  if (componentSlots.length) return Array.from(new Set(componentSlots));
+  const targetScope = String(source.targetScope || "").trim().toLowerCase();
+  const targetGroupId = String(source.targetGroupId || source.scopePreset || "").trim().toLowerCase();
+  if (targetScope === "page" || /(?:^|-)all$/.test(targetGroupId)) {
+    const contract = readOpenWebuiBuilderContract();
+    const slots = getOpenWebuiPageBuildableSlotIds(contract || {}, normalizedPageId, source.viewportProfile || source.viewport || "pc");
+    if (slots.length) return Array.from(new Set(slots));
+  }
+  return [];
+}
+
+function normalizeOpenWebuiRequirementDraftPayload(payload = {}) {
+  const source = payload && typeof payload === "object" ? payload : {};
+  const draft = source.requirementDraft && typeof source.requirementDraft === "object" ? source.requirementDraft : {};
+  const pageId = String(source.pageId || draft.pageId || "home").trim() || "home";
+  const viewportProfile = String(source.viewportProfile || draft.viewportProfile || "pc").trim().toLowerCase() || "pc";
+  const targetComponents = inferOpenWebuiConceptTargetComponents(pageId, {
+    ...draft,
+    ...source,
+  });
+  const targetSlots = inferOpenWebuiConceptTargetSlots(pageId, {
+    ...draft,
+    ...source,
+    targetComponents,
+  });
+  const refs = normalizeOpenWebuiConceptReferenceUrls(
+    source.referenceUrls !== undefined ? source.referenceUrls : draft.referenceUrls !== undefined ? draft.referenceUrls : draft.refs
+  );
+  const title = String(source.title || draft.title || "").trim();
+  const message = String(source.requestText || source.message || draft.requestText || draft.message || "").trim();
+  const background = String(source.background || draft.background || "").trim();
+  const requestText = String(source.requestText || draft.requestText || [message, background].filter(Boolean).join("\n\n")).trim();
+  const keyMessage = String(source.keyMessage || draft.keyMessage || title || message).trim();
+  const designChangeLevel = normalizeDesignChangeLevel(source.designChangeLevel || source.changeLevel || draft.designChangeLevel || draft.changeLevel, "medium");
+  const patchDepth = normalizePatchDepth(source.patchDepth || draft.patchDepth, designChangeLevel === "high" ? "strong" : "medium");
+  const builderProvider = normalizeDesignAuthorProvider(source.builderProvider || draft.builderProvider || source.plannerProvider || draft.plannerProvider || "local");
+  const normalized = {
+    mode: String(source.mode || draft.mode || "hybrid").trim() || "hybrid",
+    changeLevel: designChangeLevel,
+    designChangeLevel,
+    interventionLayer: normalizeInterventionLayer(source.interventionLayer || draft.interventionLayer, targetComponents.length ? "section-group" : "page"),
+    patchDepth,
+    rendererSurface: String(source.rendererSurface || draft.rendererSurface || "tailwind").trim() || "tailwind",
+    builderProvider,
+    plannerProvider: builderProvider,
+    journeyMode: String(source.journeyMode || draft.journeyMode || (source.journeyId || draft.journeyId ? "strategy" : "page")).trim() || "page",
+    journeyId: String(source.journeyId || draft.journeyId || "").trim(),
+    journeyDiscoveryMode: String(source.journeyDiscoveryMode || draft.journeyDiscoveryMode || (source.journeyId || draft.journeyId ? "strategy-input" : "none")).trim() || "none",
+    scopePreset: String(source.scopePreset || draft.scopePreset || source.targetGroupId || draft.targetGroupId || "").trim(),
+    targetScope: String(source.targetScope || draft.targetScope || (targetComponents.length ? "components" : "page")).trim() || "page",
+    targetSlots,
+    targetComponents,
+    targetGroupId: String(source.targetGroupId || draft.targetGroupId || source.scopePreset || draft.scopePreset || "openwebui-target").trim() || "openwebui-target",
+    targetGroupLabel: String(source.targetGroupLabel || draft.targetGroupLabel || "Open WebUI Target").trim() || "Open WebUI Target",
+    title,
+    message,
+    background,
+    direction: String(source.preferredDirection || source.direction || draft.preferredDirection || draft.direction || "").trim(),
+    tone: String(source.toneAndMood || source.tone || draft.toneAndMood || draft.tone || "").trim(),
+    avoid: String(source.avoidDirection || source.avoid || draft.avoidDirection || draft.avoid || "").trim(),
+    refs,
+    pageId,
+    viewportProfile,
+    requestText,
+    keyMessage,
+    preferredDirection: String(source.preferredDirection || source.direction || draft.preferredDirection || draft.direction || "").trim(),
+    toneAndMood: String(source.toneAndMood || source.tone || draft.toneAndMood || draft.tone || "").trim(),
+    avoidDirection: String(source.avoidDirection || source.avoid || draft.avoidDirection || draft.avoid || "").trim(),
+    referenceUrls: refs,
+  };
+  return normalized;
+}
+
+function buildOpenWebuiConceptPlannerPayload(payload = {}) {
+  const requirementDraft = normalizeOpenWebuiRequirementDraftPayload(payload);
+  return {
+    requirementDraft,
+    plannerPayload: {
+      pageId: requirementDraft.pageId,
+      viewportProfile: requirementDraft.viewportProfile,
+      mode: requirementDraft.mode,
+      requestText: requirementDraft.requestText,
+      keyMessage: requirementDraft.keyMessage,
+      preferredDirection: requirementDraft.preferredDirection,
+      avoidDirection: requirementDraft.avoidDirection,
+      toneAndMood: requirementDraft.toneAndMood,
+      referenceUrls: requirementDraft.referenceUrls,
+      title: requirementDraft.title,
+      designChangeLevel: requirementDraft.designChangeLevel,
+      interventionLayer: requirementDraft.interventionLayer,
+      patchDepth: requirementDraft.patchDepth,
+      rendererSurface: requirementDraft.rendererSurface,
+      builderProvider: requirementDraft.builderProvider,
+      targetScope: requirementDraft.targetScope,
+      targetComponents: requirementDraft.targetComponents,
+      targetGroupId: requirementDraft.targetGroupId,
+      targetGroupLabel: requirementDraft.targetGroupLabel,
+      scopePreset: requirementDraft.scopePreset,
+      journeyMode: requirementDraft.journeyMode,
+      journeyId: requirementDraft.journeyId,
+      journeyDiscoveryMode: requirementDraft.journeyDiscoveryMode,
+    },
+  };
+}
+
+function yamlScalar(value) {
+  if (Array.isArray(value)) return `[${value.map((item) => JSON.stringify(String(item || ""))).join(", ")}]`;
+  if (typeof value === "boolean") return value ? "true" : "false";
+  return JSON.stringify(String(value || ""));
+}
+
+function markdownLines(value, fallback = "-") {
+  const lines = Array.isArray(value)
+    ? value.map((item) => String(item || "").trim()).filter(Boolean)
+    : String(value || "").split(/\r?\n/).map((item) => item.trim()).filter(Boolean);
+  return lines.length ? lines.map((line) => `- ${line}`).join("\n") : fallback;
+}
+
+function normalizeOpenWebuiConceptDisplayMarkdown(value = "") {
+  let text = String(value || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\r/g, "\n")
+    .trim();
+  if (!text) return "";
+  const lineCount = text.split("\n").length;
+  const headingCount = (text.match(/#{1,6}\s+/g) || []).length;
+  if (lineCount <= Math.max(3, headingCount)) {
+    text = text
+      .replace(/[ \t]+(#{1,6})[ \t]+/g, "\n\n$1 ")
+      .replace(/[ \t]+---(?=\s|$)/g, "\n\n---\n\n")
+      .replace(/[ \t]+-\s+(?=\*\*|[가-힣A-Za-z0-9])/g, "\n- ");
+  }
+  [
+    "## 이 페이지가 해야 하는 일",
+    "## 왜 지금 럭셔리 톤인가",
+    "## 변하지 않아야 할 것들",
+    "## 무엇을 바꿀 것인가",
+    "## 페이지 구간별 방향",
+    "## 컬러 및 비주얼 방향",
+    "## 이 개편이 고객에게 주는 것",
+    "### 1. 타이포그래피 위계 전면 재설계",
+    "### 2. 히어로 영역 시네마틱 스테이지 구조 적용",
+    "### 3. 커머스·혜택 카드 밀도 및 배지 스타일 통일",
+    "### 4. 전체 섹션 배경 컬러 리듬 재정비",
+    "### 상단 진입 영역 (헤더 + 히어로 + 퀵메뉴)",
+    "### 커머스 핵심 구간 (MD 추천 · 타임딜 · 베스트 랭킹)",
+    "### 브랜드 스토리 구간 (브랜드 쇼룸 · 최신 뉴스 · 스마트라이프)",
+    "### 하단 서비스·신뢰 구간 (구독 · 마케팅 · 베스트케어 · 베스트샵)",
+  ].forEach((heading) => {
+    const escaped = heading.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    text = text.replace(new RegExp(`(^|\\n)${escaped}[ \\t]+`, "g"), `$1${heading}\n\n`);
+  });
+  text = text
+    .split("\n")
+    .flatMap((line) => {
+      const value = line.trimEnd();
+      if (!/^#{1,6}\s+/.test(value) || value.length < 80) return [value];
+      const match = /^(#{1,6}\s+(?:\d+\.\s+)?[^\n.!?。]{4,60}?)(\s+(?:LG전자|현재|아무리|첫|중단|전체|고객|이번|이\s+구간|전환|럭셔리|시네마틱|컬러|타이포|히어로|커머스|상단|에디토리얼|페이지).*)$/.exec(value);
+      if (!match) return [value];
+      return [match[1].trimEnd(), "", match[2].trim()];
+    })
+    .join("\n")
+    .replace(/^(###\s*상단\s*진입부\s*—\s*헤더\s*&)\n\n(히어로\s*&\s*퀵메뉴)\s+/gm, "$1 $2\n\n")
+    .replace(/^(###\s*하단\s*서비스·정보\s*구간\s*—\s*구독\s*·\s*마케팅\s*·\s*케어\s*·\s*베스트샵\s*안내)\s+(배지·칩·레이블\s+등\s+보조\s+UI\s+요소)/gm, "$1\n\n$2")
+    .replace(/^(##\s*이\s*제안이)\n\n(고객에게\s*주는\s*가치)\s+/gm, "$1 $2\n\n")
+    .replace(/(고객\s+모두를\s+수용하는\s+구조)\s+(이번\s+제안은)/g, "$1\n\n$2")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return text;
+}
+
+function buildOpenWebuiRequirementPlanMarkdown(requirementPlan = {}, requirementDraft = {}) {
+  const plan = requirementPlan && typeof requirementPlan === "object" ? requirementPlan : {};
+  const draft = requirementDraft && typeof requirementDraft === "object" ? requirementDraft : {};
+  const conceptDisplayMarkdown = normalizeOpenWebuiConceptDisplayMarkdown(plan.conceptDisplayMarkdown || "");
+  const builderMarkdown = String(plan.builderMarkdown || "").trim();
+  const designSpecMarkdown = String(plan.designSpecMarkdown || "").trim();
+  const requestSummary = markdownLines(plan.requestSummary || [draft.title, draft.message, draft.background].filter(Boolean));
+  const planningDirection = markdownLines(plan.planningDirection || draft.direction);
+  const designDirection = markdownLines(plan.designDirection || draft.direction);
+  const guardrails = markdownLines(plan.guardrails || draft.avoid);
+  const targetComponents = markdownLines(plan.targetComponents || draft.targetComponents);
+  const targetSlots = markdownLines(plan.targetSlots || draft.targetSlots);
+  const fallbackBuilderMarkdown = [
+    `# ${String(plan.title || draft.title || draft.keyMessage || "Atlas Builder Concept").trim()}`,
+    "",
+    "## 요청 요약",
+    requestSummary,
+    "",
+    "## 빌더 실행 범위",
+    `- pageId: ${draft.pageId || ""}`,
+    `- viewportProfile: ${draft.viewportProfile || ""}`,
+    `- targetGroupId: ${draft.targetGroupId || ""}`,
+    `- targetScope: ${draft.targetScope || ""}`,
+    `- targetSlots: ${targetSlots.replace(/\n/g, " ")}`,
+    `- targetComponents: ${targetComponents.replace(/\n/g, " ")}`,
+    "",
+    "## 기획 방향",
+    planningDirection,
+  ].join("\n");
+  return {
+    conceptDisplayMarkdown: conceptDisplayMarkdown || builderMarkdown || fallbackBuilderMarkdown,
+    builderMarkdown: builderMarkdown || fallbackBuilderMarkdown,
+    designSpecMarkdown: designSpecMarkdown || [
+      "# Design Spec",
+      "",
+      "## 디자인 방향",
+      designDirection,
+      "",
+      "## 유지/금지 조건",
+      guardrails,
+      "",
+      "## 레퍼런스",
+      markdownLines(draft.referenceUrls),
+    ].join("\n"),
+  };
+}
+
+function buildOpenWebuiConceptDocument({ requirementDraft, requirementPlan, conceptDisplayMarkdown, builderMarkdown, designSpecMarkdown, plannerProvider }) {
+  const draft = requirementDraft && typeof requirementDraft === "object" ? requirementDraft : {};
+  const plan = requirementPlan && typeof requirementPlan === "object" ? requirementPlan : {};
+  const componentIds = Array.isArray(draft.targetComponents) ? draft.targetComponents : [];
+  const slotIds = Array.from(new Set(
+    (Array.isArray(draft.targetSlots) && draft.targetSlots.length
+      ? draft.targetSlots
+      : componentIds.map((componentId) => inferSlotIdFromComponentId(componentId))
+    ).map((slotId) => String(slotId || "").trim()).filter(Boolean)
+  ));
+  const frontmatter = {
+    atlasMode: true,
+    builderReady: false,
+    status: "review",
+    pageId: draft.pageId,
+    viewportProfile: draft.viewportProfile,
+    targetGroupId: draft.targetGroupId,
+    targetGroupLabel: draft.targetGroupLabel,
+    slots: slotIds,
+    componentIds,
+    targetScope: draft.targetScope,
+    designChangeLevel: draft.designChangeLevel,
+    interventionLayer: draft.interventionLayer,
+    patchDepth: draft.patchDepth,
+    rendererSurface: draft.rendererSurface,
+    builderProvider: draft.builderProvider,
+    plannerProvider,
+  };
+  const yaml = Object.entries(frontmatter)
+    .map(([key, value]) => `${key}: ${yamlScalar(value)}`)
+    .join("\n");
+  return [
+    "---",
+    yaml,
+    "---",
+    "",
+    `# ${String(plan.title || draft.title || draft.keyMessage || "Atlas 컨셉서 초안").trim()}`,
+    "",
+    "> 이 문서는 backend concept-preview가 requirementDraft에서 생성한 컨셉서 초안입니다. 검토 후 빌드 확정 시 builderReady를 true로 전환해 기존 draft build 흐름으로 넘깁니다.",
+    "",
+    "## 원 요구사항",
+    markdownLines([draft.title, draft.message, draft.background].filter(Boolean)),
+    "",
+    "## Reference URLs",
+    markdownLines(draft.referenceUrls),
+    "",
+    "## Concept Display Markdown",
+    conceptDisplayMarkdown || builderMarkdown || "-",
+    "",
+    "## Builder Markdown",
+    builderMarkdown || "-",
+    "",
+    "## Design Spec Markdown",
+    designSpecMarkdown || "-",
+  ].join("\n");
+}
+
+function firstMarkdownHeadingText(markdown = "") {
+  const match = String(markdown || "").match(/^#\s+(.+?)\s*$/m);
+  return match ? match[1].trim() : "";
+}
+
+function resolveOpenWebuiConceptAuthorModel() {
+  return String(process.env.CONCEPT_AUTHOR_MODEL || "anthropic/claude-sonnet-4.6").trim() || "anthropic/claude-sonnet-4.6";
+}
+
+function resolveOpenWebuiDesignAuthorModel() {
+  return String(
+    process.env.DESIGN_AUTHOR_MODEL ||
+      process.env.BUILDER_MODEL ||
+      process.env.OPENROUTER_MODEL ||
+      DEFAULT_OPENROUTER_TEXT_MODEL
+  ).trim() || DEFAULT_OPENROUTER_TEXT_MODEL;
+}
+
+function buildOpenWebuiConceptAuthorSystemPrompt() {
+  return [
+    "You are CNS Atlas Concept Author for LGE digital experience work.",
+    "Write the concept document directly as polished Korean Markdown for a human user to review in chat.",
+    "Return Markdown only. Do not return JSON, YAML, code fences, hidden comments, implementation notes, or debug metadata.",
+    "Do not ask follow-up questions. The backend already checked the minimum requirement state before calling you.",
+    "Use the user's requirement as source truth. Preserve nuance and constraints; do not replace it with generic design advice.",
+    "Use headings, paragraphs, and bullets naturally. The document should feel like a senior UX/design proposal, not a schema dump.",
+    "Do not expose internal identifiers such as pageId, slotId, targetGroupId, componentId, builderReady, targetScope, or API names.",
+    "Do not include UI instructions such as clicking Action, building, preview links, or next steps. The host application will add those.",
+    "Explain why the change is needed, what should be preserved, what should change, and how the screen experience should read.",
+    "If the request is page-wide, write page-level rhythm and section-level direction. If it is section-level, focus on that section.",
+  ].join("\n");
+}
+
+function buildOpenWebuiConceptAuthorUserPrompt({ requirementDraft = {}, plannerInput = {} } = {}) {
+  const draft = requirementDraft && typeof requirementDraft === "object" ? requirementDraft : {};
+  const input = plannerInput && typeof plannerInput === "object" ? plannerInput : {};
+  const pageSummary = input.pageSummary && typeof input.pageSummary === "object" ? input.pageSummary : {};
+  const pageContext = input.pageContext && typeof input.pageContext === "object" ? input.pageContext : {};
+  const identity = pageContext.pageIdentity && typeof pageContext.pageIdentity === "object" ? pageContext.pageIdentity : {};
+  const referenceSummary = input.referenceSummary && typeof input.referenceSummary === "object" ? input.referenceSummary : {};
+  const referenceAnalyses = Array.isArray(referenceSummary.analyses) ? referenceSummary.analyses : [];
+  const payload = {
+    requirement: {
+      title: draft.title || "",
+      message: draft.message || draft.requestText || "",
+      background: draft.background || "",
+      direction: draft.direction || draft.preferredDirection || "",
+      tone: draft.tone || draft.toneAndMood || "",
+      avoid: draft.avoid || draft.avoidDirection || "",
+      designChangeLevel: draft.designChangeLevel || draft.changeLevel || "medium",
+      viewportProfile: draft.viewportProfile || "",
+      targetGroupLabel: draft.targetGroupLabel || "",
+      targetScope: draft.targetScope || "",
+      referenceUrls: draft.referenceUrls || draft.refs || [],
+    },
+    pageContext: {
+      label: pageContext.pageLabel || pageContext.workspacePageId || draft.pageId || "",
+      role: identity.role || identity.pageRole || "",
+      purpose: identity.purpose || "",
+      mustPreserve: identity.mustPreserve || identity.mustKeep || [],
+      avoid: identity.avoid || identity.avoidPatterns || [],
+    },
+    editableScope: {
+      label: draft.targetGroupLabel || "",
+      editableSlots: Array.isArray(pageSummary.editableSlots) ? pageSummary.editableSlots.slice(0, 20) : [],
+      componentCount: Array.isArray(pageSummary.existingComponents) ? pageSummary.existingComponents.length : 0,
+    },
+    references: referenceAnalyses.slice(0, 4).map((item) => ({
+      url: item?.requestedUrl || item?.finalUrl || "",
+      title: item?.title || "",
+      takeaways: Array.isArray(item?.takeaways) ? item.takeaways.slice(0, 5) : [],
+      toneSignals: Array.isArray(item?.toneSignals) ? item.toneSignals.slice(0, 5) : [],
+    })),
+  };
+  return [
+    "Write the review-ready concept document from this context.",
+    "The Markdown you return will be shown directly to the user and also saved as the canonical concept source for the later build.",
+    "Prefer a clear proposal structure, but let the content breathe naturally.",
+    JSON.stringify(payload, null, 2),
+  ].join("\n\n");
+}
+
+function normalizeOpenWebuiAuthoredConceptMarkdown(markdown = "", requirementDraft = {}) {
+  let text = normalizeOpenWebuiConceptDisplayMarkdown(markdown);
+  text = text
+    .replace(/^```(?:markdown|md)?\s*/i, "")
+    .replace(/\s*```\s*$/i, "")
+    .trim();
+  if (!text) {
+    const title = String(requirementDraft?.title || requirementDraft?.keyMessage || "Atlas 컨셉서").trim();
+    const message = String(requirementDraft?.message || requirementDraft?.requestText || "").trim();
+    text = [`# ${title || "Atlas 컨셉서"}`, "", message || "요구사항을 기준으로 컨셉서를 작성합니다."].join("\n");
+  }
+  if (!/^#\s+/.test(text)) {
+    const title = String(requirementDraft?.title || requirementDraft?.keyMessage || "Atlas 컨셉서").trim();
+    text = [`# ${title}`, "", text].join("\n").trim();
+  }
+  return text;
+}
+
+function buildOpenWebuiAuthoredConceptDocument({ requirementDraft, conceptMarkdown, plannerProvider, authorModel }) {
+  const draft = requirementDraft && typeof requirementDraft === "object" ? requirementDraft : {};
+  const componentIds = Array.isArray(draft.targetComponents) ? draft.targetComponents : [];
+  const slotIds = Array.from(new Set(
+    (Array.isArray(draft.targetSlots) && draft.targetSlots.length
+      ? draft.targetSlots
+      : componentIds.map((componentId) => inferSlotIdFromComponentId(componentId))
+    ).map((slotId) => String(slotId || "").trim()).filter(Boolean)
+  ));
+  const markdown = normalizeOpenWebuiAuthoredConceptMarkdown(conceptMarkdown, draft);
+  const frontmatter = {
+    atlasMode: true,
+    builderReady: false,
+    status: "review",
+    pageId: draft.pageId,
+    viewportProfile: draft.viewportProfile,
+    targetGroupId: draft.targetGroupId,
+    targetGroupLabel: draft.targetGroupLabel,
+    slots: slotIds,
+    componentIds,
+    targetScope: draft.targetScope,
+    designChangeLevel: draft.designChangeLevel,
+    interventionLayer: draft.interventionLayer,
+    patchDepth: draft.patchDepth,
+    rendererSurface: draft.rendererSurface,
+    builderProvider: draft.builderProvider,
+    plannerProvider,
+    conceptAuthorModel: authorModel,
+  };
+  const yaml = Object.entries(frontmatter)
+    .map(([key, value]) => `${key}: ${yamlScalar(value)}`)
+    .join("\n");
+  return [
+    "---",
+    yaml,
+    "---",
+    "",
+    markdown,
+  ].join("\n").trim();
+}
+
+function sha256Text(value = "") {
+  return crypto.createHash("sha256").update(String(value || "")).digest("hex");
+}
+
+function normalizeConceptDocumentForHashing(value = "") {
+  return String(value || "").replace(/\r\n/g, "\n").trim();
+}
+
+function sha256ConceptDocument(value = "") {
+  return sha256Text(normalizeConceptDocumentForHashing(value));
+}
+
+function normalizeAuthoringPlanSection(section = {}, fallbackSlotId = "", fallbackComponentId = "") {
+  const slotId = String(section?.slotId || fallbackSlotId || "").trim();
+  const componentId = String(section?.componentId || fallbackComponentId || "").trim();
+  const objective = String(section?.objective || section?.title || section?.label || "").trim();
+  const visualDirection = String(section?.visualDirection || section?.direction || section?.mustChange || "").trim();
+  return {
+    slotId,
+    componentId,
+    label: String(section?.label || section?.title || slotId || componentId || "").trim(),
+    copyBlocks: [
+      ...safeArray(section?.copyBlocks, 12),
+      ...safeArray(section?.copy || [], 12),
+    ].map((item) => String(item || "").trim()).filter(Boolean).slice(0, 12),
+    assetPlan: {
+      requiredRoles: safeArray(section?.assetPlan?.requiredRoles || section?.assetRoles || [], 12),
+      notes: String(section?.assetPlan?.notes || section?.assetNotes || "").trim(),
+    },
+    layoutPlan: {
+      objective,
+      visualDirection,
+      mustKeep: safeArray(section?.mustKeep || [], 12),
+      mustChange: safeArray(section?.mustChange || [], 12),
+    },
+    outputContract: {
+      rendererSurface: "tailwind",
+      slotId,
+      requiredFields: ["slotId", "html"],
+      preserveSourceSection: true,
+    },
+  };
+}
+
+function normalizeOpenWebuiAuthoringCluster(cluster = {}, slotIds = [], componentBySlot = new Map()) {
+  const allowed = new Set((Array.isArray(slotIds) ? slotIds : []).map((slotId) => String(slotId || "").trim()).filter(Boolean));
+  const clusterSlotIds = safeArray(cluster?.slotIds || cluster?.slots || cluster?.replacementTargets || [], 8)
+    .filter((slotId) => !allowed.size || allowed.has(slotId));
+  if (!clusterSlotIds.length) return null;
+  return {
+    clusterId: String(cluster?.clusterId || clusterSlotIds.join("-")).trim(),
+    targetGroupId: String(cluster?.targetGroupId || "").trim(),
+    slotIds: clusterSlotIds,
+    componentIds: clusterSlotIds.map((slotId) => componentBySlot.get(slotId)).filter(Boolean),
+    goal: String(cluster?.goal || "").trim(),
+    rules: safeArray(cluster?.rules, 8),
+    executionHint: String(cluster?.executionHint || "anchor-first-support-batch").trim(),
+  };
+}
+
+function buildDefaultOpenWebuiAuthoringClusters({ slotIds = [], componentBySlot = new Map(), targetGroupId = "" } = {}) {
+  const available = new Set((Array.isArray(slotIds) ? slotIds : []).map((slotId) => String(slotId || "").trim()).filter(Boolean));
+  const pick = (ids) => ids.filter((slotId) => available.has(slotId));
+  const topStage = [
+    {
+      clusterId: "home.top-stage",
+      targetGroupId: targetGroupId || "home-top",
+      slotIds: pick(["hero", "quickmenu"]),
+      goal: "Treat hero and quickmenu as one connected top-stage system while authoring hero as the anchor first.",
+      rules: ["hero remains the visual anchor", "quickmenu follows the hero rhythm", "do not make quickmenu compete with hero"],
+    },
+  ];
+  const orderedSupportSlots = (Array.isArray(slotIds) ? slotIds : [])
+    .map((slotId) => String(slotId || "").trim())
+    .filter((slotId) => slotId && slotId !== "hero" && slotId !== "summary" && slotId !== "quickmenu" && slotId !== "sticky");
+  const supportWindows = [];
+  for (let index = 0; index < orderedSupportSlots.length; index += 3) {
+    const windowSlotIds = orderedSupportSlots.slice(index, index + 3);
+    if (windowSlotIds.length < 2) continue;
+    supportWindows.push({
+      clusterId: `home.support-window-${supportWindows.length + 1}`,
+      targetGroupId: targetGroupId || "home-all",
+      slotIds: windowSlotIds,
+      goal: "Batch adjacent support sections while preserving the page reading order.",
+      rules: ["keep section boundaries independent", "share visual rhythm across adjacent sections", "avoid repeated wrappers and repeated CTA language"],
+    });
+  }
+  return [...topStage, ...supportWindows]
+    .map((cluster) => normalizeOpenWebuiAuthoringCluster(cluster, slotIds, componentBySlot))
+    .filter(Boolean);
+}
+
+function buildOpenWebuiAuthoringPlan({ requirementDraft, requirementPlan, conceptDocument, plannerProvider = "" } = {}) {
+  const draft = requirementDraft && typeof requirementDraft === "object" ? requirementDraft : {};
+  const plan = requirementPlan && typeof requirementPlan === "object" ? requirementPlan : {};
+  const slotIds = Array.from(new Set(
+    (Array.isArray(draft.targetSlots) && draft.targetSlots.length
+      ? draft.targetSlots
+      : Array.isArray(plan?.builderBrief?.suggestedFocusSlots)
+        ? plan.builderBrief.suggestedFocusSlots
+        : []
+    ).map((slotId) => String(slotId || "").trim()).filter(Boolean)
+  ));
+  const componentIds = Array.isArray(draft.targetComponents) ? draft.targetComponents.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const componentBySlot = new Map();
+  componentIds.forEach((componentId) => {
+    const slotId = componentId.split(".").pop();
+    if (slotId && !componentBySlot.has(slotId)) componentBySlot.set(slotId, componentId);
+  });
+  const blueprintSections = Array.isArray(plan.sectionBlueprints) ? plan.sectionBlueprints : [];
+  const sections = (blueprintSections.length ? blueprintSections : slotIds.map((slotId) => ({ slotId })))
+    .map((section, index) => {
+      const fallbackSlotId = slotIds[index] || String(section?.slotId || "").trim();
+      return normalizeAuthoringPlanSection(section, fallbackSlotId, componentBySlot.get(fallbackSlotId) || componentIds[index] || "");
+    })
+    .filter((section) => section.slotId || section.componentId);
+  const explicitClusters = Array.isArray(plan.authoringClusters)
+    ? plan.authoringClusters
+    : Array.isArray(plan.clusters)
+      ? plan.clusters
+      : [];
+  const blueprintContext = buildPagePromptBlueprintContext(String(draft.pageId || plan.pageId || "home").trim() || "home", {
+    viewportProfile: String(draft.viewportProfile || plan.viewportProfile || "pc").trim() || "pc",
+    targetGroupId: String(draft.targetGroupId || plan.targetGroupId || "").trim(),
+    targetKind: String(draft.targetScope || plan.targetScope || "").trim(),
+  });
+  const blueprintClusters = Array.isArray(blueprintContext?.activeBlueprint?.clusters)
+    ? blueprintContext.activeBlueprint.clusters
+    : [];
+  const clusters = (explicitClusters.length
+    ? explicitClusters.map((cluster) => normalizeOpenWebuiAuthoringCluster(cluster, slotIds, componentBySlot)).filter(Boolean)
+    : [
+        ...blueprintClusters.map((cluster) => normalizeOpenWebuiAuthoringCluster(cluster, slotIds, componentBySlot)).filter(Boolean),
+        ...buildDefaultOpenWebuiAuthoringClusters({
+          slotIds,
+          componentBySlot,
+          targetGroupId: String(draft.targetGroupId || plan.targetGroupId || "").trim(),
+        }),
+      ]
+  ).slice(0, 12);
+  return {
+    schemaVersion: "openwebui-authoring-plan-v1",
+    status: "ready_for_prebuild",
+    sourceTrace: {
+      conceptHash: sha256ConceptDocument(conceptDocument),
+      requirementHash: sha256Text(JSON.stringify(draft)),
+      plannerProvider: String(plannerProvider || draft.builderProvider || "").trim(),
+    },
+    target: {
+      pageId: String(draft.pageId || plan.pageId || "").trim(),
+      viewportProfile: String(draft.viewportProfile || plan.viewportProfile || "pc").trim() || "pc",
+      targetScope: String(draft.targetScope || plan.targetScope || "").trim(),
+      targetGroupId: String(draft.targetGroupId || plan.targetGroupId || "").trim(),
+      targetGroupLabel: String(draft.targetGroupLabel || plan.targetGroupLabel || "").trim(),
+      slotIds,
+      componentIds,
+    },
+    sections,
+    clusters,
+    execution: {
+      builderProvider: String(draft.builderProvider || plan.builderProvider || "").trim() || "local",
+      designAuthorModel: String(
+        draft.designAuthorModel ||
+          draft.authorModel ||
+          draft.model ||
+          plan.designAuthorModel ||
+          plan.authorModel ||
+          plan.model ||
+          resolveOpenWebuiDesignAuthorModel()
+      ).trim(),
+      designChangeLevel: String(draft.designChangeLevel || plan.designChangeLevel || "medium").trim() || "medium",
+      interventionLayer: String(draft.interventionLayer || plan.interventionLayer || "").trim(),
+      patchDepth: String(draft.patchDepth || plan.patchDepth || "").trim(),
+      rendererSurface: String(draft.rendererSurface || "tailwind").trim() || "tailwind",
+    },
+  };
+}
+
+function resolveAuthoredSectionHtmlPackageCandidate(payload = {}, conceptPackage = {}) {
+  const candidate = payload?.authoredSectionHtmlPackageCandidate && typeof payload.authoredSectionHtmlPackageCandidate === "object"
+    ? payload.authoredSectionHtmlPackageCandidate
+    : null;
+  const packageCandidate =
+    candidate?.authoredSectionHtmlPackage && typeof candidate.authoredSectionHtmlPackage === "object"
+      ? candidate.authoredSectionHtmlPackage
+      : candidate?.package && typeof candidate.package === "object"
+        ? candidate.package
+        : null;
+  if (!candidate || !packageCandidate) return null;
+  if (String(candidate.schemaVersion || "").trim() !== "authored-section-html-package-candidate-v1") return null;
+  if (String(candidate.status || "").trim() !== "ready") return null;
+  if (candidate?.validation?.deliveryReadiness?.readyForRuntime !== true) return null;
+  const expectedHash = String(candidate?.sourceTrace?.conceptHash || candidate?.conceptHash || "").trim();
+  const actualHash = sha256ConceptDocument(String(payload.conceptDocument || conceptPackage.conceptDocument || ""));
+  if (expectedHash && expectedHash !== actualHash) return null;
+  const payloadProvider = normalizeDesignAuthorProvider(payload.builderProvider || payload.authorProvider || "local");
+  const candidateProvider = String(candidate?.sourceTrace?.builderProvider || candidate?.execution?.builderProvider || "").trim();
+  if (candidateProvider && normalizeDesignAuthorProvider(candidateProvider) !== payloadProvider) return null;
+  const payloadModel = String(payload.designAuthorModel || payload.authorModel || payload.model || "").trim();
+  const candidateModel = String(candidate?.sourceTrace?.model || candidate?.execution?.model || "").trim();
+  if (payloadModel && candidateModel && payloadModel !== candidateModel) return null;
+  return {
+    package: packageCandidate,
+    document: String(candidate.authoredSectionMarkdownDocument || candidate.document || ""),
+    providerMeta: {
+      provider: "prebuilt-candidate",
+      modelCallSkipped: true,
+      conceptHash: actualHash,
+    },
+  };
+}
+
+function buildOpenWebuiPrebuildPayloadFromConceptJob(result = {}) {
+  const requirementDraft = result?.requirementDraft && typeof result.requirementDraft === "object" ? result.requirementDraft : {};
+  const authoringPlan = result?.authoringPlan && typeof result.authoringPlan === "object" ? result.authoringPlan : {};
+  const target = authoringPlan.target && typeof authoringPlan.target === "object" ? authoringPlan.target : {};
+  const execution = authoringPlan.execution && typeof authoringPlan.execution === "object" ? authoringPlan.execution : {};
+  const approvedPlan = result?.requirementPlan && typeof result.requirementPlan === "object" ? result.requirementPlan : null;
+  if (!approvedPlan) return null;
+  const pageId = String(target.pageId || requirementDraft.pageId || approvedPlan.pageId || "").trim();
+  if (!pageId) return null;
+  const viewportProfile = String(target.viewportProfile || requirementDraft.viewportProfile || approvedPlan.viewportProfile || "pc").trim() || "pc";
+  const slotIds = Array.isArray(target.slotIds) ? target.slotIds.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const componentIds = Array.isArray(target.componentIds) ? target.componentIds.map((item) => String(item || "").trim()).filter(Boolean) : [];
+  const designAuthorModel = String(
+    result.designAuthorModel ||
+      execution.designAuthorModel ||
+      execution.authorModel ||
+      execution.model ||
+      requirementDraft.designAuthorModel ||
+      requirementDraft.authorModel ||
+      requirementDraft.model ||
+      resolveOpenWebuiDesignAuthorModel()
+  ).trim();
+  return {
+    pageId,
+    viewportProfile,
+    planId: String(result.jobId || requirementDraft.conceptId || "").trim(),
+    approvedPlan,
+    conceptDocument: String(result.conceptDocument || ""),
+    conceptJobId: String(result.jobId || "").trim(),
+    authoringPlan,
+    builderProvider: normalizeDesignAuthorProvider(execution.builderProvider || requirementDraft.builderProvider || "local"),
+    authorProvider: normalizeDesignAuthorProvider(execution.builderProvider || requirementDraft.builderProvider || "local"),
+    designAuthorModel,
+    authorModel: designAuthorModel,
+    model: designAuthorModel,
+    designChangeLevel: String(execution.designChangeLevel || requirementDraft.designChangeLevel || approvedPlan.designChangeLevel || "medium").trim() || "medium",
+    interventionLayer: String(execution.interventionLayer || requirementDraft.interventionLayer || approvedPlan.interventionLayer || "section-group").trim() || "section-group",
+    patchDepth: String(execution.patchDepth || requirementDraft.patchDepth || approvedPlan.patchDepth || "medium").trim() || "medium",
+    rendererSurface: String(execution.rendererSurface || requirementDraft.rendererSurface || "tailwind").trim() || "tailwind",
+    targetScope: String(target.targetScope || requirementDraft.targetScope || approvedPlan.targetScope || (componentIds.length ? "components" : "page")).trim() || "page",
+    targetComponents: componentIds,
+    targetGroupId: String(target.targetGroupId || requirementDraft.targetGroupId || approvedPlan.targetGroupId || "").trim(),
+    targetGroupLabel: String(target.targetGroupLabel || requirementDraft.targetGroupLabel || approvedPlan.targetGroupLabel || "").trim(),
+    conceptPackage: {
+      targetGroup: {
+        groupId: String(target.targetGroupId || requirementDraft.targetGroupId || approvedPlan.targetGroupId || "").trim(),
+        groupLabel: String(target.targetGroupLabel || requirementDraft.targetGroupLabel || approvedPlan.targetGroupLabel || "").trim(),
+        slotIds,
+        componentIds,
+      },
+    },
+  };
+}
+
+function buildRegisteredOpenwebuiConceptResultFromPayload(payload = {}, jobId = "") {
+  const adaptedPayload = adaptOpenWebuiBuilderPayload(payload);
+  const approvedPlan = adaptedPayload.approvedPlan && typeof adaptedPayload.approvedPlan === "object" ? adaptedPayload.approvedPlan : null;
+  if (!approvedPlan) return null;
+  const conceptDocument = String(payload.conceptDocument || "");
+  if (!conceptDocument.trim()) return null;
+  const conceptSections = buildOpenWebuiConceptDocumentSections(conceptDocument);
+  const sourceFrontmatter = payload?.conceptPackage?.source?.frontmatter && typeof payload.conceptPackage.source.frontmatter === "object"
+    ? payload.conceptPackage.source.frontmatter
+    : {};
+  const plannerProvider = String(
+    sourceFrontmatter.plannerProvider ||
+      payload.plannerProvider ||
+      payload.conceptPackage?.plannerProvider ||
+      "external-concept"
+  ).trim() || "external-concept";
+  const requirementDraft = {
+    ...normalizeOpenWebuiRequirementDraftPayload({
+      ...payload,
+      ...payload.builderOptions,
+      builderProvider: adaptedPayload.builderProvider,
+      plannerProvider,
+      requestText: conceptSections.overview || approvedPlan.title || String(payload.conceptPackage?.title || ""),
+      keyMessage: approvedPlan.title || conceptSections.overview || String(payload.conceptPackage?.title || ""),
+      targetScope: adaptedPayload.targetScope,
+      targetComponents: adaptedPayload.targetComponents,
+      targetGroupId: adaptedPayload.targetGroupId,
+      targetGroupLabel: adaptedPayload.targetGroupLabel,
+      targetSlots: payload.conceptPackage?.targetGroup?.slotIds || [],
+      componentIds: adaptedPayload.targetComponents,
+      designChangeLevel: adaptedPayload.designChangeLevel,
+      designAuthorModel: adaptedPayload.designAuthorModel || adaptedPayload.authorModel || adaptedPayload.model || "",
+      interventionLayer: adaptedPayload.interventionLayer,
+      patchDepth: adaptedPayload.patchDepth,
+      rendererSurface: adaptedPayload.rendererSurface,
+    }),
+    builderProvider: adaptedPayload.builderProvider,
+    plannerProvider,
+  };
+  const authoringPlan = payload.authoringPlan && typeof payload.authoringPlan === "object"
+    ? payload.authoringPlan
+    : buildOpenWebuiAuthoringPlan({
+        requirementDraft,
+        requirementPlan: approvedPlan,
+        conceptDocument,
+        plannerProvider,
+      });
+  if (Array.isArray(authoringPlan?.clusters)) {
+    approvedPlan.authoringClusters = authoringPlan.clusters.slice(0, 12);
+  }
+  return {
+    ok: true,
+    jobId: String(jobId || payload.conceptJobId || "").trim(),
+    status: "done",
+    stage: "done",
+    message: "Existing concept document registered for speculative prebuild.",
+    percent: 100,
+    requirementDraft,
+    requirementPlan: approvedPlan,
+    conceptDisplayMarkdown: conceptSections.conceptDisplayMarkdown || conceptSections.overview || "",
+    builderMarkdown: conceptSections.builderMarkdown || conceptSections.overview || "",
+    designSpecMarkdown: conceptSections.designSpecMarkdown || "",
+    conceptDocument,
+    authoringPlan,
+    designAuthorModel: adaptedPayload.designAuthorModel || adaptedPayload.authorModel || adaptedPayload.model || "",
+    plannerProvider,
+    providerResult: {
+      provider: plannerProvider,
+      reusedExistingConceptDocument: true,
+      model: String(sourceFrontmatter.conceptAuthorModel || payload.conceptAuthorModel || "").trim(),
+    },
+    planningPreview: {
+      provider: plannerProvider,
+      output: { requirementPlan: approvedPlan },
+    },
+    completedAt: new Date().toISOString(),
+  };
+}
+
+function resolveOpenwebuiPrebuildOwnerFilter(payload = {}, context = {}) {
+  const externalOwner = context?.externalOwner && typeof context.externalOwner === "object" ? context.externalOwner : {};
+  return {
+    userId: String(payload.userId || externalOwner.userId || "").trim(),
+    projectId: String(payload.externalProjectId || externalOwner.projectId || "").trim(),
+    conceptThreadId: String(payload.conceptThreadId || "").trim(),
+  };
+}
+
+function openwebuiPrebuildCandidateOwnerMatches(job = null, candidateRecord = null, payload = {}, ownerFilter = {}) {
+  const filterUserId = String(ownerFilter.userId || "").trim();
+  const filterProjectId = String(ownerFilter.projectId || "").trim();
+  const filterConceptThreadId = String(ownerFilter.conceptThreadId || "").trim();
+  const jobOwner = job?.externalOwner && typeof job.externalOwner === "object" ? job.externalOwner : {};
+  const candidateOwner = candidateRecord?.externalOwner && typeof candidateRecord.externalOwner === "object" ? candidateRecord.externalOwner : {};
+  const candidateTrace = candidateRecord?.candidate?.sourceTrace && typeof candidateRecord.candidate.sourceTrace === "object"
+    ? candidateRecord.candidate.sourceTrace
+    : {};
+  if (filterUserId) {
+    const candidateUserId = String(candidateOwner.userId || candidateTrace.userId || jobOwner.userId || job?.userId || "").trim();
+    if (candidateUserId !== filterUserId) return false;
+  } else if (!String(payload.conceptJobId || "").trim()) {
+    return false;
+  }
+  if (filterProjectId) {
+    const candidateProjectId = String(candidateOwner.projectId || candidateTrace.projectId || jobOwner.projectId || "").trim();
+    if (!candidateProjectId || candidateProjectId !== filterProjectId) return false;
+  }
+  if (filterConceptThreadId) {
+    const candidateConceptThreadId = String(candidateTrace.conceptThreadId || job?.conceptThreadId || "").trim();
+    if (candidateConceptThreadId && candidateConceptThreadId !== filterConceptThreadId) return false;
+  }
+  return true;
+}
+
+function getOpenwebuiPrebuildCandidateRecordForJob(job = null) {
+  const candidateKey = String(job?.prebuild?.candidateKey || job?.candidateKey || "").trim();
+  if (!candidateKey) return null;
+  return readOpenwebuiPrebuildCandidateRecord(candidateKey) || null;
+}
+
+function buildOpenwebuiConceptJobResponse(job = null) {
+  if (!job || typeof job !== "object") return job;
+  const prebuild = job.prebuild && typeof job.prebuild === "object" ? job.prebuild : null;
+  if (!prebuild) return job;
+  const candidateKey = String(prebuild.candidateKey || job.candidateKey || "").trim();
+  const candidateRecord = candidateKey ? readOpenwebuiPrebuildCandidateRecord(candidateKey) || null : null;
+  const expiresAtMs = Date.parse(prebuild.candidateExpiresAt || "");
+  const candidateExpired = Number.isFinite(expiresAtMs) && Date.now() > expiresAtMs;
+  const candidateAvailable = Boolean(
+    prebuild.status === "done" &&
+      candidateKey &&
+      candidateRecord?.status === "ready" &&
+      !candidateExpired
+  );
+  return {
+    ...job,
+    prebuiltCandidateAvailable: candidateAvailable,
+    prebuild: {
+      ...prebuild,
+      candidateAvailable,
+      candidateExpired,
+    },
+  };
+}
+
+function findOpenWebuiPrebuiltCandidateForPayload(payload = {}, context = {}) {
+  if (payload?.authoredSectionHtmlPackageCandidate) return payload.authoredSectionHtmlPackageCandidate;
+  const conceptHash = sha256ConceptDocument(String(payload.conceptDocument || ""));
+  if (!conceptHash) return null;
+  const requestedJobId = String(payload.conceptJobId || "").trim();
+  const ownerFilter = resolveOpenwebuiPrebuildOwnerFilter(payload, context);
+  const candidates = requestedJobId
+    ? [[requestedJobId, getOpenwebuiBuilderConceptJob(requestedJobId)]]
+    : Array.from(OPENWEBUI_BUILDER_CONCEPT_JOBS.entries()).reverse();
+  for (const [, job] of candidates) {
+    const candidateRecord = getOpenwebuiPrebuildCandidateRecordForJob(job);
+    const prebuiltCandidate = candidateRecord?.candidate && typeof candidateRecord.candidate === "object" ? candidateRecord.candidate : null;
+    if (!prebuiltCandidate || job?.prebuild?.status !== "done" || candidateRecord?.status !== "ready") continue;
+    if (!openwebuiPrebuildCandidateOwnerMatches(job, candidateRecord, payload, ownerFilter)) continue;
+    if (String(prebuiltCandidate?.sourceTrace?.conceptHash || "").trim() !== conceptHash) continue;
+    if (String(prebuiltCandidate?.sourceTrace?.pageId || "").trim() !== String(payload.pageId || "").trim()) continue;
+    if (String(prebuiltCandidate?.sourceTrace?.viewportProfile || "").trim() !== String(payload.viewportProfile || "pc").trim()) continue;
+    if (!resolveAuthoredSectionHtmlPackageCandidate({ ...payload, authoredSectionHtmlPackageCandidate: prebuiltCandidate }, {})) continue;
+    return prebuiltCandidate;
+  }
+  return null;
+}
+
+function attachOpenWebuiPrebuiltCandidateToPayload(payload = {}, context = {}) {
+  const candidate = findOpenWebuiPrebuiltCandidateForPayload(payload, context);
+  if (!candidate) return payload;
+  return {
+    ...payload,
+    authoredSectionHtmlPackageCandidate: candidate,
+  };
+}
+
+function delayOpenwebuiBuilder(ms = 0) {
+  return new Promise((resolve) => setTimeout(resolve, Math.max(0, Number(ms || 0))));
+}
+
+function payloadHasPrebuiltCandidate(payload = {}) {
+  return Boolean(payload?.authoredSectionHtmlPackageCandidate && typeof payload.authoredSectionHtmlPackageCandidate === "object");
+}
+
+async function waitForOpenWebuiPrebuiltCandidateForPayload(payload = {}, context = {}) {
+  const requestedJobId = String(payload.conceptJobId || "").trim();
+  const attachedNow = attachOpenWebuiPrebuiltCandidateToPayload(payload, context);
+  if (payloadHasPrebuiltCandidate(attachedNow) || !requestedJobId || !OPENWEBUI_PREBUILD_WAIT_MAX_MS) return attachedNow;
+
+  const buildJobId = String(context.buildJobId || "").trim();
+  const startedAtMs = Date.now();
+  let lastProgressAtMs = 0;
+  while (Date.now() - startedAtMs < OPENWEBUI_PREBUILD_WAIT_MAX_MS) {
+    const conceptJob = getOpenwebuiBuilderConceptJob(requestedJobId);
+    const prebuild = conceptJob?.prebuild && typeof conceptJob.prebuild === "object" ? conceptJob.prebuild : null;
+    const status = String(prebuild?.status || "").trim().toLowerCase();
+    if (status === "done") {
+      const attached = attachOpenWebuiPrebuiltCandidateToPayload(payload, context);
+      return payloadHasPrebuiltCandidate(attached) ? attached : payload;
+    }
+    if (status === "failed" || status === "skipped" || status === "cancelled") return payload;
+    if (status !== "queued" && status !== "running") return payload;
+
+    const now = Date.now();
+    if (buildJobId && now - lastProgressAtMs > 5000) {
+      setOpenwebuiBuilderJob(buildJobId, {
+        stage: "waiting_prebuild",
+        message: "Waiting for speculative prebuild candidate to avoid duplicate Sonnet authoring.",
+        prebuildWait: {
+          conceptJobId: requestedJobId,
+          status,
+          elapsedMs: now - startedAtMs,
+          maxMs: OPENWEBUI_PREBUILD_WAIT_MAX_MS,
+        },
+      });
+      lastProgressAtMs = now;
+    }
+    await delayOpenwebuiBuilder(Math.min(OPENWEBUI_PREBUILD_WAIT_POLL_MS, Math.max(0, OPENWEBUI_PREBUILD_WAIT_MAX_MS - (Date.now() - startedAtMs))));
+  }
+
+  const finalAttached = attachOpenWebuiPrebuiltCandidateToPayload(payload, context);
+  if (payloadHasPrebuiltCandidate(finalAttached)) return finalAttached;
+  if (buildJobId) {
+    setOpenwebuiBuilderJob(buildJobId, {
+      stage: "prebuild_wait_timeout",
+      message: "Speculative prebuild did not finish within wait window; falling back to direct authoring.",
+      prebuildWait: {
+        conceptJobId: requestedJobId,
+        status: "timeout",
+        elapsedMs: Date.now() - startedAtMs,
+        maxMs: OPENWEBUI_PREBUILD_WAIT_MAX_MS,
+      },
+    });
+  }
+  return payload;
+}
+
+function writeOpenWebuiConceptPreviewTrace(jobId = "", trace = {}) {
+  const normalizedJobId = String(jobId || "").replace(/[^A-Za-z0-9_.-]/g, "");
+  if (!normalizedJobId) return null;
+  if (String(process.env.CONCEPT_TRACE_DISABLED || "").trim() === "1") return null;
+  const traceDir = path.join(ROOT, "data", "debug", "openwebui-concept-preview", normalizedJobId);
+  try {
+    const manifest = {
+      jobId: normalizedJobId,
+      createdAt: new Date().toISOString(),
+      files: {
+        requirementDraft: "requirement-draft.json",
+        requirementPlan: "requirement-plan.json",
+        providerResult: "provider-result.json",
+        planningPreview: "planning-preview.json",
+        conceptDisplayMarkdown: "concept-display.md",
+        builderMarkdown: "builder-markdown.md",
+        designSpecMarkdown: "design-spec.md",
+        conceptDocument: "concept-document.md",
+        authoringPlan: "authoring-plan.json",
+      },
+      hashes: {
+        conceptDisplayMarkdown: crypto.createHash("sha256").update(String(trace.conceptDisplayMarkdown || "")).digest("hex"),
+        builderMarkdown: crypto.createHash("sha256").update(String(trace.builderMarkdown || "")).digest("hex"),
+        designSpecMarkdown: crypto.createHash("sha256").update(String(trace.designSpecMarkdown || "")).digest("hex"),
+        conceptDocument: sha256ConceptDocument(trace.conceptDocument || ""),
+      },
+    };
+    const writeText = (fileName, value) => fs.promises.writeFile(path.join(traceDir, fileName), String(value || ""), "utf8");
+    const writeJson = (fileName, value) => fs.promises.writeFile(path.join(traceDir, fileName), `${JSON.stringify(value || {}, null, 2)}\n`, "utf8");
+    fs.promises.mkdir(traceDir, { recursive: true })
+      .then(() => Promise.all([
+        writeJson("requirement-draft.json", trace.requirementDraft || {}),
+        writeJson("requirement-plan.json", trace.requirementPlan || {}),
+        writeJson("provider-result.json", trace.providerResult || {}),
+        writeJson("planning-preview.json", trace.planningPreview || {}),
+        writeText("concept-display.md", trace.conceptDisplayMarkdown || ""),
+        writeText("builder-markdown.md", trace.builderMarkdown || ""),
+        writeText("design-spec.md", trace.designSpecMarkdown || ""),
+        writeText("concept-document.md", trace.conceptDocument || ""),
+        writeJson("authoring-plan.json", trace.authoringPlan || {}),
+        writeJson("manifest.json", manifest),
+      ]))
+      .catch((error) => {
+        console.warn(`[openwebui-concept-preview] failed to write trace jobId=${normalizedJobId}: ${error.message}`);
+      });
+    return {
+      traceDir,
+      manifestPath: path.join(traceDir, "manifest.json"),
+      writeStatus: "queued",
+      hashes: manifest.hashes,
+    };
+  } catch (error) {
+    console.warn(`[openwebui-concept-preview] failed to write trace jobId=${normalizedJobId}: ${error.message}`);
+    return null;
+  }
+}
+
+async function runOpenWebuiConceptPreview({ authContext, payload, jobId, updateJob }) {
+  const { requirementDraft, plannerPayload } = buildOpenWebuiConceptPlannerPayload(payload);
+  const pageId = plannerPayload.pageId;
+  const user = authContext.user;
+  const editableData = readWorkspaceData(user.userId);
+  const page = findPage(editableData, pageId);
+  const pdpContext = resolvePdpRuntimeContext(pageId);
+  const defaultIdentity = buildPageIdentityBrief(pageId, {
+    pageTitle: pdpContext?.title || page?.title || pageId,
+    pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
+  });
+  const override = getPageIdentityOverride(user.userId, pageId);
+  const effectiveIdentity = mergePageIdentityBrief(defaultIdentity, override || {});
+  const planningProvider = normalizeDesignAuthorProvider(plannerPayload.builderProvider || plannerPayload.plannerProvider || "local");
+  updateJob({
+    status: "running",
+    stage: "resolving_target",
+    message: "Resolving builder target from requirementDraft.",
+    percent: 15,
+    requirementDraft,
+    plannerProvider: planningProvider,
+  });
+
+  let item;
+  let providerResult;
+  if (planningProvider === "openrouter") {
+    updateJob({
+      stage: plannerPayload.referenceUrls.length ? "analyzing_references" : "generating_concept",
+      message: plannerPayload.referenceUrls.length ? "Analyzing references for concept author context." : "Writing concept document with the fixed concept author model.",
+      percent: plannerPayload.referenceUrls.length ? 35 : 45,
+    });
+    const plannerInput = await buildPlannerInputPayload({
+      user,
+      editableData,
+      pageId,
+      viewportProfile: plannerPayload.viewportProfile || "pc",
+      pageIdentityOverride: override || {},
+      mode: plannerPayload.mode,
+      requestText: plannerPayload.requestText,
+      keyMessage: plannerPayload.keyMessage,
+      preferredDirection: plannerPayload.preferredDirection,
+      avoidDirection: plannerPayload.avoidDirection,
+      toneAndMood: plannerPayload.toneAndMood,
+      referenceUrls: plannerPayload.referenceUrls,
+      designChangeLevel: plannerPayload.designChangeLevel,
+      interventionLayer: plannerPayload.interventionLayer,
+      patchDepth: plannerPayload.patchDepth,
+      targetScope: plannerPayload.targetScope,
+      targetComponents: plannerPayload.targetComponents,
+      targetGroupId: plannerPayload.targetGroupId,
+      targetGroupLabel: plannerPayload.targetGroupLabel,
+      scopePreset: plannerPayload.scopePreset,
+      builderProvider: "openrouter",
+    });
+    updateJob({ stage: "generating_concept", message: "Writing review-ready concept markdown.", percent: 60 });
+    const authorModel = resolveOpenWebuiConceptAuthorModel();
+    providerResult = await callOpenRouterText({
+      model: authorModel,
+      messages: [
+        { role: "system", content: buildOpenWebuiConceptAuthorSystemPrompt() },
+        { role: "user", content: buildOpenWebuiConceptAuthorUserPrompt({ requirementDraft, plannerInput }) },
+      ],
+      temperature: 0.35,
+      timeoutMs: Number(process.env.CONCEPT_AUTHOR_TIMEOUT_MS || 180000),
+      maxTokens: Number(process.env.CONCEPT_AUTHOR_MAX_TOKENS || 10000),
+      maxAttempts: Number(process.env.CONCEPT_AUTHOR_MAX_ATTEMPTS || 1),
+      returnMeta: true,
+    });
+    const conceptDisplayMarkdown = normalizeOpenWebuiAuthoredConceptMarkdown(providerResult.text || providerResult, requirementDraft);
+    const conceptDocument = buildOpenWebuiAuthoredConceptDocument({
+      requirementDraft,
+      conceptMarkdown: conceptDisplayMarkdown,
+      plannerProvider: "openrouter",
+      authorModel,
+    });
+    const requirementPlan = {
+      title: firstMarkdownHeadingText(conceptDisplayMarkdown) || requirementDraft.title || requirementDraft.keyMessage || "Atlas 컨셉서",
+      designChangeLevel: requirementDraft.designChangeLevel,
+      interventionLayer: requirementDraft.interventionLayer,
+      patchDepth: requirementDraft.patchDepth,
+      targetGroupId: requirementDraft.targetGroupId,
+      targetGroupLabel: requirementDraft.targetGroupLabel,
+      targetComponents: requirementDraft.targetComponents,
+      requestSummary: [requirementDraft.message || requirementDraft.requestText].filter(Boolean),
+      planningDirection: [conceptDisplayMarkdown],
+      designDirection: [conceptDisplayMarkdown],
+      priority: [],
+      guardrails: [requirementDraft.avoid].filter(Boolean),
+      referenceNotes: (requirementDraft.referenceUrls || []).map((url) => ({ url, takeaways: [] })),
+      builderBrief: {
+        objective: requirementDraft.keyMessage || requirementDraft.message || "",
+        mustKeep: [requirementDraft.avoid].filter(Boolean),
+        mustChange: [requirementDraft.direction || requirementDraft.message].filter(Boolean),
+        suggestedFocusSlots: requirementDraft.targetSlots || [],
+      },
+      conceptDisplayMarkdown,
+    };
+    const authoringPlan = buildOpenWebuiAuthoringPlan({
+      requirementDraft,
+      requirementPlan,
+      conceptDocument,
+      plannerProvider: "openrouter",
+    });
+    requirementPlan.authoringClusters = Array.isArray(authoringPlan.clusters) ? authoringPlan.clusters.slice(0, 12) : [];
+    updateJob({ stage: "formatting_concept_document", message: "Saving authored concept document.", percent: 85 });
+    const conceptTrace = writeOpenWebuiConceptPreviewTrace(jobId, {
+      requirementDraft,
+      requirementPlan,
+      conceptDisplayMarkdown,
+      builderMarkdown: conceptDisplayMarkdown,
+      designSpecMarkdown: conceptDisplayMarkdown,
+      conceptDocument,
+      authoringPlan,
+      providerResult,
+      planningPreview: {
+        provider: "concept-author",
+        model: authorModel,
+        output: { requirementPlan },
+      },
+    });
+    return {
+      ok: true,
+      jobId,
+      status: "done",
+      requirementDraft,
+      requirementPlan,
+      conceptDisplayMarkdown,
+      builderMarkdown: conceptDisplayMarkdown,
+      designSpecMarkdown: conceptDisplayMarkdown,
+      conceptDocument,
+      authoringPlan,
+      conceptTrace,
+      plannerProvider: "openrouter",
+      conceptAuthorModel: authorModel,
+      providerResult,
+      planningPreview: {
+        provider: "concept-author",
+        model: authorModel,
+        output: { requirementPlan },
+      },
+      completedAt: new Date().toISOString(),
+    };
+  } else {
+    updateJob({
+      stage: plannerPayload.referenceUrls.length ? "analyzing_references" : "generating_concept",
+      message: plannerPayload.referenceUrls.length
+        ? "Preserving reference URLs and generating a local concept preview."
+        : "Generating a local concept preview.",
+      percent: 45,
+    });
+    const planningInput = buildLocalPlanningProviderInput(plannerPayload, { effectiveIdentity });
+    providerResult = runLocalPlanningProvider(planningInput, {
+      scenarioId: inferLocalPlanningScenarioId(pageId),
+    });
+    item = buildLocalPlanningPreviewPlan(providerResult, plannerPayload);
+  }
+
+  updateJob({ stage: "formatting_concept_document", message: "Formatting builder-readable conceptDocument.", percent: 85 });
+  const requirementPlan = item?.output?.requirementPlan && typeof item.output.requirementPlan === "object" ? item.output.requirementPlan : {};
+  const markdown = buildOpenWebuiRequirementPlanMarkdown(requirementPlan, requirementDraft);
+  const conceptDocument = buildOpenWebuiConceptDocument({
+    requirementDraft,
+    requirementPlan,
+    conceptDisplayMarkdown: markdown.conceptDisplayMarkdown,
+    builderMarkdown: markdown.builderMarkdown,
+    designSpecMarkdown: markdown.designSpecMarkdown,
+    plannerProvider: planningProvider,
+  });
+  const authoringPlan = buildOpenWebuiAuthoringPlan({
+    requirementDraft,
+    requirementPlan,
+    conceptDocument,
+    plannerProvider: planningProvider,
+  });
+  requirementPlan.authoringClusters = Array.isArray(authoringPlan.clusters) ? authoringPlan.clusters.slice(0, 12) : [];
+  const conceptTrace = writeOpenWebuiConceptPreviewTrace(jobId, {
+    requirementDraft,
+    requirementPlan,
+    conceptDisplayMarkdown: markdown.conceptDisplayMarkdown,
+    builderMarkdown: markdown.builderMarkdown,
+    designSpecMarkdown: markdown.designSpecMarkdown,
+    conceptDocument,
+    authoringPlan,
+    providerResult,
+    planningPreview: item,
+  });
+  return {
+    ok: true,
+    jobId,
+    status: "done",
+    requirementDraft,
+    requirementPlan,
+    conceptDisplayMarkdown: markdown.conceptDisplayMarkdown,
+    builderMarkdown: markdown.builderMarkdown,
+    designSpecMarkdown: markdown.designSpecMarkdown,
+    conceptDocument,
+    authoringPlan,
+    conceptTrace,
+    plannerProvider: planningProvider,
+    providerResult,
+    planningPreview: item,
+    completedAt: new Date().toISOString(),
+  };
+}
+
+function startOpenWebuiConceptSpeculativePrebuild({ authContext, jobId = "", conceptResult = null } = {}) {
+  const normalizedJobId = String(jobId || "").trim();
+  if (!normalizedJobId || !conceptResult?.authoringPlan || !conceptResult?.conceptDocument) return;
+  if (String(process.env.OPENWEBUI_CONCEPT_PREBUILD_DISABLED || "").trim() === "1") return;
+  const prebuildProvider = normalizeDesignAuthorProvider(
+    conceptResult?.authoringPlan?.execution?.builderProvider ||
+      conceptResult?.requirementDraft?.builderProvider ||
+      "local"
+  );
+  if (prebuildProvider !== "openrouter" && String(process.env.OPENWEBUI_CONCEPT_PREBUILD_LOCAL || "").trim() !== "1") {
+    setOpenwebuiBuilderConceptJob(normalizedJobId, {
+      prebuild: {
+        status: "skipped",
+        reason: "prebuild_requires_openrouter_provider",
+        skippedAt: new Date().toISOString(),
+      },
+    });
+    return;
+  }
+  const prebuildPayload = buildOpenWebuiPrebuildPayloadFromConceptJob({
+    ...conceptResult,
+    jobId: normalizedJobId,
+  });
+  if (!prebuildPayload) return;
+  setOpenwebuiBuilderConceptJob(normalizedJobId, {
+    prebuild: {
+      status: "queued",
+      queuedAt: new Date().toISOString(),
+      conceptHash: String(conceptResult?.authoringPlan?.sourceTrace?.conceptHash || "").trim(),
+    },
+  });
+  enqueueOpenwebuiConceptPrebuild(async () => {
+    setOpenwebuiBuilderConceptJob(normalizedJobId, {
+      prebuild: {
+        status: "running",
+        startedAt: new Date().toISOString(),
+        conceptHash: String(conceptResult?.authoringPlan?.sourceTrace?.conceptHash || "").trim(),
+      },
+    });
+    try {
+      const result = await withOpenwebuiBuilderJobTimeout(
+        buildRuntimeDraftForBuilderPayload({
+          user: authContext.user,
+          payload: prebuildPayload,
+          externalOwner: authContext.externalOwner,
+          authorCandidateOnly: true,
+        }),
+        `${normalizedJobId}:prebuild`
+      );
+      const candidate = result?.authoredSectionHtmlPackageCandidate || null;
+      if (!candidate) throw new Error("prebuild_candidate_missing");
+      const candidateKey = buildOpenwebuiPrebuildCandidateKey(normalizedJobId, candidate?.sourceTrace?.conceptHash || "");
+      setOpenwebuiPrebuildCandidate(candidateKey, {
+        status: "ready",
+        jobId: normalizedJobId,
+        candidate,
+        externalOwner: authContext.externalOwner,
+        completedAt: new Date().toISOString(),
+      });
+      setOpenwebuiBuilderConceptJob(normalizedJobId, {
+        prebuild: {
+          status: "done",
+          completedAt: new Date().toISOString(),
+          conceptHash: String(candidate?.sourceTrace?.conceptHash || "").trim(),
+          candidateKey,
+          candidateExpiresAt: new Date(Date.now() + OPENWEBUI_PREBUILD_CANDIDATE_RETENTION_MS).toISOString(),
+          stageTiming: result.stageTiming || null,
+        },
+        prebuiltCandidateAvailable: true,
+      });
+    } catch (error) {
+      setOpenwebuiBuilderConceptJob(normalizedJobId, {
+        prebuild: {
+          status: "failed",
+          failedAt: new Date().toISOString(),
+          error: error?.error || error?.code || "concept_prebuild_failed",
+          detail: error?.detail || String(error?.message || error),
+        },
+      });
+    }
+  }, { jobId: normalizedJobId });
+}
+
+function resolveOpenWebuiPageTargetComponents(pageId = "", slotIds = []) {
+  const normalizedPageId = String(pageId || "").trim();
+  if (!normalizedPageId) return [];
+  const contract = readOpenWebuiBuilderContract();
+  const pageComponents = Array.isArray(contract?.components)
+    ? contract.components
+        .filter((component) => String(component?.pageId || "").trim() === normalizedPageId)
+        .map((component) => String(component?.componentId || "").trim())
+        .filter(Boolean)
+    : [];
+  if (pageComponents.length) return Array.from(new Set(pageComponents));
+
+  const normalizedSlotIds = safeArray(slotIds, 80)
+    .map((slotId) => String(slotId || "").trim())
+    .filter(Boolean);
+  return Array.from(new Set(normalizedSlotIds.map((slotId) => `${normalizedPageId}.${slotId}`)));
+}
+
 function buildLocalBuildProviderInput(payload = {}, options = {}) {
   const source = payload && typeof payload === "object" ? payload : {};
   const context = options && typeof options === "object" ? options : {};
@@ -8398,16 +11634,22 @@ function buildLocalBuildProviderInput(payload = {}, options = {}) {
         .filter(Boolean)
     : [];
   const targetScope = String(source.targetScope || approvedPlan.targetScope || "").trim().toLowerCase();
+  const sectionBlueprintSlotIds = Array.isArray(approvedPlan.sectionBlueprints)
+    ? approvedPlan.sectionBlueprints
+        .map((item) => String(item?.slotId || "").trim())
+        .filter(Boolean)
+    : [];
+  const pageTargetFallbackComponents = fallbackTargetComponents.length
+    ? fallbackTargetComponents
+    : resolveOpenWebuiPageTargetComponents(source.pageId || approvedPlan.pageId || "", sectionBlueprintSlotIds);
   const targetComponents =
     explicitTargetComponents.length
       ? explicitTargetComponents
       : ((targetScope === "page" || String(source.targetGroupId || approvedPlan.targetGroupId || "").trim() === "page")
-        ? fallbackTargetComponents
+        ? pageTargetFallbackComponents
         : []);
-  const slotIds = Array.isArray(approvedPlan.sectionBlueprints)
-    ? approvedPlan.sectionBlueprints
-        .map((item) => String(item?.slotId || "").trim())
-        .filter(Boolean)
+  const slotIds = sectionBlueprintSlotIds.length
+    ? sectionBlueprintSlotIds
     : targetComponents.map((componentId) => String(componentId || "").trim().split(".").pop()).filter(Boolean);
   const conceptPlans = Array.isArray(approvedPlan.conceptPlans) ? approvedPlan.conceptPlans.filter(Boolean) : [];
   const selectedConcept = approvedPlan.selectedConcept && typeof approvedPlan.selectedConcept === "object"
@@ -31337,6 +34579,14 @@ function route(req, res) {
       sendJson(res, 500, { error: "asset_proxy_failed", detail: String(error) })
     );
   }
+  if (pathname === "/api/debug/stage-timing-report" && req.method === "GET") {
+    if (!isAuthorizedDebugRequest(req, requestUrl)) {
+      return sendJson(res, 401, { ok: false, error: "debug_auth_required" });
+    }
+    return sendJson(res, 200, buildStageTimingReport({
+      limit: Number(requestUrl.searchParams.get("limit") || 200),
+    }));
+  }
   if (pathname === "/admin") {
     if (!getUserFromRequest(req)) {
       return sendRedirect(res, "/login");
@@ -31414,7 +34664,11 @@ function route(req, res) {
     const user = getRuntimePreviewUser(req, draftBuildId);
     if (!user) return sendJson(res, 401, { error: "auth_or_preview_token_required" });
     const sectionPreviewSlot = String(requestUrl.searchParams.get("sectionPreviewSlot") || "").trim();
-    const draftBuild = findDraftBuildById(user.userId, draftBuildId);
+    let draftBuild = findDraftBuildById(user.userId, draftBuildId);
+    if (!draftBuild) {
+      const fallback = findDraftBuildWithOwnerById(draftBuildId);
+      if (fallback?.draftBuild) draftBuild = fallback.draftBuild;
+    }
     if (!draftBuild) {
       return sendRawHtml(
         res,
@@ -31430,11 +34684,14 @@ function route(req, res) {
     beforeParams.set("snapshotState", "before");
     beforeParams.set("viewportProfile", compareViewportProfile);
     beforeParams.set("journeyWidget", "1");
+    const previewToken = String(requestUrl.searchParams.get("token") || "").trim();
+    if (previewToken) beforeParams.set("token", previewToken);
     if (sectionPreviewSlot) beforeParams.set("sectionPreviewSlot", sectionPreviewSlot);
     const afterParams = new URLSearchParams();
     afterParams.set("snapshotState", "after");
     afterParams.set("viewportProfile", compareViewportProfile);
     afterParams.set("highlightChanges", "1");
+    if (previewToken) afterParams.set("token", previewToken);
     if (sectionPreviewSlot) afterParams.set("sectionPreviewSlot", sectionPreviewSlot);
     const beforeSrc = `/runtime-draft/${encodeURIComponent(draftBuildId)}?${beforeParams.toString()}`;
     const afterSrc = `/runtime-draft/${encodeURIComponent(draftBuildId)}?${afterParams.toString()}`;
@@ -31542,6 +34799,7 @@ function route(req, res) {
         }
         button.addEventListener("click", function () {
           var originalText = button.textContent || "공유 링크";
+          var previewToken = new URLSearchParams(window.location.search).get("token") || "";
           button.disabled = true;
           button.textContent = "링크 생성 중";
           fetch("/api/workspace/share-draft", {
@@ -31550,7 +34808,8 @@ function route(req, res) {
             body: JSON.stringify({
               draftBuildId: button.getAttribute("data-draft-build-id") || "",
               pageId: button.getAttribute("data-page-id") || "",
-              viewportProfile: button.getAttribute("data-viewport-profile") || "pc"
+              viewportProfile: button.getAttribute("data-viewport-profile") || "pc",
+              token: previewToken
             })
           })
             .then(function (response) {
@@ -31594,7 +34853,11 @@ function route(req, res) {
     const highlightChanges = String(requestUrl.searchParams.get("highlightChanges") || "").trim() === "1";
     const selectMode = String(requestUrl.searchParams.get("selectMode") || "").trim().toLowerCase();
     const enableComponentSelection = selectMode === "component" || selectMode === "revision" || selectMode === "revise";
-    const draftBuild = findDraftBuildById(user.userId, draftBuildId);
+    let draftBuild = findDraftBuildById(user.userId, draftBuildId);
+    if (!draftBuild) {
+      const fallback = findDraftBuildWithOwnerById(draftBuildId);
+      if (fallback?.draftBuild) draftBuild = fallback.draftBuild;
+    }
     if (!draftBuild) {
       return sendRawHtml(
         res,
@@ -31634,7 +34897,7 @@ function route(req, res) {
     }
     const html = snapshotState === "before"
       ? String(renderedHtmlReference.beforeHtml || "").trim()
-      : String(renderedHtmlReference.afterHtml || "").trim();
+      : stripRuntimeInternalGuardrailLeaks(String(renderedHtmlReference.afterHtml || "").trim());
     if (!html) {
       return sendRawHtml(
         res,
@@ -32036,11 +35299,13 @@ function route(req, res) {
     }
   }
   if (pathname === "/api/workspace/plan" && req.method === "POST") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
     return readBody(req)
       .then((body) => {
-        const user = requireAuthenticatedUser(req, res);
-        if (!user) return;
-        const payload = body ? JSON.parse(body) : {};
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload;
         const pageId = String(payload.pageId || "").trim();
         if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
         const requestedOriginType = String(payload.originType || "").trim();
@@ -32085,11 +35350,13 @@ function route(req, res) {
       .catch((error) => sendJson(res, 500, { error: "workspace_plan_save_failed", detail: String(error) }));
   }
   if (pathname === "/api/workspace/plan-local-preview" && req.method === "POST") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
     return readBody(req)
       .then(async (body) => {
-        const user = requireAuthenticatedUser(req, res);
-        if (!user) return;
-        const payload = body ? JSON.parse(body) : {};
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload;
         const pageId = String(payload.pageId || "").trim();
         if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
         const editableData = readWorkspaceData(user.userId);
@@ -32143,11 +35410,13 @@ function route(req, res) {
       .catch((error) => sendJson(res, 500, { error: "workspace_plan_local_preview_failed", detail: String(error) }));
   }
   if (pathname === "/api/workspace/build-local-preview" && req.method === "POST") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
     return readBody(req)
       .then((body) => {
-        const user = requireAuthenticatedUser(req, res);
-        if (!user) return;
-        const payload = body ? JSON.parse(body) : {};
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload;
         const pageId = String(payload.pageId || "").trim();
         if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
         const approvedPlan = payload.approvedPlan && typeof payload.approvedPlan === "object" ? payload.approvedPlan : null;
@@ -32188,11 +35457,13 @@ function route(req, res) {
       .catch((error) => sendJson(res, 500, { error: "workspace_build_local_preview_failed", detail: String(error) }));
   }
   if (pathname === "/api/builder/lge/v1/draft" && req.method === "POST") {
+    const authContext = requireOpenWebuiBuilderRequest(req, res);
+    if (!authContext) return;
     return readBody(req)
       .then((body) => {
-        const authContext = requireOpenWebuiBuilderRequest(req, res);
-        if (!authContext) return;
-        const payload = body ? JSON.parse(body) : {};
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload;
         const payloadValidation = validateOpenWebuiBuilderPayload(payload);
         if (!payloadValidation.ok) {
           return sendJson(res, 400, { error: "builder_payload_invalid", validation: payloadValidation });
@@ -32210,22 +35481,39 @@ function route(req, res) {
           queuedAt,
           pollUrl: `/api/builder/lge/v1/jobs/${encodeURIComponent(jobId)}`,
           externalOwner: authContext.externalOwner,
+          conceptJobId: String(payload.conceptJobId || payload.builderOptions?.conceptJobId || "").trim(),
           validation: {
             payload: payloadValidation,
             contract: contractValidation,
           },
         });
-        const adaptedPayload = adaptOpenWebuiBuilderPayload(payload);
+        const baseAdaptedPayload = adaptOpenWebuiBuilderPayload(payload);
         setImmediate(async () => {
           const startedAt = new Date().toISOString();
           setOpenwebuiBuilderJob(jobId, { status: "running", startedAt });
           try {
-            const result = await buildRuntimeDraftForBuilderPayload({
-              user: authContext.user,
+            const adaptedPayload = await waitForOpenWebuiPrebuiltCandidateForPayload(baseAdaptedPayload, {
+              externalOwner: authContext.externalOwner,
+              buildJobId: jobId,
+            });
+            const result = await withOpenwebuiBuilderJobTimeout(
+              buildRuntimeDraftForBuilderPayload({
+                user: authContext.user,
+                payload: adaptedPayload,
+                externalOwner: authContext.externalOwner,
+              }),
+              jobId
+            );
+            const completedAt = new Date().toISOString();
+            const artifactRecord = buildOpenWebuiBuilderArtifactRecord({
+              jobId,
+              status: "ready",
+              completedAt,
+              result,
+              artifact: result.artifact,
               payload: adaptedPayload,
               externalOwner: authContext.externalOwner,
             });
-            const completedAt = new Date().toISOString();
             setOpenwebuiBuilderJob(jobId, {
               ok: true,
               status: "done",
@@ -32233,7 +35521,9 @@ function route(req, res) {
               previewPath: result.previewPath,
               comparePath: result.comparePath,
               previewToken: result.previewToken,
-              artifact: result.artifact,
+              stageTiming: result.stageTiming || null,
+              artifact: buildOpenWebuiSlimBuilderArtifact({ artifactRecord, result }),
+              artifactRecord,
               externalOwner: authContext.externalOwner,
               completedAt,
             });
@@ -32258,11 +35548,180 @@ function route(req, res) {
       })
       .catch((error) => sendJson(res, 500, { error: "builder_draft_request_failed", detail: String(error) }));
   }
+  if (pathname === "/api/builder/lge/v1/preflight" && req.method === "POST") {
+    const authContext = requireOpenWebuiBuilderRequest(req, res);
+    if (!authContext) return;
+    return readBody(req)
+      .then((body) => {
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload;
+        const preflight = buildOpenWebuiBuilderPreflightResponse(payload);
+        return sendJson(res, 200, {
+          ...preflight,
+          reasonCodes: OPENWEBUI_BUILDER_PREFLIGHT_REASON_CODES,
+          externalOwner: authContext.externalOwner,
+        });
+      })
+      .catch((error) => sendJson(res, 500, { ok: false, route: "feasibility", reasonCode: "concept_too_vague", error: "builder_preflight_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/builder/lge/v1/concept-register" && req.method === "POST") {
+    const authContext = requireOpenWebuiBuilderRequest(req, res);
+    if (!authContext) return;
+    return readBody(req)
+      .then((body) => {
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload;
+        const payloadValidation = validateOpenWebuiBuilderPayload(payload);
+        if (!payloadValidation.ok) {
+          return sendJson(res, 400, { ok: false, error: "builder_payload_invalid", validation: payloadValidation });
+        }
+        const contractValidation = validateOpenWebuiConceptAgainstBuilderContract(payload);
+        if (!contractValidation.ok) {
+          return sendJson(res, 422, { ok: false, error: "builder_payload_contract_mismatch", validation: contractValidation });
+        }
+        const requestedJobId = sanitizeJobStoreId(payload.conceptJobId || payload.builderOptions?.conceptJobId || "");
+        const jobId = requestedJobId || `builder-concept-job-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+        const queuedAt = new Date().toISOString();
+        const result = buildRegisteredOpenwebuiConceptResultFromPayload(payload, jobId);
+        if (!result) {
+          return sendJson(res, 400, { ok: false, error: "concept_register_payload_invalid" });
+        }
+        setOpenwebuiBuilderConceptJob(jobId, {
+          ...result,
+          status: "done",
+          stage: "done",
+          message: "Existing concept document registered.",
+          percent: 100,
+          queuedAt,
+          externalOwner: authContext.externalOwner,
+        });
+        startOpenWebuiConceptSpeculativePrebuild({
+          authContext,
+          jobId,
+          conceptResult: result,
+        });
+        const job = getOpenwebuiBuilderConceptJob(jobId);
+        return sendJson(res, 202, {
+          ok: true,
+          jobId,
+          status: "done",
+          pollUrl: `/api/builder/lge/v1/concept-jobs/${encodeURIComponent(jobId)}`,
+          prebuild: buildOpenwebuiConceptJobResponse(job)?.prebuild || null,
+          externalOwner: authContext.externalOwner,
+          queuedAt,
+        });
+      })
+      .catch((error) => sendJson(res, 500, { ok: false, error: "concept_register_request_failed", detail: String(error) }));
+  }
+  if (pathname === "/api/builder/lge/v1/concept-preview" && req.method === "POST") {
+    const authContext = requireOpenWebuiBuilderRequest(req, res);
+    if (!authContext) return;
+    return readBody(req)
+      .then((body) => {
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload;
+        const jobId = `builder-concept-job-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+        const queuedAt = new Date().toISOString();
+        const initialDraft = normalizeOpenWebuiRequirementDraftPayload(payload);
+        const progressPageId = initialDraft.pageId || "home";
+        const updateJob = (patch = {}) => {
+          const next = setOpenwebuiBuilderConceptJob(jobId, {
+            ...patch,
+            externalOwner: authContext.externalOwner,
+          });
+          const statusForProgress =
+            next.status === "done"
+              ? "completed"
+              : next.status === "failed"
+                ? "failed"
+                : next.status || "running";
+          setLlmProgress(authContext.user.userId, progressPageId, "openwebui-concept-preview", {
+            status: statusForProgress,
+            stage: next.stage || "",
+            message: next.message || "",
+            percent: Number(next.percent || 0),
+            detail: {
+              jobId,
+              pollUrl: `/api/builder/lge/v1/concept-jobs/${encodeURIComponent(jobId)}`,
+              plannerProvider: next.plannerProvider || initialDraft.builderProvider || "local",
+            },
+          });
+          if (statusForProgress === "completed" || statusForProgress === "failed") {
+            clearCompletedLlmProgress(authContext.user.userId, progressPageId, "openwebui-concept-preview");
+          }
+          return next;
+        };
+        updateJob({
+          ok: true,
+          status: "queued",
+          stage: "queued",
+          message: "Concept preview job queued.",
+          percent: 0,
+          queuedAt,
+          pollUrl: `/api/builder/lge/v1/concept-jobs/${encodeURIComponent(jobId)}`,
+          requirementDraft: initialDraft,
+          plannerProvider: initialDraft.builderProvider,
+        });
+        setImmediate(async () => {
+          try {
+            const result = await runOpenWebuiConceptPreview({
+              authContext,
+              payload,
+              jobId,
+              updateJob,
+            });
+            updateJob({
+              ...result,
+              status: "done",
+              stage: "done",
+              message: "Concept document is ready.",
+              percent: 100,
+            });
+            startOpenWebuiConceptSpeculativePrebuild({
+              authContext,
+              jobId,
+              conceptResult: result,
+            });
+          } catch (error) {
+            updateJob({
+              ok: false,
+              status: "failed",
+              stage: "failed",
+              message: "Concept preview failed.",
+              percent: 100,
+              error: error?.error || "concept_preview_failed",
+              detail: error?.detail || String(error?.message || error),
+              failedAt: new Date().toISOString(),
+            });
+          }
+        });
+        return sendJson(res, 202, {
+          ok: true,
+          jobId,
+          status: "queued",
+          pollUrl: `/api/builder/lge/v1/concept-jobs/${encodeURIComponent(jobId)}`,
+          externalOwner: authContext.externalOwner,
+          queuedAt,
+        });
+      })
+      .catch((error) => sendJson(res, 500, { ok: false, status: "failed", error: "concept_preview_request_failed", detail: String(error) }));
+  }
+  if (pathname.startsWith("/api/builder/lge/v1/concept-jobs/")) {
+    const authContext = requireOpenWebuiBuilderRequest(req, res);
+    if (!authContext) return;
+    const jobId = decodeURIComponent(pathname.slice("/api/builder/lge/v1/concept-jobs/".length));
+    const job = getOpenwebuiBuilderConceptJob(jobId);
+    if (!job) return sendJson(res, 404, { ok: false, jobId, status: "not_found", error: "concept_job_not_found" });
+    return sendJson(res, 200, buildOpenwebuiConceptJobResponse(job));
+  }
   if (pathname.startsWith("/api/builder/lge/v1/jobs/") && pathname.endsWith("/ack") && req.method === "POST") {
     const authContext = requireOpenWebuiBuilderRequest(req, res);
     if (!authContext) return;
     const jobId = decodeURIComponent(pathname.slice("/api/builder/lge/v1/jobs/".length, -"/ack".length));
-    const job = OPENWEBUI_BUILDER_JOBS.get(jobId);
+    const job = getOpenwebuiBuilderJob(jobId);
     if (!job) return sendJson(res, 404, { ok: false, jobId, status: "not_found", error: "builder_job_not_found" });
     const next = setOpenwebuiBuilderJob(jobId, {
       acknowledged: true,
@@ -32271,333 +35730,111 @@ function route(req, res) {
     });
     return sendJson(res, 200, { ok: true, jobId, status: next.status, acknowledged: true, acknowledgedAt: next.acknowledgedAt });
   }
+  if (pathname.startsWith("/api/builder/lge/v1/jobs/") && pathname.endsWith("/artifact") && req.method === "GET") {
+    const authContext = requireOpenWebuiBuilderRequest(req, res);
+    if (!authContext) return;
+    const jobId = decodeURIComponent(pathname.slice("/api/builder/lge/v1/jobs/".length, -"/artifact".length));
+    const job = getOpenwebuiBuilderJob(jobId);
+    if (!job) return sendJson(res, 404, { ok: false, jobId, status: "not_found", error: "builder_job_not_found" });
+    if (String(job.status || "").trim() !== "done") {
+      return sendJson(res, 409, { ok: false, jobId, status: job.status || "unknown", error: "builder_artifact_not_ready" });
+    }
+    const artifact = hydrateOpenWebuiBuilderArtifactDetail(job, authContext);
+    if (!artifact) return sendJson(res, 404, { ok: false, jobId, error: "builder_artifact_detail_not_found" });
+    return sendJson(res, 200, {
+      ok: true,
+      jobId,
+      builderRunId: job.builderRunId,
+      artifact,
+      artifactRecord: job.artifactRecord || artifact.artifactRecord || null,
+    });
+  }
   if (pathname.startsWith("/api/builder/lge/v1/jobs/")) {
     const authContext = requireOpenWebuiBuilderRequest(req, res);
     if (!authContext) return;
     const jobId = decodeURIComponent(pathname.slice("/api/builder/lge/v1/jobs/".length));
-    const job = OPENWEBUI_BUILDER_JOBS.get(jobId);
+    const job = getOpenwebuiBuilderJob(jobId);
     if (!job) return sendJson(res, 404, { ok: false, jobId, status: "not_found", error: "builder_job_not_found" });
-    return sendJson(res, 200, job);
+    return sendJson(res, 200, markOpenwebuiBuilderJobTimedOutIfStale(jobId, job));
+  }
+  if (pathname.startsWith("/api/workspace/build-local-draft/jobs/") && req.method === "GET") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
+    const jobId = decodeURIComponent(pathname.slice("/api/workspace/build-local-draft/jobs/".length));
+    const job = getWorkspaceBuildLocalDraftJob(jobId);
+    if (!job || String(job.userId || "").trim() !== user.userId) {
+      return sendJson(res, 404, { ok: false, jobId, status: "not_found", error: "workspace_build_local_draft_job_not_found" });
+    }
+    return sendJson(res, 200, markWorkspaceBuildLocalDraftJobTimedOutIfStale(jobId, job));
   }
   if (pathname === "/api/workspace/build-local-draft" && req.method === "POST") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
     return readBody(req)
       .then((body) => {
-        const user = requireAuthenticatedUser(req, res);
-        if (!user) return;
-        const payload = body ? JSON.parse(body) : {};
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload;
         const pageId = String(payload.pageId || "").trim();
         if (!pageId) return sendJson(res, 400, { error: "page_id_required" });
         const approvedPlan = payload.approvedPlan && typeof payload.approvedPlan === "object" ? payload.approvedPlan : null;
         if (!approvedPlan) return sendJson(res, 400, { error: "approved_plan_required" });
-        const editableData = readWorkspaceData(user.userId);
-        const page = findPage(editableData, pageId);
-        const editablePayload = buildLlmEditableList(pageId, {
-          editableData,
-          viewportProfile: payload.viewportProfile || "pc",
-        });
-        const pageEditableComponents = Array.isArray(editablePayload?.components) ? editablePayload.components : [];
-        const pdpContext = resolvePdpRuntimeContext(pageId);
-        const defaultIdentity = buildPageIdentityBrief(pageId, {
-          pageTitle: pdpContext?.title || page?.title || pageId,
-          pageGroup: String(page?.pageGroup || (pdpContext ? "product-detail" : "other")).trim() || "other",
-        });
-        const override = getPageIdentityOverride(user.userId, pageId);
-        const effectiveIdentity = mergePageIdentityBrief(defaultIdentity, override || {});
-        const buildInput = buildLocalBuildProviderInput(payload, {
-          effectiveIdentity,
-          pageEditableComponents,
-        });
-        const foundation = buildLocalBuildFoundation(buildInput, {
-          selectedConceptId: approvedPlan?.selectedConcept?.conceptId,
-          selectedConceptLabel: approvedPlan?.selectedConcept?.conceptLabel,
-        });
-        const slotIds = Array.isArray(foundation?.request?.targetGroup?.slotIds)
-          ? foundation.request.targetGroup.slotIds
-          : [];
-        const referenceArtifacts = buildRuntimeReferenceArtifacts(pageId, payload.viewportProfile, slotIds);
-        if (!referenceArtifacts?.rawShellHtml) {
-          return sendJson(res, 404, { error: "reference_page_shell_not_found", pageId, viewportProfile: payload.viewportProfile || "pc" });
-        }
-        const conceptPackage = buildConceptPackageFromRequirementPlan(approvedPlan, {
-          viewportProfile: referenceArtifacts.viewportProfile || payload.viewportProfile,
-          pageIdentity: effectiveIdentity,
-          targetGroupId: payload.targetGroupId,
-          targetGroupLabel: payload.targetGroupLabel,
-          targetScope: payload.targetScope,
-          patchDepth: payload.patchDepth,
-          designChangeLevel: payload.designChangeLevel,
-        });
-        const authorInput = buildDesignAuthorInput({
-          pageId,
-          viewportProfile: referenceArtifacts.viewportProfile,
-          conceptPackage,
-          referenceContext: {
-            rawShellHtml: referenceArtifacts.rawShellHtml,
-            currentPageHtmlExcerpt: referenceArtifacts.rawShellHtml,
-            currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-          },
-          currentSectionContext: {
-            currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-            currentSectionAssetMap:
-              referenceArtifacts.currentSectionAssetMap && typeof referenceArtifacts.currentSectionAssetMap === "object"
-                ? referenceArtifacts.currentSectionAssetMap
-                : Object.fromEntries(
-                    Object.entries(referenceArtifacts.currentSectionHtmlMap || {}).map(([slotId]) => [
-                      slotId,
-                      Object.entries(referenceArtifacts.currentPageAssetMap || {})
-                        .filter(([assetSlotId]) => String(assetSlotId || "").startsWith(`${slotId}-`))
-                        .map(([assetSlotId, sourceUrl]) => ({ assetSlotId, source: sourceUrl })),
-                    ])
-                  ),
-          },
-        });
-        const authorSequencePlan = buildSectionSequencePlan(authorInput);
-        const designAuthorProvider = normalizeDesignAuthorProvider(payload.builderProvider || payload.authorProvider || "local");
-        const designAuthorModel = String(payload.designAuthorModel || payload.authorModel || payload.model || "").trim();
-        const bypassDesignModelProfile =
-          designAuthorProvider === "openrouter" &&
-          designAuthorModel &&
-          (payload.bypassDesignModelProfile === true || String(payload.bypassDesignModelProfile || "").trim() === "1");
-        const authorResult = designAuthorProvider === "openrouter"
-          ? withTemporaryEnv(
-              bypassDesignModelProfile ? { DESIGN_MODEL_PROFILE_BYPASS: "1" } : {},
-              () => buildLlmAuthoredSectionHtmlPackage({
-                pageId,
-                viewportProfile: referenceArtifacts.viewportProfile,
-                authorInput,
-                cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
-                referenceContext: {
-                  currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-                  currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-                },
-              }, designAuthorModel ? { model: designAuthorModel } : {})
-            )
-          : Promise.resolve({
-              package: buildLocalAuthoredSectionHtmlPackage({
-                pageId,
-                viewportProfile: referenceArtifacts.viewportProfile,
-                authorInput,
-                cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
-                referenceContext: {
-                  currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-                  currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-                },
-              }),
-              providerMeta: {
-                provider: "local",
-                usedDemoFallback: false,
-              },
-            });
-        return Promise.resolve(authorResult).then((resolvedAuthorResult) => {
-        let authoredSectionHtmlPackage =
-          resolvedAuthorResult?.package && typeof resolvedAuthorResult.package === "object"
-              ? enrichAuthoredSectionHtmlPackageWithAuthorInput({
-                  authoredSectionHtmlPackage: resolvedAuthorResult.package,
-                  authorInput,
-                  cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
-                })
-              : buildLocalAuthoredSectionHtmlPackage({
-                  pageId,
-                  viewportProfile: referenceArtifacts.viewportProfile,
-                  authorInput,
-                  cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
-                  referenceContext: {
-                    currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-                  currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-                },
-              });
-          const authorInputSnapshot = buildDesignAuthorInputSnapshot(authorInput);
-          const normalizedAssetUsage = normalizeAuthoredAssetUsage({
-            authoredSectionHtmlPackage,
-            authorInputSnapshot,
-          });
-          authoredSectionHtmlPackage = normalizedAssetUsage?.package || authoredSectionHtmlPackage;
-          const authoredSectionMarkdownDocument =
-            String(resolvedAuthorResult?.document || "").trim() ||
-            buildLocalAuthoredSectionMarkdownDocument({
-              pageId,
-              viewportProfile: referenceArtifacts.viewportProfile,
-              authorInput,
-              cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
-              referenceContext: {
-                currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-                currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-              },
-            });
-          const authorProviderMeta =
-            resolvedAuthorResult?.providerMeta && typeof resolvedAuthorResult.providerMeta === "object"
-              ? resolvedAuthorResult.providerMeta
-              : { provider: designAuthorProvider };
-        const authoringStageTrace = buildAuthoringStageTrace({
-          payload,
-          approvedPlan,
-          pageEditableComponents,
-          buildInput,
-          foundation,
-          referenceArtifacts,
-          conceptPackage,
-          authorInput,
-          sequencePlan: authorSequencePlan,
-          authorProviderMeta,
-        });
-        const designAuthorFailureDebug =
-          authorProviderMeta?.provider === "local-fallback"
-            ? {
-                error: String(authorProviderMeta.error || "").trim(),
-                diagnostics:
-                  authorProviderMeta.diagnostics && typeof authorProviderMeta.diagnostics === "object"
-                    ? authorProviderMeta.diagnostics
-                    : null,
-                rawDocumentPreview: String(authorProviderMeta.rawDocumentPreview || "").trim(),
-                failedDocument: String(authorProviderMeta.failedDocument || "").trim(),
-                failedRawDocument: String(authorProviderMeta.failedRawDocument || "").trim(),
-                authoringStageTrace,
-              }
-            : null;
-        const authorOutputValidation = validateDesignAuthorOutput({
-          authoredSectionMarkdownDocument,
-          authoredSectionHtmlPackage,
-          conceptPackage,
-          authorInputSnapshot,
-          validationContext: {
-            referencePageShell: {
-              pageId,
-              viewportProfile: referenceArtifacts.viewportProfile,
-              rawShellHtml: referenceArtifacts.rawShellHtml,
-              sectionBoundaryMap: referenceArtifacts.sectionBoundaryMap,
-              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-              currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-            },
-            assetResolutionContext: {
-              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-            },
-            sanitizePolicy: {
-              stripScripts: true,
-              stripInlineHandlers: true,
-              stripJavascriptUrls: true,
-            },
-          },
-        });
-        if (!authorOutputValidation?.deliveryReadiness?.readyForRuntime) {
-          return sendJson(res, 422, {
-            error: "design_author_output_not_ready",
-            validation: authorOutputValidation,
-            conceptPackage: sanitizeAuthoringSnapshotForStorage(conceptPackage),
-            authorInput: sanitizeAuthoringSnapshotForStorage(authorInputSnapshot),
-            authorProviderMeta,
-          });
-        }
-        const runtimeResult = renderRuntimeDraft({
-          authoredSectionMarkdownDocument,
-          authoredSectionHtmlPackage,
-          referencePageShell: {
-            pageId,
-            viewportProfile: referenceArtifacts.viewportProfile,
-            rawShellHtml: referenceArtifacts.rawShellHtml,
-            sectionBoundaryMap: referenceArtifacts.sectionBoundaryMap,
-          },
-          runtimeContext: {
-            assetResolutionContext: {
-              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-            },
-          },
-        });
-        const runtimeDraft = runtimeResult?.draftBuild && typeof runtimeResult.draftBuild === "object"
-          ? runtimeResult.draftBuild
-          : {};
-        const storedConceptPackage = sanitizeAuthoringSnapshotForStorage(conceptPackage);
-        const storedAuthorInputSnapshot = sanitizeAuthoringSnapshotForStorage(authorInputSnapshot);
-        const storedAuthoringStageTrace = sanitizeAuthoringSnapshotForStorage(authoringStageTrace);
-        const storedFoundation = sanitizeAuthoringSnapshotForStorage(foundation);
-        const draftItem = sanitizeAuthoringSnapshotForStorage({
-          ...runtimeDraft,
-          id: String(runtimeDraft.id || "").trim() || `runtime-draft-${Date.now()}`,
-          planId: String(payload.planId || "").trim(),
-          summary: foundation?.draft?.summary || runtimeDraft.summary || "runtime authored html draft",
-          builderProvider: designAuthorProvider,
-          builderVersion: "design-runtime-v1",
-          rendererSurface: "tailwind",
-          targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
-          executionStrategy: {
-            builderProvider: designAuthorProvider,
-            rendererSurface: "tailwind",
-            targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
-          },
-          operations: Array.isArray(foundation?.draft?.operations) ? foundation.draft.operations : [],
-          report: {
-            ...(foundation?.draft?.report && typeof foundation.draft.report === "object" ? foundation.draft.report : {}),
-            authoredSections: runtimeDraft?.report?.authoredSections || [],
-            sanitizeRemoved: runtimeDraft?.report?.sanitizeRemoved || [],
-            resolvedAssets: runtimeDraft?.report?.resolvedAssets || [],
-          },
-          snapshotData: {
-            ...(runtimeDraft?.snapshotData && typeof runtimeDraft.snapshotData === "object" ? runtimeDraft.snapshotData : {}),
-            source: "design-runtime-local-build-draft",
-            pageId,
-            workspacePageId: pageId,
-            builderProvider: designAuthorProvider,
-            patchDepth: String(payload.patchDepth || "medium").trim() || "medium",
-            interventionLayer: String(payload.interventionLayer || "section-group").trim() || "section-group",
-            targetGroupId: String(foundation?.request?.targetGroup?.groupId || payload.targetGroupId || "").trim(),
-            executionMode: "authored-section-html",
-            cloneRenderModel: foundation?.draft?.cloneRenderModel || null,
-            conceptPackage: storedConceptPackage,
-            designAuthorInput: storedAuthorInputSnapshot,
-            designAuthorOutputValidation: authorOutputValidation,
-            designAuthorProviderMeta: authorProviderMeta,
-            designAuthorFailureDebug,
-            authoredSectionMarkdownDocument,
-            authoredSectionHtmlPackage,
-            authoringStageTrace: storedAuthoringStageTrace,
-            referencePageShell: {
-              pageId,
-              viewportProfile: referenceArtifacts.viewportProfile,
-              rawShellHtml: referenceArtifacts.rawShellHtml,
-              currentPageHtmlExcerpt: referenceArtifacts.rawShellHtml,
-              sectionBoundaryMap: referenceArtifacts.sectionBoundaryMap,
-              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-              currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-            },
-            currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-            currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-            runtimeAdvisory: Array.isArray(runtimeResult?.advisory) ? runtimeResult.advisory : [],
-          },
-        });
-        const saved = saveDraftBuild(user.userId, draftItem);
-        return sendJson(res, 200, {
+        const jobId = `workspace-build-local-draft-job-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+        const queuedAt = new Date().toISOString();
+        const pollUrl = `/api/workspace/build-local-draft/jobs/${encodeURIComponent(jobId)}`;
+        setWorkspaceBuildLocalDraftJob(jobId, {
           ok: true,
-          item: saved,
-          previewPath: `/runtime-draft/${encodeURIComponent(String(saved?.id || "").trim())}`,
-          comparePath: `/runtime-compare/${encodeURIComponent(String(saved?.id || "").trim())}`,
-          providerResult: {
-            ...storedFoundation,
-            conceptPackage: storedConceptPackage,
-            authorInput: storedAuthorInputSnapshot,
-            authorOutputValidation,
-            authorProviderMeta,
-            designAuthorFailureDebug,
-            authoringStageTrace: storedAuthoringStageTrace,
-            authoredSectionMarkdownDocument,
-            authoredSectionHtmlPackage,
-            referenceArtifacts: {
-              pageId: referenceArtifacts.pageId,
-              viewportProfile: referenceArtifacts.viewportProfile,
-              currentSectionHtmlMap: referenceArtifacts.currentSectionHtmlMap,
-              currentPageAssetMap: referenceArtifacts.currentPageAssetMap,
-            },
-            runtimeAdvisory: runtimeResult?.advisory || [],
-          },
+          status: "queued",
+          stage: "queued",
+          message: "Workspace build-local-draft job queued.",
+          percent: 0,
+          userId: user.userId,
+          pageId,
+          viewportProfile: String(payload.viewportProfile || "pc").trim() || "pc",
+          queuedAt,
+          pollUrl,
         });
+        setImmediate(async () => {
+          setWorkspaceBuildLocalDraftJob(jobId, {
+            status: "running",
+            stage: "building_draft",
+            message: "Building runtime draft.",
+            percent: 10,
+            startedAt: new Date().toISOString(),
+          });
+          try {
+            const result = await withOpenwebuiBuilderJobTimeout(
+              buildRuntimeDraftForBuilderPayload({ user, payload, externalOwner: null }),
+              jobId
+            );
+            setWorkspaceBuildLocalDraftJob(jobId, buildWorkspaceBuildLocalDraftJobDonePatch(result));
+          } catch (error) {
+            setWorkspaceBuildLocalDraftJob(jobId, {
+              ...normalizeBuilderJobFailure(error, "workspace_build_local_draft_failed"),
+              stage: "failed",
+              message: "Workspace build-local-draft failed.",
+              percent: 100,
+            });
+          }
+        });
+        return sendJson(res, 202, {
+          ok: true,
+          jobId,
+          status: "queued",
+          pollUrl,
+          queuedAt,
         });
       })
       .catch((error) => sendJson(res, 500, { error: "workspace_build_local_draft_failed", detail: String(error) }));
   }
   if (pathname === "/api/workspace/runtime-draft" && req.method === "POST") {
+    const user = requireAuthenticatedUser(req, res);
+    if (!user) return;
     return readBody(req)
       .then((body) => {
-        const user = requireAuthenticatedUser(req, res);
-        if (!user) return;
-        const payload = body ? JSON.parse(body) : {};
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload;
         const authoredSectionMarkdownDocument = String(payload.authoredSectionMarkdownDocument || "").trim();
         const authoredSectionHtmlPackage =
           payload.authoredSectionHtmlPackage && typeof payload.authoredSectionHtmlPackage === "object"
@@ -32893,13 +36130,28 @@ function route(req, res) {
   if (pathname === "/api/workspace/share-draft" && req.method === "POST") {
     return readBody(req)
       .then((body) => {
-        const user = requireAuthenticatedUser(req, res);
-        if (!user) return;
-        const payload = body ? JSON.parse(body) : {};
+        const parsed = parseJsonBodyOr400(body, res);
+        if (!parsed.ok) return;
+        const payload = parsed.payload || {};
         const draftBuildId = String(payload.draftBuildId || payload.buildId || "").trim();
         const pageId = String(payload.pageId || "").trim();
         const viewportProfile = String(payload.viewportProfile || "pc").trim() || "pc";
         if (!draftBuildId || !pageId) return sendJson(res, 400, { error: "draft_build_id_and_page_id_required" });
+        let user = getUserFromRequest(req);
+        if (!user) {
+          const tokenPayload = verifyPreviewToken(payload.token || "");
+          const tokenDraftBuildId = String(tokenPayload?.draftBuildId || "").trim();
+          const tokenUserId = String(tokenPayload?.userId || "").trim();
+          if (tokenPayload && tokenDraftBuildId === draftBuildId && tokenUserId) {
+            user = {
+              userId: tokenUserId,
+              loginId: "openwebui-preview-token",
+              displayName: "Open WebUI Preview",
+              previewToken: true,
+            };
+          }
+        }
+        if (!user) return sendJson(res, 401, { error: "auth_or_preview_token_required" });
         const draftBuild = findDraftBuildById(user.userId, draftBuildId);
         if (!draftBuild) return sendJson(res, 404, { error: "draft_build_not_found" });
         const draftPageId = String(draftBuild.pageId || "").trim();

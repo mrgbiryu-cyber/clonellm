@@ -143,8 +143,8 @@ function normalizeBuilderV2Request(payload = {}, matchedPlan = null) {
         matchedPlan?.input?.userInput?.builderMode ||
         matchedPlan?.output?.requirementPlan?.builderMode ||
         process.env.BUILDER_DEFAULT_MODE ||
-        "compare",
-      "compare"
+        "standard",
+      "standard"
     ),
     rendererSurface: normalizeRendererSurface(
       rendererSurfaceValue,

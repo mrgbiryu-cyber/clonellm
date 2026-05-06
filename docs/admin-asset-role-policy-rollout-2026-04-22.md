@@ -219,6 +219,25 @@ Next step:
 
 - separate “card is complete promo surface” vs “promo art reused as background”
 
+### CSS composition / lower home sections
+
+Policy:
+
+- `css-composition-section`
+
+Covered slots:
+
+- `smart-life`
+- `missed-benefits`
+- `lg-best-care`
+- `bestshop-guide`
+
+Rules:
+
+- these sections are primarily CSS composition/replay surfaces, so new full-bleed imagery is not required
+- when card media is needed, use `background-only`, `object-only`, or `reference-only`
+- avoid treating complete promo artwork as a new overlaid background
+
 ### More pages need real generated families
 
 Quickmenu now has a generated icon family.

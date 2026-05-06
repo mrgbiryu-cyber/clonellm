@@ -5294,7 +5294,7 @@
             tone: "active",
             title: "디자인 생성 중",
             description: "현재 컨셉서 기준으로 빌더 결과를 생성하고 있습니다.",
-            primaryId: state.hasJourneyPlan || state.hasJourneyIntent ? "runJourneyBuildBtn" : "runBatchedComposeBtn",
+            primaryId: state.hasJourneyPlan || state.hasJourneyIntent ? "runJourneyBuildBtn" : "launchBuilderBtn",
           };
         }
         if (!state.hasRequirements) {
@@ -5359,10 +5359,8 @@
           return {
             tone: "active",
             title: "현재 컨셉서로 페이지 첫 생성",
-            description: state.isMobile
-              ? "컨셉서는 유지하고, 현재 모바일 페이지의 디자인 결과를 생성합니다."
-              : "현재 자동 배치 생성은 모바일부터 지원합니다.",
-            primaryId: "runBatchedComposeBtn",
+            description: "컨셉서는 유지하고, 현재 페이지의 디자인 결과를 생성합니다.",
+            primaryId: "launchBuilderBtn",
           };
         }
         if (state.statuses.builder === "stale") {
@@ -5370,7 +5368,7 @@
             tone: "active",
             title: "현재 컨셉서로 다시 생성",
             description: "컨셉서 또는 요구사항이 결과보다 최신입니다. 기존 컨셉서를 유지하고 빌더만 다시 실행하세요.",
-            primaryId: "runBatchedComposeBtn",
+            primaryId: "launchBuilderBtn",
           };
         }
         if (!state.hasSavedVersion) {
@@ -6958,10 +6956,25 @@
             : buildBuilderStatusLabel(page);
         }
         if (launchBuilderBtnEl) {
-          launchBuilderBtnEl.hidden = true;
-          launchBuilderBtnEl.disabled = true;
-          launchBuilderBtnEl.textContent = "구버전 단일 빌더";
-          setButtonEmphasis(launchBuilderBtnEl, false);
+          const shouldShowSingleBuilder = workflowState.hasPlan && !workflowState.hasJourneyIntent && !hasJourneyPlan;
+          const canRunSingleBuilder = shouldShowSingleBuilder &&
+            !currentContentLoading &&
+            runState !== "running" &&
+            workflowState.hasRequirements &&
+            workflowState.statuses.prd !== "stale" &&
+            !workflowState.journeyFlowMismatch;
+          launchBuilderBtnEl.hidden = !shouldShowSingleBuilder;
+          launchBuilderBtnEl.disabled = !canRunSingleBuilder;
+          launchBuilderBtnEl.textContent = runState === "running"
+            ? "빌더 실행 중..."
+            : workflowState.statuses.prd === "stale"
+              ? "컨셉서 갱신 필요"
+              : !workflowState.hasDraft
+                ? "빌더 승인 및 실행"
+                : workflowState.statuses.builder === "stale"
+                  ? "현재 컨셉서로 다시 생성"
+                  : "같은 컨셉서로 다시 생성";
+          setButtonEmphasis(launchBuilderBtnEl, nextAction.primaryId === "launchBuilderBtn");
         }
         if (saveBuilderVersionBtnEl) {
           if (hasJourneyPlan) {
@@ -8442,7 +8455,15 @@
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify(buildLocalBuildPreviewPayload(page, requirementDraft)),
             });
-            const savedDraft = payload?.item || null;
+            const buildJob = payload?.status === "queued" && payload?.pollUrl
+              ? await pollWorkspaceBuildLocalDraftJob(payload.pollUrl)
+              : payload;
+            if (buildJob?.status === "failed") {
+              const error = new Error(buildJob.userMessage || buildJob.detail || buildJob.error || "workspace_build_local_draft_failed");
+              error.payload = buildJob;
+              throw error;
+            }
+            const savedDraft = buildJob?.item || null;
             setBuilderRunState(page.id, "idle");
             setLocalBuildPreview(page, null);
             if (savedDraft?.id) {
@@ -8611,6 +8632,28 @@
           await new Promise((resolve) => window.setTimeout(resolve, 7000));
         }
         throw new Error("journey_build_timeout");
+      }
+
+      async function pollWorkspaceBuildLocalDraftJob(pollUrl, { timeoutMs = 1200000 } = {}) {
+        const normalizedPollUrl = String(pollUrl || "").trim();
+        if (!normalizedPollUrl) throw new Error("workspace_build_local_draft_poll_url_missing");
+        const startedAt = Date.now();
+        while (Date.now() - startedAt < timeoutMs) {
+          const job = await fetchJson(normalizedPollUrl);
+          if (job.status === "done" || job.status === "failed") return job;
+          setInlineFeedback(
+            builderFeedbackEl,
+            [
+              "디자인 생성 job이 진행 중입니다.",
+              job.stage ? `단계: ${job.stage}` : "",
+              Number.isFinite(Number(job.percent)) ? `${Number(job.percent).toFixed(0)}%` : "",
+            ].filter(Boolean).join(" "),
+          );
+          const elapsedMs = Date.now() - startedAt;
+          const intervalMs = elapsedMs < 15000 ? 2000 : elapsedMs < 60000 ? 5000 : 10000;
+          await new Promise((resolve) => window.setTimeout(resolve, intervalMs));
+        }
+        throw new Error("workspace_build_local_draft_timeout");
       }
 
       async function runJourneyBuildExecution(page) {
